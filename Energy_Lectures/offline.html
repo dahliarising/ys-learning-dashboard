@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#12151C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>오프라인 — 에너지 OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Noto+Sans+KR:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#12151C;--surface:#1A1E27;--border:#2A2E3A;
+  --text:#E8E6E1;--text-dim:#9A9A9A;
+  --accent:#8A6ABF;--gold:#E8C96A;
+}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Noto Sans KR',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:24px;text-align:center;
+}
+.offline-icon{
+  font-size:4rem;margin-bottom:24px;
+  animation:float 3s ease-in-out infinite;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-12px);}
+}
+h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.8rem;font-weight:600;
+  color:var(--gold);margin-bottom:12px;
+}
+.subtitle{
+  font-size:0.95rem;color:var(--text-dim);
+  line-height:1.7;margin-bottom:32px;
+  max-width:360px;
+}
+.tip-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:20px 24px;
+  max-width:400px;width:100%;margin-bottom:24px;
+  text-align:left;
+}
+.tip-card h3{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.8rem;color:var(--accent);
+  margin-bottom:10px;letter-spacing:0.5px;
+}
+.tip-card p{
+  font-size:0.85rem;line-height:1.7;color:var(--text-dim);
+}
+.tip-card .highlight{color:var(--gold);font-weight:700;}
+.retry-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(138,106,191,0.15);
+  border:1px solid var(--accent);
+  color:var(--accent);border-radius:8px;
+  padding:12px 24px;font-size:0.9rem;
+  font-family:'JetBrains Mono',monospace;
+  cursor:pointer;transition:all 0.3s;
+  text-decoration:none;
+}
+.retry-btn:hover,.retry-btn:active{
+  background:rgba(138,106,191,0.3);
+  transform:translateY(-1px);
+}
+.cached-list{
+  margin-top:32px;max-width:400px;width:100%;
+}
+.cached-list h3{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.75rem;color:var(--text-dim);
+  margin-bottom:12px;
+}
+.cached-days{
+  display:flex;flex-wrap:wrap;gap:6px;
+  justify-content:center;
+}
+.cached-day{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;padding:4px 10px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;color:var(--text-dim);
+  text-decoration:none;transition:all 0.2s;
+}
+.cached-day:hover{border-color:var(--accent);color:var(--accent);}
+.cached-day.available{border-color:var(--gold);color:var(--gold);}
+.brand{
+  margin-top:40px;font-family:'JetBrains Mono',monospace;
+  font-size:0.65rem;color:var(--text-dim);opacity:0.5;
+}
+</style>
+</head>
+<body>
+
+<div class="offline-icon">⚡</div>
+<h1>오프라인 상태입니다</h1>
+<p class="subtitle">
+  네트워크에 연결되지 않았습니다.<br>
+  이전에 열어본 강의는 캐시에서 볼 수 있습니다.
+</p>
+
+<div class="tip-card">
+  <h3>💡 OFFLINE TIP</h3>
+  <p>
+    출퇴근 전에 <span class="highlight">Wi-Fi 연결 상태에서 강의를 한 번 열어두면</span>
+    오프라인에서도 자동으로 캐시됩니다.
+    최초 접속 시 전체 50일 강의가 자동 캐시됩니다.
+  </p>
+</div>
+
+<a class="retry-btn" href="javascript:location.reload()">
+  🔄 다시 연결 시도
+</a>
+
+<div class="cached-list">
+  <h3>📦 캐시된 강의 (클릭하여 이동)</h3>
+  <div class="cached-days" id="cachedDays">
+    <span class="cached-day" style="color:var(--text-dim);">확인 중...</span>
+  </div>
+</div>
+
+<div class="brand">에너지 OS</div>
+
+<script>
+// Check which days are cached and show them
+(async function(){
+  const container = document.getElementById('cachedDays');
+  if (!('caches' in window)) {
+    container.innerHTML = '<span class="cached-day">캐시 API 미지원</span>';
+    return;
+  }
+  try {
+    const cache = await caches.open('energy-os-v1');
+    const keys = await cache.keys();
+    const cached = keys
+      .map(r => {
+        const m = r.url.match(/day(\d+)_/);
+        return m ? parseInt(m[1]) : null;
+      })
+      .filter(Boolean)
+      .sort((a, b) => a - b);
+
+    if (cached.length === 0) {
+      container.innerHTML = '<span class="cached-day">캐시된 강의 없음</span>';
+      return;
+    }
+
+    container.innerHTML = '';
+    for (let d = 1; d <= 50; d++) {
+      const isCached = cached.includes(d);
+      // Find filename from cache
+      const match = keys.find(r => r.url.includes(`day${String(d).padStart(2,'0')}_`));
+      if (isCached && match) {
+        const url = new URL(match.url);
+        const a = document.createElement('a');
+        a.className = 'cached-day available';
+        a.href = url.pathname.split('/').pop();
+        a.textContent = `D${String(d).padStart(2,'0')}`;
+        container.appendChild(a);
+      } else {
+        const span = document.createElement('span');
+        span.className = 'cached-day';
+        span.textContent = `D${String(d).padStart(2,'0')}`;
+        container.appendChild(span);
+      }
+    }
+  } catch(e) {
+    container.innerHTML = '<span class="cached-day">캐시 확인 실패</span>';
+  }
+})();
+
+// Auto-retry when connection is restored
+window.addEventListener('online', () => {
+  location.reload();
+});
+</script>
+</body>
+</html>

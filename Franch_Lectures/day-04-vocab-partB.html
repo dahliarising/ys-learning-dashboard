@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 04 — 자동차 부품 어휘 Part B: 브레이크·파워트레인·차체</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════ RESET & BASE ═══════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-alt: #181C26;
+  --terracotta: #BF6A4A;
+  --gold: #C9A84C;
+  --text: #E8E4DF;
+  --text-dim: #8A8680;
+  --text-bright: #F5F2ED;
+  --accent-glow: rgba(191,106,74,0.15);
+  --gold-glow: rgba(201,168,76,0.12);
+  --border: #2A2D35;
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Noto Sans KR', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+}
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.75;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--terracotta); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ═══════════════════ STICKY HEADER ═══════════════════ */
+.sticky-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sticky-header .logo {
+  font-family: var(--font-heading);
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--terracotta);
+  letter-spacing: 0.05em;
+}
+.sticky-header .day-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--gold);
+  background: var(--gold-glow);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid rgba(201,168,76,0.25);
+}
+.sticky-header .series-info {
+  font-size: 0.7rem; color: var(--text-dim);
+}
+
+/* ═══════════════════ HERO SECTION ═══════════════════ */
+.hero {
+  text-align: center;
+  padding: 4rem 1.5rem 3rem;
+  background: linear-gradient(180deg, rgba(191,106,74,0.08) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+}
+.hero .overline {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 0.4rem;
+  line-height: 1.2;
+}
+.hero .subtitle {
+  font-size: 1rem; color: var(--text-dim);
+  margin-bottom: 2rem;
+}
+
+/* ═══════════════════ SECTION LAYOUT ═══════════════════ */
+.container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+section { padding: 3rem 0; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 1.8rem; font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+.card-alt { background: var(--bg-card-alt); }
+
+/* ═══════════════════ TECHNICAL NOTE BOX ═══════════════════ */
+.tech-box {
+  background: linear-gradient(135deg, rgba(191,106,74,0.08), rgba(201,168,76,0.06));
+  border: 1px solid rgba(191,106,74,0.2);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.tech-box h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.tech-box .note {
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--terracotta);
+}
+.tech-box .note strong { color: var(--gold); font-weight: 500; }
+.tech-box .note p { font-size: 0.9rem; color: var(--text-dim); margin-top: 0.2rem; }
+
+/* ═══════════════════ 5-COLUMN TABLE ═══════════════════ */
+.expr-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.expr-table th {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 0.8rem 0.6rem;
+  border-bottom: 2px solid var(--border);
+  white-space: normal;
+  word-wrap: break-word;
+}
+.expr-table td {
+  padding: 0.65rem 0.6rem;
+  border-bottom: 1px solid rgba(42,45,53,0.5);
+  font-size: 0.85rem;
+  vertical-align: top;
+}
+.expr-table tr:hover { background: rgba(191,106,74,0.04); }
+.expr-table .fr-word {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--terracotta);
+  font-size: 1rem;
+}
+.expr-table .play-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: rgba(191,106,74,0.2);
+  border: 1px solid rgba(191,106,74,0.4);
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 0.4rem;
+  font-size: 0.7rem;
+  transition: all 0.2s;
+}
+.expr-table .play-btn:hover {
+  background: rgba(191,106,74,0.4);
+  border-color: var(--terracotta);
+}
+.pronunciation {
+  font-family: var(--font-mono);
+  font-style: italic;
+  color: var(--gold);
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+.approx-ko {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+/* ═══════════════════ GRAMMAR SVG ═══════════════════ */
+.grammar-visual { margin: 1rem 0; border-radius: 12px; overflow: hidden; }
+.grammar-visual svg { width: 100%; height: auto; display: block; }
+.grammar-note {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  background: rgba(201,168,76,0.06);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+}
+.grammar-note strong { color: var(--gold); font-weight: 500; }
+
+/* ═══════════════════ DIALOGUE ═══════════════════ */
+.dialogue { margin: 1.5rem 0; }
+.dialogue-line {
+  display: flex; gap: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.6rem;
+}
+.speaker-a { background: rgba(191,106,74,0.06); border: 1px solid rgba(191,106,74,0.15); }
+.speaker-b { background: rgba(201,168,76,0.04); border: 1px solid rgba(201,168,76,0.1); }
+.speaker-name {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  min-width: 90px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+.dialogue-text { flex: 1; }
+.fr-line {
+  font-family: var(--font-heading);
+  font-size: 1.05rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.2rem;
+}
+.ko-line { font-size: 0.85rem; color: var(--text-dim); }
+.dialogue-play {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+}
+.dialogue-play button {
+  background: rgba(191,106,74,0.2);
+  border: 1px solid rgba(191,106,74,0.3);
+  color: var(--terracotta);
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+.dialogue-play button:hover {
+  background: rgba(191,106,74,0.4);
+  border-color: var(--terracotta);
+}
+
+/* ═══════════════════ PRONUNCIATION DRILL ═══════════════════ */
+.pron-drill { margin: 1.5rem 0; }
+.pron-item {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1.2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 0.8rem;
+}
+.pron-item .number {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--terracotta);
+  font-weight: 700;
+  min-width: 24px;
+}
+.pron-item .content { flex: 1; }
+.pron-word {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--terracotta);
+  font-size: 1.1rem;
+  margin-bottom: 0.2rem;
+}
+.pron-ipa {
+  font-family: var(--font-mono);
+  font-style: italic;
+  color: var(--gold);
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+}
+.pron-tip { font-size: 0.88rem; color: var(--text-dim); line-height: 1.6; }
+
+/* ═══════════════════ QUIZ ═══════════════════ */
+.quiz-container { margin: 2rem 0; }
+.quiz-question {
+  background: rgba(191,106,74,0.06);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--gold);
+}
+.quiz-q-text {
+  font-size: 1rem;
+  color: var(--text);
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.quiz-option {
+  padding: 0.8rem;
+  background: rgba(201,168,76,0.05);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  user-select: none;
+}
+.quiz-option:hover {
+  background: rgba(201,168,76,0.12);
+  border-color: var(--gold);
+}
+.quiz-option.selected {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  color: var(--bg);
+  font-weight: 600;
+}
+.quiz-option.correct {
+  background: #2d5016;
+  border-color: #4a7c24;
+  color: #9ff080;
+}
+.quiz-option.incorrect {
+  background: #5c1a1a;
+  border-color: #a73a3a;
+  color: #ff8080;
+}
+
+/* ═══════════════════ DIALOGUE REVIEW BOX ═══════════════════ */
+.dialogue-review {
+  background: linear-gradient(135deg, rgba(201,168,76,0.06), rgba(191,106,74,0.04));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+.dialogue-review h3 {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.review-item {
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.review-item:last-child {
+  border-bottom: none;
+}
+.review-label {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+}
+.review-text {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  color: var(--terracotta);
+  font-weight: 500;
+}
+
+/* ═══════════════════ SHADOWING SYSTEM ═══════════════════ */
+.shadow-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+.shadow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.shadow-title {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--gold);
+}
+.shadow-controls {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+.shadow-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(191,106,74,0.15);
+  border: 1px solid rgba(191,106,74,0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.shadow-btn:hover {
+  background: rgba(191,106,74,0.3);
+  border-color: var(--terracotta);
+  transform: scale(1.05);
+}
+.shadow-btn.active {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  color: var(--bg);
+}
+.speed-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+.speed-control input {
+  width: 60px;
+  accent-color: var(--terracotta);
+}
+.shadow-item {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+  transition: all 0.3s;
+}
+.shadow-item.active-phrase {
+  background: rgba(191,106,74,0.12);
+  border-color: var(--terracotta);
+  transform: scale(1.02);
+}
+.shadow-item.done-phrase {
+  opacity: 0.6;
+}
+.shadow-item-fr {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.3rem;
+}
+.shadow-item-ko {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+.shadow-progress {
+  margin: 1.5rem 0 1rem;
+}
+.shadow-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+.shadow-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--terracotta), var(--gold));
+  width: 0%;
+  transition: width 0.3s ease;
+}
+.shadow-progress-text {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  text-align: right;
+}
+.shadow-status {
+  font-size: 0.9rem;
+  color: var(--gold);
+  padding: 0.8rem;
+  background: rgba(201,168,76,0.06);
+  border-radius: 6px;
+  text-align: center;
+  margin-top: 1rem;
+  min-height: 1.5rem;
+}
+
+/* ═══════════════════ VOICE SELECTOR ═══════════════════ */
+#voiceSelectorContainer {
+  margin-bottom: 1rem;
+}
+#voiceSelectorContainer select {
+  background: var(--bg-card-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+/* ═══════════════════ FOOTER ═══════════════════ */
+footer {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+}
+</style>
+</head>
+<body>
+
+<div class="sticky-header">
+  <div class="logo">🎓 Renault Korea</div>
+  <div class="day-tag">DAY 04</div>
+  <div class="series-info">자동차 부품 어휘 Part B — 약 15분</div>
+</div>
+
+<div class="hero">
+  <div class="overline">● Module 자동차 부품 어휘</div>
+  <h1>자동차 부품 어휘 Part B</h1>
+  <div class="subtitle">브레이크·파워트레인·차체 (Freins·Chaîne de traction·Carrosserie)</div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════ 1. BRAKE VOCABULARY ═══════════════════ -->
+<section>
+<div class="section-label">● 1부: 브레이크 시스템</div>
+<h2 class="section-title">브레이크 시스템 (Système de freinage)</h2>
+
+<div class="tech-box">
+<h3>🔧 기술 유의사항</h3>
+<div class="note">
+<strong>프랑스어 발음:</strong> 브레이크 용어는 모두 기술적 정확도가 매우 높습니다. <strong>-e 또는 -que로 끝나는 단어는 최종 자음이 묵음</strong>입니다. <strong>/ʁ/는 항상 강하게 "흐"로 발음</strong>하세요.
+<p style="margin-top: 0.5rem;">예: "frein" /fʁɛ̃/ → "프흐앵" (NOT "프렌")</p>
+</div>
+</div>
+
+<div class="card">
+<table class="expr-table">
+<thead>
+<tr>
+<th>프랑스어</th>
+<th>IPA</th>
+<th>한국어 근사음</th>
+<th>한국어 뜻</th>
+<th>사용 상황</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="fr-word">le frein</span></td>
+<td><span class="pronunciation">/fʁɛ̃/</span></td>
+<td><span class="approx-ko">프흐앵</span></td>
+<td>브레이크</td>
+<td>일반적인 제동 장치</td>
+</tr>
+<tr>
+<td><span class="fr-word">le disque de frein</span></td>
+<td><span class="pronunciation">/disk də fʁɛ̃/</span></td>
+<td><span class="approx-ko">디스크 드 프흐앵</span></td>
+<td>브레이크 디스크</td>
+<td>원판식 브레이크 부품</td>
+</tr>
+<tr>
+<td><span class="fr-word">la plaquette de frein</span></td>
+<td><span class="pronunciation">/plakɛt də fʁɛ̃/</span></td>
+<td><span class="approx-ko">플라껫 드 프흐앵</span></td>
+<td>브레이크 패드</td>
+<td>디스크를 누르는 마찰재</td>
+</tr>
+<tr>
+<td><span class="fr-word">l'étrier</span></td>
+<td><span class="pronunciation">/etʁije/</span></td>
+<td><span class="approx-ko">에트흐이에</span></td>
+<td>브레이크 캘리퍼</td>
+<td>패드를 누르는 틀</td>
+</tr>
+<tr>
+<td><span class="fr-word">le maître-cylindre</span></td>
+<td><span class="pronunciation">/mɛtʁ silɛ̃dʁ/</span></td>
+<td><span class="approx-ko">메뜨흐 실랑드흐</span></td>
+<td>마스터 실린더</td>
+<td>브레이크액 압력 발생</td>
+</tr>
+<tr>
+<td><span class="fr-word">le cylindre de roue</span></td>
+<td><span class="pronunciation">/silɛ̃dʁ də ʁu/</span></td>
+<td><span class="approx-ko">실랑드흐 드 루</span></td>
+<td>휠 실린더</td>
+<td>드럼 브레이크 압력 전달</td>
+</tr>
+<tr>
+<td><span class="fr-word">le tambour de frein</span></td>
+<td><span class="pronunciation">/tɑ̃buʁ də fʁɛ̃/</span></td>
+<td><span class="approx-ko">탕부흐 드 프흐앵</span></td>
+<td>브레이크 드럼</td>
+<td>드럼식 브레이크 외부</td>
+</tr>
+<tr>
+<td><span class="fr-word">le fluide de frein</span></td>
+<td><span class="pronunciation">/flɥid də fʁɛ̃/</span></td>
+<td><span class="approx-ko">플위드 드 프흐앵</span></td>
+<td>브레이크액</td>
+<td>압력 전달 유체</td>
+</tr>
+<tr>
+<td><span class="fr-word">la garniture de frein</span></td>
+<td><span class="pronunciation">/gaʁnityʁ də fʁɛ̃/</span></td>
+<td><span class="approx-ko">가흐니튀흐 드 프흐앵</span></td>
+<td>브레이크 라이닝</td>
+<td>드럼 브레이크 마찰재</td>
+</tr>
+<tr>
+<td><span class="fr-word">l'ABS (système anti-blocage)</span></td>
+<td><span class="pronunciation">/a be ɛs/ /sistɛm ɑ̃ti blɔkaʒ/</span></td>
+<td><span class="approx-ko">아 베 에스 / 시스떼m 앙띠 블로까주</span></td>
+<td>ABS (잠금 방지)</td>
+<td>미끄럼 방지 장치</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ═══════════════════ 2. POWERTRAIN VOCABULARY ═══════════════════ -->
+<section>
+<div class="section-label">● 2부: 파워트레인 (Chaîne de traction)</div>
+<h2 class="section-title">파워트레인 시스템</h2>
+
+<div class="card">
+<table class="expr-table">
+<thead>
+<tr>
+<th>프랑스어</th>
+<th>IPA</th>
+<th>한국어 근사음</th>
+<th>한국어 뜻</th>
+<th>사용 상황</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="fr-word">le moteur</span></td>
+<td><span class="pronunciation">/mɔtœʁ/</span></td>
+<td><span class="approx-ko">모또외흐</span></td>
+<td>엔진</td>
+<td>동력원</td>
+</tr>
+<tr>
+<td><span class="fr-word">la boîte de vitesses</span></td>
+<td><span class="pronunciation">/bwat də vitɛs/</span></td>
+<td><span class="approx-ko">부아뜨 드 비떼스</span></td>
+<td>변속기</td>
+<td>기어 박스</td>
+</tr>
+<tr>
+<td><span class="fr-word">l'embrayage</span></td>
+<td><span class="pronunciation">/ɑ̃bʁɛjaʒ/</span></td>
+<td><span class="approx-ko">앙브흐에야주</span></td>
+<td>클러치</td>
+<td>엔진과 변속기 연결/분리</td>
+</tr>
+<tr>
+<td><span class="fr-word">le disque d'embrayage</span></td>
+<td><span class="pronunciation">/disk dɑ̃bʁɛjaʒ/</span></td>
+<td><span class="approx-ko">디스크 당브흐에야주</span></td>
+<td>클러치 디스크</td>
+<td>회전 동력 전달</td>
+</tr>
+<tr>
+<td><span class="fr-word">le volant moteur</span></td>
+<td><span class="pronunciation">/vɔlɑ̃ mɔtœʁ/</span></td>
+<td><span class="approx-ko">볼랑 모또외흐</span></td>
+<td>플라이휠</td>
+<td>에너지 저장 및 안정화</td>
+</tr>
+<tr>
+<td><span class="fr-word">le différentiel</span></td>
+<td><span class="pronunciation">/diferɑ̃sjɛl/</span></td>
+<td><span class="approx-ko">디페랑씨엘</span></td>
+<td>차동기어</td>
+<td>바퀴 회전 차이 조정</td>
+</tr>
+<tr>
+<td><span class="fr-word">l'arbre de transmission</span></td>
+<td><span class="pronunciation">/aʁbʁ də tʁɑ̃smisjo/</span></td>
+<td><span class="approx-ko">아흐브흐 드 트랑스미씨옹</span></td>
+<td>구동축</td>
+<td>회전력 전달</td>
+</tr>
+<tr>
+<td><span class="fr-word">le joint de cardan</span></td>
+<td><span class="pronunciation">/ʒwɛ̃ də kaʁdɑ̃/</span></td>
+<td><span class="approx-ko">주앙 드 까흐당</span></td>
+<td>유니버설 조인트</td>
+<td>각도 변환 연결부</td>
+</tr>
+<tr>
+<td><span class="fr-word">le pignon</span></td>
+<td><span class="pronunciation">/piɲɔ/</span></td>
+<td><span class="approx-ko">피뉴옹</span></td>
+<td>기어 (작은)</td>
+<td>회전력 변환</td>
+</tr>
+<tr>
+<td><span class="fr-word">la couronne</span></td>
+<td><span class="pronunciation">/kuʁɔn/</span></td>
+<td><span class="approx-ko">쿠롱</span></td>
+<td>기어 (큰)</td>
+<td>회전력 변환</td>
+</tr>
+<tr>
+<td><span class="fr-word">le roulement</span></td>
+<td><span class="pronunciation">/ʁulmɑ̃/</span></td>
+<td><span class="approx-ko">룰맑</span></td>
+<td>베어링</td>
+<td>회전축 지지</td>
+</tr>
+<tr>
+<td><span class="fr-word">la courroie de distribution</span></td>
+<td><span class="pronunciation">/kuʁwa də distʁibyjo/</span></td>
+<td><span class="approx-ko">쿠루아 드 디스트리뷔씨옹</span></td>
+<td>타이밍 벨트</td>
+<td>밸브 타이밍 조정</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ═══════════════════ 3. BODY & CHASSIS VOCABULARY ═══════════════════ -->
+<section>
+<div class="section-label">● 3부: 차체와 섀시</div>
+<h2 class="section-title">차체 및 섀시 (Carrosserie et Châssis)</h2>
+
+<div class="card">
+<table class="expr-table">
+<thead>
+<tr>
+<th>프랑스어</th>
+<th>IPA</th>
+<th>한국어 근사음</th>
+<th>한국어 뜻</th>
+<th>사용 상황</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="fr-word">la carrosserie</span></td>
+<td><span class="pronunciation">/kaʁɔsʁi/</span></td>
+<td><span class="approx-ko">까롓흐리</span></td>
+<td>차체</td>
+<td>전체 외부 구조</td>
+</tr>
+<tr>
+<td><span class="fr-word">le pare-chocs</span></td>
+<td><span class="pronunciation">/paʁ ʃɔk/</span></td>
+<td><span class="approx-ko">빠흐 숍</span></td>
+<td>범퍼</td>
+<td>충격 흡수 장치</td>
+</tr>
+<tr>
+<td><span class="fr-word">le capot</span></td>
+<td><span class="pronunciation">/kapo/</span></td>
+<td><span class="approx-ko">까뽀</span></td>
+<td>보닛 (뚜껑)</td>
+<td>엔진실 덮개</td>
+</tr>
+<tr>
+<td><span class="fr-word">le coffre</span></td>
+<td><span class="pronunciation">/kɔfʁ/</span></td>
+<td><span class="approx-ko">꼬프흐</span></td>
+<td>트렁크</td>
+<td>짐칸</td>
+</tr>
+<tr>
+<td><span class="fr-word">la porte</span></td>
+<td><span class="pronunciation">/pɔʁt/</span></td>
+<td><span class="approx-ko">뽀흐뜨</span></td>
+<td>문</td>
+<td>탑승 개구부</td>
+</tr>
+<tr>
+<td><span class="fr-word">la vitre / la glace</span></td>
+<td><span class="pronunciation">/vitʁ/ /glas/</span></td>
+<td><span class="approx-ko">비뜨흐 / 글라쓰</span></td>
+<td>창 / 유리</td>
+<td>채광 및 시야</td>
+</tr>
+<tr>
+<td><span class="fr-word">le toit</span></td>
+<td><span class="pronunciation">/twa/</span></td>
+<td><span class="approx-ko">투아</span></td>
+<td>지붕</td>
+<td>상부 덮개</td>
+</tr>
+<tr>
+<td><span class="fr-word">le châssis</span></td>
+<td><span class="pronunciation">/ʃasi/</span></td>
+<td><span class="approx-ko">샤시</span></td>
+<td>섀시</td>
+<td>전체 구조 틀</td>
+</tr>
+<tr>
+<td><span class="fr-word">la suspension</span></td>
+<td><span class="pronunciation">/syspɑ̃sjo/</span></td>
+<td><span class="approx-ko">쉬스팡씨옹</span></td>
+<td>현가장치</td>
+<td>바퀴와 차체 연결</td>
+</tr>
+<tr>
+<td><span class="fr-word">la barre stabilisatrice</span></td>
+<td><span class="pronunciation">/baʁ stabilizatʁis/</span></td>
+<td><span class="approx-ko">바흐 스따빌리자뜨리쓰</span></td>
+<td>안티롤 바</td>
+<td>회전 안정성 향상</td>
+</tr>
+<tr>
+<td><span class="fr-word">l'amortisseur</span></td>
+<td><span class="pronunciation">/amɔʁtisœʁ/</span></td>
+<td><span class="approx-ko">아모흐띠쇠흐</span></td>
+<td>쇼크 업소버</td>
+<td>진동 감소</td>
+</tr>
+<tr>
+<td><span class="fr-word">le ressort</span></td>
+<td><span class="pronunciation">/ʁəsɔʁ/</span></td>
+<td><span class="approx-ko">흐쇼흐</span></td>
+<td>스프링</td>
+<td>탄성 지지</td>
+</tr>
+<tr>
+<td><span class="fr-word">la roue</span></td>
+<td><span class="pronunciation">/ʁu/</span></td>
+<td><span class="approx-ko">루</span></td>
+<td>바퀴</td>
+<td>회전 부품</td>
+</tr>
+<tr>
+<td><span class="fr-word">le pneu / le pneus</span></td>
+<td><span class="pronunciation">/pnø/ /pnø/</span></td>
+<td><span class="approx-ko">프뇌 / 프뇌</span></td>
+<td>타이어</td>
+<td>접지 부분</td>
+</tr>
+<tr>
+<td><span class="fr-word">le pare-brise</span></td>
+<td><span class="pronunciation">/paʁ bʁiz/</span></td>
+<td><span class="approx-ko">빠흐 브흐리즈</span></td>
+<td>앞 유리</td>
+<td>전면 창</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ═══════════════════ 4. GRAMMAR: COMPOUND TECHNICAL NOUNS ═══════════════════ -->
+<section>
+<div class="section-label">● 문법: 복합 기술 용어</div>
+<h2 class="section-title">복합 기술 용어 구조</h2>
+
+<div class="card">
+<p style="margin-bottom: 1.2rem; color: var(--text-dim);">
+프랑스의 기술 용어는 종종 "X de Y" (Y의 X) 구조를 사용합니다. 이는 한국어 수식 관계와 반대입니다.
+</p>
+
+<div class="grammar-visual">
+<svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg">
+<!-- Title -->
+<text x="250" y="25" font-size="18" font-weight="bold" text-anchor="middle" fill="#BF6A4A">
+  "X de Y" 구조
+</text>
+
+<!-- French side -->
+<rect x="20" y="50" width="200" height="120" fill="none" stroke="#BF6A4A" stroke-width="2" rx="8"/>
+<text x="120" y="75" font-size="14" font-weight="bold" text-anchor="middle" fill="#BF6A4A">
+  프랑스어
+</text>
+<text x="120" y="105" font-size="13" font-family="'Cormorant Garamond'" text-anchor="middle" fill="#C9A84C">
+  <tspan x="120">le disque</tspan>
+  <tspan x="120" dy="20" font-size="11" fill="#8A8680">(원판)</tspan>
+</text>
+<text x="180" y="140" font-size="12" fill="#8A8680">+</text>
+<text x="120" y="160" font-size="13" font-family="'Cormorant Garamond'" text-anchor="middle" fill="#C9A84C">
+  de frein
+</text>
+
+<!-- Arrow -->
+<path d="M 240 110 L 270 110" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+<!-- Korean side -->
+<rect x="280" y="50" width="200" height="120" fill="none" stroke="#C9A84C" stroke-width="2" rx="8"/>
+<text x="380" y="75" font-size="14" font-weight="bold" text-anchor="middle" fill="#C9A84C">
+  한국어
+</text>
+<text x="380" y="105" font-size="13" text-anchor="middle" fill="#E8E4DF">
+  <tspan x="380">브레이크</tspan>
+  <tspan x="380" dy="20" font-size="11" fill="#8A8680">(수식된 명사)</tspan>
+</text>
+<text x="340" y="140" font-size="12" fill="#8A8680">←</text>
+<text x="380" y="160" font-size="13" text-anchor="middle" fill="#E8E4DF">
+  디스크
+</text>
+
+<!-- Arrow marker definition -->
+<defs>
+  <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+    <polygon points="0 0, 10 3, 0 6" fill="#C9A84C"/>
+  </marker>
+</defs>
+</svg>
+</div>
+
+<div class="grammar-note">
+<strong>핵심 패턴:</strong> 프랑스어에서는 "le disque de frein" (원판 of 브레이크) → 한국어로는 "브레이크 디스크"로 역순입니다. <strong>의존 관계를 명확히 파악</strong>하면 복합 용어 이해가 쉬워집니다.
+</div>
+
+<div style="margin-top: 1.5rem; padding: 1rem; background: rgba(201,168,76,0.05); border-left: 3px solid var(--gold); border-radius: 0 6px 6px 0;">
+<strong style="color: var(--gold);">예시:</strong>
+<ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-dim); font-size: 0.9rem;">
+<li>la plaquette de frein → 브레이크 패드</li>
+<li>le disque d'embrayage → 클러치 디스크</li>
+<li>la courroie de distribution → 타이밍 벨트</li>
+<li>l'arbre de transmission → 구동축</li>
+</ul>
+</div>
+</section>
+
+<!-- ═══════════════════ 5. DIALOGUE: TECHNICAL DISCUSSION ═══════════════════ -->
+<section>
+<div class="section-label">● 5부: 기술 대화</div>
+<h2 class="section-title">대화: 브레이크 및 파워트레인 점검</h2>
+
+<div class="dialogue">
+<div class="dialogue-line speaker-a">
+<div class="speaker-name">Vous<br/>(당신, KR Ingénieur)</div>
+<div class="dialogue-text">
+<div class="fr-line">Bonjour, j'ai un problème avec le système de freinage. Les plaquettes de frein doivent être remplacées?</div>
+<div class="ko-line">안녕하세요. 브레이크 시스템에 문제가 있습니다. 브레이크 패드를 교체해야 하나요?</div>
+<div class="dialogue-play">
+<button onclick="speakFr('Bonjour, j\'ai un problème avec le système de freinage. Les plaquettes de frein doivent être remplacées?')">🔊 듣기</button>
+</div>
+</div>
+</div>
+
+<div class="dialogue-line speaker-b">
+<div class="speaker-name">Pierre<br/>(프랑스 동료)</div>
+<div class="dialogue-text">
+<div class="fr-line">Oui, les plaquettes sont usées. Il faut vérifier aussi le disque de frein et le maître-cylindre.</div>
+<div class="ko-line">네, 패드가 마모되었습니다. 브레이크 디스크와 마스터 실린더도 확인해야 합니다.</div>
+<div class="dialogue-play">
+<button onclick="speakFr('Oui, les plaquettes sont usées. Il faut vérifier aussi le disque de frein et le maître-cylindre.')">🔊 듣기</button>
+</div>
+</div>
+</div>
+
+<div class="dialogue-line speaker-a">
+<div class="speaker-name">Vous</div>
+<div class="dialogue-text">
+<div class="fr-line">Bien sûr. Et concernant la transmission, comment est la boîte de vitesses?</div>
+<div class="ko-line">물론입니다. 그리고 변속기에 관해서, 변속기는 어떻게 되나요?</div>
+<div class="dialogue-play">
+<button onclick="speakFr('Bien sûr. Et concernant la transmission, comment est la boîte de vitesses?')">🔊 듣기</button>
+</div>
+</div>
+</div>
+
+<div class="dialogue-line speaker-b">
+<div class="speaker-name">Pierre</div>
+<div class="dialogue-text">
+<div class="fr-line">La boîte fonctionne bien. Mais je dois vérifier l'embrayage et les roulements de la suspension.</div>
+<div class="ko-line">변속기는 잘 작동합니다. 하지만 클러치와 현가장치 베어링을 확인해야 합니다.</div>
+<div class="dialogue-play">
+<button onclick="speakFr('La boîte fonctionne bien. Mais je dois vérifier l\'embrayage et les roulements de la suspension.')">🔊 듣기</button>
+</div>
+</div>
+</div>
+
+<div class="dialogue-line speaker-a">
+<div class="speaker-name">Vous</div>
+<div class="dialogue-text">
+<div class="fr-line">D'accord. Quel est le délai pour terminer la révision?</div>
+<div class="ko-line">그렇군요. 점검을 완료하는 데 시간이 얼마나 걸리나요?</div>
+<div class="dialogue-play">
+<button onclick="speakFr('D\'accord. Quel est le délai pour terminer la révision?')">🔊 듣기</button>
+</div>
+</div>
+</div>
+
+<div class="dialogue-line speaker-b">
+<div class="speaker-name">Pierre</div>
+<div class="dialogue-text">
+<div class="fr-line">Trois jours environ. Je vais préparer le devis pour vous.</div>
+<div class="ko-line">약 3일입니다. 견적서를 준비해 드리겠습니다.</div>
+<div class="dialogue-play">
+<button onclick="speakFr('Trois jours environ. Je vais préparer le devis pour vous.')">🔊 듣기</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dialogue-review">
+<h3>🎯 대화 검토 포인트</h3>
+<div class="review-item">
+<div class="review-label">핵심 표현:</div>
+<div class="review-text">J'ai un problème avec... (~ 문제가 있습니다) / Il faut... (~ 해야 합니다) / Comment est...? (~ 어떻게 되나요?)</div>
+</div>
+<div class="review-item">
+<div class="review-label">발음 트릭:</div>
+<div class="review-text">/ʁ/ 음은 항상 흐로 발음 | "usées" = /yze/ (우제) | "bien" = /bjɛ̃/ (비앙)</div>
+</div>
+<div class="review-item">
+<div class="review-label">기술 정확도:</div>
+<div class="review-text">모든 부품명은 정확하게 발음합니다. 특히 끝에 -e 또는 -que가 있는 단어는 최종 자음이 묵음입니다.</div>
+</div>
+</div>
+
+</section>
+
+<!-- ═══════════════════ 6. PRONUNCIATION DRILLS ═══════════════════ -->
+<section>
+<div class="section-label">● 6부: 발음 드릴</div>
+<h2 class="section-title">5가지 발음 연습</h2>
+
+<div class="pron-drill">
+<div class="pron-item">
+<div class="number">1</div>
+<div class="content">
+<div class="pron-word">frein /fʁɛ̃/</div>
+<div class="pron-ipa">프흐앵</div>
+<div class="pron-tip"><strong>Tip:</strong> /fʁ/ 조합. 'f' 후 혀를 뒤로 말아서 목뒤쪽 마찰음 /ʁ/ 발음. 끝의 /ɛ̃/는 비음화된 "에(ㄴ)" 소리.</div>
+</div>
+</div>
+
+<div class="pron-item">
+<div class="number">2</div>
+<div class="content">
+<div class="pron-word">embrayage /ɑ̃bʁɛjaʒ/</div>
+<div class="pron-ipa">앙브흐에야주</div>
+<div class="pron-tip"><strong>Tip:</strong> 4음절 단어. /ɑ̃/ = 앙(비음), /bʁ/ = 브흐(강한 유성 자음), /ɛ/ = 에, /jaʒ/ = 야주. 각 음절을 명확히 분리해서 발음.</div>
+</div>
+</div>
+
+<div class="pron-item">
+<div class="number">3</div>
+<div class="content">
+<div class="pron-word">suspension /syspɑ̃sjo/</div>
+<div class="pron-ipa">쉬스팡씨옹</div>
+<div class="pron-tip"><strong>Tip:</strong> /y/ = 입을 동글게 모아서 "위". /s/ 초성은 날카롭게. 끝 /ɔ̃/ = 옹(비음). 프랑스 기술 용어의 고전적 패턴.</div>
+</div>
+</div>
+
+<div class="pron-item">
+<div class="number">4</div>
+<div class="content">
+<div class="pron-word">carrosserie /kaʁɔsʁi/</div>
+<div class="pron-ipa">까롓흐리</div>
+<div class="pron-tip"><strong>Tip:</strong> /k/ = 까. /ʁ/ 음은 늘 목뒤 마찰음 "흐". 중간의 /ɔ/ = 오. 마지막 /ʁi/ = 흐리. 혀 위치 변화에 주의.</div>
+</div>
+</div>
+
+<div class="pron-item">
+<div class="number">5</div>
+<div class="content">
+<div class="pron-word">différentiel /diferɑ̃sjɛl/</div>
+<div class="pron-ipa">디페랑씨엘</div>
+<div class="pron-tip"><strong>Tip:</strong> /d/ = 디. /e/ = 에. /ʁ/ = 흐(필수). /ɑ̃/ = 앙(비음). /sj/ = 씨(연음화된 /ʃ/). 마지막 /ɛl/ = 엘.</div>
+</div>
+</div>
+</div>
+
+</section>
+
+<!-- ═══════════════════ 7. INTERACTIVE SHADOWING ═══════════════════ -->
+<section>
+<div class="section-label">● 7부: 쉐도잉 엔진</div>
+<h2 class="section-title">쉐도잉 연습: 핵심 용어와 표현</h2>
+
+<div class="shadow-section" id="shadowSection">
+<div class="shadow-header">
+<div class="shadow-title">🎧 음성 쉐도잉</div>
+<div class="shadow-controls">
+<button class="shadow-btn" id="shadowPlayAll" onclick="shadowStartAll()">▶ 전체</button>
+<button class="shadow-btn" onclick="shadowStopAll()">■ 정지</button>
+<div class="speed-control">
+<label for="shadowSpeed">속도:</label>
+<input type="range" id="shadowSpeed" min="0.5" max="1.5" step="0.1" value="0.8" />
+<span id="shadowSpeedLabel">0.8x</span>
+</div>
+</div>
+</div>
+
+<div id="voiceSelectorContainer"></div>
+
+<div id="shadowItems"></div>
+
+<div class="shadow-progress">
+<div class="shadow-progress-bar">
+<div class="shadow-progress-fill" id="shadowProgressFill"></div>
+</div>
+<div class="shadow-progress-text" id="shadowProgressText">0/15</div>
+</div>
+
+<div class="shadow-status" id="shadowStatus">준비 완료. ▶ 버튼을 클릭하세요.</div>
+</div>
+
+</section>
+
+<!-- ═══════════════════ 8. QUIZ ═══════════════════ -->
+<section>
+<div class="section-label">● 8부: 이해도 확인</div>
+<h2 class="section-title">퀴즈</h2>
+
+<div class="quiz-container">
+
+<div class="quiz-question">
+<div class="quiz-q-text">1. "la plaquette de frein"은 무엇을 의미합니까?</div>
+<div class="quiz-options">
+<div class="quiz-option" onclick="checkAnswer(this, 'correct')">브레이크 패드</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">브레이크 드럼</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">브레이크 디스크</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">마스터 실린더</div>
+</div>
+</div>
+
+<div class="quiz-question">
+<div class="quiz-q-text">2. "l'embrayage"의 발음은?</div>
+<div class="quiz-options">
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">엠브라자주</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'correct')">앙브흐에야주</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">엠프레야주</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">암브레이주</div>
+</div>
+</div>
+
+<div class="quiz-question">
+<div class="quiz-q-text">3. "le moteur"는 어떤 부품입니까?</div>
+<div class="quiz-options">
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">변속기</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">클러치</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'correct')">엔진</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">타이어</div>
+</div>
+</div>
+
+<div class="quiz-question">
+<div class="quiz-q-text">4. "la boîte de vitesses"의 한국어 뜻은?</div>
+<div class="quiz-options">
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">디스크 브레이크</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'correct')">변속기</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">현가장치</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">베어링</div>
+</div>
+</div>
+
+<div class="quiz-question">
+<div class="quiz-q-text">5. 다음 중 차체 부품은 어느 것입니까?</div>
+<div class="quiz-options">
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">le pignon</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'correct')">le pare-chocs</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">le différentiel</div>
+<div class="quiz-option" onclick="checkAnswer(this, 'incorrect')">l'embrayage</div>
+</div>
+</div>
+
+</div>
+
+</section>
+
+</div>
+
+<footer>
+<p>🎓 <strong>Renault Korea Engineering French Course</strong> | Day 04 — 자동차 부품 어휘 Part B (Freins, Transmission, Carrosserie)</p>
+<p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-dim);">각 용어의 발음은 fr-FR 표준 음성으로 생성되며, 실제 Renault 기술 대화에 사용되는 표현들입니다.</p>
+</footer>
+
+<script>
+(function() {
+  var selectedFrVoice = null;
+  var shadowPlaying = false;
+  var shadowIndex = 0;
+  var shadowPhrases = [
+    { fr: 'Le frein', ko: '브레이크' },
+    { fr: 'Le disque de frein', ko: '브레이크 디스크' },
+    { fr: 'La plaquette de frein', ko: '브레이크 패드' },
+    { fr: 'Le moteur', ko: '엔진' },
+    { fr: 'La boîte de vitesses', ko: '변속기' },
+    { fr: 'L\'embrayage', ko: '클러치' },
+    { fr: 'Le différentiel', ko: '차동기어' },
+    { fr: 'La carrosserie', ko: '차체' },
+    { fr: 'Le pare-chocs', ko: '범퍼' },
+    { fr: 'La suspension', ko: '현가장치' },
+    { fr: 'L\'amortisseur', ko: '쇼크 업소버' },
+    { fr: 'Le ressort', ko: '스프링' },
+    { fr: 'La roue', ko: '바퀴' },
+    { fr: 'Le pneu', ko: '타이어' },
+    { fr: 'Le pare-brise', ko: '앞 유리' }
+  ];
+
+  function getAllFrenchVoices() {
+    var voices = window.speechSynthesis.getVoices();
+    return voices.filter(function(v) { return v.lang.indexOf('fr') === 0; });
+  }
+
+  function getFrenchVoice() {
+    if (selectedFrVoice) return selectedFrVoice;
+    var frVoices = getAllFrenchVoices();
+    if (frVoices.length > 0) return frVoices[0];
+    return null;
+  }
+
+  function initFrenchVoice() {
+    var frVoices = getAllFrenchVoices();
+    if (frVoices.length > 0) selectedFrVoice = frVoices[0];
+  }
+
+  window.speakFr = function(text, onEnd, rate) {
+    var utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'fr-FR';
+    utter.rate = rate || 0.9;
+    var voice = getFrenchVoice();
+    if (voice) utter.voice = voice;
+    if (onEnd) utter.onend = onEnd;
+    window.speechSynthesis.speak(utter);
+  };
+
+  function addInlinePlayButtons() {
+    document.querySelectorAll('.expr-table tr').forEach(function(row, idx) {
+      if (idx === 0) return;
+      var frCell = row.querySelector('.fr-word');
+      if (frCell && !frCell.querySelector('.play-btn')) {
+        var text = frCell.textContent.trim();
+        var btn = document.createElement('button');
+        btn.className = 'play-btn';
+        btn.innerHTML = '🔊';
+        btn.style.verticalAlign = 'middle';
+        btn.onclick = function(e) { e.stopPropagation(); speakFr(text, null, 0.9); };
+        frCell.appendChild(btn);
+      }
+    });
+  }
+
+  function buildShadowingSection() {
+    var container = document.querySelector('.container');
+    var tracker = document.getElementById('shadowItems');
+    var itemsHTML = '';
+    shadowPhrases.forEach(function(phrase, i) {
+      itemsHTML += '<div class="shadow-item" data-index="' + i + '">' +
+        '<div class="shadow-item-fr">' + phrase.fr + '</div>' +
+        '<div class="shadow-item-ko">' + phrase.ko + '</div>' +
+        '</div>';
+    });
+    if (tracker) {
+      tracker.innerHTML = itemsHTML +
+        '<div class="shadow-progress"><div class="shadow-progress-bar"><div class="shadow-progress-fill" id="shadowProgressFill"></div></div><div class="shadow-progress-text" id="shadowProgressText">0/' + shadowPhrases.length + '</div></div>' +
+        '<div class="shadow-status" id="shadowStatus"></div>';
+    }
+    var speedSlider = document.getElementById('shadowSpeed');
+    var speedLabel = document.getElementById('shadowSpeedLabel');
+    if (speedSlider) speedSlider.addEventListener('input', function() { speedLabel.textContent = this.value + 'x'; });
+    buildVoiceSelector(document.getElementById('voiceSelectorContainer'));
+  }
+
+  function buildVoiceSelector(container) {
+    if (!container) return;
+    var frVoices = getAllFrenchVoices();
+    if (frVoices.length <= 1) return;
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:var(--text-dim);margin-bottom:0.75rem;';
+    wrapper.innerHTML = '<span>🇫🇷 음성:</span>';
+    var sel = document.createElement('select');
+    sel.style.cssText = 'background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:0.3rem 0.5rem;font-size:0.8rem;cursor:pointer;';
+    frVoices.forEach(function(v, i) {
+      var opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = v.name + (v.localService ? ' (로컬)' : ' (온라인)');
+      if (v === selectedFrVoice) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', function() { selectedFrVoice = frVoices[parseInt(this.value)]; speakFr('Bonjour', null, 0.9); });
+    wrapper.appendChild(sel);
+    container.appendChild(wrapper);
+  }
+
+  window.shadowStartAll = function() {
+    shadowPlaying = true; shadowIndex = 0;
+    document.querySelectorAll('.shadow-item').forEach(function(el) { el.classList.remove('active-phrase', 'done-phrase'); });
+    document.getElementById('shadowPlayAll')?.classList.add('active');
+    document.getElementById('shadowStatus').textContent = '🎧 쉐도잉 시작...';
+    playShadowPhrase(0);
+  };
+
+  window.shadowStopAll = function() {
+    shadowPlaying = false; window.speechSynthesis.cancel();
+    document.getElementById('shadowPlayAll')?.classList.remove('active');
+    document.getElementById('shadowStatus').textContent = '⏹ 정지됨';
+    document.querySelectorAll('.shadow-item').forEach(function(el) { el.classList.remove('active-phrase'); });
+  };
+
+  function playShadowPhrase(idx) {
+    if (!shadowPlaying || idx >= shadowPhrases.length) {
+      if (idx >= shadowPhrases.length) {
+        document.getElementById('shadowStatus').textContent = '✓ 쉐도잉 연습 완료!';
+        document.getElementById('shadowPlayAll')?.classList.remove('active');
+      }
+      shadowPlaying = false; return;
+    }
+    var phrase = shadowPhrases[idx];
+    var items = document.querySelectorAll('.shadow-item');
+    items.forEach(function(el) { el.classList.remove('active-phrase'); });
+    if (items[idx]) { items[idx].classList.add('active-phrase'); items[idx].scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    var fill = document.getElementById('shadowProgressFill');
+    var text = document.getElementById('shadowProgressText');
+    if (fill) fill.style.width = ((idx + 1) / shadowPhrases.length * 100) + '%';
+    if (text) text.textContent = (idx + 1) + '/' + shadowPhrases.length;
+    document.getElementById('shadowStatus').textContent = '👂 듣기: ' + phrase.fr;
+    var utter = new SpeechSynthesisUtterance(phrase.fr);
+    utter.lang = 'fr-FR';
+    utter.rate = parseFloat(document.getElementById('shadowSpeed')?.value || '0.8');
+    var voice = getFrenchVoice();
+    if (voice) utter.voice = voice;
+    utter.onend = function() {
+      if (!shadowPlaying) return;
+      document.getElementById('shadowStatus').textContent = '🗣 따라 말해보세요: ' + phrase.fr;
+      setTimeout(function() {
+        if (!shadowPlaying) return;
+        if (items[idx]) { items[idx].classList.remove('active-phrase'); items[idx].classList.add('done-phrase'); }
+        playShadowPhrase(idx + 1);
+      }, 3000);
+    };
+    window.speechSynthesis.speak(utter);
+  }
+
+  window.checkAnswer = function(option, correctness) {
+    var qDiv = option.closest('.quiz-question');
+    qDiv.querySelectorAll('.quiz-option').forEach(function(opt) {
+      opt.classList.remove('selected', 'correct', 'incorrect');
+      if (opt === option) opt.classList.add(correctness);
+    });
+  };
+
+  function init() {
+    function waitForVoices(cb) {
+      var voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) { cb(); return; }
+      var tries = 0;
+      var interval = setInterval(function() {
+        voices = window.speechSynthesis.getVoices(); tries++;
+        if (voices.length > 0 || tries > 20) { clearInterval(interval); cb(); }
+      }, 100);
+      window.speechSynthesis.addEventListener('voiceschanged', function() { clearInterval(interval); cb(); }, { once: true });
+    }
+    waitForVoices(function() { initFrenchVoice(); addInlinePlayButtons(); buildShadowingSection(); });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+</body>
+</html>
+

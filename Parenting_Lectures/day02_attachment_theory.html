@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAY 02: 애착 이론 — 안정 애착의 힘</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0A0C10;
+            --bg-card-light: #12151B;
+            --bg-card-dark: #181C24;
+            --green: #4ABF8A;
+            --gold: #C9A84C;
+            --danger: #E85D5D;
+            --text-primary: #E8E8E8;
+            --text-secondary: #A0A0A0;
+            --border: #2A2D35;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--green), var(--gold));
+            border-radius: 6px;
+            border: 2px solid var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, var(--gold), var(--green));
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: linear-gradient(to bottom, var(--bg-card-dark), rgba(24, 28, 36, 0.95));
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+        }
+
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--green);
+        }
+
+        .header-day {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+        }
+
+        .pomodoro-btn {
+            background: linear-gradient(135deg, var(--gold), #B8942B);
+            border: none;
+            color: var(--bg-primary);
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: transform 0.2s;
+        }
+
+        .pomodoro-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .timer-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 4rem;
+            color: var(--green);
+            margin: 1.5rem 0;
+            font-weight: 700;
+        }
+
+        .timer-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+
+        .timer-btn {
+            background: var(--green);
+            border: none;
+            color: var(--bg-primary);
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .timer-btn:hover {
+            background: #3BA075;
+        }
+
+        .timer-btn.stop {
+            background: var(--danger);
+        }
+
+        .timer-btn.stop:hover {
+            background: #D74444;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--bg-card-dark), var(--bg-card-light));
+            border-bottom: 2px solid var(--green);
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .hero-part {
+            display: inline-block;
+            background: rgba(74, 191, 138, 0.15);
+            color: var(--green);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .hero-oneliner {
+            font-size: 1.1rem;
+            color: var(--gold);
+            font-style: italic;
+            margin-bottom: 1.5rem;
+        }
+
+        .badges {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(201, 168, 76, 0.15);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .section {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-number {
+            display: inline-flex;
+            width: 40px;
+            height: 40px;
+            background: rgba(74, 191, 138, 0.2);
+            border: 2px solid var(--green);
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .strategy-box {
+            background: var(--bg-card-light);
+            border-left: 4px solid var(--green);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .strategy-title {
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .time-table {
+            background: var(--bg-card-dark);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .time-row {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+        }
+
+        .time-row:last-child {
+            border-bottom: none;
+        }
+
+        .time-label {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .time-activity {
+            color: var(--text-primary);
+            padding-left: 1rem;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .science-card {
+            background: linear-gradient(135deg, var(--bg-card-light), var(--bg-card-dark));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .science-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--green);
+        }
+
+        .card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .card-content {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .insight-box {
+            background: rgba(74, 191, 138, 0.1);
+            border-left: 3px solid var(--green);
+            padding: 1rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+        }
+
+        .insight-title {
+            color: var(--green);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .deep-dive {
+            background: var(--bg-card-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        .deep-dive-header {
+            background: rgba(74, 191, 138, 0.15);
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: var(--green);
+            transition: background 0.3s;
+            border: 1px solid rgba(74, 191, 138, 0.3);
+        }
+
+        .deep-dive-header:hover {
+            background: rgba(74, 191, 138, 0.25);
+        }
+
+        .deep-dive-toggle {
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+
+        .deep-dive-content {
+            padding: 1.5rem;
+            display: none;
+            border-top: 1px solid var(--border);
+            background: var(--bg-card-dark);
+        }
+
+        .deep-dive-content.active {
+            display: block;
+        }
+
+        .deep-dive-content ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .deep-dive-content li {
+            margin-bottom: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .diagram-container {
+            background: var(--bg-card-light);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .diagram-title {
+            font-weight: 600;
+            color: var(--green);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        svg {
+            display: inline-block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .comparison-table {
+            width: 100%;
+            background: var(--bg-card-dark);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+
+        .comparison-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            background: rgba(74, 191, 138, 0.2);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .comparison-header-cell {
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--green);
+            text-align: center;
+            border-right: 1px solid var(--border);
+        }
+
+        .comparison-header-cell:last-child {
+            border-right: none;
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-row:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-cell {
+            padding: 1rem;
+            color: var(--text-primary);
+            border-right: 1px solid var(--border);
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .comparison-cell:last-child {
+            border-right: none;
+        }
+
+        .comparison-cell strong {
+            color: var(--gold);
+        }
+
+        .practice-guide {
+            background: var(--bg-card-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .age-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .age-tab {
+            background: none;
+            border: none;
+            padding: 1rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .age-tab.active {
+            color: var(--green);
+            border-bottom-color: var(--green);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .dialog-exchange {
+            background: var(--bg-card-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--gold);
+        }
+
+        .dialog-scenario {
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .dialog-turn {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(24, 28, 36, 0.8);
+            border-radius: 6px;
+            border-left: 3px solid var(--text-secondary);
+        }
+
+        .dialog-turn.dad {
+            border-left-color: var(--green);
+            background: rgba(74, 191, 138, 0.08);
+        }
+
+        .dialog-turn.child {
+            border-left-color: var(--gold);
+            background: rgba(201, 168, 76, 0.08);
+        }
+
+        .dialog-turn.dad-response {
+            border-left-color: var(--green);
+            background: rgba(74, 191, 138, 0.08);
+        }
+
+        .dialog-speaker {
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            color: var(--gold);
+        }
+
+        .dialog-turn.dad .dialog-speaker,
+        .dialog-turn.dad-response .dialog-speaker {
+            color: var(--green);
+        }
+
+        .dialog-text {
+            color: var(--text-primary);
+            font-style: italic;
+            padding-left: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .do-dont {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .do-box, .dont-box {
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .do-box {
+            background: rgba(74, 191, 138, 0.15);
+            border-left: 3px solid var(--green);
+            color: var(--text-primary);
+        }
+
+        .dont-box {
+            background: rgba(232, 93, 93, 0.15);
+            border-left: 3px solid var(--danger);
+            color: var(--text-primary);
+        }
+
+        .do-box::before {
+            content: "✓ DO";
+            display: block;
+            color: var(--green);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .dont-box::before {
+            content: "✗ DON'T";
+            display: block;
+            color: var(--danger);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.1), rgba(74, 191, 138, 0.1));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tip-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 0.8rem;
+        }
+
+        .tip-content {
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+
+        .relationship-tip {
+            background: var(--bg-card-light);
+            border-left: 4px solid var(--gold);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .relationship-tip-title {
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .quiz-container {
+            background: var(--bg-card-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .quiz-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: var(--gold);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .quiz-question {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .quiz-option {
+            background: var(--bg-card-dark);
+            border: 1px solid var(--border);
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-primary);
+        }
+
+        .quiz-option:hover {
+            border-color: var(--green);
+            background: rgba(74, 191, 138, 0.1);
+        }
+
+        .quiz-option input {
+            margin-right: 0.8rem;
+            cursor: pointer;
+        }
+
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .quiz-feedback.correct {
+            background: rgba(74, 191, 138, 0.15);
+            border-left: 3px solid var(--green);
+            color: var(--green);
+            display: block;
+        }
+
+        .quiz-feedback.incorrect {
+            background: rgba(232, 93, 93, 0.15);
+            border-left: 3px solid var(--danger);
+            color: var(--danger);
+            display: block;
+        }
+
+        .spaced-repetition {
+            background: var(--bg-card-dark);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .sr-title {
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .sr-bar {
+            background: var(--border);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .sr-progress {
+            background: var(--green);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .do-dont {
+                grid-template-columns: 1fr;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-header,
+            .comparison-row {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-header-cell,
+            .comparison-cell {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div>
+                <div class="header-title">과학적 육아 스터디</div>
+                <div class="header-day">DAY 02 / 21</div>
+            </div>
+            <button class="pomodoro-btn" onclick="openPomodoroModal()">⏱️ 25분 타이머</button>
+        </div>
+    </header>
+
+    <div class="modal" id="pomodoroModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closePomodoroModal()">✕</button>
+            <div class="modal-title">Pomodoro</div>
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            <div class="timer-buttons">
+                <button class="timer-btn" id="startBtn" onclick="startTimer()">시작</button>
+                <button class="timer-btn stop" id="stopBtn" onclick="stopTimer()" style="display:none;">중지</button>
+                <button class="timer-btn" onclick="resetTimer()">리셋</button>
+            </div>
+        </div>
+    </div>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-part">PART 1 — 발달심리 기초</div>
+            <h1 class="hero-title">애착 이론 — 안정 애착의 힘</h1>
+            <p class="hero-subtitle">Bowlby의 애착 이론으로 아이의 행동을 이해하고 안정적 관계 구축하기</p>
+            <p class="hero-oneliner">"부모의 반응 일관성이 아이의 평생 관계 방식을 결정한다"</p>
+            <div class="badges">
+                <span class="badge">첫째(5-7세)</span>
+                <span class="badge">둘째(2-4세)</span>
+                <span class="badge">전체</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="section fade-up">
+        <h2 class="section-title">
+            <span class="section-number">1</span>학습 전략
+        </h2>
+        <div class="strategy-box">
+            <div class="strategy-title">오늘의 핵심 학습 경로</div>
+            <p style="margin-bottom: 1rem; color: var(--text-secondary);">25분 집중 학습으로 애착 이론의 과학적 근거를 파악하고 가정에서 실제 적용할 수 있는 전략을 익힙니다.</p>
+            <div class="time-table">
+                <div class="time-row">
+                    <div class="time-label">0-5분</div>
+                    <div class="time-activity">애착의 정의 & Bowlby 4가지 유형과 생애 영향 이해하기</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-label">5-10분</div>
+                    <div class="time-activity">Strange Situation 실험과 Internal Working Model 개념</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-label">10-15분</div>
+                    <div class="time-activity">아버지 애착의 신경과학: 옥시토신 vs 바소프레신</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-label">15-20분</div>
+                    <div class="time-activity">부모 반응 일관성과 뇌 발달: HPA축, PFC, 편도체</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-label">20-25분</div>
+                    <div class="time-activity">실전 다이얼로그 & 형제자매 관찰 팁</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section fade-up">
+        <h2 class="section-title">
+            <span class="section-number">2</span>과학적 근거
+        </h2>
+        <div class="cards-grid">
+            <div class="science-card">
+                <div class="card-title">Bowlby의 4가지 애착 유형</div>
+                <div class="card-content">
+                    존 볼비(John Bowlby)는 애착을 4가지로 분류했습니다:
+                    <ul style="margin: 1rem 0 0 1.5rem; color: var(--text-secondary);">
+                        <li><strong style="color: var(--green);">안정 애착(Secure)</strong>: 부모의 반응이 일관적이고 신뢰할 수 있음. 부재 시 안전기지에서 탐색하고 위험 시 즉시 귀환</li>
+                        <li><strong style="color: var(--gold);">불안정-저항형(Anxious-Resistant)</strong>: 부모가 불규칙하게 반응. 부모에게 집착하고 분리불안이 심함</li>
+                        <li><strong style="color: var(--danger);">불안정-회피형(Avoidant)</strong>: 부모가 거의 반응하지 않음. 부모를 무시하는 것처럼 보이며 정서적 거리감 유지</li>
+                        <li><strong style="color: #FF9999;">혼란형(Disorganized)</strong>: 불규칙하고 두려운 반응. 부모가 아이의 두려움의 원천일 때 발생. 접근과 회피의 양가감정</li>
+                    </ul>
+                </div>
+                <div class="insight-box">
+                    <div class="insight-title">생애 영향</div>
+                    <p style="margin-bottom: 0.5rem;">안정 애착: 높은 학업 성취, 긍정적 또래 관계, 낮은 불안 장애율</p>
+                    <p>불안정 애착: 행동 문제, 학교 적응 곤란, 성인기 관계 어려움</p>
+                </div>
+            </div>
+
+            <div class="science-card">
+                <div class="card-title">아버지 애착의 신경과학</div>
+                <div class="card-content">
+                    어머니와 아버지의 애착은 신경생물학적으로 다릅니다:
+                    <ul style="margin: 1rem 0 0 1.5rem; color: var(--text-secondary);">
+                        <li><strong style="color: var(--green);">어머니</strong>: 옥시토신(Oxytocin) 중심 → 돌봄, 안정, 내적 안전감 촉진</li>
+                        <li><strong style="color: var(--gold);">아버지</strong>: 바소프레신(Vasopressin) 중심 → 탐색, 경계, 외부 세계 이해 촉진</li>
+                        <li>두 호르몬의 균형이 건강한 정서-인지 발달을 촉진</li>
+                    </ul>
+                </div>
+                <div class="insight-box">
+                    <div class="insight-title">아버지의 역할</div>
+                    <p style="margin-bottom: 0.5rem;">아버지와의 상호작용이 많은 아이:</p>
+                    <p>• 높은 위험 감수 능력과 스트레스 대응력<br>• 사회적 지배력과 또래 지위 향상<br>• 아버지 애착 = 어머니 애착만큼 중요</p>
+                </div>
+            </div>
+
+            <div class="science-card">
+                <div class="card-title">반응성 일관성의 뇌 과학</div>
+                <div class="card-content">
+                    부모가 일관되게 반응할 때 아이의 뇌에서:
+                    <ul style="margin: 1rem 0 0 1.5rem; color: var(--text-secondary);">
+                        <li>HPA축(스트레스 회로)이 정상 범위로 조절됨</li>
+                        <li>전전두피질(PFC) 발달이 촉진되어 감정 조절 능력 향상</li>
+                        <li>편도체의 과반응성이 감소하여 공포 반응 조절 개선</li>
+                        <li>신뢰감 기반 신경회로가 형성되어 관계 능력 향상</li>
+                    </ul>
+                </div>
+                <div class="insight-box">
+                    <div class="insight-title">행동적 증거</div>
+                    <p style="margin-bottom: 0.5rem;">안정적 애착 아이들의 특징:</p>
+                    <p>• 좌절과 실패에 더 강한 회복력<br>• 높은 문제 해결 능력<br>• 더 긍정적인 또래 관계</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section fade-up">
+        <div class="deep-dive">
+            <div class="deep-dive-header" onclick="toggleDeepDive(event)">
+                <span>🔬 Deep Dive: Ainsworth의 Strange Situation 실험</span>
+                <span class="deep-dive-toggle">▼</span>
+            </div>
+            <div class="deep-dive-content">
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);">메어리 에인스워스(Mary Ainsworth)는 1970년대 Bowlby 이론을 검증하기 위해 "Strange Situation"이라는 관찰 실험을 개발했습니다.</p>
+                
+                <h4 style="color: var(--green); margin: 1rem 0 0.5rem 0;">실험 절차 (약 20분)</h4>
+                <ul style="margin-bottom: 1rem;">
+                    <li><strong>1단계:</strong> 아이와 부모가 낯선 방에 들어감</li>
+                    <li><strong>2단계:</strong> 낯선 성인이 들어와 아이와 상호작용</li>
+                    <li><strong>3단계:</strong> 부모가 방을 나감 (분리)</li>
+                    <li><strong>4단계:</strong> 부모가 돌아옴 (재결합)</li>
+                    <li><strong>5단계:</strong> 부모가 다시 나감</li>
+                    <li><strong>6단계:</strong> 부모가 최종 귀환</li>
+                </ul>
+
+                <h4 style="color: var(--green); margin: 1rem 0 0.5rem 0;">관찰 지표</h4>
+                <ul style="margin-bottom: 1rem;">
+                    <li>부모의 부재 중 울음 여부</li>
+                    <li>부모의 귀환 시 반응 (접근 vs 회피 vs 양가감정)</li>
+                    <li>낯선 사람과의 상호작용 정도</li>
+                    <li>탐색 행동의 활발성</li>
+                </ul>
+
+                <h4 style="color: var(--green); margin: 1rem 0 0.5rem 0;">애착 유형 판정</h4>
+                <p style="color: var(--text-secondary);">이 실험을 통해 아이의 애착 유형을 명확히 판정할 수 있으며, 이는 발달심리 진단에 표준으로 사용되고 있습니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section fade-up">
+        <div class="deep-dive">
+            <div class="deep-dive-header" onclick="toggleDeepDive(event)">
+                <span>🧠 Deep Dive: Internal Working Model (내적 작동 모델)</span>
+                <span class="deep-dive-toggle">▼</span>
+            </div>
+            <div class="deep-dive-content">
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);">Bowlby가 제시한 가장 중요한 개념으로, 아이가 부모의 반응 패턴을 통해 형성하는 "관계에 대한 심리 지도"입니다.</p>
+                
+                <h4 style="color: var(--green); margin: 1rem 0 0.5rem 0;">안정 애착 아이의 IWM</h4>
+                <ul style="margin-bottom: 1rem;">
+                    <li>"부모는 믿을 수 있다" → 세상은 안전하다고 지각</li>
+                    <li>"내가 울면 부모가 온다" → 자신을 가치 있는 사람으로 여김</li>
+                    <li>"위험할 때는 부모를 찾아도 된다" → 도움 요청을 당연시함</li>
+                    <li>결과: 독립적이면서도 필요할 때 도움을 청하는 건강한 성인</li>
+                </ul>
+
+                <h4 style="color: var(--green); margin: 1rem 0 0.5rem 0;">불안정 애착 아이의 IWM</h4>
+                <ul style="margin-bottom: 1rem;">
+                    <li><strong>저항형:</strong> "부모는 예측 불가능하다" → 지속적 불안감, 과도한 집착</li>
+                    <li><strong>회피형:</strong> "부모는 내 신호를 무시한다" → 감정 억압, 독립 외형</li>
+                    <li><strong>혼란형:</strong> "부모는 위협이다" → 신뢰 기초 부족, 관계 회피</li>
+                </ul>
+
+                <h4 style="color: var(--green); margin: 1rem 0 0.5rem 0;">장기적 영향</h4>
+                <p style="color: var(--text-secondary);">IWM은 성인기 파트너 관계, 직업 관계, 스트레스 대처 방식까지 영향을 미칩니다. 하지만 치료적 관계, 일관된 애정 관계 등으로 재형성이 가능합니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section fade-up">
+        <h2 class="section-title">
+            <span class="section-number">3</span>애착 유형 비교
+        </h2>
+        <div class="diagram-container">
+            <div class="diagram-title">4가지 애착 유형의 특징 비교</div>
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div class="comparison-header-cell">유형</div>
+                    <div class="comparison-header-cell">부모 반응 패턴</div>
+                    <div class="comparison-header-cell">아이의 행동</div>
+                    <div class="comparison-header-cell">성인기 결과</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell"><strong style="color: var(--green);">안정 애착</strong></div>
+                    <div class="comparison-cell">일관적, 신뢰할 수 있음</div>
+                    <div class="comparison-cell">부모와 안전기지 형성, 탐색 활발</div>
+                    <div class="comparison-cell">안정적 관계, 높은 자존감</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell"><strong style="color: var(--gold);">저항형</strong></div>
+                    <div class="comparison-cell">불규칙, 예측 불가</div>
+                    <div class="comparison-cell">부모 집착, 분리불안, 탐색 미흡</div>
+                    <div class="comparison-cell">불안정 관계, 질투심, 의존</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell"><strong style="color: var(--danger);">회피형</strong></div>
+                    <div class="comparison-cell">거의 반응하지 않음</div>
+                    <div class="comparison-cell">부모 무시, 감정 억압</div>
+                    <div class="comparison-cell">회피적 관계, 감정 억압</div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-cell"><strong style="color: #FF9999;">혼란형</strong></div>
+                    <div class="comparison-cell">두려운, 학대적</div>
+                    <div class="comparison-cell">접근-회피 반복, 예측 불가</div>
+                    <div class="comparison-cell">관계 회피, 신뢰 결핍</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section fade-up">
+        <h2 class="section-title">
+            <span class="section-number">4</span>애착 순환 구조
+        </h2>
+        <div class="diagram-container">
+            <div class="diagram-title">안정 애착의 순환 메커니즘 vs 불안정 애착</div>
+            <svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
+                <defs>
+                    <marker id="arrowhead-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#4ABF8A"/>
+                    </marker>
+                    <marker id="arrowhead-gold" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#C9A84C"/>
+                    </marker>
+                    <marker id="arrowhead-danger" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#E85D5D"/>
+                    </marker>
+                </defs>
+
+                <text x="175" y="30" font-family="Noto Sans KR" font-size="14" font-weight="700" text-anchor="middle" fill="#4ABF8A">안정 애착</text>
+
+                <circle cx="175" cy="150" r="140" fill="none" stroke="#2A2D35" stroke-width="2" stroke-dasharray="5,5"/>
+
+                <circle cx="175" cy="150" r="35" fill="#4ABF8A" opacity="0.2" stroke="#4ABF8A" stroke-width="2"/>
+                <text x="175" y="160" font-family="Noto Sans KR" font-size="13" font-weight="600" text-anchor="middle" fill="#4ABF8A">신뢰</text>
+
+                <circle cx="175" cy="30" r="25" fill="#12151B" stroke="#C9A84C" stroke-width="2"/>
+                <text x="175" y="36" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#C9A84C">신호</text>
+
+                <path d="M 175 55 L 175 95" stroke="#4ABF8A" stroke-width="2" fill="none" marker-end="url(#arrowhead-green)"/>
+
+                <circle cx="290" cy="150" r="25" fill="#12151B" stroke="#4ABF8A" stroke-width="2"/>
+                <text x="290" y="156" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#4ABF8A">반응</text>
+
+                <path d="M 270 160 L 220 200" stroke="#4ABF8A" stroke-width="2" fill="none" marker-end="url(#arrowhead-green)"/>
+
+                <circle cx="175" cy="270" r="25" fill="#12151B" stroke="#4ABF8A" stroke-width="2"/>
+                <text x="175" y="276" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#4ABF8A">탐색</text>
+
+                <path d="M 155 255 L 130 190" stroke="#4ABF8A" stroke-width="2" fill="none" marker-end="url(#arrowhead-green)"/>
+
+                <circle cx="60" cy="150" r="25" fill="#12151B" stroke="#4ABF8A" stroke-width="2"/>
+                <text x="60" y="156" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#4ABF8A">안전기지</text>
+
+                <text x="175" y="330" font-family="Noto Sans KR" font-size="11" font-weight="600" text-anchor="middle" fill="#4ABF8A">선순환: 신뢰 강화</text>
+
+                <text x="825" y="30" font-family="Noto Sans KR" font-size="14" font-weight="700" text-anchor="middle" fill="#E85D5D">불안정 애착</text>
+
+                <circle cx="825" cy="150" r="140" fill="none" stroke="#2A2D35" stroke-width="2" stroke-dasharray="5,5"/>
+
+                <circle cx="825" cy="150" r="35" fill="#E85D5D" opacity="0.2" stroke="#E85D5D" stroke-width="2"/>
+                <text x="825" y="160" font-family="Noto Sans KR" font-size="13" font-weight="600" text-anchor="middle" fill="#E85D5D">불안</text>
+
+                <circle cx="825" cy="30" r="25" fill="#12151B" stroke="#C9A84C" stroke-width="2"/>
+                <text x="825" y="36" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#C9A84C">신호</text>
+
+                <path d="M 825 55 L 825 95" stroke="#E85D5D" stroke-width="2" fill="none" marker-end="url(#arrowhead-danger)"/>
+
+                <circle cx="940" cy="150" r="25" fill="#12151B" stroke="#E85D5D" stroke-width="2"/>
+                <text x="940" y="156" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#E85D5D">불규칙</text>
+
+                <path d="M 920 160 L 870 200" stroke="#E85D5D" stroke-width="2" fill="none" marker-end="url(#arrowhead-danger)"/>
+
+                <circle cx="825" cy="270" r="25" fill="#12151B" stroke="#E85D5D" stroke-width="2"/>
+                <text x="825" y="276" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#E85D5D">불안심화</text>
+
+                <path d="M 805 255 L 780 190" stroke="#E85D5D" stroke-width="2" fill="none" marker-end="url(#arrowhead-danger)"/>
+
+                <circle cx="710" cy="150" r="25" fill="#12151B" stroke="#E85D5D" stroke-width="2"/>
+                <text x="710" y="156" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#E85D5D">집착/회피</text>
+
+                <text x="825" y="330" font-family="Noto Sans KR" font-size="11" font-weight="600" text-anchor="middle" fill="#E85D5D">악순환: 불안 증폭</text>
+
+                <text x="500" y="380" font-family="Noto Sans KR" font-size="12" font-weight="600" text-anchor="middle" fill="#4ABF8A">부모의 반응 일관성이 아이의 신경계를 조절(교감신경 ↔ 부교감신경) 하는 메커니즘</text>
+                <text x="500" y="410" font-family="Noto Sans KR" font-size="11" text-anchor="middle" fill="#A0A0A0">안정 애착 아이: HPA축 정상 활성화 → 스트레스 호르몬 정상 수준</text>
+                <text x="500" y="430" font-family="Noto Sans KR" font-size="11" text-anchor="middle" fill="#A0A0A0">불안정 애착 아이: HPA축 과활성화 → 만성 스트레스 상태 → 전전두피질 발달 저해</text>
+            </svg>
+        </div>
+    </section>
+
+    <section class="section fade-up">
+        <h2 class="section-title">
+            <span class="section-number">5</span>실전 3-턴 다이얼로그
+        </h2>
+        <div class="practice-guide">
+            <div class="age-tabs">
+                <button class="age-tab active" onclick="switchTab(event, 'age6')">첫째 (5-7세)</button>
+                <button class="age-tab" onclick="switchTab(event, 'age3')">둘째 (2-4세)</button>
+            </div>
+
+            <div id="age6" class="tab-content active">
+                <h3 style="color: var(--green); margin-bottom: 1rem; font-weight: 600;">5-7세 아이: 초등 준비 단계 — 언어적 애착 강화</h3>
+
+                <div class="dialog-exchange">
+                    <div class="dialog-scenario">상황 1: 아침 등원 의식 (5분 투자)</div>
+                    
+                    <div class="dialog-turn dad">
+                        <div class="dialog-speaker">아빠</div>
+                        <div class="dialog-text">"오늘 학교에서 제일 하고 싶은 게 뭐야? 우리 아이 목표를 들어볼까."</div>
+                    </div>
+
+                    <div class="dialog-turn child">
+                        <div class="dialog-speaker">아이</div>
+                        <div class="dialog-text">"미술 시간에 그림을 좀 더 잘 그리고 싶어요."</div>
+                    </div>
+
+                    <div class="dialog-turn dad-response">
+                        <div class="dialog-speaker">아빠 (후속 반응)</div>
+                        <div class="dialog-text">"좋은 목표네. 내가 데리러 올 때 그림 어땠는지 들어볼게. 그리고 우리 아이가 힘들 때는 손 들고 선생님께 물어봐도 돼. 엄마(아빠)는 항상 오후 3시에 너를 데리러 올 거야. 약속이야."</div>
+                    </div>
+
+                    <div class="do-dont">
+                        <div class="do-box">일관되게 귀가 시간을 지키고, "나는 항상 너를 데리러 온다"는 메시지를 반복하기. 아이의 뇌가 패턴을 학습할 때까지 지속 필요.</div>
+                        <div class="dont-box">일정이 바뀌게 되면 아침에 미리 알려주기. 갑작스러운 변화는 분리불안을 악화시킴. "오늘은 할머니가 데리러 올 거야"는 미리 공지.</div>
+                    </div>
+                </div>
+
+                <div class="dialog-exchange">
+                    <div class="dialog-scenario">상황 2: 저녁 귀가 의식 (핵심)</div>
+                    
+                    <div class="dialog-turn dad">
+                        <div class="dialog-speaker">아빠</div>
+                        <div class="dialog-text">아이가 나타나면 먼저 핸드폰을 내려놓고, 눈맞춤을 하며 "오늘 어땠어?"라고 물으면 안 됨. 대신: "아침에 그림 목표가 어땠어? 선생님이 뭐라고 했어?"</div>
+                    </div>
+
+                    <div class="dialog-turn child">
+                        <div class="dialog-speaker">아이</div>
+                        <div class="dialog-text">"선생님이 칭찬해 주셨어요!"</div>
+                    </div>
+
+                    <div class="dialog-turn dad-response">
+                        <div class="dialog-speaker">아빠 (반응)</div>
+                        <div class="dialog-text">"정말? 그럼 우리 아이가 열심히 했구나. 내가 자랑스러워. 어디를 제일 잘 그렸어? 내가 봐도 될까?"</div>
+                    </div>
+
+                    <div class="do-dont">
+                        <div class="do-box">아이의 말을 끝까지 듣고, 구체적인 후속 질문으로 깊이 있게 상호작용. 이는 아이의 전전두피질 발달을 직접 자극함.</div>
+                        <div class="dont-box">피곤해 보인다고 상호작용을 건너뛰기. 귀가 직후 5-10분이 애착 신호의 가장 민감한 시간.</div>
+                    </div>
+                </div>
+
+                <div class="dialog-exchange">
+                    <div class="dialog-scenario">상황 3: 자기 전 의식 (몸과 마음 안정)</div>
+                    
+                    <div class="dialog-turn dad">
+                        <div class="dialog-speaker">아빠</div>
+                        <div class="dialog-text">"오늘 하루 동안 우리 아이가 어려웠던 순간이 있었어? 아빠에게 얘기해 줄 수 있어?"</div>
+                    </div>
+
+                    <div class="dialog-turn child">
+                        <div class="dialog-speaker">아이</div>
+                        <div class="dialog-text">"수학 시간에 문제를 못 풀어서 슬펐어요."</div>
+                    </div>
+
+                    <div class="dialog-turn dad-response">
+                        <div class="dialog-speaker">아빠</div>
+                        <div class="dialog-text">"그럴 수 있지. 6살 아이도 아직 배우는 거고. 내일 선생님한테 다시 물어봐도 돼. 모르는 게 당연해. 그리고 여긴 안전한 곳이야. 아빠는 여기 있어. 자 이제 편히 자고, 내일 또 뵐게."</div>
+                    </div>
+
+                    <div class="do-dont">
+                        <div class="do-box">아이의 감정을 인정하고, "안전하다"는 메시지 전달. 이것이 과도한 HPA축 활성화를 낮추는 핵심.</div>
+                        <div class="dont-box">아이의 불안을 무시하거나, "그깟 거 뭐 하는 거야"라고 내팽개치기. 아이는 부모가 내 감정을 중요하지 않게 여긴다고 해석.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="age3" class="tab-content">
+                <h3 style="color: var(--green); margin-bottom: 1rem; font-weight: 600;">2-4세 아이: 분리 불안 극복 — 일관된 신호</h3>
+
+                <div class="dialog-exchange">
+                    <div class="dialog-scenario">상황 1: 아침 헤어짐 (비통상적으로 중요)</div>
+                    
+                    <div class="dialog-turn dad">
+                        <div class="dialog-speaker">아빠</div>
+                        <div class="dialog-text">"엄마(아빠) 일 가볼게. 너는 선생님이랑 재미있게 놀아."</div>
+                    </div>
+
+                    <div class="dialog-turn child">
+                        <div class="dialog-speaker">아이</div>
+                        <div class="dialog-text">"아빠 가지 마! 우엉 (울음)"</div>
+                    </div>
+
+                    <div class="dialog-turn dad-response">
+                        <div class="dialog-speaker">아빠</div>
+                        <div class="dialog-text">"아빠가 잠깐 가는 거야. 데리러 올 거니까 기다려. 선생님이 너한테 좋은 사람이야. 아빠가 곧 와. 뽀뽀하고 가." (물리적으로 안아주되, 결연한 태도 유지. 미안해하거나 불안해 보이면 안 됨)</div>
+                    </div>
+
+                    <div class="do-dont">
+                        <div class="do-box">매일 같은 시간, 같은 방식으로 헤어지기. 아이는 이 반복을 통해 "또 돌아올 거야"라는 뇌 패턴을 형성. 3주 정도 지나면 울음이 줄어듦.</div>
+                        <div class="dont-box">아이가 울까봐 헤어지는 것을 미루거나, 조용히 빠져나가기. 후자는 신뢰 붕괴를 초래해 불안을 악화시킴.</div>
+                    </div>
+                </div>
+
+                <div class="dialog-exchange">
+                    <div class="dialog-scenario">상황 2: 귀가 의식 (재결합)</div>
+                    
+                    <div class="dialog-turn dad">
+                        <div class="dialog-speaker">아빠</div>
+                        <div class="dialog-text">아이가 뛰어올 때 바로 안아주고, 15-20초 간 눈맞춤과 신체 접촉 유지.</div>
+                    </div>
+
+                    <div class="dialog-turn child">
+                        <div class="dialog-speaker">아이</div>
+                        <div class="dialog-text">"아빠! (안기거나 때리는 행동)" — 회피형 아이는 때릴 수 있음. 이는 혼란의 신호.</div>
+                    </div>
+
+                    <div class="dialog-turn dad-response">
+                        <div class="dialog-speaker">아빠</div>
+                        <div class="dialog-text">"아빠가 왔어. 너를 본 게 얼마나 좋은지! 오늘 어땠어? 재미있었어? 힘들었어?" (아이의 정서 상태를 문장으로 인정)</div>
+                    </div>
+
+                    <div class="do-dont">
+                        <div class="do-box">귀가 직후 핸드폰 무조건 내려놓기. 아이는 부모의 물리적 복귀와 정서적 복귀 모두가 필요.</div>
+                        <div class="dont-box">귀가 후 5분 이내에 숙제, 간식, 목욕 등을 강제하기. 먼저 정서적 연결, 그 다음에 실무적 일정.</div>
+                    </div>
+                </div>
+
+                <div class="dialog-exchange">
+                    <div class="dialog-scenario">상황 3: 자기 전 재보장 의식</div>
+                    
+                    <div class="dialog-turn dad">
+                        <div class="dialog-speaker">아빠</div>
+                        <div class="dialog-text">"내일도 엄마(아빠)가 데리러 올 거야. 약속."</div>
+                    </div>
+
+                    <div class="dialog-turn child">
+                        <div class="dialog-speaker">아이</div>
+                        <div class="dialog-text">"꼭 와?"</div>
+                    </div>
+
+                    <div class="dialog-turn dad-response">
+                        <div class="dialog-speaker">아빠</div>
+                        <div class="dialog-text">"응, 꼭 와. 아빠는 항상 너를 데리러 가. 자 이제 푹 자고 좋은 꿈 꿔. 아빠가 보고 있어." (신체 접촉 유지)</div>
+                    </div>
+
+                    <div class="do-dont">
+                        <div class="do-box">같은 말을 반복해도 괜찮음. 아이는 이 반복 자체에서 안전감을 얻음. "약속"이라는 단어 사용이 효과적.</div>
+                        <div class="dont-box">아이가 자기 전에 불안해하면 "그런 거 생각하지 마"라고 하기. 감정을 억누르면 내적 불안은 심화됨.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section fade-up">
+        <h2 class="section-title">
+            <span class="section-number">6</span>형제자매 & 부부 관계 팁
+        </h2>
+
+        <div class="relationship-tip">
+            <div class="relationship-tip-title">형제자매별 애착 신호 읽기</div>
+            <p style="margin-bottom: 1rem; color: var(--text-secondary);">각 아이의 애착 신호는 태어난 순서, 기질, 성별에 따라 다릅니다. 첫째와 둘째의 필요를 동시에 만족시키는 것이 핵심입니다.</p>
+            
+            <p style="margin-bottom: 0.5rem;"><strong style="color: var(--green);">첫째의 특징:</strong> 언어로 표현 가능. "엄마 봐, 나 봐"라고 명확히 신호. 부모의 관심 분산에 민감. 형제 출생 후 일관된 개인 시간(1:1 일정) 필요.</p>
+            
+            <p style="margin-bottom: 0.5rem;"><strong style="color: var(--green);">둘째의 특징:</strong> 신체 신호로 표현 (울음, 몸부림). 더 자주 울기만 해도 불안정 애착의 신호일 수 있음. "더 자주 울긴 하지만 방치해도 된다"는 함정에 빠지기 쉬움.</p>
+            
+            <p style="color: var(--text-secondary);"><strong style="color: var(--gold);">부모의 대응:</strong> 공평함(동일함)과 공정함(필요에 맞춤)을 구분. 한 아이가 더 많은 지속적 반응을 필요로 한다면 제공하되, 다른 아이를 완전히 배제하지 않도록 주의. 예: 둘째가 울 때 첫째도 함께 안기 vs 첫째만 밀어내기</p>
+        </div>
+
+        <div class="relationship-tip">
+            <div class="relationship-tip-title">부부 공동양육과 스트레스 관리</div>
+            <p style="margin-bottom: 1rem; color: var(--text-secondary);">아이의 애착 안정성은 부모 간 신뢰와 협력에도 영향을 받습니다. 부부가 서로 다른 애착 방식을 가질 때 아이는 혼란을 경험합니다.</p>
+            
+            <p style="margin-bottom: 0.5rem;"><strong style="color: var(--green);">상황:</strong> 엄마는 민감한 애착(자주 안음), 아빠는 거리를 두는 애착(독립 강조)</p>
+            
+            <p style="margin-bottom: 0.5rem;"><strong style="color: var(--gold);">해결:</strong> 주 1회 15분, 부부만의 시간 가지기. "우리 육아 방식이 다르다"는 인정. 아이 앞에서 부부 관계의 일관성과 신뢰 표현 (작은 신체 접촉, 감사 표현). 아버지도 아이 애착의 주요 제공자임을 재확인.</p>
+            
+            <p style="color: var(--text-secondary);"><strong style="color: var(--danger);">주의:</strong> 부부 갈등 중에 아이가 한쪽 부모를 선택하도록 강요하면 아이는 "부모를 잃을까봐"라는 불안감으로 혼란형 애착이 발달합니다.</p>
+        </div>
+    </section>
+
+    <section class="section fade-up">
+        <h2 class="section-title">
+            <span class="section-number">7</span>학습 확인
+        </h2>
+
+        <div class="quiz-container">
+            <div class="quiz-number">Quiz 1</div>
+            <div class="quiz-question">Bowlby의 애착 이론에서 "안정 애착"의 가장 중요한 요소는 무엇인가요?</div>
+            <div class="quiz-options">
+                <label class="quiz-option">
+                    <input type="radio" name="quiz1" value="a" onchange="checkQuiz1('a')"> 부모가 항상 아이와 함께 있기
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz1" value="b" onchange="checkQuiz1('b')"> 부모의 반응이 일관적이고 신뢰할 수 있기
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz1" value="c" onchange="checkQuiz1('c')"> 아이의 모든 요구를 즉시 들어주기
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz1" value="d" onchange="checkQuiz1('d')"> 엄격한 규칙을 세우고 일관되게 집행하기
+                </label>
+            </div>
+            <div id="feedback1" class="quiz-feedback"></div>
+            <div class="spaced-repetition">
+                <div class="sr-title">학습 진도</div>
+                <div class="sr-bar">
+                    <div class="sr-progress" id="progress1" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quiz-container">
+            <div class="quiz-number">Quiz 2</div>
+            <div class="quiz-question">아버지와 어머니의 애착 관계에서 가장 큰 신경생물학적 차이는?</div>
+            <div class="quiz-options">
+                <label class="quiz-option">
+                    <input type="radio" name="quiz2" value="a" onchange="checkQuiz2('a')"> 어머니는 옥시토신, 아버지는 바소프레신이 더 활성화됨
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz2" value="b" onchange="checkQuiz2('b')"> 어머니만 뇌에서 애착 호르몬이 분비됨
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz2" value="c" onchange="checkQuiz2('c')"> 아버지의 애착은 애초에 별로 중요하지 않음
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz2" value="d" onchange="checkQuiz2('d')"> 신경생물학적 차이가 전혀 없음
+                </label>
+            </div>
+            <div id="feedback2" class="quiz-feedback"></div>
+            <div class="spaced-repetition">
+                <div class="sr-title">학습 진도</div>
+                <div class="sr-bar">
+                    <div class="sr-progress" id="progress2" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quiz-container">
+            <div class="quiz-number">Quiz 3</div>
+            <div class="quiz-question">부모의 일관된 반응이 아이의 뇌에 직접 영향을 미치는 신경계 영역은?</div>
+            <div class="quiz-options">
+                <label class="quiz-option">
+                    <input type="radio" name="quiz3" value="a" onchange="checkQuiz3('a')"> HPA축 (시상하부-뇌하수체-부신축)
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz3" value="b" onchange="checkQuiz3('b')"> 전전두피질과 편도체의 발달 비율
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz3" value="c" onchange="checkQuiz3('c')"> 위의 모든 것
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz3" value="d" onchange="checkQuiz3('d')"> 애착은 뇌 발달과 무관함
+                </label>
+            </div>
+            <div id="feedback3" class="quiz-feedback"></div>
+            <div class="spaced-repetition">
+                <div class="sr-title">학습 진도</div>
+                <div class="sr-bar">
+                    <div class="sr-progress" id="progress3" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const fadeUpObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeUp 0.6s ease-out forwards';
+                    fadeUpObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-up').forEach(element => {
+            fadeUpObserver.observe(element);
+        });
+
+        let timerInterval = null;
+        let timeLeft = 25 * 60;
+
+        function openPomodoroModal() {
+            document.getElementById('pomodoroModal').classList.add('active');
+        }
+
+        function closePomodoroModal() {
+            document.getElementById('pomodoroModal').classList.remove('active');
+            if (timerInterval) clearInterval(timerInterval);
+            timeLeft = 25 * 60;
+            updateTimerDisplay();
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'block';
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    alert('25분 완료! 수고하셨습니다.');
+                    document.getElementById('startBtn').style.display = 'block';
+                    document.getElementById('stopBtn').style.display = 'none';
+                    timeLeft = 25 * 60;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+        }
+
+        function resetTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+            timeLeft = 25 * 60;
+            updateTimerDisplay();
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timerDisplay').textContent =
+                String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        }
+
+        function switchTab(event, tabId) {
+            event.preventDefault();
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.age-tab').forEach(tab => tab.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function toggleDeepDive(event) {
+            const header = event.currentTarget;
+            const content = header.nextElementSibling;
+            const toggle = header.querySelector('.deep-dive-toggle');
+
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                toggle.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('active');
+                toggle.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        function checkQuiz1(answer) {
+            const feedback = document.getElementById('feedback1');
+            const correct = answer === 'b';
+
+            if (correct) {
+                feedback.textContent = '✓ 정답입니다! 일관성 있는 반응이 안정 애착의 핵심입니다. 아이의 뇌는 부모의 반응 패턴을 학습하고, 이것이 신경계 조절의 기초가 됩니다.';
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                document.getElementById('progress1').style.width = '100%';
+            } else {
+                feedback.textContent = '✗ 다시 한 번 생각해보세요. 부모의 일관된 반응이 핵심입니다. 지속적 반응이 아이의 HPA축과 전전두피질 발달을 직접 조절합니다.';
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                document.getElementById('progress1').style.width = '30%';
+            }
+        }
+
+        function checkQuiz2(answer) {
+            const feedback = document.getElementById('feedback2');
+            const correct = answer === 'a';
+
+            if (correct) {
+                feedback.textContent = '✓ 정답입니다! 두 호르몬의 균형이 건강한 발달을 촉진합니다. 옥시토신은 안정감, 바소프레신은 탐색 능력을 제공합니다.';
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                document.getElementById('progress2').style.width = '100%';
+            } else {
+                feedback.textContent = '✗ 다시 한 번 생각해보세요. 아버지의 애착도 매우 중요하고 신경생물학적으로 어머니와 다르게 작동합니다.';
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                document.getElementById('progress2').style.width = '30%';
+            }
+        }
+
+        function checkQuiz3(answer) {
+            const feedback = document.getElementById('feedback3');
+            const correct = answer === 'c';
+
+            if (correct) {
+                feedback.textContent = '✓ 정답입니다! 부모의 일관된 반응은 HPA축, 전전두피질, 편도체 등 뇌 전반에 걸쳐 영향을 미칩니다.';
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                document.getElementById('progress3').style.width = '100%';
+            } else {
+                feedback.textContent = '✗ 다시 한 번 생각해보세요. 애착은 뇌 구조와 신경계 발달의 기초입니다.';
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                document.getElementById('progress3').style.width = '30%';
+            }
+        }
+    </script>
+</body>
+</html>

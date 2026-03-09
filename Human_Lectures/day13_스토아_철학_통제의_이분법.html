@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 13 — 스토아 철학: 통제의 이분법</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #8A6ABF;
+            --gold: #C9A84C;
+            --green: #6BBF8A;
+            --red: #BF6B6B;
+            --cyan: #6BB5BF;
+            --bg: #0A0C10;
+            --card: #12151C;
+            --card2: #161A24;
+            --text1: #E8E9F3;
+            --text2: #9EA0B8;
+            --border: rgba(138, 106, 191, 0.15);
+            --glow: rgba(138, 106, 191, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg);
+            color: var(--text1);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.1) 0%, rgba(201, 168, 76, 0.05) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .progress-bar {
+            width: 150px;
+            height: 6px;
+            background-color: var(--card2);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 59.1%;
+            background: linear-gradient(90deg, var(--purple) 0%, var(--gold) 100%);
+            border-radius: 3px;
+        }
+
+        /* Series Banner */
+        .series-banner {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem 2rem;
+            background-color: var(--card);
+            border-left: 4px solid var(--purple);
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: var(--text2);
+        }
+
+        .series-banner strong {
+            color: var(--gold);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.08) 0%, rgba(201, 168, 76, 0.04) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .gauge-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .gauge {
+            width: 180px;
+            height: 180px;
+            position: relative;
+        }
+
+        .gauge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .gauge-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 50%);
+            font-size: 0.75rem;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text1);
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text2);
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .meta-badges {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            padding: 0.5rem 1rem;
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text2);
+        }
+
+        .badge.highlight {
+            border-color: var(--purple);
+            color: var(--purple);
+        }
+
+        .keyword-badges {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .keyword {
+            padding: 0.4rem 0.8rem;
+            background-color: rgba(201, 168, 76, 0.1);
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        /* Learning Strategy */
+        .strategy-box {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .strategy-box h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .time-slot {
+            background-color: var(--card2);
+            border-left: 3px solid var(--purple);
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .time-slot-label {
+            font-weight: 600;
+            color: var(--purple);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .time-slot-content {
+            font-size: 0.9rem;
+            color: var(--text2);
+            line-height: 1.5;
+        }
+
+        .infp-tip {
+            background: linear-gradient(135deg, rgba(107, 181, 138, 0.1) 0%, rgba(107, 181, 138, 0.05) 100%);
+            border-left: 3px solid var(--green);
+            padding: 1.5rem;
+            border-radius: 6px;
+            font-style: italic;
+            color: var(--text2);
+        }
+
+        /* Concept Cards */
+        .concepts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .concept-card {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .concept-card:hover {
+            border-color: var(--purple);
+            box-shadow: 0 8px 32px rgba(138, 106, 191, 0.15);
+        }
+
+        .concept-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--purple) 0%, var(--gold) 100%);
+        }
+
+        .concept-card h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--gold);
+        }
+
+        .concept-card .subtitle {
+            font-size: 0.85rem;
+            color: var(--text2);
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .concept-card p {
+            font-size: 0.95rem;
+            color: var(--text2);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .examples {
+            background-color: var(--card2);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--text2);
+        }
+
+        .examples strong {
+            color: var(--cyan);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .example-item {
+            margin: 0.5rem 0 0.5rem 1.5rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .example-item::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--purple);
+        }
+
+        .deep-dive-toggle {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--purple);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .deep-dive-toggle:hover {
+            background-color: rgba(138, 106, 191, 0.1);
+            border-color: var(--purple);
+        }
+
+        .deep-dive {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            margin-top: 1rem;
+        }
+
+        .deep-dive.active {
+            max-height: 1000px;
+        }
+
+        .deep-dive-content {
+            background-color: var(--card2);
+            padding: 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: var(--text2);
+            border-left: 3px solid var(--cyan);
+        }
+
+        /* Diagram Section */
+        .diagram-section {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .diagram-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            color: var(--gold);
+        }
+
+        .diagram-svg {
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            display: block;
+        }
+
+        .diagram-legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            text-align: left;
+        }
+
+        .legend-item {
+            padding: 1rem;
+            background-color: var(--card2);
+            border-radius: 6px;
+            border-left: 3px solid var(--purple);
+        }
+
+        .legend-item strong {
+            color: var(--gold);
+        }
+
+        .legend-item p {
+            font-size: 0.9rem;
+            color: var(--text2);
+            margin-top: 0.5rem;
+        }
+
+        /* Practice Guide */
+        .practice-guide {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.1) 0%, rgba(201, 168, 76, 0.05) 100%);
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .practice-guide h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+        }
+
+        .practice-item {
+            background-color: var(--card);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--cyan);
+        }
+
+        .practice-item h4 {
+            color: var(--cyan);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .practice-item p {
+            color: var(--text2);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Philosophy Section */
+        .philosophy-section {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .philosophy-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+        }
+
+        .philosopher {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .philosopher:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .philosopher h4 {
+            color: var(--purple);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .quote-block {
+            background-color: var(--card2);
+            border-left: 3px solid var(--gold);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 6px;
+            font-style: italic;
+            color: var(--text2);
+            line-height: 1.7;
+        }
+
+        .quote-block::before {
+            content: '"';
+            font-size: 2rem;
+            color: var(--gold);
+            margin-right: 0.5rem;
+            line-height: 0.5;
+        }
+
+        .neuroscience-connection {
+            background: linear-gradient(135deg, rgba(107, 181, 181, 0.1) 0%, rgba(107, 181, 181, 0.05) 100%);
+            border-left: 3px solid var(--cyan);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: var(--text2);
+        }
+
+        .neuroscience-connection strong {
+            color: var(--cyan);
+        }
+
+        /* Quiz Section */
+        .quiz-section {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .quiz-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+        }
+
+        .quiz-item {
+            background-color: var(--card2);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--cyan);
+        }
+
+        .quiz-item h4 {
+            color: var(--cyan);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .quiz-question {
+            color: var(--text1);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-option {
+            padding: 0.75rem 1rem;
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text2);
+        }
+
+        .quiz-option:hover {
+            border-color: var(--purple);
+            background-color: rgba(138, 106, 191, 0.05);
+        }
+
+        .quiz-option.selected {
+            border-color: var(--purple);
+            background-color: rgba(138, 106, 191, 0.15);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--green);
+            background-color: rgba(107, 191, 138, 0.15);
+            color: var(--green);
+        }
+
+        .quiz-option.incorrect {
+            border-color: var(--red);
+            background-color: rgba(191, 107, 107, 0.15);
+            color: var(--red);
+        }
+
+        .quiz-feedback {
+            display: none;
+            padding: 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+        }
+
+        .quiz-feedback.correct {
+            background-color: rgba(107, 191, 138, 0.1);
+            border-left: 3px solid var(--green);
+            color: var(--green);
+        }
+
+        .quiz-feedback.incorrect {
+            background-color: rgba(191, 107, 107, 0.1);
+            border-left: 3px solid var(--red);
+            color: var(--red);
+        }
+
+        .check-button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--purple) 0%, var(--gold) 100%);
+            border: none;
+            border-radius: 4px;
+            color: var(--bg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(138, 106, 191, 0.3);
+        }
+
+        .check-button:active {
+            transform: translateY(0);
+        }
+
+        /* Spaced Repetition Tracker */
+        .spaced-rep {
+            background: linear-gradient(135deg, rgba(191, 107, 107, 0.1) 0%, rgba(191, 107, 107, 0.05) 100%);
+            border: 1px solid rgba(191, 107, 107, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .spaced-rep h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+        }
+
+        .rep-schedule {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .rep-day {
+            background-color: var(--card);
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .rep-day.checked {
+            border-color: var(--green);
+            background-color: rgba(107, 191, 138, 0.1);
+        }
+
+        .rep-day-label {
+            font-size: 0.85rem;
+            color: var(--text2);
+            margin-bottom: 0.5rem;
+        }
+
+        .rep-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .rep-checkbox:hover {
+            border-color: var(--purple);
+        }
+
+        .rep-checkbox.checked {
+            border-color: var(--green);
+            background-color: var(--green);
+            color: var(--bg);
+        }
+
+        /* Animations */
+        .ani {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .header-title {
+                font-size: 1.5rem;
+            }
+
+            .hero {
+                padding: 2rem 1.5rem;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .gauge {
+                width: 140px;
+                height: 140px;
+            }
+
+            .gauge-text {
+                font-size: 1.5rem;
+            }
+
+            .concepts {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 0 1.5rem 2rem;
+            }
+
+            header {
+                padding: 0.75rem 1.5rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .header-title {
+                font-size: 1.3rem;
+            }
+
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .meta-badges {
+                gap: 0.5rem;
+            }
+
+            .badge {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .time-slots {
+                grid-template-columns: 1fr;
+            }
+
+            .diagram-legend {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .container {
+                padding: 0 1rem 1.5rem;
+            }
+
+            header {
+                padding: 0.5rem 1rem;
+            }
+
+            .hero {
+                padding: 1.5rem 1rem;
+            }
+
+            .series-banner {
+                padding: 1rem;
+                margin: 1.5rem auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="header-title">인간 탐구</div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Series Banner -->
+    <div class="series-banner">
+        <strong>Part 3: 철학적 삶의 프레임</strong> | Day 13 of 22 | 스토아 철학: 통제의 이분법
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero ani">
+            <div class="gauge-container">
+                <svg class="gauge" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background circle -->
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(138, 106, 191, 0.15)" stroke-width="8"/>
+                    <!-- Progress arc -->
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#C9A84C" stroke-width="8" stroke-dasharray="155.8 264" stroke-linecap="round" stroke-dashoffset="-66.1" transform="rotate(-90 50 50)"/>
+                    <text class="gauge-text">59.1%</text>
+                    <text class="gauge-label" x="50" y="65">Progress</text>
+                </svg>
+            </div>
+
+            <h1>스토아 철학: 통제의 이분법</h1>
+            <p>당신이 정말 통제할 수 있는 것은 무엇인가?</p>
+
+            <div class="meta-badges">
+                <span class="badge highlight">Part 3</span>
+                <span class="badge">⏱ 25분</span>
+                <span class="badge">🔴 고급</span>
+            </div>
+
+            <div class="keyword-badges">
+                <span class="keyword">통제의 이분법</span>
+                <span class="keyword">에픽테토스</span>
+                <span class="keyword">자유의지</span>
+                <span class="keyword">스트레스 관리</span>
+                <span class="keyword">신경과학</span>
+            </div>
+        </section>
+
+        <!-- Learning Strategy -->
+        <section class="strategy-box ani">
+            <h3>학습 전략</h3>
+            <div class="time-slots">
+                <div class="time-slot">
+                    <div class="time-slot-label">0-5분</div>
+                    <div class="time-slot-content">통제의 이분법 개념 소개 및 개인적 사례 연결</div>
+                </div>
+                <div class="time-slot">
+                    <div class="time-slot-label">5-12분</div>
+                    <div class="time-slot-content">프로하이레시스와 신경과학적 기초 (전전두피질, 대뇌변연계)</div>
+                </div>
+                <div class="time-slot">
+                    <div class="time-slot-label">12-20분</div>
+                    <div class="time-slot-content">Locus of Control 개념과 2027년 이전 스트레스 대응</div>
+                </div>
+                <div class="time-slot">
+                    <div class="time-slot-label">20-25분</div>
+                    <div class="time-slot-content">실제 연습 및 일상 적용 (이사 결정, 직무 전환 상황)</div>
+                </div>
+            </div>
+
+            <div class="infp-tip">
+                💡 <strong>INFP를 위한 팁:</strong> 스토아 철학은 감정을 무시하지 않습니다. 오히려 당신의 감정을 존중하면서도, 실제로 통제할 수 있는 부분(당신의 가치관, 도덕적 선택, 노력의 방향)에 집중하세요. 통제 불가능한 것에 대한 불안감과 통제 가능한 것에 대한 책임감을 동시에 포용하는 것이 진정한 지혜입니다.
+            </div>
+        </section>
+
+        <!-- Concept Cards -->
+        <section class="concepts ani">
+            <!-- Card 1 -->
+            <div class="concept-card" onclick="toggleCard(this)">
+                <h3>통제의 이분법</h3>
+                <div class="subtitle">에픽테토스의 핵심 교리</div>
+                <p>스토아 철학자 에픽테토스(Epictetus, 50-135 AD)는 인생의 모든 것을 두 가지로 나눴습니다: <strong>우리가 통제할 수 있는 것(eph' hēmin)</strong>과 <strong>통제할 수 없는 것(ouk eph' hēmin)</strong>.</p>
+
+                <div class="examples">
+                    <strong>통제 가능한 것:</strong>
+                    <div class="example-item">당신의 신념, 가치관, 도덕적 선택</div>
+                    <div class="example-item">노력의 방향과 집중력</div>
+                    <div class="example-item">반응 방식과 태도</div>
+                    <div class="example-item">자기 통제와 자기 훈련</div>
+                </div>
+
+                <div class="examples">
+                    <strong>통제 불가능한 것:</strong>
+                    <div class="example-item">다른 사람의 행동과 판단</div>
+                    <div class="example-item">경제 상황, 건강 위기</div>
+                    <div class="example-item">조직 구조 변화, 이사 일정</div>
+                    <div class="example-item">자녀의 성격과 선택</div>
+                </div>
+
+                <div class="examples">
+                    <strong>당신의 상황에 적용:</strong>
+                    <div class="example-item">상사의 평가 ❌ | 당신의 성과 최대화 ✓</div>
+                    <div class="example-item">회사의 경영 변화 ❌ | 기술 향상에 대한 헌신 ✓</div>
+                    <div class="example-item">아이의 학교 적응 ❌ | 가정 환경과 정서적 지원 ✓</div>
+                </div>
+
+                <button class="deep-dive-toggle" onclick="event.stopPropagation()">깊이 있는 탐구</button>
+                <div class="deep-dive">
+                    <div class="deep-dive-content">
+                        <strong>신경과학적 해석:</strong><br>
+                        이분법은 뇌의 의사결정 시스템과 정확히 일치합니다. 당신이 통제할 수 있는 것들은 모두 <strong>전전두피질(Prefrontal Cortex, PFC)</strong>의 활성화가 필요합니다. 이것은 계획, 의도, 자기통제를 담당하는 영역입니다. 반대로 통제 불가능한 것들에 대해 PFC를 낭비하면, 뇌의 자원이 편도체(Amygdala)의 스트레스 반응으로 흡수되어 코르티솔이 지속적으로 증가합니다.<br><br>
+                        에픽테토스의 교리는 본질적으로 <strong>신경자원의 효율적 배분</strong>에 관한 것입니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="concept-card" onclick="toggleCard(this)">
+                <h3>프로하이레시스</h3>
+                <div class="subtitle">Prohairesis: 자유의지의 신경학</div>
+                <p>스토아 철학의 중심에는 <strong>프로하이레시스(prohairesis)</strong>라는 개념이 있습니다. 이는 단순한 선택이 아니라, 당신의 가치관에 기반한 <strong>의도적 선택</strong>입니다.</p>
+
+                <div class="examples">
+                    <strong>프로하이레시스의 3가지 요소:</strong>
+                    <div class="example-item">판단: 상황을 도덕적으로 평가하는 능력</div>
+                    <div class="example-item">의도: 가치관에 따른 명확한 목표 설정</div>
+                    <div class="example-item">실행: 일관성 있는 행동</div>
+                </div>
+
+                <div class="examples">
+                    <strong>당신의 삶에서:</strong>
+                    <div class="example-item">2027년 새 지역 이전: 불안감 대신 "어떤 엔지니어가 되고 싶은가?"에 집중</div>
+                    <div class="example-item">아이들과의 시간: 스트레스받지 말고, "어떤 아버지가 되고 싶은가?" 선택</div>
+                </div>
+
+                <button class="deep-dive-toggle" onclick="event.stopPropagation()">깊이 있는 탐구</button>
+                <div class="deep-dive">
+                    <div class="deep-dive-content">
+                        <strong>전전두피질과 도덕적 판단:</strong><br>
+                        프로하이레시스는 <strong>배외측 전전두피질(dorsolateral PFC)</strong>와 <strong>내측 전전두피질(medial PFC)</strong>의 협력으로 구현됩니다. 배외측 PFC는 의도적 주의 조절(당신의 가치관에 맞는 목표에만 집중)을 담당하고, 내측 PFC는 자기 참조적 사고(이것이 나의 가치인가?)를 담당합니다.<br><br>
+                        <strong>전대상피질(Anterior Cingulate Cortex, ACC)</strong>는 이 과정에서 갈등 모니터링 역할을 합니다. "통제 불가능한 것에 신경 쓰고 있는가?"라는 신호를 발생시킵니다.<br><br>
+                        프로하이레시스를 연습하면, 당신의 뇌가 점점 더 효율적으로 자기 통제를 실행하게 됩니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="concept-card" onclick="toggleCard(this)">
+                <h3>Locus of Control</h3>
+                <div class="subtitle">통제 소재: 심리학과 신경과학</div>
+                <p><strong>Locus of Control(통제 소재)</strong>는 심리학자 Julian Rotter(1954)의 개념으로, 우리가 사건을 얼마나 통제할 수 있다고 믿는지를 측정합니다.</p>
+
+                <div class="examples">
+                    <strong>내적 통제 소재 (Internal):</strong>
+                    <div class="example-item">성공과 실패가 자신의 행동 때문이라고 믿음</div>
+                    <div class="example-item">스트레스 호르몬(코르티솔) 수치: ↓</div>
+                    <div class="example-item">심리적 회복력: ↑</div>
+                </div>
+
+                <div class="examples">
+                    <strong>외적 통제 소재 (External):</strong>
+                    <div class="example-item">운명, 운, 다른 사람 탓</div>
+                    <div class="example-item">코르티솔 수치: ↑↑↑</div>
+                    <div class="example-item">무기력감, 우울증 위험: ↑</div>
+                </div>
+
+                <button class="deep-dive-toggle" onclick="event.stopPropagation()">깊이 있는 탐구</button>
+                <div class="deep-dive">
+                    <div class="deep-dive-content">
+                        <strong>신경내분비학적 증거:</strong><br>
+                        2019년 메타분석(심리학 리뷰)에 따르면, 높은 내적 통제 소재를 가진 사람들은 스트레스 상황에서 <strong>코르티솔 반응이 낮습니다</strong>. 왜? 왜냐하면 뇌가 "이것은 내가 행동할 수 있는 상황"이라고 평가하기 때문입니다.<br><br>
+                        반대로 외적 통제 소재가 높으면, 편도체가 과활성화되고 HPA축(Hypothalamic-Pituitary-Adrenal axis)이 지속적으로 활성화됩니다. 이것이 만성 스트레스입니다.<br><br>
+                        <strong>좋은 소식:</strong> 통제 소재는 고정된 특성이 아닙니다. 스토아 철학을 통해 당신의 신경계를 재프로그래밍할 수 있습니다.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Diagram Section -->
+        <section class="diagram-section ani">
+            <h3>당신의 통제 영역</h3>
+            <p style="color: var(--text2); margin-bottom: 2rem;">에픽테토스의 이분법을 동심원으로 시각화</p>
+
+            <svg class="diagram-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                <!-- Outer circle: 통제 불가능 -->
+                <circle cx="200" cy="200" r="180" fill="rgba(191, 107, 107, 0.05)" stroke="rgba(191, 107, 107, 0.3)" stroke-width="2" stroke-dasharray="5,5"/>
+
+                <!-- Middle circle: 영향 가능 -->
+                <circle cx="200" cy="200" r="110" fill="rgba(107, 181, 191, 0.08)" stroke="rgba(107, 181, 191, 0.4)" stroke-width="2"/>
+
+                <!-- Inner circle: 통제 가능 -->
+                <circle cx="200" cy="200" r="50" fill="rgba(138, 106, 191, 0.15)" stroke="rgba(138, 106, 191, 0.6)" stroke-width="2"/>
+
+                <!-- Center dot -->
+                <circle cx="200" cy="200" r="6" fill="#C9A84C"/>
+
+                <!-- Labels -->
+                <text x="200" y="205" text-anchor="middle" font-size="16" font-weight="700" fill="#C9A84C" font-family="'Noto Sans KR'">나의 선택</text>
+
+                <text x="200" y="140" text-anchor="middle" font-size="13" fill="var(--gold)" font-family="'Noto Sans KR'">통제 영역</text>
+                <text x="200" y="155" text-anchor="middle" font-size="11" fill="rgba(201, 168, 76, 0.8)" font-family="'Noto Sans KR'">신념, 노력, 태도</text>
+
+                <text x="200" y="70" text-anchor="middle" font-size="13" fill="#6BB5BF" font-family="'Noto Sans KR'">영향 가능 영역</text>
+                <text x="200" y="85" text-anchor="middle" font-size="11" fill="rgba(107, 181, 191, 0.8)" font-family="'Noto Sans KR'">대화, 설득, 노력</text>
+
+                <text x="200" y="30" text-anchor="middle" font-size="13" fill="#BF6B6B" font-family="'Noto Sans KR'">통제 불가능 영역</text>
+                <text x="200" y="45" text-anchor="middle" font-size="11" fill="rgba(191, 107, 107, 0.8)" font-family="'Noto Sans KR'">받아들임, 관찰</text>
+            </svg>
+
+            <div class="diagram-legend">
+                <div class="legend-item">
+                    <strong>최내각 (당신의 선택)</strong>
+                    <p>당신의 신념 · 판단 · 도덕적 선택 · 노력의 방향 · 태도 · 자기 훈련</p>
+                </div>
+                <div class="legend-item">
+                    <strong>중간층 (영향 가능)</strong>
+                    <p>상사와의 관계 · 팀 문화 · 가족과의 대화 · 아이의 성장 환경</p>
+                </div>
+                <div class="legend-item">
+                    <strong>최외각 (통제 불가능)</strong>
+                    <p>경제 상황 · 조직 개편 · 이사 일정 · 타인의 행동 · 질병</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Practice Guide -->
+        <section class="practice-guide ani">
+            <h3>실천 가이드</h3>
+
+            <div class="practice-item">
+                <h4>⏱ 30초 - 통제 이분법 질문</h4>
+                <p>지금 당신을 괴롭히는 일에 대해 물어보세요:</p>
+                <p style="margin-top: 0.75rem; padding: 1rem; background-color: var(--card2); border-radius: 4px; font-style: italic;">
+                    "이것은 내가 통제할 수 있는가?"<br>
+                    → YES: 즉시 행동하라. 무엇을 할 수 있는가?<br>
+                    → NO: 관찰하고 받아들이라. 감정을 느끼되, 그것에 종속되지 말라.
+                </p>
+            </div>
+
+            <div class="practice-item">
+                <h4>📝 5분 - 저널링: 오늘의 걱정 분류</h4>
+                <p>종이에 적으세요:</p>
+                <ul style="margin-top: 0.75rem; margin-left: 1.5rem; color: var(--text2);">
+                    <li>오늘 걱정한 세 가지</li>
+                    <li>각각이 "통제 가능"인지 "불가능"인지 표시</li>
+                    <li>통제 가능한 것에 대해: 내일 취할 구체적 행동</li>
+                    <li>통제 불가능한 것에 대해: 한 문장으로 받아들임 표현</li>
+                </ul>
+            </div>
+
+            <div class="practice-item">
+                <h4>🌙 매일 저녁 - 스토아 저녁 복기 (5-10분)</h4>
+                <p>세네카의 "Senecan Review"를 간단히:</p>
+                <ul style="margin-top: 0.75rem; margin-left: 1.5rem; color: var(--text2);">
+                    <li>오늘 내가 통제할 수 있었던 순간은?</li>
+                    <li>내 선택이 나의 가치관과 일치했는가?</li>
+                    <li>통제 불가능한 일에 대해 불필요하게 불안해했는가?</li>
+                    <li>내일 더 잘할 수 있는 한 가지는?</li>
+                </ul>
+            </div>
+
+            <div class="practice-item">
+                <h4>🏢 현실 사례: 회사 상황에 적용</h4>
+                <p>
+                    <strong>2027년 새 지역 이전:</strong><br>
+                    통제 불가능: 회사의 이사 결정, 타이밍, 부동산 시장<br>
+                    통제 가능: 새 팀과 좋은 관계 구축, 기술 능력 강화, 가족과의 계획, 긍정적 태도
+                </p>
+            </div>
+        </section>
+
+        <!-- Philosophy Section -->
+        <section class="philosophy-section ani">
+            <h3>철학자들의 통찰</h3>
+
+            <div class="philosopher">
+                <h4>에픽테토스 (Epictetus, 50-135 AD)</h4>
+                <div class="quote-block">
+                    "어떤 일이 당신을 방해할 수 없습니다. 오직 당신의 그것에 대한 판단만이 당신을 방해합니다."
+                    <br><br>
+                    "당신이 두려워하는 것은 사건 자체가 아닙니다. 당신이 그 사건에 대해 하는 판단입니다."
+                </div>
+                <p style="margin-top: 1rem; color: var(--text2);">
+                    에픽테토스는 노예로서 고문과 가난을 경험했지만, "나의 의지는 어떤 외부 힘도 지배할 수 없다"고 선언했습니다.
+                </p>
+                <div class="neuroscience-connection">
+                    <strong>신경과학과의 연결:</strong> 이것은 <strong>인지적 재평가(Cognitive Reappraisal)</strong>의 고전입니다. 당신의 반응을 바꾸는 것은 뇌의 감정 처리 회로를 직접 제어하는 것입니다. 이것이 바로 심리 치료(특히 CBT, REBT)의 기초입니다.
+                </div>
+            </div>
+
+            <div class="philosopher">
+                <h4>세네카 (Seneca, 4 BC - 65 AD)</h4>
+                <div class="quote-block">
+                    "우리가 겪는 고통의 대부분은 우리의 생각에서 비롯된 것입니다. 우리는 일어나지 않을 일에 대해 고통받습니다."
+                    <br><br>
+                    "역경은 우리에게 덕을 드러낼 기회를 줍니다. 호의적인 상황에서는 당신의 진정한 성격을 알 수 없습니다."
+                </div>
+                <p style="margin-top: 1rem; color: var(--text2);">
+                    세네카는 "Adversity is the Path to Virtue"라고 믿었습니다. 당신이 겪는 스트레스(이사, 조직 변화, 육아)는 당신의 도덕적 성장의 도구입니다.
+                </p>
+                <div class="neuroscience-connection">
+                    <strong>신경과학과의 연결:</strong> <strong>Post-Traumatic Growth(외상 후 성장)</strong> 연구는 세네카의 직관을 확인해줍니다. 어려움을 의미 있게 재해석할 때, 우리의 뇌는 더 강한 신경 경로를 형성하고 회복력(resilience)이 증가합니다.
+                </div>
+            </div>
+
+            <div class="philosopher">
+                <h4>마르쿠스 아우렐리우스 (Marcus Aurelius, 121-180 AD)</h4>
+                <div class="quote-block">
+                    "당신이 제어하지 못하는 일에 대해 화를 낼 권리가 없습니다. 당신이 할 수 있는 것을 하지 않으면 화낼 이유가 있습니다."
+                    <br><br>
+                    "매일 아침 당신은 방해꾼, 감忘者, 배은망덕한 자를 만날 것입니다. 이들은 올바르게 행동하지 못합니다. 하지만 당신은 할 수 있습니다."
+                </div>
+                <p style="margin-top: 1rem; color: var(--text2);">
+                    마르쿠스 아우렐리우스는 로마의 황제였지만, 매일 자신이 통제할 수 있는 것(덕, 도덕, 선택)에만 집중하라고 다짐했습니다.
+                </p>
+                <div class="neuroscience-connection">
+                    <strong>신경과학과의 연결:</strong> <strong>기대 관리(Expectation Management)</strong>와 <strong>심리적 거리두기(Psychological Distancing)</strong>는 전전두피질의 활성화를 증가시킵니다. 다른 사람의 행동에 대한 기대를 낮추고 거리를 둘 때, 당신의 스트레스 반응은 현저히 감소합니다.
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section class="quiz-section ani">
+            <h3>이해도 확인</h3>
+
+            <div class="quiz-item">
+                <h4>문제 1</h4>
+                <div class="quiz-question">
+                    당신의 상사가 당신의 성과를 인정하지 않았습니다. 스토아 철학적 관점에서 올바른 태도는?
+                </div>
+                <div class="quiz-options" id="quiz1-options">
+                    <div class="quiz-option" onclick="checkAns(this, false)">A. 상사를 설득하기 위해 더 많은 시간을 투자하고, 상사의 인정에 대해 계속 생각한다.</div>
+                    <div class="quiz-option" onclick="checkAns(this, true)">B. 상사의 판단은 통제 불가능하므로, 내 성과의 질을 최대화하는 것에만 집중한다.</div>
+                    <div class="quiz-option" onclick="checkAns(this, false)">C. 상사의 판단은 운명이므로, 내가 할 수 있는 것이 없다고 포기한다.</div>
+                    <div class="quiz-option" onclick="checkAns(this, false)">D. 상사의 행동을 바꾸기 위해 다른 동료들의 지원을 받는다.</div>
+                </div>
+                <div class="quiz-feedback" id="quiz1-feedback"></div>
+            </div>
+
+            <div class="quiz-item">
+                <h4>문제 2</h4>
+                <div class="quiz-question">
+                    프로하이레시스(prohairesis)가 신경과학적으로 활성화되는 뇌 영역은?
+                </div>
+                <div class="quiz-options" id="quiz2-options">
+                    <div class="quiz-option" onclick="checkAns(this, false)">A. 편도체 (Amygdala) - 감정 처리</div>
+                    <div class="quiz-option" onclick="checkAns(this, true)">B. 전전두피질 (Prefrontal Cortex) - 계획과 의도적 선택</div>
+                    <div class="quiz-option" onclick="checkAns(this, false)">C. 해마 (Hippocampus) - 기억 형성</div>
+                    <div class="quiz-option" onclick="checkAns(this, false)">D. 소뇌 (Cerebellum) - 운동 조절</div>
+                </div>
+                <div class="quiz-feedback" id="quiz2-feedback"></div>
+            </div>
+        </section>
+
+        <!-- Spaced Repetition Tracker -->
+        <section class="spaced-rep ani">
+            <h3>간격 반복 추적기</h3>
+            <p style="color: var(--text2); margin-bottom: 1.5rem;">스토아 철학의 내화를 위해 이 일정에 따라 복습하세요:</p>
+
+            <div class="rep-schedule">
+                <div class="rep-day">
+                    <div class="rep-day-label">오늘</div>
+                    <div class="rep-checkbox" onclick="this.classList.toggle('checked')"></div>
+                </div>
+                <div class="rep-day">
+                    <div class="rep-day-label">1일 후</div>
+                    <div class="rep-checkbox" onclick="this.classList.toggle('checked')"></div>
+                </div>
+                <div class="rep-day">
+                    <div class="rep-day-label">3일 후</div>
+                    <div class="rep-checkbox" onclick="this.classList.toggle('checked')"></div>
+                </div>
+                <div class="rep-day">
+                    <div class="rep-day-label">7일 후</div>
+                    <div class="rep-checkbox" onclick="this.classList.toggle('checked')"></div>
+                </div>
+                <div class="rep-day">
+                    <div class="rep-day-label">14일 후</div>
+                    <div class="rep-checkbox" onclick="this.classList.toggle('checked')"></div>
+                </div>
+                <div class="rep-day">
+                    <div class="rep-day-label">30일 후</div>
+                    <div class="rep-checkbox" onclick="this.classList.toggle('checked')"></div>
+                </div>
+            </div>
+
+            <p style="color: var(--text2); margin-top: 2rem; font-style: italic; text-align: center;">
+                각 단계에서 30초의 "통제 이분법 질문"을 다시 수행하세요.
+            </p>
+        </section>
+
+        <!-- Footer -->
+        <div style="text-align: center; padding: 3rem 2rem; color: var(--text2); font-size: 0.9rem; border-top: 1px solid var(--border); margin-top: 4rem;">
+            <p>인간 탐구 시리즈 | Day 13/22 | 신경과학 × 철학</p>
+            <p style="margin-top: 1rem; font-size: 0.85rem;">
+                참고: 본 콘텐츠는 에픽테토스, 세네카, 마르쿠스 아우렐리우스의 스토아 철학을 현대 신경과학과 심리학 연구와 통합한 것입니다.
+            </p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Toggle concept card deep dive
+        function toggleCard(element) {
+            const deepDive = element.querySelector('.deep-dive');
+            if (deepDive) {
+                deepDive.classList.toggle('active');
+            }
+        }
+
+        // Check answer for quiz
+        function checkAns(btn, correct) {
+            const quiz = btn.closest('.quiz-item');
+            const options = quiz.querySelectorAll('.quiz-option');
+            const feedback = quiz.querySelector('.quiz-feedback');
+
+            // Disable all options
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+
+            if (correct) {
+                btn.classList.add('correct');
+                feedback.classList.add('show', 'correct');
+                feedback.textContent = '✓ 정확합니다! 당신의 이해가 깊습니다.';
+            } else {
+                btn.classList.add('incorrect');
+                feedback.classList.add('show', 'incorrect');
+                feedback.textContent = '✗ 재검토해주세요. 개념 카드를 다시 읽어보는 것을 권장합니다.';
+                
+                // Highlight correct answer
+                options.forEach(opt => {
+                    if (opt.getAttribute('onclick').includes('true')) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.animationDelay = `${index * 0.1}s`;
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, index * 50);
+                }
+            });
+        }, observerOptions);
+
+        // Observe all .ani elements
+        document.querySelectorAll('.ani').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

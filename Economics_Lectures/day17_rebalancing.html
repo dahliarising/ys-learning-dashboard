@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 17 | 자산 배분 리밸런싱 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #9A9890;
+  --text-dim: #5A584F;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 17 / 23</span>
+    <span class="header-title">자산 배분 리밸런싱</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 3 · 부동산 & 자산 배분</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 3 — 부동산 & 자산 배분</div>
+  <h1 class="hero-day">Day 17</h1>
+  <h2 class="hero-subtitle">자산 배분 리밸런싱</h2>
+  <p class="hero-quote">"리밸런싱은 자동화된 절약이다. 수익을 거둬서 손실을 메운다."</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 3: 15~19</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:73.9%"></div></div>
+    <div class="progress-label"><span>Day 17</span><span>17 / 23 완료 (73.9%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 주기적 리셋이 뇌의 인지편향을 교정</h3>
+    <p>감정적 의사결정을 방지하려면 리밸런싱을 정기화해야 합니다(달력/밴드 방식). 손실 자산을 매수하는 '역심리'는 뇌의 손실회피 편향을 극복하는 훈련입니다. 정기적 계산은 전전두엽(계획중추)을 강화합니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">0-5분</td><td>리밸런싱 개념: 왜 필요한가?</td><td>변동성 통제 & 규율 있는 매매</td></tr>
+<tr><td class="time-col">5-10분</td><td>리밸런싱 3가지 방식 비교</td><td>달력 리밸런싱(연1회) vs 밴드(±5%) vs 수익률 기여도</td></tr>
+<tr><td class="time-col">10-15분</td><td>학생 자산(순자산 3.28억) 기반 계산</td><td>한국 시장 & 글로벌 배분 리밸런싱</td></tr>
+<tr><td class="time-col">15-20분</td><td>세후 수익률의 역할</td><td>매매세금 & 배당세금 영향도 분석</td></tr>
+<tr><td class="time-col">20-25분</td><td>Day 15-16과 연계: 부동산 리밸런싱</td><td>집 매도 후 주식 증가 시뮬레이션</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">자산 배분 리밸런싱</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">리밸런싱 3가지 방식</div>
+      <div class="card-body"><strong>1. 달력 리밸런싱 (Calendar Rebalancing)</strong>
+<br>매년 1월 1일(또는 정기 날짜)에 목표 배분 비율로 재조정
+<br>장점: 간단, 기계적 실행 가능 | 단점: 시장 변동에 반응 느림
+<br><br><strong>2. 밴드 리밸런싱 (Band/Corridor Rebalancing)</strong>
+<br>각 자산이 목표 ±5% 범위를 벗어나면 즉시 조정 (목표 주식 60% → 55~65% 범위 설정)
+<br>장점: 변동성 즉시 제어 | 단점: 빈번한 매매세금 발생
+<br><br><strong>3. 수익률 기여도 리밸런싱 (Performance Attribution Rebalancing)</strong>
+<br>각 자산의 누적 수익률을 추적하고 과수익 자산을 일부 매도, 손실 자산 매수
+<br>장점: 심리적 역발상 자동화 | 단점: 복잡한 계산 필요</div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">학생 자산 배분 & 리밸런싱 시뮬레이션</div>
+      <div class="card-body"><div class="formula-block">
+<div class="formula-line"><span class="formula-highlight">순자산 구성 (2026년 3월 기준):</span></div>
+<div class="formula-line">• 주택 7억 (부채 4억) → 순자산 3억</div>
+<div class="formula-line">• 주식 2,800만원 (삼성전자·SK하이닉스)</div>
+<div class="formula-line">• 현금·기타 자산 0만 (부재)</div>
+<div class="formula-line"><span class="formula-highlight">총 순자산 = 3억 + 0.28억 = 3.28억</span></div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line"><span class="formula-highlight">목표 배분 (주식 40%, 부동산 60%):</span></div>
+<div class="formula-line">• 부동산(순자산 기준): 3.28억 × 60% = 1.968억 ≈ 2억 (현재 3억이므로 과비중)</div>
+<div class="formula-line">• 주식: 3.28억 × 40% = 1.312억 (현재 0.28억이므로 저비중)</div>
+<div class="formula-line"><span class="formula-highlight">필요 조정: 부동산 1억 추가 매각 또는 주식 1억 매수</span></div>
+<div class="formula-comment">* 실제: 부동산 유동성 낮음 → 주식 신규 매수 또는 점진적 부동산 매각 권고</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">세후 수익률 역산 (After-Tax Yield)</div>
+      <div class="card-body"><div class="formula-block">
+<div class="formula-line"><span class="formula-highlight">세전 수익률</span> vs <span class="formula-highlight">세후 수익률</span></div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line"><span class="formula-highlight">사례: 주식 연 10% 수익</span></div>
+<div class="formula-line">• 기본세율: 배당금 15.4% (지방세 포함), 양도차익 기본 20%</div>
+<div class="formula-line">• 배당금 월 100만원(연 10% 기여) × 15.4% = 월 15.4만원 세금</div>
+<div class="formula-line">• 주식 가격 상승 1000만원 × 20% = 200만원 양도세</div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line">세후 수익률 = (세전 수익금 - 세금) / 초기 자본 × 100%</div>
+<div class="formula-line">= (수익금 × (1 - 세율)) / 초기 자본</div>
+<div class="formula-line"><span class="formula-highlight">세율 15.4%면 세후 수익률 = 10% × (1 - 0.154) = 8.46%</span></div>
+<div class="formula-comment">* 비과세(삼성전자 우회수익 포함)면 그대로 10% 유지</div>
+</div></div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+      <div class="chart-container">
+      <div class="chart-title">REBALANCING: 현재 vs 목표 배분</div>
+      <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;margin:0 auto;display:block;">
+        <!-- 현재 배분 (좌측) -->
+        <text x="200" y="30" font-size="14" font-weight="600" fill="#C9A84C" text-anchor="middle">CURRENT (현재)</text>
+
+        <!-- 원형 차트 (좌측) -->
+        <circle cx="200" cy="180" r="120" fill="none" stroke="#4A9EBF" stroke-width="80" stroke-dasharray="30.16 402.12" stroke-dashoffset="0" opacity="0.7"/>
+        <circle cx="200" cy="180" r="120" fill="none" stroke="#C9A84C" stroke-width="80" stroke-dasharray="371.96 402.12" stroke-dashoffset="-30.16" opacity="0.7"/>
+
+        <!-- 범례 (좌측) -->
+        <g>
+          <rect x="50" y="340" width="12" height="12" fill="#4A9EBF" opacity="0.7"/>
+          <text x="70" y="350" font-size="12" fill="#E8E6E1">부동산 91.5% (3억)</text>
+        </g>
+        <g>
+          <rect x="50" y="365" width="12" height="12" fill="#C9A84C" opacity="0.7"/>
+          <text x="70" y="375" font-size="12" fill="#E8E6E1">주식 8.5% (2,800만원)</text>
+        </g>
+
+        <!-- 목표 배분 (우측) -->
+        <text x="650" y="30" font-size="14" font-weight="600" fill="#4ABF7A" text-anchor="middle">TARGET (목표)</text>
+
+        <!-- 원형 차트 (우측) -->
+        <circle cx="650" cy="180" r="120" fill="none" stroke="#4A9EBF" stroke-width="80" stroke-dasharray="240.96 402.12" stroke-dashoffset="0" opacity="0.7"/>
+        <circle cx="650" cy="180" r="120" fill="none" stroke="#C9A84C" stroke-width="80" stroke-dasharray="161.16 402.12" stroke-dashoffset="-240.96" opacity="0.7"/>
+
+        <!-- 범례 (우측) -->
+        <g>
+          <rect x="500" y="340" width="12" height="12" fill="#4A9EBF" opacity="0.7"/>
+          <text x="520" y="350" font-size="12" fill="#E8E6E1">부동산 60% (1.97억)</text>
+        </g>
+        <g>
+          <rect x="500" y="365" width="12" height="12" fill="#C9A84C" opacity="0.7"/>
+          <text x="520" y="375" font-size="12" fill="#E8E6E1">주식 40% (1.31억)</text>
+        </g>
+
+        <!-- 화살표 & 조정량 -->
+        <path d="M 380 180 L 520 180" stroke="#BF4A4A" stroke-width="2" marker-end="url(#arrowRed)"/>
+        <text x="450" y="170" font-size="12" fill="#BF4A4A" font-weight="600" text-anchor="middle">+주식 1.03억</text>
+
+        <defs>
+          <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="#BF4A4A"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  <details class="deep-dive">
+    <summary>밴드 리밸런싱의 세금 최적화: ±5% 밴드를 ±10%로 늘리면?</summary>
+    <div class="deep-dive-content">
+    <p><strong>배경:</strong> 리밸런싱할 때마다 매매세금(배당세 15.4% + 양도세 20%)이 발생합니다. 밴드를 넓히면 매매 횟수가 줄어들어 세금 절감이 가능합니다.</p>
+    <p><strong>시뮬레이션:</strong></p>
+    <p style="color:#C9A84C;">• 밴드 ±5%: 목표 40% 기준 → 38~42% 범위 (연 3-4회 리밸런싱)</p>
+    <p style="color:#C9A84C;">• 밴드 ±10%: 목표 40% 기준 → 36~44% 범위 (연 1-2회 리밸런싱)</p>
+    <p><strong>세금 절감:</strong> 매매 빈도 50% 감소 → 연간 매매세금 약 50-100만원 절감</p>
+    <p><strong>트레이드오프:</strong> 변동성 노출 증가 (정상적 범위 내 변화는 관리 가능)</p>
+    <p style="color:#4A9EBF;"><strong>💡 권고:</strong> 반도체 집중도가 높은 학생의 경우, 밴드 ±8% 정도가 적절합니다(세금 & 변동성 균형).</p>
+    </div>
+    </details>
+    <details class="deep-dive">
+    <summary>배당금 재투자 vs 현금 보유: DRIP 전략의 세금 함정</summary>
+    <div class="deep-dive-content">
+    <p><strong>배당재투자(DRIP: Dividend Reinvestment Plan)의 함정:</strong></p>
+    <p>배당금을 받아서 바로 같은 주식을 매수하면, 국세청은 이를 '매매'로 봅니다. 따라서:</p>
+    <p style="color:#BF4A4A;">• 배당금에 대한 배당세 15.4% 납부</p>
+    <p style="color:#BF4A4A;">• 재매수한 주식에서 미래 양도차익 발생 시 추가 양도세 납부</p>
+    <p>결국 <strong>배당금 + 양도차익</strong>에서 이중 세금</p>
+    <p><strong>이 문제를 해결하려면:</strong></p>
+    <p style="color:#4A9EBF;">1. ISA(비과세계좌) 내에서 DRIP 실행 → 배당세·양도세 모두 비과세 (연 2,000만원 한도)</p>
+    <p style="color:#4A9EBF;">2. 현금 보유 후 리밸런싱 시점에만 매수 → 매매 빈도 감소로 세금 절감</p>
+    <p><strong>학생의 경우:</strong> ISA 납입한도(연 2,000만원) 내에서 우량주 DRIP 권고.</p>
+    </div>
+    </details>
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+      <div class="sim-box">
+      <h3>내 자산에 직접 적용: 리밸런싱 액션 플랜</h3>
+      <p style="font-size:0.85rem;color:#9A9890;margin-bottom:1rem;">
+      순자산 3.28억 기준, 목표 부동산 60% / 주식 40% 달성을 위한 단계별 계획:
+      </p>
+      <ul class="checklist">
+        <li><strong>Step 1 (2026년 4월):</strong> 주식 추가 매수 또는 현금 이용</li>
+        <li style="margin-top:0.5rem;"><strong>Step 2 (6개월 주기):</strong> 각 자산 수익률 기여도 추적, 밴드(±5%) 확인</li>
+        <li style="margin-top:0.5rem;"><strong>Step 3 (2027년 1월):</strong> 달력 리밸런싱 실행 (연 1회)</li>
+        <li style="margin-top:0.5rem;"><strong>Step 4 (부동산 매각 시):</strong> 양도세 고려하여 일괄 주식 매수 vs 점진적 매수 판단</li>
+        <li style="margin-top:0.5rem;"><strong>Step 5 (지속):</strong> 매년 배당·이자·양도차익 세후 수익률 계산 & 기록</li>
+      </ul>
+    </div>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    <div class="bias-name">손실회피편향 & 리밸런싱의 심리전</div>
+    <p><span class="neuro-tag">뇌과학 | 전전두엽 활성화</span> <span class="engineer-tag">엔지니어 사고 | 규칙 기반</span></p>
+    <p>손실 자산을 매수하는 것(역심리)은 뇌의 손실회피 본능을 극복하는 훈련입니다. 손실 자산은 '위험'이 아니라 '할인된 기회'입니다.</p>
+    <p><strong>구체적 규칙으로 극복:</strong></p>
+    <p style="color:#C9A84C;"><strong>규칙 1.</strong> "리밸런싱은 감정이 아닌 스프레드시트로 결정" → 달력 고정(연 1월 1일) 또는 밴드 정의(±5%)</p>
+    <p style="color:#C9A84C;"><strong>규칙 2.</strong> "손실 자산 매수 시 '왜?'를 먼저 적고 매수" → 세 가지 이유 기록(배분, 장기 가치, 세금 효율)</p>
+    <p style="color:#4ABF7A;"><strong>뇌과학 효과:</strong> 정기적 리밸런싱은 전전두엽(계획·논리 중추)을 반복 활성화하여 감정적 의사결정 능력을 약화시킵니다. 6개월마다 반복하면 신경가소성으로 인해 역심리가 자동화됩니다.</p>
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 리밸런싱이 필요한 가장 근본적인 이유는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 매매 수수료를 벌기 위해</li>
+<li onclick="checkAnswer(this,'q1',true)">② 시장 변동성을 통제하고 정해진 위험 수준 유지</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 가장 높은 수익을 얻기 위해</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 세금을 최소화하기 위해</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>리밸런싱은 장기 위험을 관리하는 도구입니다. 배분이 목표에서 벗어나면 포트폴리오의 위험 수준이 높아집니다. 정기적 조정으로 원래 위험 수준을 유지합니다.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 학생의 순자산 3.28억 기준, 목표 배분 60% 부동산/40% 주식일 때 필요한 주식 추가 매수액은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 약 5,000만원</li>
+<li onclick="checkAnswer(this,'q2',true)">② 약 1억원</li>
+<li onclick="checkAnswer(this,'q2',false)">③ 약 1.5억원</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 약 2억원</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ②</strong><br>목표 주식 배분 = 3.28억 × 40% = 1.312억원. 현재 주식 0.28억 → 필요액 = 1.312 - 0.28 = 1.032억 ≈ 1억원</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 17</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 24일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 26일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 30일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">04월 06일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 22일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day16_house_swap_simulation.html">← Day 16</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 17 / 23</span>
+  <a class="nav-btn" href="day18_global_diversification.html">Day 18 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

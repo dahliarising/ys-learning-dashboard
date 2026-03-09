@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#12151C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="에너지 OS">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2312151C'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='%23E8C96A'>⚡</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>에너지 OS — Day 01 | 인체 에너지 3대 시스템</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════ CSS VARIABLES ═══════════ */
+:root {
+  --bg: #0A0C10;
+  --surface: #12151C;
+  --surface2: #1A1E28;
+  --border: #252A38;
+  --gold: #C9A84C;
+  --gold-light: #E8C96A;
+  --blue: #4A9EBF;
+  --green: #4ABF8A;
+  --purple: #8A6ABF;
+  --orange: #BF6A4A;
+  --red: #BF4A4A;
+  --text: #D8D3C8;
+  --text-dim: #7A7A8A;
+  --text-bright: #F0EBE0;
+  --accent: #8A6ABF; /* Part 1 = purple */
+}
+
+/* ═══════════ RESET & BASE ═══════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ═══════════ LAYOUT ═══════════ */
+.container { max-width: 960px; margin: 0 auto; padding: 0 24px 80px; }
+
+/* ═══════════ STICKY HEADER ═══════════ */
+.sticky-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sticky-header .brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700; font-size: 1.1rem; color: var(--gold);
+}
+.sticky-header .part-label {
+  font-size: 0.8rem; color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(138,106,191,0.12);
+  padding: 4px 12px; border-radius: 20px;
+}
+
+/* ═══════════ HERO ═══════════ */
+.hero {
+  text-align: center;
+  padding: 60px 0 40px;
+  position: relative;
+}
+.hero .series-note {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem; color: var(--text-dim);
+  margin-bottom: 12px;
+}
+.hero .day-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4rem; font-weight: 700;
+  color: var(--accent); line-height: 1;
+  margin-bottom: 8px;
+}
+.hero .day-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem; font-weight: 600;
+  color: var(--text-bright); margin-bottom: 4px;
+}
+.hero .day-title-en {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; color: var(--text-dim);
+  margin-bottom: 20px;
+}
+.hero .quote {
+  font-style: italic; color: var(--gold-light);
+  font-size: 1.05rem; margin-bottom: 30px;
+  padding: 0 20px;
+}
+/* Progress ring */
+.progress-ring-wrap {
+  display: inline-block; position: relative;
+  width: 100px; height: 100px; margin-bottom: 24px;
+}
+.progress-ring-wrap .ring-text {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.2rem; font-weight: 700; color: var(--accent);
+}
+.progress-ring-wrap .ring-text small {
+  font-size: 0.6rem; color: var(--text-dim); font-weight: 400;
+}
+/* Meta badges */
+.meta-badges {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+}
+.meta-badge {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 6px 14px;
+  font-size: 0.78rem; color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ═══════════ SECTION TITLES ═══════════ */
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 700;
+  color: var(--text-bright);
+  margin: 48px 0 20px;
+  padding-left: 16px;
+  border-left: 3px solid var(--accent);
+}
+
+/* ═══════════ CARDS ═══════════ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 20px;
+  transition: border-color 0.3s;
+}
+.card:hover { border-color: var(--accent); }
+.card-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 2px; color: var(--accent);
+  margin-bottom: 8px;
+}
+.card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; font-weight: 700;
+  color: var(--text-bright); margin-bottom: 12px;
+}
+.card p, .card li {
+  font-size: 0.92rem; line-height: 1.8;
+  color: var(--text);
+}
+.card ul { padding-left: 20px; }
+.card ul li { margin-bottom: 6px; }
+
+/* Purple box */
+.brain-box {
+  background: rgba(138,106,191,0.08);
+  border: 1px solid rgba(138,106,191,0.25);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 24px;
+}
+.brain-box .box-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem; font-weight: 700;
+  color: var(--purple); margin-bottom: 12px;
+}
+
+/* Time table */
+.time-table {
+  display: grid; grid-template-columns: auto 1fr;
+  gap: 6px 16px; font-size: 0.85rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+.time-table .tt-time { color: var(--gold); font-weight: 500; }
+.time-table .tt-desc { color: var(--text); }
+
+/* Deep dive toggle */
+details {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+details summary {
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+}
+details summary:hover { color: var(--gold); }
+details .detail-body {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+
+/* ═══════════ SVG SECTION ═══════════ */
+.svg-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px 0;
+  overflow-x: auto;
+}
+.svg-section .svg-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem; color: var(--accent);
+  text-transform: uppercase; letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+
+/* ═══════════ PROTOCOL ═══════════ */
+.protocol-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+.protocol-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+}
+.protocol-card .p-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; color: var(--gold);
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.protocol-card h4 {
+  font-size: 1rem; font-weight: 700;
+  color: var(--text-bright); margin-bottom: 8px;
+}
+.protocol-card .check-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 0.85rem; margin-bottom: 6px;
+}
+.protocol-card .check-item input[type="checkbox"] {
+  accent-color: var(--accent);
+  margin-top: 4px; flex-shrink: 0;
+}
+
+/* ═══════════ ENERGY LOG ═══════════ */
+.energy-log {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  margin: 24px 0;
+}
+.energy-log h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem; color: var(--gold);
+  margin-bottom: 16px;
+}
+.log-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 12px; flex-wrap: wrap;
+}
+.log-row label {
+  font-size: 0.85rem; color: var(--text);
+  min-width: 160px;
+}
+.log-row input[type="range"] {
+  flex: 1; min-width: 120px;
+  accent-color: var(--accent);
+}
+.log-row .range-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem; color: var(--accent);
+  min-width: 30px; text-align: center;
+}
+.log-row input[type="number"], .log-row input[type="text"] {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-bright);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  width: 80px;
+}
+.log-save-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none; border-radius: 8px;
+  padding: 10px 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: opacity 0.2s;
+}
+.log-save-btn:hover { opacity: 0.85; }
+.log-status {
+  font-size: 0.8rem; color: var(--green);
+  margin-top: 8px; min-height: 20px;
+}
+
+/* ═══════════ QUIZ ═══════════ */
+.quiz-section { margin: 32px 0; }
+.quiz-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.quiz-card .q-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; color: var(--accent);
+  text-transform: uppercase; letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.quiz-card .q-text {
+  font-size: 0.95rem; color: var(--text-bright);
+  margin-bottom: 14px; font-weight: 500;
+}
+.quiz-card .q-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-card .q-opt {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  color: var(--text);
+}
+.quiz-card .q-opt:hover {
+  border-color: var(--accent);
+  background: rgba(138,106,191,0.1);
+}
+.quiz-card .q-opt.correct {
+  border-color: var(--green) !important;
+  background: rgba(74,191,138,0.12) !important;
+  color: var(--green) !important;
+}
+.quiz-card .q-opt.wrong {
+  border-color: var(--red) !important;
+  background: rgba(191,74,74,0.12) !important;
+  color: var(--red) !important;
+}
+.quiz-card .q-feedback {
+  margin-top: 10px; font-size: 0.82rem;
+  min-height: 20px; line-height: 1.6;
+}
+
+/* ═══════════ SPACED REPETITION ═══════════ */
+.spaced-rep {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin: 24px 0;
+}
+.sr-grid {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  margin-top: 12px;
+}
+.sr-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  text-align: center;
+}
+.sr-item.today {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.sr-item .sr-day { font-weight: 700; }
+.sr-item .sr-label { color: var(--text-dim); font-size: 0.65rem; }
+
+/* ═══════════ NEXT DAY PREVIEW ═══════════ */
+.next-preview {
+  background: linear-gradient(135deg, rgba(138,106,191,0.08), rgba(201,168,76,0.06));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin: 24px 0;
+  text-align: center;
+}
+.next-preview .np-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.next-preview .np-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; font-weight: 700;
+  color: var(--text-bright);
+}
+.next-preview .np-desc {
+  font-size: 0.85rem; color: var(--text-dim);
+  margin-top: 6px;
+}
+
+/* ═══ FADE-UP (SAFE) ═══ */
+.fade-up {
+  opacity: 1;
+  transform: translateY(0);
+}
+.js-ready .fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.js-ready .fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══════════ RESPONSIVE ═══════════ */
+/* ── Mobile Optimization ── */
+@media (max-width:480px){
+  :root{--pad:12px;}
+  body{font-size:14px;}
+  .container{padding:0 12px 60px;}
+  .hero .day-num{font-size:2.5rem;}
+  .hero .day-title{font-size:1.15rem;line-height:1.4;}
+  .hero .day-title-en{font-size:0.7rem;}
+  .hero .quote{font-size:0.8rem;padding:8px 12px;}
+  .progress-ring-wrap svg{width:70px;height:70px;}
+  .ring-text{font-size:0.7rem;}
+  .meta-badges{gap:4px;flex-wrap:wrap;}
+  .meta-badge{font-size:0.65rem;padding:3px 8px;}
+  .card{padding:14px;margin-bottom:12px;}
+  .card h3{font-size:1rem;}
+  .card p,.card li{font-size:0.82rem;line-height:1.6;}
+  .section-title{font-size:1.15rem;}
+  .svg-section{margin:12px -12px;padding:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .svg-section svg{min-width:300px;max-width:100%;height:auto;}
+  .svg-title{font-size:0.8rem;}
+  .comparison-table{font-size:0.75rem;}
+  .comparison-table th,.comparison-table td{padding:6px 8px;}
+  .protocol-grid{grid-template-columns:1fr;gap:10px;}
+  .protocol-card{padding:14px;}
+  .protocol-card h4{font-size:0.9rem;}
+  .time-table{font-size:0.75rem;gap:4px 8px;}
+  .brain-box{padding:14px;}
+  .quiz-card{padding:14px;}
+  .q-text{font-size:0.85rem;}
+  .q-opt{padding:10px 12px;font-size:0.82rem;min-height:44px;display:flex;align-items:center;}
+  .log-row{flex-direction:column;gap:4px;}
+  .log-row label{font-size:0.8rem;}
+  .energy-log{padding:14px;}
+  .spaced-rep{padding:14px;}
+  .sr-grid{gap:6px;}
+  .sr-item{padding:6px 4px;}
+  .sr-day{font-size:0.75rem;}
+  .next-preview{padding:14px;}
+  .sticky-header{padding:6px 12px;font-size:0.72rem;}
+  .sticky-header .brand{font-size:0.72rem;}
+  .sticky-header .part-label{font-size:0.65rem;}
+  .nav-links{flex-direction:column;gap:6px;align-items:stretch;}
+  .nav-links a{text-align:center;padding:10px;font-size:0.82rem;}
+  .detail-panel{padding:12px;}
+  .detail-panel .metric{font-size:0.7rem;padding:3px 8px;}
+  .svg-tooltip{max-width:200px;font-size:0.72rem;padding:8px 10px;}
+  details summary{font-size:0.82rem;padding:8px;}
+  .highlight-num{font-size:0.9em;}
+  .check-item{font-size:0.8rem;min-height:36px;}
+  .check-item input[type="checkbox"]{width:18px;height:18px;}
+}
+@media (max-width:360px){
+  .hero .day-num{font-size:2rem;}
+  .hero .day-title{font-size:1rem;}
+  .card{padding:12px;}
+  .svg-section svg{min-width:500px;}
+}
+@media (min-width:481px) and (max-width:768px){
+  .container{padding:0 20px 60px;}
+  .protocol-grid{grid-template-columns:1fr;}
+  .svg-section svg{min-width:700px;}
+  .nav-links a{padding:10px 16px;}
+}
+/* Touch-friendly enhancements */
+@media (hover:none) and (pointer:coarse){
+  .q-opt{min-height:48px;padding:12px 14px;}
+  .check-item{min-height:40px;}
+  .nav-links a{min-height:44px;display:flex;align-items:center;justify-content:center;}
+  .log-save-btn{min-height:48px;font-size:0.9rem;}
+  .svg-hotspot{pointer-events:auto;}
+  details summary{min-height:44px;display:flex;align-items:center;}
+}
+/* Swipe navigation indicator */
+.swipe-hint{display:none;text-align:center;padding:8px;font-size:0.72rem;color:var(--text-dim);opacity:0.6;}
+@media (hover:none) and (pointer:coarse){.swipe-hint{display:block;}}
+/* Bottom navigation bar for mobile */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(18,21,28,0.97);border-top:1px solid var(--border);padding:8px 16px;z-index:200;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+.mobile-nav .mn-inner{display:flex;justify-content:space-between;align-items:center;max-width:600px;margin:0 auto;}
+.mobile-nav a{color:var(--accent);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:0.8rem;padding:8px 16px;border-radius:6px;background:rgba(var(--accent-rgb,138,106,191),0.1);min-width:80px;text-align:center;transition:background 0.2s;}
+.mobile-nav a:active{background:rgba(var(--accent-rgb,138,106,191),0.25);}
+.mobile-nav .mn-current{color:var(--gold);font-size:0.85rem;font-weight:700;}
+@media (max-width:640px){.mobile-nav{display:block;}}
+@media (max-width:640px){.nav-links{display:none;}}
+
+/* Comparison table */
+.comparison-table {
+  width: 100%; border-collapse: collapse;
+  margin: 16px 0; font-size: 0.85rem;
+}
+.comparison-table th {
+  background: var(--surface2);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.comparison-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: top;
+}
+.comparison-table tr:hover td {
+  background: rgba(138,106,191,0.04);
+}
+.highlight-num {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--gold); font-weight: 700;
+}
+.tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin: 2px;
+}
+.tag-red { background: rgba(191,74,74,0.15); color: var(--red); }
+.tag-orange { background: rgba(191,106,74,0.15); color: var(--orange); }
+.tag-blue { background: rgba(74,158,191,0.15); color: var(--blue); }
+.tag-green { background: rgba(74,191,138,0.15); color: var(--green); }
+
+@keyframes pathway-draw{0%{stroke-dashoffset:400}100%{stroke-dashoffset:0}}
+@keyframes molecule-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes energy-pulse{0%,100%{opacity:0.6;r:4}50%{opacity:1;r:7}}
+.anim-path{stroke-dasharray:400;animation:pathway-draw 2s ease-out forwards;}
+.anim-molecule{animation:molecule-float 3s ease-in-out infinite;}
+.anim-energy{animation:energy-pulse 2s ease-in-out infinite;}
+
+/* ── Interactive SVG System ── */
+.svg-interactive{position:relative;overflow:visible;}
+.svg-tooltip{position:absolute;background:rgba(18,21,28,0.96);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;color:var(--text);font-size:0.78rem;line-height:1.5;max-width:260px;pointer-events:none;opacity:0;transform:translateY(8px);transition:opacity 0.25s ease,transform 0.25s ease;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,0.4);backdrop-filter:blur(8px);}
+.svg-tooltip.visible{opacity:1;transform:translateY(0);}
+.svg-tooltip .tip-title{font-weight:700;color:var(--accent);margin-bottom:4px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.5px;text-transform:uppercase;}
+.svg-tooltip .tip-value{font-family:'JetBrains Mono',monospace;color:var(--gold);font-size:0.82rem;}
+.svg-tooltip .tip-desc{color:#B0ADAA;margin-top:3px;}
+.svg-hotspot{cursor:pointer;transition:opacity 0.2s,filter 0.2s;}
+.svg-hotspot:hover{filter:brightness(1.4) drop-shadow(0 0 6px var(--accent));opacity:1 !important;}
+.svg-hotspot.focused{filter:brightness(1.5) drop-shadow(0 0 10px var(--accent));}
+.svg-hotspot:not(.focused):not(:hover){opacity:0.65;transition:opacity 0.4s;}
+.svg-focus-active .svg-hotspot:not(.focused):not(:hover){opacity:0.3;}
+.svg-label-popup{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--accent);color:#12151C;padding:3px 8px;border-radius:4px;font-size:0.7rem;font-weight:700;white-space:nowrap;opacity:0;transition:opacity 0.2s;pointer-events:none;}
+.svg-hotspot:hover+.svg-label-popup,.svg-hotspot:hover .svg-label-popup{opacity:1;}
+.detail-panel{background:rgba(30,33,45,0.95);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:10px;display:none;animation:panelSlide 0.3s ease;}
+.detail-panel.active{display:block;}
+@keyframes panelSlide{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.detail-panel h4{color:var(--accent);font-size:0.85rem;margin:0 0 8px;}
+.detail-panel .metric{display:inline-flex;align-items:center;gap:4px;background:rgba(var(--accent-rgb,138,106,191),0.1);padding:4px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:0.75rem;margin:3px 4px 3px 0;}
+.detail-panel .metric-val{color:var(--accent);font-weight:700;}
+.detail-panel .insight{font-size:0.78rem;color:#B0ADAA;line-height:1.6;margin-top:8px;}
+.detail-panel .close-btn{position:absolute;top:8px;right:12px;cursor:pointer;color:#7A7A8A;font-size:1rem;}
+.detail-panel .close-btn:hover{color:var(--accent);}
+
+</style>
+
+<noscript><style>.fade-up{opacity:1!important;transform:none!important;}.mobile-nav{display:block!important;}</style></noscript>
+</head>
+<body>
+<script>
+// ═══ Fade-Up Failsafe ═══
+document.body.classList.add('js-ready');
+setTimeout(function(){
+  document.querySelectorAll('.fade-up:not(.visible)').forEach(function(el){
+    el.classList.add('visible');
+  });
+}, 3000);
+</script>
+
+
+<!-- ═══════════ STICKY HEADER ═══════════ -->
+<header class="sticky-header">
+  <div class="brand">에너지 OS / Day 01</div>
+  <div class="part-label">PART 1: 에너지 시스템 이해</div>
+</header>
+
+<div class="container">
+
+<!-- ═══════════ ① HERO ═══════════ -->
+<section class="hero fade-up">
+  <div class="series-note">이 시리즈 예상 총 Day: 50일 · PART 1/9</div>
+  <div class="day-num">01</div>
+  <div class="day-title">인체 에너지 3대 시스템</div>
+  <div class="day-title-en">The Three Energy Systems of the Human Body</div>
+  <div class="quote">"에너지가 넘치는 사람의 비밀은 더 만드는 것이 아니라,<br>3가지 에너지 시스템을 효율적으로 전환하는 것이다."</div>
+
+  <div class="progress-ring-wrap">
+    <svg width="100" height="100" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border)" stroke-width="4"/>
+      <circle cx="50" cy="50" r="42" fill="none" stroke="var(--accent)" stroke-width="4"
+        stroke-dasharray="263.9" stroke-dashoffset="258.6"
+        stroke-linecap="round" transform="rotate(-90 50 50)">
+        <animate attributeName="stroke-dashoffset" from="263.9" to="258.6" dur="1s" fill="freeze"/>
+      </circle>
+    </svg>
+    <div class="ring-text">
+      1/50
+      <small>DAYS</small>
+    </div>
+  </div>
+
+  <div class="meta-badges">
+    <span class="meta-badge">⏱ 포모도로 25분</span>
+    <span class="meta-badge">🔬 ATP · PCr · 해당과정</span>
+    <span class="meta-badge">💪 전신 에너지 시스템</span>
+    <span class="meta-badge">🔁 복습: D+1, D+3, D+7</span>
+  </div>
+</section>
+
+<!-- ═══════════ ② 뇌과학 학습 전략 박스 ═══════════ -->
+<section class="fade-up">
+  <div class="brain-box">
+    <div class="box-title">🧠 뇌과학 학습 전략 — 포모도로 25분 배분</div>
+    <p style="font-size:0.85rem; color:var(--text-dim); margin-bottom:14px;">
+      전두엽의 작업기억은 약 20~25분 후 glucose 고갈로 효율이 급락합니다 (Baumeister, 2007). 
+      아래 시간 배분은 <strong>인코딩→정교화→검색 연습</strong>의 신경과학적 기억 형성 3단계에 맞춰 설계되었습니다.
+    </p>
+    <div class="time-table">
+      <span class="tt-time">0 ~ 5분</span>
+      <span class="tt-desc">개념 이해 — 에너지 시스템 3종 구조 파악 (스키마 형성)</span>
+      <span class="tt-time">5 ~ 18분</span>
+      <span class="tt-desc">핵심 내용 — 각 시스템 메커니즘 + SVG 다이어그램 정독 (정교화)</span>
+      <span class="tt-time">18 ~ 23분</span>
+      <span class="tt-desc">실전 적용 — "오늘부터 바꿀 것" 프로토콜 체크 (절차 기억)</span>
+      <span class="tt-time">23 ~ 25분</span>
+      <span class="tt-desc">퀴즈 3문제 — 능동 인출로 장기기억 전환 (검색 연습)</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ③ 과학적 메커니즘 카드 3개 ═══════════ -->
+<h2 class="section-title fade-up">에너지 시스템 3종 메커니즘</h2>
+
+<!-- CARD 1: ATP-PCr -->
+<div class="card fade-up">
+  <div class="card-label">SYSTEM 01 · PHOSPHAGEN</div>
+  <h3>ATP-PCr 시스템 (0~10초)</h3>
+  <p>
+    <span class="tag tag-red">무산소</span> <span class="tag tag-red">초고강도</span>
+  </p>
+  <p style="margin-top:12px;">
+    근육 세포에 이미 저장된 <strong>ATP</strong>(아데노신 삼인산)와 <strong>포스포크레아틴(PCr)</strong>을 
+    즉시 분해해 에너지를 방출하는 시스템. 산소가 필요 없고, 0.1초 만에 최대 출력 가능.
+  </p>
+  <table class="comparison-table" style="margin-top:14px;">
+    <tr><th>항목</th><th>값</th></tr>
+    <tr><td>지속 시간</td><td><span class="highlight-num">0~10초</span></td></tr>
+    <tr><td>최대 출력</td><td><span class="highlight-num">~36 kcal/min</span> (3시스템 중 최고)</td></tr>
+    <tr><td>연료</td><td>ATP 직접 + PCr → ATP 재합성 (크레아틴 키나아제 효소)</td></tr>
+    <tr><td>부산물</td><td>크레아틴 + 무기인산 (Pi) — 산성 부산물 거의 없음</td></tr>
+    <tr><td>회복 시간</td><td><span class="highlight-num">2~5분</span> 완전 회복 (PCr 재합성)</td></tr>
+  </table>
+  <p style="margin-top:12px; font-size:0.88rem;">
+    <strong>💡 이래서 내 에너지에 중요:</strong> CrossFit WOD에서 1RM 데드리프트, 박스점프 1회, 
+    클린 & 저크 — 모두 이 시스템이 담당. PCr 저장량이 높을수록 폭발적 동작 사이의 회복이 빨라짐.
+  </p>
+  <details>
+    <summary>🔬 Deep Dive: PCr 재합성과 크레아틴 보충</summary>
+    <div class="detail-body">
+      PCr은 미토콘드리아에서 생성된 ATP를 이용해 재합성됩니다 (Phosphocreatine Shuttle). 
+      크레아틴 모노하이드레이트 보충 (3~5g/일)은 근육 PCr 저장량을 ~20% 증가시키는 것으로 
+      메타분석에서 확인됨 (Rawson & Volek, 2003). 이는 세트 간 회복 속도를 직접적으로 높입니다.
+      <br><br>
+      <strong>실용적 연결:</strong> CrossFit에서 세트 간 휴식 2분이면 PCr의 ~87%가 회복. 
+      크레아틴 보충 시 같은 2분에 ~95%까지 회복 → 5라운드 WOD의 마지막 라운드 퍼포먼스 유지.
+    </div>
+  </details>
+</div>
+
+<!-- CARD 2: Glycolytic -->
+<div class="card fade-up">
+  <div class="card-label">SYSTEM 02 · GLYCOLYTIC</div>
+  <h3>해당과정 시스템 (10초~2분)</h3>
+  <p>
+    <span class="tag tag-orange">무산소</span> <span class="tag tag-orange">고강도</span>
+  </p>
+  <p style="margin-top:12px;">
+    글루코스(혈당) 또는 근육 글리코겐을 <strong>산소 없이</strong> 분해하여 ATP를 빠르게 생산. 
+    ATP-PCr이 고갈된 직후 주력으로 전환됨. 부산물로 <strong>젖산(Lactate)</strong>과 <strong>H⁺ 이온</strong> 생성.
+  </p>
+  <table class="comparison-table" style="margin-top:14px;">
+    <tr><th>항목</th><th>값</th></tr>
+    <tr><td>지속 시간</td><td><span class="highlight-num">10초~2분</span></td></tr>
+    <tr><td>최대 출력</td><td><span class="highlight-num">~16 kcal/min</span></td></tr>
+    <tr><td>연료</td><td>글루코스 → 피루브산 → 젖산 (1 글루코스 → 2 ATP)</td></tr>
+    <tr><td>부산물</td><td>젖산 + H⁺ (pH 저하 → 근육 타는 느낌, 피로감)</td></tr>
+    <tr><td>제한 요인</td><td>H⁺ 축적 → pH 6.4 이하에서 효소 활성 급감</td></tr>
+  </table>
+  <p style="margin-top:12px; font-size:0.88rem;">
+    <strong>💡 이래서 내 에너지에 중요:</strong> 400m 전력 질주, CrossFit 메트콘(AMRAP 3분), 
+    계단 뛰어오르기 — 전부 해당과정 의존. 젖산역치(LT)가 높을수록 이 '타는 느낌' 없이 더 오래 버팀.
+  </p>
+  <details>
+    <summary>🔬 Deep Dive: 젖산은 악당이 아니다</summary>
+    <div class="detail-body">
+      오해: "젖산이 피로를 만든다." <br>
+      실제: 젖산(Lactate)은 <strong>에너지 연료이자 신호 분자</strong>입니다. 
+      근육에서 생성된 젖산은 혈액을 타고 심장·뇌·간으로 이동해 에너지원으로 사용됩니다 (Brooks, 2018 — Lactate Shuttle Theory).
+      <br><br>
+      진짜 피로 원인은 <strong>H⁺ 이온 축적</strong>에 의한 pH 저하. 
+      젖산 자체는 오히려 H⁺를 일부 흡수하는 완충 역할. 
+      잘 훈련된 선수는 젖산 재활용 능력(=젖산 역치)이 높아 같은 강도에서 덜 피로함.
+    </div>
+  </details>
+</div>
+
+<!-- CARD 3: Oxidative -->
+<div class="card fade-up">
+  <div class="card-label">SYSTEM 03 · OXIDATIVE</div>
+  <h3>유산소 시스템 (2분~)</h3>
+  <p>
+    <span class="tag tag-blue">유산소</span> <span class="tag tag-green">저~중강도</span>
+  </p>
+  <p style="margin-top:12px;">
+    <strong>미토콘드리아</strong> 내에서 산소를 사용해 탄수화물·지방·(소량) 단백질을 완전 분해. 
+    ATP 생산량은 3시스템 중 최대이나 속도가 느림. 지속 에너지의 핵심 엔진.
+  </p>
+  <table class="comparison-table" style="margin-top:14px;">
+    <tr><th>항목</th><th>값</th></tr>
+    <tr><td>지속 시간</td><td><span class="highlight-num">2분~수 시간</span></td></tr>
+    <tr><td>최대 출력</td><td><span class="highlight-num">~10 kcal/min</span> (느리지만 오래 지속)</td></tr>
+    <tr><td>연료</td><td>글루코스 → 피루브산 → 아세틸CoA → TCA 사이클 → 전자전달계<br>
+      1 글루코스 → <span class="highlight-num">36~38 ATP</span> (해당과정의 19배!)</td></tr>
+    <tr><td>지방 연소</td><td>지방산 → β-산화 → 아세틸CoA (1 팔미트산 → <span class="highlight-num">129 ATP</span>)</td></tr>
+    <tr><td>부산물</td><td>CO₂ + H₂O (깨끗한 연소)</td></tr>
+  </table>
+  <p style="margin-top:12px; font-size:0.88rem;">
+    <strong>💡 이래서 내 에너지에 중요:</strong> 10K 러닝의 에너지 ~95%가 이 시스템. 
+    사무실에서 4시간 집중하는 뇌 에너지도 유산소 시스템이 공급. 
+    <strong>미토콘드리아 밀도 = 당신의 기본 에너지 레벨.</strong> 
+    "누가 봐도 에너지 넘치는 사람"의 생화학적 정체 = 미토콘드리아가 많은 사람.
+  </p>
+  <details>
+    <summary>🔬 Deep Dive: "에너지 넘치는 사람"의 생화학적 정의</summary>
+    <div class="detail-body">
+      "에너지가 넘친다"를 과학적으로 분해하면:
+      <br><br>
+      <strong>1. 높은 미토콘드리아 밀도</strong> — 같은 산소량으로 더 많은 ATP 생산.<br>
+      <strong>2. 넓은 유산소 베이스 (높은 VO2max)</strong> — 일상 활동이 최대 능력의 낮은 %에서 작동 → 여유.<br>
+      <strong>3. 높은 젖산역치</strong> — 강도를 올려도 피로가 늦게 옴.<br>
+      <strong>4. 효율적인 에너지 시스템 전환</strong> — 상황에 맞게 3시스템을 빠르게 스위칭.<br>
+      <br>
+      측정 가능한 프록시: <strong>VO2max ≥ 45 ml/kg/min</strong> (30대 남성 상위 20%), 
+      <strong>안정 시 심박수 ≤ 58 BPM</strong>, <strong>HRV ≥ 50ms (RMSSD)</strong>.
+    </div>
+  </details>
+</div>
+
+<!-- ═══════════ ④ 3시스템 비교 요약 ═══════════ -->
+<div class="card fade-up">
+  <div class="card-label">COMPARISON MATRIX</div>
+  <h3>에너지 3대 시스템 비교 요약</h3>
+  <div style="overflow-x:auto;">
+    <table class="comparison-table">
+      <tr>
+        <th>구분</th>
+        <th>ATP-PCr</th>
+        <th>해당과정</th>
+        <th>유산소</th>
+      </tr>
+      <tr>
+        <td>시간</td>
+        <td><span class="highlight-num">0~10초</span></td>
+        <td><span class="highlight-num">10초~2분</span></td>
+        <td><span class="highlight-num">2분~∞</span></td>
+      </tr>
+      <tr>
+        <td>산소 필요</td>
+        <td>❌ 불필요</td>
+        <td>❌ 불필요</td>
+        <td>✅ 필수</td>
+      </tr>
+      <tr>
+        <td>ATP 속도</td>
+        <td>⚡⚡⚡ 즉각</td>
+        <td>⚡⚡ 빠름</td>
+        <td>⚡ 느림</td>
+      </tr>
+      <tr>
+        <td>ATP 총량</td>
+        <td>매우 적음</td>
+        <td>적음 (2 ATP/글루코스)</td>
+        <td><span class="highlight-num">36~38</span> ATP/글루코스</td>
+      </tr>
+      <tr>
+        <td>연료</td>
+        <td>PCr</td>
+        <td>글루코스/글리코겐</td>
+        <td>탄수화물+지방+단백질</td>
+      </tr>
+      <tr>
+        <td>부산물</td>
+        <td>크레아틴, Pi</td>
+        <td>젖산, H⁺</td>
+        <td>CO₂, H₂O</td>
+      </tr>
+      <tr>
+        <td>운동 예시</td>
+        <td>1RM 리프트, 점프</td>
+        <td>400m 스프린트, WOD</td>
+        <td>10K 러닝, 장시간 집중</td>
+      </tr>
+      <tr>
+        <td>일상 예시</td>
+        <td>무거운 짐 들기</td>
+        <td>계단 뛰어오르기</td>
+        <td>걷기, 사무 집중, 육아</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════ ⑤ SVG 에너지 타임라인 ═══════════ -->
+<div class="svg-section fade-up">
+  <div class="svg-title">⚡ Energy System Timeline — 시간에 따른 에너지 기여도 변화</div>
+  <svg id="timeline-svg" viewBox="0 0 900 400" style="width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background grid -->
+    <defs>
+      <linearGradient id="atp-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#BF4A4A" stop-opacity="0.7"/>
+        <stop offset="100%" stop-color="#BF4A4A" stop-opacity="0.05"/>
+      </linearGradient>
+      <linearGradient id="glyc-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#BF6A4A" stop-opacity="0.7"/>
+        <stop offset="100%" stop-color="#BF6A4A" stop-opacity="0.05"/>
+      </linearGradient>
+      <linearGradient id="aero-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#4A9EBF" stop-opacity="0.7"/>
+        <stop offset="100%" stop-color="#4A9EBF" stop-opacity="0.05"/>
+      </linearGradient>
+    </defs>
+
+    <!-- Grid lines -->
+    <g stroke="var(--border)" stroke-width="0.5" opacity="0.5">
+      <line x1="80" y1="50" x2="80" y2="310"/>
+      <line x1="80" y1="310" x2="860" y2="310"/>
+      <!-- Horizontal guides -->
+      <line x1="80" y1="115" x2="860" y2="115" stroke-dasharray="4,4"/>
+      <line x1="80" y1="180" x2="860" y2="180" stroke-dasharray="4,4"/>
+      <line x1="80" y1="245" x2="860" y2="245" stroke-dasharray="4,4"/>
+    </g>
+
+    <!-- Y axis labels -->
+    <text x="70" y="55" text-anchor="end" fill="#7A7A8A" font-family="JetBrains Mono" font-size="11">100%</text>
+    <text x="70" y="120" text-anchor="end" fill="#7A7A8A" font-family="JetBrains Mono" font-size="11">75%</text>
+    <text x="70" y="185" text-anchor="end" fill="#7A7A8A" font-family="JetBrains Mono" font-size="11">50%</text>
+    <text x="70" y="250" text-anchor="end" fill="#7A7A8A" font-family="JetBrains Mono" font-size="11">25%</text>
+    <text x="70" y="315" text-anchor="end" fill="#7A7A8A" font-family="JetBrains Mono" font-size="11">0%</text>
+    <text x="30" y="180" text-anchor="middle" fill="#7A7A8A" font-family="Noto Sans KR" font-size="11" transform="rotate(-90,30,180)">에너지 기여도</text>
+
+    <!-- X axis labels -->
+    <text x="100" y="335" fill="#7A7A8A" font-family="JetBrains Mono" font-size="10">0s</text>
+    <text x="180" y="335" fill="#7A7A8A" font-family="JetBrains Mono" font-size="10">10s</text>
+    <text x="300" y="335" fill="#7A7A8A" font-family="JetBrains Mono" font-size="10">30s</text>
+    <text x="420" y="335" fill="#7A7A8A" font-family="JetBrains Mono" font-size="10">1min</text>
+    <text x="540" y="335" fill="#7A7A8A" font-family="JetBrains Mono" font-size="10">2min</text>
+    <text x="660" y="335" fill="#7A7A8A" font-family="JetBrains Mono" font-size="10">5min</text>
+    <text x="780" y="335" fill="#7A7A8A" font-family="JetBrains Mono" font-size="10">10min</text>
+    <text x="470" y="360" fill="#7A7A8A" font-family="Noto Sans KR" font-size="11" text-anchor="middle">운동 시간 →</text>
+
+    <!-- Phase dividers -->
+    <line x1="180" y1="50" x2="180" y2="310" stroke="#BF4A4A" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
+    <line x1="540" y1="50" x2="540" y2="310" stroke="#BF6A4A" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
+
+    <!-- Phase labels -->
+    <text class="svg-hotspot" data-tip-title="ATP-PC 시스템" data-tip-value="0~10초 최대 파워" data-tip-desc="크로스핏 1RM, 스프린트 출발 시 주력 에너지원" x="130" y="42" text-anchor="middle" fill="#BF4A4A" font-family="JetBrains Mono" font-size="10" font-weight="700">ATP-PCr ZONE</text>
+    <text x="360" y="42" text-anchor="middle" fill="#BF6A4A" font-family="JetBrains Mono" font-size="10" font-weight="700">GLYCOLYTIC ZONE</text>
+    <text x="700" y="42" text-anchor="middle" fill="#4A9EBF" font-family="JetBrains Mono" font-size="10" font-weight="700">OXIDATIVE ZONE</text>
+
+    <!-- ATP-PCr curve (fast rise, fast drop) -->
+    <path d="M80,310 L80,55 L100,60 L130,80 L180,200 L250,270 L350,295 L860,305" 
+          fill="url(#atp-grad)" stroke="none" opacity="0.6">
+      <animate attributeName="opacity" from="0" to="0.6" dur="0.8s" fill="freeze"/>
+    </path>
+    <path d="M80,55 L100,60 L130,80 L180,200 L250,270 L350,295 L860,305" 
+          fill="none" stroke="#BF4A4A" stroke-width="2.5" stroke-linecap="round">
+      <animate attributeName="stroke-dashoffset" from="1000" to="0" dur="1.5s" fill="freeze"/>
+    </path>
+
+    <!-- Glycolytic curve (slower rise, peak ~30s-1min, then drops) -->
+    <path d="M80,310 L100,300 L130,250 L180,140 L250,80 L350,70 L420,90 L540,180 L660,260 L780,290 L860,300" 
+          fill="url(#glyc-grad)" stroke="none" opacity="0.5">
+      <animate attributeName="opacity" from="0" to="0.5" dur="1s" begin="0.3s" fill="freeze"/>
+    </path>
+    <path d="M100,300 L130,250 L180,140 L250,80 L350,70 L420,90 L540,180 L660,260 L780,290 L860,300" 
+          fill="none" stroke="#BF6A4A" stroke-width="2.5" stroke-linecap="round">
+      <animate attributeName="stroke-dashoffset" from="1000" to="0" dur="1.5s" begin="0.3s" fill="freeze"/>
+    </path>
+
+    <!-- Oxidative curve (slow rise, dominates after 2min) -->
+    <path d="M80,310 L130,305 L180,290 L250,260 L350,200 L420,160 L540,100 L660,70 L780,58 L860,55" 
+          fill="url(#aero-grad)" stroke="none" opacity="0.5">
+      <animate attributeName="opacity" from="0" to="0.5" dur="1.2s" begin="0.6s" fill="freeze"/>
+    </path>
+    <path d="M130,305 L180,290 L250,260 L350,200 L420,160 L540,100 L660,70 L780,58 L860,55" 
+          fill="none" stroke="#4A9EBF" stroke-width="2.5" stroke-linecap="round">
+      <animate attributeName="stroke-dashoffset" from="1000" to="0" dur="1.5s" begin="0.6s" fill="freeze"/>
+    </path>
+
+    <!-- Legend -->
+    <g transform="translate(100, 370)">
+      <rect x="0" y="0" width="14" height="3" rx="1" fill="#BF4A4A"/>
+      <text x="20" y="5" fill="#BF4A4A" font-family="JetBrains Mono" font-size="10">ATP-PCr</text>
+      <rect x="120" y="0" width="14" height="3" rx="1" fill="#BF6A4A"/>
+      <text class="svg-hotspot" data-tip-title="해당과정" data-tip-value="10초~2분" data-tip-desc="400m 달리기, AMRAP 세트 시 주로 사용" x="140" y="5" fill="#BF6A4A" font-family="JetBrains Mono" font-size="10">해당과정</text>
+      <rect x="260" y="0" width="14" height="3" rx="1" fill="#4A9EBF"/>
+      <text class="svg-hotspot" data-tip-title="산화적 인산화" data-tip-value="2분 이상 지속" data-tip-desc="Zone 2 러닝에서 지방 산화 극대화" x="280" y="5" fill="#4A9EBF" font-family="JetBrains Mono" font-size="10">유산소</text>
+    </g>
+
+    <!-- Annotation: CrossFit WOD -->
+    <g opacity="0.8">
+      <rect x="250" y="340" width="180" height="20" rx="4" fill="rgba(191,106,74,0.15)" stroke="#BF6A4A" stroke-width="0.5"/>
+      <text x="340" y="354" text-anchor="middle" fill="#BF6A4A" font-family="JetBrains Mono" font-size="9">← CrossFit AMRAP 3min →</text>
+    </g>
+    <g opacity="0.8">
+      <rect x="600" y="340" width="180" height="20" rx="4" fill="rgba(74,158,191,0.15)" stroke="#4A9EBF" stroke-width="0.5"/>
+      <text x="690" y="354" text-anchor="middle" fill="#4A9EBF" font-family="JetBrains Mono" font-size="9">← 10K 러닝 ~50min →</text>
+    </g>
+  </svg>
+</div>
+
+<!-- ═══════════ CrossFit 에너지 전환 SVG ═══════════ -->
+<div class="svg-section fade-up">
+  <div class="svg-title">🔄 CrossFit WOD 중 에너지 시스템 전환 — 실시간 시뮬레이션</div>
+  <svg viewBox="0 0 900 280" style="width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect x="40" y="30" width="820" height="180" rx="8" fill="var(--surface2)" stroke="var(--border)" stroke-width="1"/>
+    
+    <!-- WOD Phases -->
+    <!-- Phase 1: Deadlift 1RM attempt (0-8s) -->
+    <rect x="42" y="32" width="80" height="176" rx="6" fill="rgba(191,74,74,0.15)"/>
+    <text x="82" y="55" text-anchor="middle" fill="#BF4A4A" font-family="JetBrains Mono" font-size="9" font-weight="700">DEADLIFT</text>
+    <text x="82" y="68" text-anchor="middle" fill="#BF4A4A" font-family="JetBrains Mono" font-size="8">1RM · 8s</text>
+    
+    <!-- Energy bars for phase 1 -->
+    <rect x="55" y="85" width="54" height="12" rx="2" fill="#BF4A4A" opacity="0.9"/>
+    <text x="56" y="94" fill="white" font-family="JetBrains Mono" font-size="8" font-weight="700">ATP-PCr 90%</text>
+    <rect x="55" y="102" width="6" height="12" rx="2" fill="#BF6A4A" opacity="0.7"/>
+    <rect x="55" y="119" width="3" height="12" rx="2" fill="#4A9EBF" opacity="0.5"/>
+
+    <!-- Phase 2: Box Jumps x10 (8s-50s) -->
+    <rect x="130" y="32" width="160" height="176" rx="6" fill="rgba(191,106,74,0.15)"/>
+    <text x="210" y="55" text-anchor="middle" fill="#BF6A4A" font-family="JetBrains Mono" font-size="9" font-weight="700">BOX JUMPS ×10</text>
+    <text x="210" y="68" text-anchor="middle" fill="#BF6A4A" font-family="JetBrains Mono" font-size="8">8s~50s</text>
+    
+    <rect x="143" y="85" width="18" height="12" rx="2" fill="#BF4A4A" opacity="0.7"/>
+    <rect x="143" y="102" width="94" height="12" rx="2" fill="#BF6A4A" opacity="0.9"/>
+    <text x="145" y="111" fill="white" font-family="JetBrains Mono" font-size="8" font-weight="700">해당과정 65%</text>
+    <rect x="143" y="119" width="30" height="12" rx="2" fill="#4A9EBF" opacity="0.7"/>
+
+    <!-- Phase 3: 400m Run (50s-2min) -->
+    <rect x="298" y="32" width="200" height="176" rx="6" fill="rgba(191,106,74,0.12)"/>
+    <text x="398" y="55" text-anchor="middle" fill="#BF6A4A" font-family="JetBrains Mono" font-size="9" font-weight="700">400m RUN</text>
+    <text x="398" y="68" text-anchor="middle" fill="#BF6A4A" font-family="JetBrains Mono" font-size="8">50s~2min</text>
+    
+    <rect x="310" y="85" width="6" height="12" rx="2" fill="#BF4A4A" opacity="0.5"/>
+    <rect x="310" y="102" width="80" height="12" rx="2" fill="#BF6A4A" opacity="0.8"/>
+    <text x="312" y="111" fill="white" font-family="JetBrains Mono" font-size="8" font-weight="700">해당과정 50%</text>
+    <rect x="310" y="119" width="60" height="12" rx="2" fill="#4A9EBF" opacity="0.8"/>
+    <text x="312" y="128" fill="white" font-family="JetBrains Mono" font-size="8">유산소 40%</text>
+
+    <!-- Phase 4: Rest 2min (recovery) -->
+    <rect x="506" y="32" width="120" height="176" rx="6" fill="rgba(74,191,138,0.08)"/>
+    <text x="566" y="55" text-anchor="middle" fill="#4ABF8A" font-family="JetBrains Mono" font-size="9" font-weight="700">REST</text>
+    <text x="566" y="68" text-anchor="middle" fill="#4ABF8A" font-family="JetBrains Mono" font-size="8">2min · PCr 회복</text>
+
+    <text x="520" y="95" fill="#4ABF8A" font-family="JetBrains Mono" font-size="8">PCr: 87% 재충전</text>
+    <text x="520" y="112" fill="#4ABF8A" font-family="JetBrains Mono" font-size="8">H⁺: 간에서 제거 중</text>
+    <text x="520" y="129" fill="#4ABF8A" font-family="JetBrains Mono" font-size="8">유산소: 계속 가동</text>
+    
+    <!-- Arrow showing PCr recovery -->
+    <line x1="520" y1="145" x2="610" y2="145" stroke="#4ABF8A" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+    <rect x="520" y="152" width="20" height="8" rx="2" fill="#BF4A4A" opacity="0.3"/>
+    <rect x="580" y="152" width="40" height="8" rx="2" fill="#BF4A4A" opacity="0.8"/>
+    <text x="520" y="175" fill="#7A7A8A" font-family="JetBrains Mono" font-size="7">시작</text>
+    <text x="600" y="175" fill="#7A7A8A" font-family="JetBrains Mono" font-size="7">2분 후</text>
+
+    <!-- Phase 5: Round 2 starts -->
+    <rect x="634" y="32" width="224" height="176" rx="6" fill="rgba(138,106,191,0.08)"/>
+    <text x="746" y="55" text-anchor="middle" fill="#8A6ABF" font-family="JetBrains Mono" font-size="9" font-weight="700">ROUND 2 시작!</text>
+    <text x="746" y="68" text-anchor="middle" fill="#8A6ABF" font-family="JetBrains Mono" font-size="8">3시스템 재 순환</text>
+    
+    <text x="650" y="95" fill="#D8D3C8" font-family="Noto Sans KR" font-size="9">→ PCr이 충분히 회복되었으므로</text>
+    <text x="650" y="112" fill="#D8D3C8" font-family="Noto Sans KR" font-size="9">  다시 1RM 급 폭발력 가능</text>
+    <text x="650" y="132" fill="#D8D3C8" font-family="Noto Sans KR" font-size="9">→ 유산소 베이스가 높을수록</text>
+    <text x="650" y="149" fill="#D8D3C8" font-family="Noto Sans KR" font-size="9">  라운드 간 회복이 빠름</text>
+    <text x="650" y="170" fill="#C9A84C" font-family="JetBrains Mono" font-size="9" font-weight="700">핵심 = 미토콘드리아 밀도</text>
+
+    <!-- Arrow marker -->
+    <defs>
+      <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6" fill="#4ABF8A"/>
+      </marker>
+    </defs>
+
+    <!-- Timeline bar at bottom -->
+    <rect x="42" y="215" width="816" height="4" rx="2" fill="var(--border)"/>
+    <circle cx="42" cy="217" r="4" fill="#BF4A4A"/>
+    <circle cx="130" cy="217" r="4" fill="#BF6A4A"/>
+    <circle cx="298" cy="217" r="4" fill="#BF6A4A"/>
+    <circle cx="506" cy="217" r="4" fill="#4ABF8A"/>
+    <circle cx="634" cy="217" r="4" fill="#8A6ABF"/>
+    
+    <text x="42" y="240" fill="#7A7A8A" font-family="JetBrains Mono" font-size="9" text-anchor="middle">0s</text>
+    <text x="130" y="240" fill="#7A7A8A" font-family="JetBrains Mono" font-size="9" text-anchor="middle">8s</text>
+    <text x="298" y="240" fill="#7A7A8A" font-family="JetBrains Mono" font-size="9" text-anchor="middle">50s</text>
+    <text x="506" y="240" fill="#7A7A8A" font-family="JetBrains Mono" font-size="9" text-anchor="middle">2:00</text>
+    <text x="634" y="240" fill="#7A7A8A" font-family="JetBrains Mono" font-size="9" text-anchor="middle">4:00</text>
+    
+    <text x="450" y="268" text-anchor="middle" fill="#7A7A8A" font-family="Noto Sans KR" font-size="10">
+      ▲ 실제 CrossFit WOD에서 3가지 에너지 시스템이 실시간으로 전환되는 과정
+    </text>
+  </svg>
+</div>
+
+<!-- ═══════════ ⑥ 실전 프로토콜 ═══════════ -->
+<h2 class="section-title fade-up">⚡ 실전 프로토콜 — "에너지 시스템을 내 편으로"</h2>
+
+<div class="protocol-grid fade-up">
+  <div class="protocol-card">
+    <div class="p-time">⏱ 30초 — 즉시 가능</div>
+    <h4>에너지 인식 전환</h4>
+    <div class="check-item"><input type="checkbox"> "피곤하다" → "어떤 에너지 시스템이 고갈됐지?"로 리프레이밍</div>
+    <div class="check-item"><input type="checkbox"> 지금 내 활동의 에너지 시스템 인식: 사무 = 유산소, 계단 = 해당과정</div>
+  </div>
+
+  <div class="protocol-card">
+    <div class="p-time">⏱ 5분 — 오늘 실천</div>
+    <h4>에너지 시스템 활성화 테스트</h4>
+    <div class="check-item"><input type="checkbox"> ATP-PCr 테스트: 제자리 점프 최대 높이 3회 → 세트 간 3분 쉬고 반복 (회복 느껴보기)</div>
+    <div class="check-item"><input type="checkbox"> 해당과정 테스트: 계단 3층 전력 질주 → 다리 타는 느낌 = H⁺ 축적 체감</div>
+    <div class="check-item"><input type="checkbox"> 유산소 테스트: 5분 걷기 → 거의 피로 없음 = 유산소 시스템의 효율성 체감</div>
+  </div>
+
+  <div class="protocol-card">
+    <div class="p-time">📅 이번 주 — 루틴 추가</div>
+    <h4>에너지 베이스 측정 시작</h4>
+    <div class="check-item"><input type="checkbox"> 안정 시 심박수 기록 시작: 기상 직후 누운 상태에서 1분 측정 → 매일 기록</div>
+    <div class="check-item"><input type="checkbox"> 주관적 에너지 레벨 1~10 매일 3회 기록 (아침·오후·저녁)</div>
+    <div class="check-item"><input type="checkbox"> 크레아틴 모노하이드레이트 3g/일 시작 (PCr 저장량 ↑20%)</div>
+    <div class="check-item"><input type="checkbox"> 이번 주 CrossFit WOD 중 세트 간 휴식 2분 정확히 지키기 → PCr 회복 최적화</div>
+  </div>
+</div>
+
+<!-- ═══════════ ⑦ 에너지 로그 ═══════════ -->
+<div class="energy-log fade-up" id="energyLog">
+  <h3>📊 오늘의 에너지 로그 — Day 01</h3>
+  <p style="font-size:0.82rem; color:var(--text-dim); margin-bottom:16px;">
+    매일 같은 시간에 기록할수록 패턴 발견이 빨라집니다. 데이터가 쌓이면 에너지 최적화의 레버를 찾을 수 있습니다.
+  </p>
+
+  <div class="log-row">
+    <label>아침 에너지 (1~10):</label>
+    <input type="range" id="log-morning" min="1" max="10" value="5" oninput="document.getElementById('val-morning').textContent=this.value">
+    <span class="range-val" id="val-morning">5</span>
+  </div>
+  <div class="log-row">
+    <label>운동 퍼포먼스 (1~10):</label>
+    <input type="range" id="log-workout" min="1" max="10" value="5" oninput="document.getElementById('val-workout').textContent=this.value">
+    <span class="range-val" id="val-workout">5</span>
+  </div>
+  <div class="log-row">
+    <label>수면 시간 (h):</label>
+    <input type="number" id="log-sleep-hrs" min="0" max="12" step="0.5" value="7" style="width:70px;">
+  </div>
+  <div class="log-row">
+    <label>수면 품질 (1~10):</label>
+    <input type="range" id="log-sleep-q" min="1" max="10" value="5" oninput="document.getElementById('val-sleepq').textContent=this.value">
+    <span class="range-val" id="val-sleepq">5</span>
+  </div>
+  <div class="log-row">
+    <label>HRV (ms, 있으면):</label>
+    <input type="number" id="log-hrv" min="0" max="200" step="1" placeholder="—" style="width:70px;">
+  </div>
+  <div class="log-row">
+    <label>안정심박수 (BPM):</label>
+    <input type="number" id="log-rhr" min="30" max="120" step="1" placeholder="—" style="width:70px;">
+  </div>
+
+  <button class="log-save-btn" onclick="saveLog()">💾 저장하기</button>
+  <div class="log-status" id="logStatus"></div>
+</div>
+
+<!-- ═══════════ ⑧ 퀴즈 ═══════════ -->
+<h2 class="section-title fade-up">🧩 복습 퀴즈 — 3문제</h2>
+
+<div class="quiz-section fade-up">
+  <!-- Q1 -->
+  <div class="quiz-card" id="quiz1">
+    <div class="q-num">Question 01 — 메커니즘 이해</div>
+    <div class="q-text">CrossFit에서 1RM 데드리프트를 시도할 때 (약 5초), 주로 사용되는 에너지 시스템과 그 특징으로 올바른 것은?</div>
+    <div class="q-options">
+      <div class="q-opt" onclick="checkQuiz(1, this, false)">A. 해당과정 — 글루코스를 분해하여 빠르게 ATP 생산, 젖산 발생</div>
+      <div class="q-opt" onclick="checkQuiz(1, this, true)">B. ATP-PCr — 근육에 저장된 PCr 분해, 산소 불필요, 출력 최대</div>
+      <div class="q-opt" onclick="checkQuiz(1, this, false)">C. 유산소 — 미토콘드리아에서 산소 사용, 36 ATP/글루코스</div>
+      <div class="q-opt" onclick="checkQuiz(1, this, false)">D. 3가지 시스템이 균등하게 기여 (각 33%)</div>
+    </div>
+    <div class="q-feedback" id="fb1"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-card" id="quiz2">
+    <div class="q-num">Question 02 — 수치 적용</div>
+    <div class="q-text">유산소 시스템에서 글루코스 1분자가 완전 산화될 때 생성되는 ATP 수는? 해당과정(2 ATP)의 몇 배인가?</div>
+    <div class="q-options">
+      <div class="q-opt" onclick="checkQuiz(2, this, false)">A. 12 ATP, 6배</div>
+      <div class="q-opt" onclick="checkQuiz(2, this, false)">B. 24 ATP, 12배</div>
+      <div class="q-opt" onclick="checkQuiz(2, this, true)">C. 36~38 ATP, 약 19배</div>
+      <div class="q-opt" onclick="checkQuiz(2, this, false)">D. 48 ATP, 24배</div>
+    </div>
+    <div class="q-feedback" id="fb2"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-card" id="quiz3">
+    <div class="q-num">Question 03 — 실전 판단</div>
+    <div class="q-text">CrossFit WOD에서 세트 간 휴식 2분의 과학적 근거로 가장 적절한 것은?</div>
+    <div class="q-options">
+      <div class="q-opt" onclick="checkQuiz(3, this, false)">A. 젖산이 완전히 제거되는 데 2분이 필요하다</div>
+      <div class="q-opt" onclick="checkQuiz(3, this, true)">B. PCr이 ~87% 재합성되어 다음 세트의 폭발적 출력을 회복한다</div>
+      <div class="q-opt" onclick="checkQuiz(3, this, false)">C. 심박수가 안정 시 수준으로 완전히 돌아온다</div>
+      <div class="q-opt" onclick="checkQuiz(3, this, false)">D. 미토콘드리아가 새로 생성되어 유산소 용량이 늘어난다</div>
+    </div>
+    <div class="q-feedback" id="fb3"></div>
+  </div>
+</div>
+
+<!-- ═══════════ ⑨ 간격 반복 트래커 ═══════════ -->
+<div class="spaced-rep fade-up">
+  <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--gold);">
+    🔁 간격 반복 스케줄 — Day 01
+  </h3>
+  <p style="font-size:0.82rem; color:var(--text-dim); margin-top:6px;">
+    에빙하우스 망각곡선 기반: D+1(24h 내 첫 복습)에서 기억 유지율이 80% → 95%로 상승합니다.
+  </p>
+  <div class="sr-grid">
+    <div class="sr-item today">
+      <div class="sr-day">D+0</div>
+      <div class="sr-label">오늘 학습</div>
+    </div>
+    <div class="sr-item">
+      <div class="sr-day">D+1</div>
+      <div class="sr-label">내일 복습</div>
+    </div>
+    <div class="sr-item">
+      <div class="sr-day">D+3</div>
+      <div class="sr-label">3일 후</div>
+    </div>
+    <div class="sr-item">
+      <div class="sr-day">D+7</div>
+      <div class="sr-label">1주 후</div>
+    </div>
+    <div class="sr-item">
+      <div class="sr-day">D+14</div>
+      <div class="sr-label">2주 후</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ⑩ 내일 예고 ═══════════ -->
+<div class="next-preview fade-up">
+  <div class="np-label">NEXT → DAY 02</div>
+  <div class="np-title">미토콘드리아 — 에너지 공장</div>
+  <div class="np-desc">
+    "에너지 넘치는 사람"의 진짜 비밀 = 미토콘드리아 밀도.<br>
+    유산소 훈련이 미토콘드리아를 늘리는 메커니즘, 그리고 CrossFit이 에너지 베이스를 올리는 이유.
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ═══════════ FADE UP OBSERVER ═══════════
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// ═══════════ QUIZ LOGIC ═══════════
+const quizFeedback = {
+  1: {
+    correct: '✅ 정답! ATP-PCr 시스템은 0~10초 이내의 최대 강도 활동에서 지배적. 근육 내 PCr을 크레아틴 키나아제 효소로 분해하여 즉각적으로 ATP를 재합성합니다. 산소 불필요, 출력 ~36 kcal/min으로 3시스템 중 최고.',
+    wrong: '❌ 오답. 5초짜리 1RM은 ATP-PCr 시스템 영역입니다. 10초 미만의 최대 강도 활동 = ATP-PCr이 지배. 해당과정은 10초~2분, 유산소는 2분 이상에서 주력입니다.'
+  },
+  2: {
+    correct: '✅ 정답! 유산소 시스템(TCA 사이클 + 전자전달계)에서 글루코스 1분자 → 36~38 ATP. 해당과정의 2 ATP 대비 약 19배 효율. 이것이 유산소 베이스가 "기본 에너지 레벨"을 결정하는 이유입니다.',
+    wrong: '❌ 오답. 유산소 시스템은 글루코스 1분자에서 36~38 ATP를 생산합니다. 해당과정(2 ATP)의 약 19배. 이 엄청난 효율 차이가 미토콘드리아 밀도 = 에너지 레벨인 근거입니다.'
+  },
+  3: {
+    correct: '✅ 정답! PCr은 2분 휴식으로 ~87% 재합성됩니다 (Harris et al., 1976). 이는 다음 세트에서 ATP-PCr 시스템을 다시 가동할 수 있게 해 폭발적 출력을 유지시킵니다. 젖산 완전 제거는 30~60분 소요, 미토콘드리아 신생은 수주 단위.',
+    wrong: '❌ 오답. 핵심은 PCr 재합성입니다. 2분 휴식 시 PCr ~87% 회복 → 다음 세트 폭발적 출력 가능. 젖산 완전 제거는 30~60분이 필요하고, 미토콘드리아 신생(biogenesis)은 수주 단위의 적응입니다.'
+  }
+};
+
+function checkQuiz(qNum, el, isCorrect) {
+  const card = document.getElementById('quiz' + qNum);
+  const opts = card.querySelectorAll('.q-opt');
+  const fb = document.getElementById('fb' + qNum);
+  
+  // Prevent re-answering
+  if (card.dataset.answered) return;
+  card.dataset.answered = 'true';
+  
+  opts.forEach(opt => {
+    opt.style.pointerEvents = 'none';
+    opt.style.opacity = '0.6';
+  });
+
+  if (isCorrect) {
+    el.classList.add('correct');
+    el.style.opacity = '1';
+    fb.style.color = 'var(--green)';
+    fb.textContent = quizFeedback[qNum].correct;
+  } else {
+    el.classList.add('wrong');
+    el.style.opacity = '1';
+    // Highlight correct answer
+    opts.forEach(opt => {
+      if (opt.getAttribute('onclick').includes('true')) {
+        opt.classList.add('correct');
+        opt.style.opacity = '1';
+      }
+    });
+    fb.style.color = 'var(--red)';
+    fb.textContent = quizFeedback[qNum].wrong;
+  }
+}
+
+// ═══════════ ENERGY LOG SAVE ═══════════
+function saveLog() {
+  const data = {
+    day: 1,
+    date: new Date().toISOString().slice(0, 10),
+    morning: document.getElementById('log-morning').value,
+    workout: document.getElementById('log-workout').value,
+    sleepHrs: document.getElementById('log-sleep-hrs').value,
+    sleepQ: document.getElementById('log-sleep-q').value,
+    hrv: document.getElementById('log-hrv').value || null,
+    rhr: document.getElementById('log-rhr').value || null
+  };
+  
+  // Save to localStorage
+  let logs = JSON.parse(localStorage.getItem('ys-energy-logs') || '[]');
+  // Remove existing entry for today
+  logs = logs.filter(l => l.date !== data.date || l.day !== data.day);
+  logs.push(data);
+  localStorage.setItem('ys-energy-logs', JSON.stringify(logs));
+  
+  const status = document.getElementById('logStatus');
+  status.textContent = '✅ 저장 완료! (' + data.date + ')';
+  setTimeout(() => { status.textContent = ''; }, 3000);
+}
+</script>
+
+
+<script>
+
+// ── Interactive SVG Tooltip & Focus System ──
+(function(){
+  const diagrams = document.querySelectorAll('.diagram-box');
+  diagrams.forEach(box => {
+    let tooltip = box.querySelector('.svg-tooltip');
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.className = 'svg-tooltip';
+      box.style.position = 'relative';
+      box.appendChild(tooltip);
+    }
+    const hotspots = box.querySelectorAll('.svg-hotspot');
+    hotspots.forEach(hs => {
+      hs.addEventListener('mouseenter', e => {
+        const t = hs.dataset.tipTitle || '';
+        const v = hs.dataset.tipValue || '';
+        const d = hs.dataset.tipDesc || '';
+        tooltip.innerHTML = (t ? '<div class="tip-title">'+t+'</div>' : '') +
+          (v ? '<div class="tip-value">'+v+'</div>' : '') +
+          (d ? '<div class="tip-desc">'+d+'</div>' : '');
+        const rect = hs.getBoundingClientRect();
+        const boxRect = box.getBoundingClientRect();
+        tooltip.style.left = (rect.left - boxRect.left + rect.width/2 - 130) + 'px';
+        tooltip.style.top = (rect.top - boxRect.top - tooltip.offsetHeight - 10) + 'px';
+        tooltip.classList.add('visible');
+      });
+      hs.addEventListener('mouseleave', () => {
+        tooltip.classList.remove('visible');
+      });
+      // Touch fallback for tooltips
+      hs.addEventListener('touchstart', function(ev) {
+        ev.stopPropagation();
+        var t = hs.dataset.tipTitle || '';
+        var v = hs.dataset.tipValue || '';
+        var d = hs.dataset.tipDesc || '';
+        tooltip.innerHTML = (t ? '<div class="tip-title">'+t+'</div>' : '') +
+          (v ? '<div class="tip-value">'+v+'</div>' : '') +
+          (d ? '<div class="tip-desc">'+d+'</div>' : '');
+        var rect = hs.getBoundingClientRect();
+        var boxRect = box.getBoundingClientRect();
+        tooltip.style.left = Math.max(0, (rect.left - boxRect.left + rect.width/2 - 130)) + 'px';
+        tooltip.style.top = Math.max(0, (rect.top - boxRect.top - tooltip.offsetHeight - 10)) + 'px';
+        tooltip.classList.add('visible');
+        setTimeout(function(){ tooltip.classList.remove('visible'); }, 3000);
+      }, {passive: true});
+
+      hs.addEventListener('click', () => {
+        const wasActive = hs.classList.contains('focused');
+        box.querySelectorAll('.svg-hotspot').forEach(h => h.classList.remove('focused'));
+        const panel = box.querySelector('.detail-panel');
+        if (wasActive) {
+          box.classList.remove('svg-focus-active');
+          if(panel) panel.classList.remove('active');
+        } else {
+          hs.classList.add('focused');
+          box.classList.add('svg-focus-active');
+          if(panel && hs.dataset.detail){
+            panel.innerHTML = '<span class="close-btn" onclick="this.parentElement.classList.remove(\'active\');this.closest(\'.diagram-box\').classList.remove(\'svg-focus-active\');this.closest(\'.diagram-box\').querySelectorAll(\'.svg-hotspot\').forEach(h=>h.classList.remove(\'focused\'))">✕</span>' + hs.dataset.detail;
+            panel.classList.add('active');
+          }
+        }
+      });
+    });
+  });
+})();
+
+</script>
+<script>
+// ── Swipe Navigation ──
+(function(){
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const threshold = 80;
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, {passive: true});
+
+  document.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) < threshold) return;
+
+    const links = document.querySelectorAll('.mobile-nav a, .nav-links a');
+    if (diff > 0) {
+      // Swipe left → next day
+      const next = Array.from(links).find(a => a.textContent.includes('→') || a.textContent.includes('Day'));
+      if (next && next.href && next.textContent.includes('→')) next.click();
+    } else {
+      // Swipe right → prev day
+      const prev = Array.from(links).find(a => a.textContent.includes('←'));
+      if (prev && prev.href) prev.click();
+    }
+  }, {passive: true});
+})();
+// ── Service Worker Registration ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

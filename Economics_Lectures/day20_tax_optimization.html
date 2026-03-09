@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 20 | 절세 전략 기초 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #9A9890;
+  --text-dim: #5A584F;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 20 / 23</span>
+    <span class="header-title">절세 전략 기초</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 4 · 세금 & 자산 시스템</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 4 — 세금 & 자산 시스템</div>
+  <h1 class="hero-day">Day 20</h1>
+  <h2 class="hero-subtitle">절세 전략 기초</h2>
+  <p class="hero-quote">"세금을 내지 않는 것은 투자가 아니라 절약이다."</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 4: 20~23</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:87.0%"></div></div>
+    <div class="progress-label"><span>Day 20</span><span>20 / 23 완료 (87.0%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 세금 계산의 신경-엔지니어링</h3>
+    <p>세금은 복잡한 규칙이지만, 정기 계산은 뇌의 수리 능력(계산 회로)과 규칙 적응 능력을 동시에 강화합니다. 특히 엔지니어 사고(if-then 로직)로 ISA/IRP 규칙을 프로그래밍하면 자동 절세가 실현됩니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">0-5분</td><td>2026년 한국 세제 개요</td><td>배당세·양도세·종합과세 기본</td></tr>
+<tr><td class="time-col">5-10분</td><td>ISA (비과세계좌) 완전 이해</td><td>한도·비과세 범위·실수하기 쉬운 부분</td></tr>
+<tr><td class="time-col">10-15분</td><td>IRP (개인형 퇴직연금) 세액공제</td><td>연 900만 공제 / 환급액 계산</td></tr>
+<tr><td class="time-col">15-20분</td><td>연금저축 활용 & 비교</td><td>ISA vs IRP vs 연금저축 우선순위</td></tr>
+<tr><td class="time-col">20-25분</td><td>학생의 2026년 절세 로드맵</td><td>구체적 금액과 기한 정리</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">절세 전략 기초</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">2026년 한국 세제 정리 (배당·양도·종합)</div>
+      <div class="card-body"><div class="data-table-wrap">
+<table class="data-table">
+  <thead>
+    <tr>
+      <th style="text-align:left">항목</th>
+      <th>국내 주식</th>
+      <th>해외 주식</th>
+      <th>부동산 양도</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>배당세</strong></td>
+      <td>15.4% (기본)</td>
+      <td>15.4% (동일)</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td><strong>양도세</strong></td>
+      <td>20% (기본) / 25% (고액)</td>
+      <td>25% (신고 기준)</td>
+      <td>20% (기본) + 지방세</td>
+    </tr>
+    <tr>
+      <td><strong>종합과세 기준</strong></td>
+      <td>금융소득 2,000만 초과 시 종합</td>
+      <td>해외주식 배당 + 양도차익 합산</td>
+      <td>장기보유 공제 (10년 이상)</td>
+    </tr>
+    <tr>
+      <td><strong>비과세 (ISA)</strong></td>
+      <td>연 2,000만 한도 무제한</td>
+      <td>연 250만 한도만 비과세</td>
+      <td>미적용</td>
+    </tr>
+    <tr>
+      <td><strong>세액공제 (IRP)</strong></td>
+      <td>-</td>
+      <td>-</td>
+      <td>연 900만 범위 내 16.5% 공제</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">ISA 최대 활용: 연 2,000만 한도의 정확한 이해</div>
+      <div class="card-body"><div class="formula-block">
+<div class="formula-line"><span class="formula-highlight">ISA 기본 규칙 (2026년):</span></div>
+<div class="formula-line">• 연간 납입 한도: 2,000만원 (초과분은 일반계좌로 자동 이체)</div>
+<div class="formula-line">• 비과세 대상: 배당금 + 양도차익 (모두 포함!)</div>
+<div class="formula-line">• 1인 1계좌 원칙 (은행/증권사 중 1곳만 선택)</div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line"><span class="formula-highlight">학생의 최적 ISA 배분 (2,000만원):</span></div>
+<div class="formula-line">① 국내 배당주 1,500만원</div>
+<div class="formula-line">   → 연 배당금 약 37.5만원 (배당수익률 2.5%)</div>
+<div class="formula-line">   → 비과세 절세 효과: 37.5만 × 15.4% = <span class="formula-highlight">약 5.8만원 절세</span></div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line">② 해외 배당주 (S&P500 배당형) 500만원</div>
+<div class="formula-line">   → 연 배당금 약 7.5만원 + 양도차익 제한(연 250만 한도)</div>
+<div class="formula-line">   → 비과세 절세 효과: (7.5만 + 250만 양도차익) × 15.4~25% = <span class="formula-highlight">약 39만원 절세</span></div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line"><span class="formula-highlight">연간 ISA 절세 총액: 약 45만원</span></div>
+<div class="formula-line">10년 누적: 약 450만원</div>
+<div class="formula-comment">* ISA 한도 초과 투자분은 일반계좌로 세금 납부 필수</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">IRP 세액공제: 연 900만 한도, 실제 환급액 계산</div>
+      <div class="card-body"><div class="formula-block">
+<div class="formula-line"><span class="formula-highlight">IRP (개인형 퇴직연금) 기본:</span></div>
+<div class="formula-line">• 납입 한도: 연 300만원 (사업소득자는 900만원까지 가능)</div>
+<div class="formula-line">• 세액공제 대상: 납입액의 16.5% (주택자금 제외)</div>
+<div class="formula-line">• 수령: 55세 이상 (적립금 × 70% 이상 연금, 30% 까지 일시금)</div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line"><span class="formula-highlight">학생의 경우 (직장인 vs 사업소득자 다른 한도):</span></div>
+<div class="formula-line"><strong>시나리오 1: 직장인 급여만</strong></div>
+<div class="formula-line">→ 연 300만 IRP + 연금저축 400만 추가 가능 = 총 700만</div>
+<div class="formula-line">→ IRP 세액공제: 300만 × 16.5% = <span class="formula-highlight">49.5만원 환급</span></div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line"><strong>시나리오 2: 부동산 임대료 사업소득자</strong></div>
+<div class="formula-line">→ 연 900만 IRP 납입 가능</div>
+<div class="formula-line">→ IRP 세액공제: 900만 × 16.5% = <span class="formula-highlight">148.5만원 환급</span></div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line"><span class="formula-highlight">학생 권고:</span> 부동산 담보대출 이자(연 약 1,800만)를 사업소득</div>
+<div class="formula-line">범위 내에 포함시킬 수 있는지 세무사 상담 필수</div>
+<div class="formula-comment">* 2026년 IRP 한도 변경 여부 확인 필수</div>
+</div></div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+      <div class="chart-container">
+      <div class="chart-title">TAX OPTIMIZATION: 2026년 절세 전략 효과</div>
+      <svg viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:850px;margin:0 auto;display:block;">
+        <!-- 제목 -->
+        <text x="450" y="30" font-size="13" font-weight="600" fill="#C9A84C" text-anchor="middle">학생의 2026년 절세 로드맵</text>
+
+        <!-- 1. ISA 절세 -->
+        <g>
+          <rect x="50" y="60" width="250" height="200" fill="#4A9EBF" opacity="0.15" stroke="#4A9EBF" stroke-width="2" rx="6"/>
+          <text x="175" y="85" font-size="12" font-weight="600" fill="#4A9EBF" text-anchor="middle">1. ISA 비과세</text>
+          <text x="175" y="110" font-size="10" fill="#E8E6E1" text-anchor="middle">한도: 연 2,000만원</text>
+
+          <text x="60" y="135" font-size="9" fill="#9A9890">• 국내 배당주</text>
+          <text x="60" y="150" font-size="9" fill="#E8E6E1">1,500만 × 2.5%</text>
+          <text x="60" y="165" font-size="9" fill="#E8E6E1">배당금 37.5만</text>
+          <text x="60" y="180" font-size="9" fill="#9A9890">→ 세금 없음</text>
+          <text x="60" y="195" font-size="9" fill="#C9A84C" font-weight="600">절세: 5.8만원</text>
+
+          <text x="60" y="225" font-size="9" fill="#9A9890">• 해외주식</text>
+          <text x="60" y="240" font-size="9" fill="#E8E6E1">500만 + 배당금</text>
+          <text x="60" y="255" font-size="9" fill="#C9A84C" font-weight="600">절세: 39만원</text>
+        </g>
+
+        <!-- 2. IRP 세액공제 -->
+        <g>
+          <rect x="330" y="60" width="250" height="200" fill="#C9A84C" opacity="0.15" stroke="#C9A84C" stroke-width="2" rx="6"/>
+          <text x="455" y="85" font-size="12" font-weight="600" fill="#C9A84C" text-anchor="middle">2. IRP 세액공제</text>
+          <text x="455" y="110" font-size="10" fill="#E8E6E1" text-anchor="middle">한도: 연 300~900만원</text>
+
+          <text x="340" y="135" font-size="9" fill="#9A9890">직장인 기준:</text>
+          <text x="340" y="150" font-size="9" fill="#E8E6E1">IRP 300만 납입</text>
+          <text x="340" y="165" font-size="9" fill="#9A9890">× 16.5% 공제율</text>
+
+          <text x="340" y="190" font-size="9" fill="#C9A84C" font-weight="600">환급액: 49.5만원</text>
+
+          <text x="340" y="215" font-size="8" fill="#9A9890">(사업소득자 경우)</text>
+          <text x="340" y="228" font-size="8" fill="#9A9890">900만 × 16.5%</text>
+          <text x="340" y="241" font-size="8" fill="#C9A84C" font-weight="600">= 148.5만원</text>
+        </g>
+
+        <!-- 3. 연금저축 추가 공제 -->
+        <g>
+          <rect x="610" y="60" width="250" height="200" fill="#4ABF7A" opacity="0.15" stroke="#4ABF7A" stroke-width="2" rx="6"/>
+          <text x="735" y="85" font-size="12" font-weight="600" fill="#4ABF7A" text-anchor="middle">3. 연금저축 공제</text>
+          <text x="735" y="110" font-size="10" fill="#E8E6E1" text-anchor="middle">한도: 연 400만원</text>
+
+          <text x="620" y="135" font-size="9" fill="#E8E6E1">직장인:</text>
+          <text x="620" y="150" font-size="9" fill="#E8E6E1">400만 × 13.2%</text>
+          <text x="620" y="165" font-size="9" fill="#9A9890">= 52.8만원 공제</text>
+
+          <text x="620" y="190" font-size="9" fill="#9A9890">자영업자:</text>
+          <text x="620" y="205" font-size="9" fill="#E8E6E1">400만 × 16.5%</text>
+          <text x="620" y="220" font-size="9" fill="#9A9890">= 66만원 공제</text>
+        </g>
+
+        <!-- 합계 -->
+        <rect x="50" y="290" width="810" height="90" fill="#BF4A4A" opacity="0.12" stroke="#BF4A4A" stroke-width="2" rx="6"/>
+        <text x="455" y="315" font-size="13" font-weight="600" fill="#C9A84C" text-anchor="middle">2026년 연간 절세 총액</text>
+
+        <text x="100" y="345" font-size="11" fill="#E8E6E1"><strong>시나리오 A (직장인):</strong></text>
+        <text x="100" y="363" font-size="10" fill="#E8E6E1">ISA 45만 + IRP 49.5만 + 연금저축 52.8만</text>
+        <text x="100" y="378" font-size="11" fill="#C9A84C" font-weight="600">=  총 147.3만원 절세</text>
+
+        <text x="500" y="345" font-size="11" fill="#E8E6E1"><strong>시나리오 B (사업소득자):</strong></text>
+        <text x="500" y="363" font-size="10" fill="#E8E6E1">ISA 45만 + IRP 148.5만 + 연금저축 66만</text>
+        <text x="500" y="378" font-size="11" fill="#C9A84C" font-weight="600">=  총 259.5만원 절세</text>
+
+        <!-- 10년 누적 -->
+        <text x="455" y="420" font-size="12" font-weight="600" fill="#4ABF7A" text-anchor="middle">10년 누적 절세 효과</text>
+        <text x="455" y="445" font-size="11" fill="#E8E6E1" text-anchor="middle">시나리오 A: 약 1,500만원 | 시나리오 B: 약 2,600만원</text>
+      </svg>
+    </div>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  <details class="deep-dive">
+    <summary>ISA vs IRP vs 연금저축: 어느 계좌에 먼저 투자해야 할까?</summary>
+    <div class="deep-dive-content">
+    <p><strong>우선순위 의사결정:</strong> 세금 절감 효율성 + 유동성 + 수익성</p>
+    <p><strong>1순위: ISA (개인종합자산관리계좌)</strong></p>
+    <p style="color:#4ABF7A;">장점: 무제한 비과세(해외 250만 한도), 유동성 100% (언제든 출금), 수익성 제약 없음</p>
+    <p style="color:#4ABF7A;">추천: 연 2,000만원 전액 투자 (절세 45만 + 유동성 높음)</p>
+    <p><strong>2순위: IRP (개인형 퇴직연금)</strong></p>
+    <p style="color:#C9A84C;">장점: 세액공제 16.5% (현금 환급!), 수익 재투자 비과세</p>
+    <p style="color:#C9A84C;">단점: 55세까지 인출 불가 (장기 구속), 수수료 높음(연 0.5~1%)</p>
+    <p style="color:#C9A84C;">추천: 직장인 300만 또는 사업소득자 900만 (세액공제 49~149만원이므로 필수)</p>
+    <p><strong>3순위: 연금저축 (IRA)</strong></p>
+    <p style="color:#BF4A4A;">장점: 세액공제 13.2~16.5%, 55세 부분 인출 가능 (IRP보다 유동)</p>
+    <p style="color:#BF4A4A;">단점: IRP보다 공제율 낮음, 역시 장기 구속</p>
+    <p style="color:#BF4A4A;">추천: ISA + IRP 한도 초과 시 추가 투자 (연 400만 이내)</p>
+    <p style="color:#C9A84C;"><strong>학생의 최적 배분:</strong> ISA 2,000만 + IRP 300만 + 연금저축 400만 = 연 2,700만 절세 투자</p>
+    </div>
+    </details>
+    <details class="deep-dive">
+    <summary>2026년 세제 변경사항 & 미래 대비: 다가오는 "금융소득 종합과세"</summary>
+    <div class="deep-dive-content">
+    <p><strong>현재 (2026년 3월):</strong> 금융소득 2,000만원 초과 시 종합과세 (종합세율 최대 45%)</p>
+    <p><strong>미래 변경 예정:</strong> 2025년 세제 개편에 따라 금융소득 종합과세 기준이 인하될 가능성</p>
+    <p>예상 시나리오:</p>
+    <p style="color:#4A9EBF;">• 2027년: 기준 1,500만 인하 (세수 확대)</p>
+    <p style="color:#4A9EBF;">• 2029년: 기준 1,000만 인하 (EU 선진국 수준)</p>
+    <p><strong>영향:</strong> 배당금이 많은 투자자는 ISA 비과세 비중을 더 높여야 함</p>
+    <p><strong>대응 전략:</strong></p>
+    <p style="color:#C9A84C;">1. ISA 2,000만 적극 활용 (배당금 집중)</p>
+    <p style="color:#C9A84C;">2. 고배당주보다는 성장주(배당 없음) 선호로 전환</p>
+    <p style="color:#C9A84C;">3. 해외주식 비중 증대 (해외세제 변경 시간 확보)</p>
+    </div>
+    </details>
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+      <div class="sim-box">
+      <h3>2026년 절세 액션 플랜: 월별 실행</h3>
+      <p style="font-size:0.85rem;color:#9A9890;margin-bottom:1rem;">
+      즉시 실행 가능한 절세 대책:
+      </p>
+      <ul class="checklist">
+        <li><strong>1월 이내:</strong> ISA 개설 (은행 또는 증권사 선택) & 2,000만 입금</li>
+        <li style="margin-top:0.5rem;"><strong>2월 이내:</strong> IRP 계좌 개설 (동료 추천 또는 세무사 상담) & 월 25만 자동이체 설정</li>
+        <li style="margin-top:0.5rem;"><strong>3월 이내:</strong> 연금저축 상품 선택 (펀드 vs 보험) & 월 33만 자동이체</li>
+        <li style="margin-top:0.5rem;"><strong>매월:</strong> ISA 배당금 추적 기록 (비과세 한도 250만 모니터링)</li>
+        <li style="margin-top:0.5rem;"><strong>11월:</strong> 2026년 예상 세금 계산 & 12월 추가 납입 검토</li>
+        <li style="margin-top:0.5rem;"><strong>1월 말:</strong> 전년도 세금 정산 & 환급금 신청 (ISA 비과세 증명 필수)</li>
+      </ul>
+      <p style="font-size:0.82rem;color:#C9A84C;margin-top:1.2rem;"><strong>목표:</strong> 연 150~250만원 절세 누적 → 10년 1,500~2,500만원 추가 자산 형성</p>
+    </div>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    <div class="bias-name">세금 무시 편향 (Tax Aversion Bias)</div>
+    <p><span class="neuro-tag">뇌과학 | 정보 처리 한계</span> <span class="engineer-tag">엔지니어 사고 | 시스템 자동화</span></p>
+    <p>세금 계산은 복잡하므로, 뇌가 "어차피 복잡하니 무시해버리자"라고 회피합니다. 결과적으로 절세 기회를 놓칩니다. 대부분 투자자가 ISA를 안 쓰는 이유입니다.</p>
+    <p><strong>뇌의 회피 패턴 인식:</strong></p>
+    <p style="color:#BF4A4A;"><strong>패턴 1.</strong> "세금은 복잡하다" → 뇌가 정보 처리 포기</p>
+    <p style="color:#BF4A4A;"><strong>패턴 2.</strong> "어차피 내가 못 하니까" → 무력감</p>
+    <p style="color:#BF4A4A;"><strong>패턴 3.</strong> "나중에 하면 되지" → 시간 편향</p>
+    <p><strong>엔지니어식 극복:</strong></p>
+    <p style="color:#4A9EBF;"><strong>규칙 1.</strong> "세금 계산을 프로그래밍 한다" → 스프레드시트 자동화</p>
+    <p style="color:#4A9EBF;"><strong>규칙 2.</strong> "매월 같은 시간에 세금 기록" → 자동이체와 동시에</p>
+    <p style="color:#4A9EBF;"><strong>규칙 3.</strong> "연간 1회 세금 정산" → 달력에 고정 일정 표시</p>
+    <p style="color:#4ABF7A;"><strong>신경과학 효과:</strong> 반복된 세금 계산은 뇌의 수리 회로를 강화하고, "세금은 피할 수 있는 것"이라는 긍정적 신경 경로를 형성합니다. 6개월 반복 후 "세금 처리 능력"이 자동화됩니다.</p>
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 2026년 한국 배당세와 해외주식 양도세율의 차이는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',true)">① 배당세는 같지만 양도세는 5% 차이 (국내 20% vs 해외 25%)</li>
+<li onclick="checkAnswer(this,'q1',false)">② 해외주식이 배당세 5% 낮음</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 국내 주식이 양도세 25%로 더 높음</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 배당세와 양도세 모두 국내가 5% 높음</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ①</strong><br>배당세는 국내외 동일 15.4%, 하지만 양도세는 국내 20% vs 해외 25%로 5% 차이가 있습니다.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 학생의 ISA 최적 배분에서 국내 배당주에 1,500만 투자할 때, 연간 절세 금액은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',true)">① 약 5.8만원</li>
+<li onclick="checkAnswer(this,'q2',false)">② 약 15만원</li>
+<li onclick="checkAnswer(this,'q2',false)">③ 약 23만원</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 약 40만원</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ①</strong><br>국내 배당주 1,500만 × 2.5% 배당수익률 = 37.5만원 배당금 × 15.4% 세율 = 5.77만원 절세</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 20</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 27일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 29일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">04월 02일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">04월 09일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 25일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day19_part3_review.html">← Day 19</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 20 / 23</span>
+  <a class="nav-btn" href="day21_financial_income_tax.html">Day 21 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

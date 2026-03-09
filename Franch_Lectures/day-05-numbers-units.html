@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 05 — 숫자·단위·측정값 표현</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════ RESET & BASE ═══════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-alt: #181C26;
+  --terracotta: #BF6A4A;
+  --gold: #C9A84C;
+  --text: #E8E4DF;
+  --text-dim: #8A8680;
+  --text-bright: #F5F2ED;
+  --accent-glow: rgba(191,106,74,0.15);
+  --gold-glow: rgba(201,168,76,0.12);
+  --border: #2A2D35;
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Noto Sans KR', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+}
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.75;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--terracotta); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ═══════════════════ STICKY HEADER ═══════════════════ */
+.sticky-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sticky-header .logo {
+  font-family: var(--font-heading);
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--terracotta);
+  letter-spacing: 0.05em;
+}
+.sticky-header .day-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--gold);
+  background: var(--gold-glow);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid rgba(201,168,76,0.25);
+}
+.sticky-header .series-info {
+  font-size: 0.7rem; color: var(--text-dim);
+}
+
+/* ═══════════════════ HERO SECTION ═══════════════════ */
+.hero {
+  text-align: center;
+  padding: 4rem 1.5rem 3rem;
+  background: linear-gradient(180deg, rgba(191,106,74,0.08) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+}
+.hero .overline {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 0.4rem;
+  line-height: 1.2;
+}
+.hero .subtitle {
+  font-size: 1rem; color: var(--text-dim);
+  margin-bottom: 2rem;
+}
+.hero-sentence {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+.hero-sentence::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--terracotta), var(--gold));
+}
+.hero-sentence .fr {
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.3rem;
+}
+.hero-sentence .ipa {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--gold);
+  font-style: italic;
+  margin-bottom: 0.4rem;
+}
+.hero-sentence .ko {
+  font-size: 1rem; color: var(--text-dim);
+}
+
+/* ═══════════════════ SECTION LAYOUT ═══════════════════ */
+.container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+section { padding: 3rem 0; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 1.8rem; font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 1.5rem;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+.card-alt { background: var(--bg-card-alt); }
+
+/* ═══════════════════ BRAIN SCIENCE BOX ═══════════════════ */
+.brain-box {
+  background: linear-gradient(135deg, rgba(191,106,74,0.08), rgba(201,168,76,0.06));
+  border: 1px solid rgba(191,106,74,0.2);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.brain-box h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.brain-box .strategy {
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--terracotta);
+}
+.brain-box .strategy strong { color: var(--gold); font-weight: 500; }
+.brain-box .strategy p { font-size: 0.9rem; color: var(--text-dim); margin-top: 0.2rem; }
+.tip-highlight { color: var(--terracotta); font-weight: 500; }
+
+/* ═══════════════════ 5-COLUMN TABLE ═══════════════════ */
+.expr-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.expr-table th {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 0.8rem 0.6rem;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+.expr-table td {
+  padding: 0.65rem 0.6rem;
+  border-bottom: 1px solid rgba(42,45,53,0.5);
+  font-size: 0.85rem;
+  vertical-align: top;
+}
+.expr-table tr:hover { background: rgba(191,106,74,0.04); }
+.expr-table .fr-word {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--terracotta);
+  font-size: 1rem;
+}
+.pronunciation {
+  font-family: var(--font-mono);
+  font-style: italic;
+  color: var(--gold);
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+.approx-ko {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+/* ═══════════════════ GRAMMAR SVG ═══════════════════ */
+.grammar-visual { margin: 1rem 0; border-radius: 12px; overflow: hidden; }
+.grammar-visual svg { width: 100%; height: auto; display: block; }
+.grammar-note {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  background: rgba(201,168,76,0.06);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+}
+.grammar-note strong { color: var(--gold); font-weight: 500; }
+
+/* ═══════════════════ DIALOGUE ═══════════════════ */
+.dialogue-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.dialogue-title {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.3rem;
+}
+.dialogue-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 1.2rem;
+  font-style: italic;
+}
+.dialogue { margin: 1rem 0; }
+.dialogue-line {
+  display: flex; gap: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.6rem;
+}
+.speaker-a { background: rgba(191,106,74,0.06); border: 1px solid rgba(191,106,74,0.15); }
+.speaker-b { background: rgba(201,168,76,0.04); border: 1px solid rgba(201,168,76,0.1); }
+.speaker-name {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  min-width: 90px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+.dialogue-text { flex: 1; }
+.fr-line {
+  font-family: var(--font-heading);
+  font-size: 1.05rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.2rem;
+}
+.ko-line { font-size: 0.85rem; color: var(--text-dim); }
+
+.dialogue-review {
+  background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(191,106,74,0.06));
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 10px;
+  padding: 1.2rem;
+  margin-top: 1rem;
+}
+.dialogue-review h4 {
+  font-family: var(--font-heading);
+  color: var(--gold);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+.dialogue-review ul { padding-left: 1.5rem; }
+.dialogue-review li { margin-bottom: 0.5rem; font-size: 0.88rem; color: var(--text-dim); line-height: 1.6; }
+.dialogue-review strong { color: var(--gold); font-weight: 500; }
+
+/* ═══════════════════ PRONUNCIATION DRILL ═══════════════════ */
+.pron-drill { margin: 1rem 0; }
+.pron-item {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1.2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 0.8rem;
+}
+.pron-item .number {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--terracotta);
+  font-weight: 700;
+  min-width: 24px;
+}
+.pron-word {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--terracotta);
+  font-size: 1.1rem;
+  margin-bottom: 0.2rem;
+}
+.pron-ipa {
+  font-family: var(--font-mono);
+  font-style: italic;
+  color: var(--gold);
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+}
+.pron-approx {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  margin-bottom: 0.4rem;
+}
+.pron-tip { font-size: 0.88rem; color: var(--text-dim); line-height: 1.6; }
+
+/* ═══════════════════ SHADOWING SECTION ═══════════════════ */
+.shadowing-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.8rem;
+  margin: 2rem 0;
+}
+.shadowing-section h3 {
+  font-family: var(--font-heading);
+  font-size: 1.2rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.5rem;
+}
+.shadowing-section .desc {
+  font-size: 0.9rem; color: var(--text-dim);
+  margin-bottom: 1.2rem;
+}
+.shadow-controls {
+  display: flex; align-items: center; gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.shadow-ctrl-btn {
+  background: var(--terracotta); color: white;
+  border: none; border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 0.4rem;
+  transition: all 0.2s;
+}
+.shadow-ctrl-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.shadow-ctrl-btn.active { background: var(--gold); color: var(--bg); }
+.shadow-ctrl-btn svg { width: 16px; height: 16px; }
+.shadow-speed {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.85rem; color: var(--text-dim);
+}
+.shadow-speed input {
+  width: 80px;
+  accent-color: var(--terracotta);
+}
+#voiceSelectorContainer { margin-top: 1rem; }
+#shadowItems {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.shadow-item {
+  background: var(--bg-card-alt); border: 1px solid var(--border);
+  border-radius: 8px; padding: 1rem;
+  display: flex; align-items: flex-start; gap: 0.8rem;
+  transition: all 0.3s; cursor: default;
+}
+.shadow-item.active-phrase {
+  border-color: var(--terracotta);
+  box-shadow: 0 0 12px var(--accent-glow);
+  background: rgba(191,106,74,0.08);
+}
+.shadow-item.done-phrase { opacity: 0.6; border-color: var(--gold); }
+.shadow-item .num {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--gold);
+  font-weight: 700;
+  min-width: 24px;
+}
+.phrase-text { flex: 1; }
+.phrase-fr {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--terracotta);
+  font-size: 0.95rem;
+  margin-bottom: 0.2rem;
+}
+.phrase-ipa {
+  font-family: var(--font-mono);
+  font-style: italic;
+  color: var(--gold);
+  font-size: 0.75rem;
+  margin-bottom: 0.2rem;
+}
+.phrase-ko { font-size: 0.8rem; color: var(--text-dim); }
+.shadow-btn {
+  width: 28px; height: 28px;
+  background: rgba(191,106,74,0.2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.shadow-btn svg { width: 14px; height: 14px; fill: var(--terracotta); }
+.shadow-btn:hover { background: var(--terracotta); border-color: var(--terracotta); }
+.shadow-btn:hover svg { fill: white; }
+.shadow-btn.playing { animation: pulse 0.6s infinite; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.shadow-progress {
+  background: var(--bg-card-alt); border-radius: 8px;
+  padding: 0.8rem; margin-top: 1rem;
+}
+.shadow-progress-bar {
+  width: 100%; height: 6px;
+  background: var(--border); border-radius: 3px;
+  overflow: hidden; margin-bottom: 0.5rem;
+}
+.shadow-progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--terracotta), var(--gold));
+  transition: width 0.3s;
+}
+.shadow-progress-text {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+.shadow-status {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--gold);
+  margin-top: 0.8rem;
+  font-weight: 500;
+}
+
+/* ═══════════════════ QUIZ ═══════════════════ */
+.quiz-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+.quiz-block h4 {
+  font-family: var(--font-heading);
+  color: var(--terracotta);
+  font-size: 1.1rem;
+  margin-bottom: 0.8rem;
+}
+.quiz-block input[type="text"] {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  width: 200px;
+}
+.quiz-block button {
+  background: var(--terracotta);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  margin-left: 0.5rem;
+}
+.quiz-block button:hover { opacity: 0.85; }
+.quiz-result { margin-top: 0.5rem; font-size: 0.85rem; }
+.correct { color: #4CAF50; }
+.incorrect { color: #F44336; }
+
+/* ═══════════════════ TRACKER ═══════════════════ */
+.tracker { margin-top: 3rem; padding: 1.5rem; background: var(--bg-card); border-radius: 12px; }
+.tracker h3 {
+  font-family: var(--font-heading);
+  color: var(--text-bright); font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+.tracker-grid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 6px;
+}
+.tracker-cell {
+  aspect-ratio: 1;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tracker-cell:hover { border-color: var(--terracotta); }
+.tracker-cell.active { background: var(--terracotta); border-color: var(--terracotta); color: white; }
+.tracker-cell.today { border-color: var(--gold); box-shadow: 0 0 8px var(--gold-glow); }
+.tracker-legend {
+  display: flex; gap: 1.5rem; margin-top: 1rem;
+  font-size: 0.75rem; color: var(--text-dim);
+}
+.tracker-legend span { display: flex; align-items: center; gap: 0.3rem; }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+.legend-dot.done { background: var(--terracotta); }
+.legend-dot.today-dot { border: 1px solid var(--gold); background: transparent; }
+
+/* ═══════════════════ FOOTER ═══════════════════ */
+footer {
+  text-align: center; padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem; color: var(--text-dim);
+}
+
+/* ═══════════════════ RESPONSIVE ═══════════════════ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero { padding: 3rem 1rem 2rem; }
+  .container { padding: 0 1rem; }
+  .card { padding: 1.2rem; }
+  .expr-table { font-size: 0.75rem; display: block; overflow-x: auto; }
+  .expr-table th, .expr-table td { padding: 0.5rem 0.4rem; }
+  .dialogue-line { flex-direction: column; gap: 0.3rem; }
+  .speaker-name { min-width: auto; }
+  .pron-item { flex-direction: column; gap: 0.5rem; }
+  .shadow-controls { gap: 0.5rem; }
+  #shadowItems { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════ SCROLLBAR ═══════════════════ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--terracotta); }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ STICKY HEADER ═══════════════════ -->
+<div class="sticky-header">
+  <div>
+    <div class="logo">Renault Korea</div>
+    <div class="series-info">French for Automotive Engineers</div>
+  </div>
+  <div class="day-tag">DAY 05</div>
+</div>
+
+<!-- ═══════════════════ HERO SECTION ═══════════════════ -->
+<div class="hero">
+  <div class="overline">JOUR CINQ</div>
+  <h1>숫자·단위·측정값 표현</h1>
+  <div class="subtitle">Numbers, Units & Measurements in Automotive Engineering</div>
+  
+  <div class="hero-sentence">
+    <div class="fr">La course de l'amortisseur est de 120 millimètres.</div>
+    <div class="ipa">/la kuʁs də lamɔʁtisœʁ ɛ də sɛ̃vɛ̃ milimɛtʁ/</div>
+    <div class="ko">쇼크 업소버의 스트로크는 120 밀리미터입니다.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ CONTAINER START ═══════════════════ -->
+<div class="container">
+
+<!-- ═══════════════════ SECTION 1: 0-10 ═══════════════════ -->
+<section>
+  <div class="section-label">SECTION 1</div>
+  <h2 class="section-title">0부터 10까지 숫자 (Numbers 0-10)</h2>
+  
+  <div class="card">
+    <table class="expr-table">
+      <thead>
+        <tr>
+          <th>프랑스어</th>
+          <th>IPA</th>
+          <th>한국어 근사음</th>
+          <th>한국어 뜻</th>
+          <th>사용 상황</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fr-word">zéro</td>
+          <td class="pronunciation">/zeʁo/</td>
+          <td class="approx-ko">제로</td>
+          <td>0</td>
+          <td>기본 개수 세기</td>
+        </tr>
+        <tr>
+          <td class="fr-word">un</td>
+          <td class="pronunciation">/œ̃/</td>
+          <td class="approx-ko">응</td>
+          <td>1</td>
+          <td>기본 개수 세기</td>
+        </tr>
+        <tr>
+          <td class="fr-word">deux</td>
+          <td class="pronunciation">/dø/</td>
+          <td class="approx-ko">되</td>
+          <td>2</td>
+          <td>기본 개수 세기</td>
+        </tr>
+        <tr>
+          <td class="fr-word">trois</td>
+          <td class="pronunciation">/tʁwa/</td>
+          <td class="approx-ko">뜨루아</td>
+          <td>3</td>
+          <td>기본 개수 세기</td>
+        </tr>
+        <tr>
+          <td class="fr-word">quatre</td>
+          <td class="pronunciation">/katʁ/</td>
+          <td class="approx-ko">깟흐</td>
+          <td>4</td>
+          <td>기본 개수 세기</td>
+        </tr>
+        <tr>
+          <td class="fr-word">cinq</td>
+          <td class="pronunciation">/sɛ̃k/</td>
+          <td class="approx-ko">싱크</td>
+          <td>5</td>
+          <td>기본 개수 세기</td>
+        </tr>
+        <tr>
+          <td class="fr-word">six</td>
+          <td class="pronunciation">/sis/</td>
+          <td class="approx-ko">식스</td>
+          <td>6</td>
+          <td>기본 개수 세기</td>
+        </tr>
+        <tr>
+          <td class="fr-word">sept</td>
+          <td class="pronunciation">/sɛt/</td>
+          <td class="approx-ko">셉</td>
+          <td>7</td>
+          <td>기본 개수 세기</td>
+        </tr>
+        <tr>
+          <td class="fr-word">huit</td>
+          <td class="pronunciation">/ɥit/</td>
+          <td class="approx-ko">위</td>
+          <td>8</td>
+          <td>기본 개수 세기</td>
+        </tr>
+        <tr>
+          <td class="fr-word">neuf</td>
+          <td class="pronunciation">/nœf/</td>
+          <td class="approx-ko">뇌프</td>
+          <td>9</td>
+          <td>기본 개수 세기</td>
+        </tr>
+        <tr>
+          <td class="fr-word">dix</td>
+          <td class="pronunciation">/dis/</td>
+          <td class="approx-ko">디스</td>
+          <td>10</td>
+          <td>기본 개수 세기</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════ SECTION 2: TENS & HUNDREDS ═══════════════════ -->
+<section>
+  <div class="section-label">SECTION 2</div>
+  <h2 class="section-title">10-100 (Tens, Special Numbers)</h2>
+  
+  <div class="card">
+    <table class="expr-table">
+      <thead>
+        <tr>
+          <th>프랑스어</th>
+          <th>IPA</th>
+          <th>한국어 근사음</th>
+          <th>한국어 뜻</th>
+          <th>주의사항</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fr-word">vingt</td>
+          <td class="pronunciation">/vɛ̃/</td>
+          <td class="approx-ko">뱅</td>
+          <td>20</td>
+          <td><strong>정확한 자음 /v/ 모음 /ɛ̃/</strong></td>
+        </tr>
+        <tr>
+          <td class="fr-word">trente</td>
+          <td class="pronunciation">/tʁɑ̃t/</td>
+          <td class="approx-ko">뜨롱트</td>
+          <td>30</td>
+          <td><strong>비모음 /ɑ̃/ 주의</strong></td>
+        </tr>
+        <tr>
+          <td class="fr-word">quarante</td>
+          <td class="pronunciation">/kaʁɑ̃t/</td>
+          <td class="approx-ko">깟롱트</td>
+          <td>40</td>
+          <td><strong>R /ʁ/ 흐음 발음</strong></td>
+        </tr>
+        <tr>
+          <td class="fr-word">cinquante</td>
+          <td class="pronunciation">/sɛ̃kɑ̃t/</td>
+          <td class="approx-ko">싱깡트</td>
+          <td>50</td>
+          <td><strong>이중 비모음: /ɛ̃/ + /ɑ̃/</strong></td>
+        </tr>
+        <tr>
+          <td class="fr-word">soixante</td>
+          <td class="pronunciation">/swaʁɑ̃t/</td>
+          <td class="approx-ko">수아흐앙트</td>
+          <td>60</td>
+          <td><strong>/swa/ → 수아, /ʁ/ → 흐</strong></td>
+        </tr>
+        <tr>
+          <td class="fr-word">soixante-dix</td>
+          <td class="pronunciation">/swaʁɑ̃tdis/</td>
+          <td class="approx-ko">수아흐앙트디스</td>
+          <td>70</td>
+          <td><strong>70 = 60+10 (벨기에/스위스는 septante)</strong></td>
+        </tr>
+        <tr>
+          <td class="fr-word">quatre-vingts</td>
+          <td class="pronunciation">/katʁəvɛ̃/</td>
+          <td class="approx-ko">깟뀌벡</td>
+          <td>80</td>
+          <td><strong>80 = 4×20 (음절 축약: 뀌)</strong></td>
+        </tr>
+        <tr>
+          <td class="fr-word">quatre-vingt-dix</td>
+          <td class="pronunciation">/katʁəvɛ̃dis/</td>
+          <td class="approx-ko">깟뀌벡디스</td>
+          <td>90</td>
+          <td><strong>90 = 80+10</strong></td>
+        </tr>
+        <tr>
+          <td class="fr-word">cent</td>
+          <td class="pronunciation">/sɑ̃/</td>
+          <td class="approx-ko">상</td>
+          <td>100</td>
+          <td><strong>비모음 /ɑ̃/</strong></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="grammar-note">
+      <strong>규칙:</strong> 벨기에와 스위스에서는 70 = septante, 80 = huitante, 90 = nonante를 사용합니다.
+      하지만 <strong>프랑스 (Renault HQ)</strong>에서는 soixante-dix (60+10), quatre-vingts (4×20), 
+      quatre-vingt-dix (80+10) 구조를 씁니다.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ SECTION 3: UNITS ═══════════════════ -->
+<section>
+  <div class="section-label">SECTION 3</div>
+  <h2 class="section-title">자동차 기술 단위 (Automotive Units)</h2>
+  
+  <div class="card">
+    <table class="expr-table">
+      <thead>
+        <tr>
+          <th>프랑스어</th>
+          <th>IPA</th>
+          <th>한국어 근사음</th>
+          <th>한국어 뜻</th>
+          <th>사용 맥락</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fr-word">millimètre (mm)</td>
+          <td class="pronunciation">/miliˈmɛtʁ/</td>
+          <td class="approx-ko">밀리메트르</td>
+          <td>mm</td>
+          <td><em>현가 스트로크 측정</em></td>
+        </tr>
+        <tr>
+          <td class="fr-word">centimètre (cm)</td>
+          <td class="pronunciation">/sɑ̃tiˈmɛtʁ/</td>
+          <td class="approx-ko">샹티메트르</td>
+          <td>cm</td>
+          <td><em>휠 오프셋 측정</em></td>
+        </tr>
+        <tr>
+          <td class="fr-word">mètre (m)</td>
+          <td class="pronunciation">/mɛtʁ/</td>
+          <td class="approx-ko">메트르</td>
+          <td>m</td>
+          <td><em>차량 길이/높이</em></td>
+        </tr>
+        <tr>
+          <td class="fr-word">Newton-mètre (N·m)</td>
+          <td class="pronunciation">/njuːtɑ̃ˈmɛtʁ/</td>
+          <td class="approx-ko">뉴턴-메트르</td>
+          <td>N·m</td>
+          <td><em>조임 토크 값</em></td>
+        </tr>
+        <tr>
+          <td class="fr-word">kilogramme (kg)</td>
+          <td class="pronunciation">/kiloɡʁam/</td>
+          <td class="approx-ko">킬로그람</td>
+          <td>kg</td>
+          <td><em>차체 중량</em></td>
+        </tr>
+        <tr>
+          <td class="fr-word">bar (pressure)</td>
+          <td class="pronunciation">/baʁ/</td>
+          <td class="approx-ko">바르</td>
+          <td>bar</td>
+          <td><em>에어 서스펜션 압력</em></td>
+        </tr>
+        <tr>
+          <td class="fr-word">degré Celsius (°C)</td>
+          <td class="pronunciation">/dəɡʁe sɛlˈsius/</td>
+          <td class="approx-ko">드그레 셀시우스</td>
+          <td>°C</td>
+          <td><em>온도 설정값</em></td>
+        </tr>
+        <tr>
+          <td class="fr-word">seconde (s)</td>
+          <td class="pronunciation">/səɡɔ̃d/</td>
+          <td class="approx-ko">쓰고드</td>
+          <td>s</td>
+          <td><em>시간 측정</em></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════ SECTION 4: MEASUREMENT EXPRESSIONS ═══════════════════ -->
+<section>
+  <div class="section-label">SECTION 4</div>
+  <h2 class="section-title">측정값 표현 (Measurement Expressions)</h2>
+  
+  <div class="card">
+    <table class="expr-table">
+      <thead>
+        <tr>
+          <th>프랑스어</th>
+          <th>IPA</th>
+          <th>한국어 뜻</th>
+          <th>맥락</th>
+          <th>발음 팁</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fr-word">La course de l'amortisseur est de 120 mm</td>
+          <td class="pronunciation">/la kuʁs də lamɔʁtisœʁ ɛ də sɛ̃vɛ̃ milimɛtʁ/</td>
+          <td>쇼크 업소버의 스트로크는 120mm입니다</td>
+          <td><em>측정값 기술</em></td>
+          <td><small>/də/ → 드, /sɛ̃/ → 상, /vɛ̃/ → 뱅</small></td>
+        </tr>
+        <tr>
+          <td class="fr-word">Le couple de serrage doit être 85 N·m</td>
+          <td class="pronunciation">/lə kuplədaraʒ dwatɛtʁ katʁəvɛ̃sinq n·mɛtʁ/</td>
+          <td>조임 토크는 85N·m이어야 합니다</td>
+          <td><em>조임값 지시</em></td>
+          <td><small>/dwat/ → 드와, /ɛtʁ/ → 에트르</small></td>
+        </tr>
+        <tr>
+          <td class="fr-word">La pression système est 6 bars</td>
+          <td class="pronunciation">/la pʁɛsjɔ̃ sistɛm ɛ sis baʁ/</td>
+          <td>시스템 압력은 6bar입니다</td>
+          <td><em>압력 값 표기</em></td>
+          <td><small>/pʁɛsjɔ̃/ → 프레숑, /sis/ → 식스, /baʁ/ → 바르</small></td>
+        </tr>
+        <tr>
+          <td class="fr-word">Tolérance: ±0,5 mm maximum</td>
+          <td class="pronunciation">/tɔleʁɑ̃s plys wen dəmi milimɛtʁ maksimɔm/</td>
+          <td>허용 오차: 최대 ±0.5mm</td>
+          <td><em>공차 명시</em></td>
+          <td><small>/tɔleʁɑ̃s/ → 톨롱스, /dəmi/ → 드미</small></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════ SECTION 5: GRAMMAR RULES ═══════════════════ -->
+<section>
+  <div class="section-label">SECTION 5</div>
+  <h2 class="section-title">문법: 숫자·단위·공차 (Grammar Rules)</h2>
+  
+  <div class="brain-box">
+    <h3>&#128165; 핵심 규칙 — Key Patterns</h3>
+    
+    <div class="strategy">
+      <strong>1. 수 + 단위 구조 (de + Unit)</strong>
+      <p style="margin-top: 0.3rem;"><code>120 <strong>mm</strong> / 85 <strong>N·m</strong> / 6 <strong>bars</strong></code></p>
+      <p>단위 앞에 숫자, 뒤에 단위명. 복수형 's': 2개 이상 (여러 bars, mais 1 mm).</p>
+    </div>
+    
+    <div class="strategy">
+      <strong>2. Cent vs Cents (100 이상 처리)</strong>
+      <p style="margin-top: 0.3rem;"><code><strong>Cent</strong> = 100 / <strong>Deux cents</strong> = 200 / <strong>Deux cent vingt</strong> = 220</code></p>
+      <p>정확히 백의 배수면 's' 추가. 뒤에 다른 수字가 오면 's' 제거.</p>
+    </div>
+    
+    <div class="strategy">
+      <strong>3. 소수·공차 (Décimales & Tolérances)</strong>
+      <p style="margin-top: 0.3rem;"><code>0,5 mm = <strong>zéro virgule cinq</strong> / ±0.5 = <strong>plus ou moins zéro virgule cinq</strong></code></p>
+      <p>프랑스: 소수점 = virgule (쉼표). 영국/미국과 다름. '공차': tolérance.</p>
+    </div>
+    
+  </div>
+  
+  <div class="card">
+    <h3 style="font-family: var(--font-heading); color: var(--terracotta); margin-bottom: 1rem;">SVG: 단위 동의 구조 (Unit Agreement)</h3>
+    <div class="grammar-visual">
+      <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background -->
+        <rect width="600" height="200" fill="#0A0C10" stroke="none"/>
+        
+        <!-- Title -->
+        <text x="300" y="25" font-family="Georgia, serif" font-size="16" font-weight="bold" fill="#BF6A4A" text-anchor="middle">
+          Le nombre + L'unité (Structure)
+        </text>
+        
+        <!-- Example 1: 1mm -->
+        <g id="example1">
+          <rect x="20" y="50" width="160" height="130" fill="#12151C" stroke="#2A2D35" stroke-width="1" rx="8"/>
+          <text x="100" y="75" font-family="Georgia, serif" font-size="13" font-weight="bold" fill="#C9A84C" text-anchor="middle">1 mm</text>
+          <text x="100" y="100" font-family="Consolas, mono" font-size="11" fill="#E8E4DF" text-anchor="middle">"un millimètre"</text>
+          <text x="100" y="125" font-family="Noto Sans KR" font-size="10" fill="#8A8680" text-anchor="middle">1밀리미터</text>
+          <text x="100" y="145" font-family="Consolas, mono" font-size="9" fill="#8A8680" text-anchor="middle">NO 's' (1개)</text>
+        </g>
+        
+        <!-- Arrow -->
+        <path d="M 190 115 L 230 115" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+        
+        <!-- Example 2: 5mm -->
+        <g id="example2">
+          <rect x="240" y="50" width="160" height="130" fill="#12151C" stroke="#2A2D35" stroke-width="1" rx="8"/>
+          <text x="320" y="75" font-family="Georgia, serif" font-size="13" font-weight="bold" fill="#C9A84C" text-anchor="middle">5 mm</text>
+          <text x="320" y="100" font-family="Consolas, mono" font-size="11" fill="#E8E4DF" text-anchor="middle">"cinq millimètres"</text>
+          <text x="320" y="125" font-family="Noto Sans KR" font-size="10" fill="#8A8680" text-anchor="middle">5밀리미터</text>
+          <text x="320" y="145" font-family="Consolas, mono" font-size="9" fill="#8A8680" text-anchor="middle">WITH 's' (2+개)</text>
+        </g>
+        
+        <!-- Arrow -->
+        <path d="M 410 115 L 450 115" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+        
+        <!-- Example 3: cent -->
+        <g id="example3">
+          <rect x="460" y="50" width="120" height="130" fill="#12151C" stroke="#2A2D35" stroke-width="1" rx="8"/>
+          <text x="520" y="75" font-family="Georgia, serif" font-size="13" font-weight="bold" fill="#C9A84C" text-anchor="middle">100</text>
+          <text x="520" y="100" font-family="Consolas, mono" font-size="11" fill="#E8E4DF" text-anchor="middle">"cent"</text>
+          <text x="520" y="125" font-family="Noto Sans KR" font-size="10" fill="#8A8680" text-anchor="middle">백</text>
+          <text x="520" y="145" font-family="Consolas, mono" font-size="9" fill="#8A8680" text-anchor="middle">NO 's'</text>
+        </g>
+        
+        <!-- Arrow marker definition -->
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+            <polygon points="0 0, 10 3, 0 6" fill="#C9A84C"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+    <div class="grammar-note">
+      <strong>핵심:</strong> 2개 이상이면 단위에 's' 추가. "2 mm" = "deux millimètre<strong>s</strong>".
+      하지만 정확히 100, 1000, 1000000은 's' 없음. "200" = "deux cent<strong>s</strong>" ✓ but "220" = "deux cent vingt" ✗ (수 뒤에 다른 수가 오면 제거).
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ SECTION 6: DIALOGUE ═══════════════════ -->
+<section>
+  <div class="section-label">SECTION 6</div>
+  <h2 class="section-title">실무 대화 (Technical Dialogue)</h2>
+  
+{DIALOGUE_CONTENT}
+</section>
+
+<!-- ═══════════════════ SECTION 7: PRONUNCIATION DRILLS ═══════════════════ -->
+<section>
+  <div class="section-label">SECTION 7</div>
+  <h2 class="section-title">발음 연습: 까다로운 숫자들 (Pronunciation Drills)</h2>
+  
+  <div class="card">
+    <div class="pron-drill">
+      <div class="pron-item">
+        <div class="number">1</div>
+        <div style="flex: 1;">
+          <div class="pron-word">soixante-dix</div>
+          <div class="pron-ipa">/swaʁɑ̃tdis/</div>
+          <div class="pron-approx">근사음: <strong>수아흐앙트디스</strong></div>
+          <div class="pron-tip">벨기에·스위스 = septante (셉똥트). 프랑스는 60+10 구조.</div>
+        </div>
+      </div>
+      <div class="pron-item">
+        <div class="number">2</div>
+        <div style="flex: 1;">
+          <div class="pron-word">quatre-vingts</div>
+          <div class="pron-ipa">/katʁəvɛ̃/</div>
+          <div class="pron-approx">근사음: <strong>깟뀌벡</strong></div>
+          <div class="pron-tip">/ə/ = 슈와음절음 (음절 경감). /ɛ̃/ = 비모음 '앙'.</div>
+        </div>
+      </div>
+      <div class="pron-item">
+        <div class="number">3</div>
+        <div style="flex: 1;">
+          <div class="pron-word">quatre-vingt-dix</div>
+          <div class="pron-ipa">/katʁəvɛ̃dis/</div>
+          <div class="pron-approx">근사음: <strong>깟뀌벡디스</strong></div>
+          <div class="pron-tip">80+10. 마지막 /i/ 다음 'x'는 묵음. 80번에만 's' 추가.</div>
+        </div>
+      </div>
+      <div class="pron-item">
+        <div class="number">4</div>
+        <div style="flex: 1;">
+          <div class="pron-word">cent (mille)</div>
+          <div class="pron-ipa">/sɑ̃/ (/mil/)</div>
+          <div class="pron-approx">근사음: <strong>상 (밀)</strong></div>
+          <div class="pron-tip">/sɑ̃/ = 비모음 /ɑ̃/. 'cent vingt' ≠ 'cents' (복수 조건 주의).</div>
+        </div>
+      </div>
+      <div class="pron-item">
+        <div class="number">5</div>
+        <div style="flex: 1;">
+          <div class="pron-word">zéro</div>
+          <div class="pron-ipa">/zeʁo/</div>
+          <div class="pron-approx">근사음: <strong>제로</strong></div>
+          <div class="pron-tip">마지막 'o'는 폐음. 'r' /ʁ/ = 깊은 흐음 발음.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ SECTION 8: QUIZ ═══════════════════ -->
+<section>
+  <div class="section-label">SECTION 8</div>
+  <h2 class="section-title">퀴즈: 숫자·단위 이해도 (Quiz)</h2>
+  
+  <div class="quiz-block">
+    <h4>Q1: 70은 프랑스어로 어떻게 말할까요?</h4>
+    <input type="text" id="q1" placeholder="답을 입력하세요...">
+    <button onclick="checkQuiz(1)">확인</button>
+    <div id="r1" class="quiz-result"></div>
+  </div>
+  
+  <div class="quiz-block">
+    <h4>Q2: "85 Newton-mètres"를 IPA로 표기할 때, 핵심 비모음 2개는?</h4>
+    <input type="text" id="q2" placeholder="/ɛ̃/과 /ɔ̃/ 같은 형식으로...">
+    <button onclick="checkQuiz(2)">확인</button>
+    <div id="r2" class="quiz-result"></div>
+  </div>
+  
+  <div class="quiz-block">
+    <h4>Q3: "Je mesure 1 mm et 5 mm" — 이 두 케이스에서 단위 뒤 복수 's' 규칙을 설명하세요.</h4>
+    <input type="text" id="q3" placeholder="답을 입력하세요...">
+    <button onclick="checkQuiz(3)">확인</button>
+    <div id="r3" class="quiz-result"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ TRACKER ═══════════════════ -->
+<div class="tracker">
+  <h3>&#128197; 학습 진행률 (Learning Tracker)</h3>
+  <div class="tracker-grid" id="trackerGrid"></div>
+  <div class="tracker-legend">
+    <span><div class="legend-dot done"></div>완료</span>
+    <span><div class="legend-dot today-dot"></div>오늘</span>
+  </div>
+</div>
+
+</div>
+<!-- ═══════════════════ CONTAINER END ═══════════════════ -->
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer>
+  <p>Renault Korea — French Learning for Automotive Engineers</p>
+  <p style="margin-top: 0.5rem; font-size: 0.7rem;">Day 05 | 숫자·단위·측정값 | v1.0</p>
+</footer>
+
+<script>
+// ═══════════════════ QUIZ LOGIC ═══════════════════
+function checkQuiz(n) {
+  const input = document.getElementById('q' + n).value.trim().toLowerCase();
+  const result = document.getElementById('r' + n);
+  
+  if (n === 1) {
+    if (input.includes('soixante-dix') || input.includes('60+10') || input.includes('60 10')) {
+      result.innerHTML = '<span class="correct">&#10004; 정답! soixante-dix = 60 + 10. 프랑스 특유 구조입니다.</span>';
+    } else {
+      result.innerHTML = '<span class="incorrect">&#10008; 다시 생각해보세요. 70 = 60 + 10 구조 (벨기에는 septante).</span>';
+    }
+  } else if (n === 2) {
+    if ((input.includes('ɛ̃') || input.includes('앵')) && (input.includes('ɑ̃') || input.includes('앙'))) {
+      result.innerHTML = '<span class="correct">&#10004; 정답! /ɛ̃/(in) + /ɑ̃/(an). 85 = quatre-vingt-cinq에서 두 개 모두 들립니다.</span>';
+    } else {
+      result.innerHTML = '<span class="incorrect">&#10008; 힌트: /ɛ̃/과 /ɑ̃/ 비모음 2개를 찾으세요. quatre-v**in**gt-c**in**q와 quatre-v**an**gt에서.</span>';
+    }
+  } else if (n === 3) {
+    if (input.includes('1') || input.includes('일') || input.includes('one')) {
+      result.innerHTML = '<span class="correct">&#10004; 정답! "1 mm"는 millimètre (s 없음), "5 mm"는 millimètres (s 추가). 2개 이상이면 's'를 붙입니다.</span>';
+    } else {
+      result.innerHTML = '<span class="incorrect">&#10008; 힌트: 1개 = 단수 (s 없음), 2개 이상 = 복수 (s 추가). "1 mm" vs "5 mm"의 차이를 생각해보세요.</span>';
+    }
+  }
+}
+
+// ═══════════════════ TRACKER LOGIC ═══════════════════
+(function() {
+  const grid = document.getElementById('trackerGrid');
+  const storageKey = 'fr-eng-tracker-day05';
+  let data = {};
+  try { data = JSON.parse(localStorage.getItem(storageKey)) || {}; } catch(e) {}
+  for (let i = 1; i <= 26; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'tracker-cell';
+    if (i === 1) cell.classList.add('today');
+    if (data['day' + i]) cell.classList.add('active');
+    cell.textContent = i < 10 ? '0' + i : i;
+    cell.addEventListener('click', function() {
+      this.classList.toggle('active');
+      data['day' + i] = this.classList.contains('active');
+      localStorage.setItem(storageKey, JSON.stringify(data));
+    });
+    grid.appendChild(cell);
+  }
+})();
+
+// ═══════════════════ SHADOWING ENGINE ═══════════════════
+(function(){{
+  const PLAY_SVG = '<svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21" fill="currentColor"/></svg>';
+  const PAUSE_SVG = '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="4" height="18" fill="currentColor"/><rect x="15" y="3" width="4" height="18" fill="currentColor"/></svg>';
+  const STOP_SVG = '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor"/></svg>';
+  const SPEAKER_SVG = '<svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21" fill="currentColor"/></svg>';
+
+  let currentUtterance = null;
+  let currentBtn = null;
+  let selectedFrVoice = null;
+  
+  const PREFERRED_VOICES = [
+    'Thomas', 'Amelie', 'Amélie', 'Audrey', 'Aurélie', 'Marie',
+    'Google français', 'Google French',
+    'Microsoft Paul', 'Microsoft Hortense', 'Microsoft Julie',
+    'Virginie', 'Siri', 'Chloe', 'Chloé', 'Léa', 'Nicolas'
+  ];
+
+  function getAllFrenchVoices() {{
+    return window.speechSynthesis.getVoices().filter(function(v) {{
+      return v.lang === 'fr-FR' || v.lang === 'fr_FR' || v.lang === 'fr';
+    }});
+  }}
+
+  function initFrenchVoice() {{
+    var frVoices = getAllFrenchVoices();
+    if (frVoices.length === 0) {{
+      var anyFr = window.speechSynthesis.getVoices().filter(function(v) {{ return v.lang.startsWith('fr'); }});
+      if (anyFr.length > 0) selectedFrVoice = anyFr[0];
+      return;
+    }}
+    for (var i = 0; i < PREFERRED_VOICES.length; i++) {{
+      var pref = PREFERRED_VOICES[i];
+      var match = frVoices.find(function(v) {{ return v.name.includes(pref); }});
+      if (match) {{ selectedFrVoice = match; break; }}
+    }}
+    if (!selectedFrVoice) selectedFrVoice = frVoices[0];
+    console.log('[Shadowing] Using French voice:', selectedFrVoice?.name, selectedFrVoice?.lang);
+  }}
+
+  function getFrenchVoice() {{
+    if (!selectedFrVoice) initFrenchVoice();
+    return selectedFrVoice;
+  }}
+
+  function speakFr(text, btn, rate) {{
+    window.speechSynthesis.cancel();
+    if (currentBtn) currentBtn.classList.remove('playing');
+    var cleanText = text.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    if (!cleanText) return;
+    var utter = new SpeechSynthesisUtterance(cleanText);
+    utter.lang = 'fr-FR';
+    utter.rate = rate || parseFloat(document.getElementById('shadowSpeed')?.value || '0.8');
+    utter.pitch = 1.0;
+    var voice = getFrenchVoice();
+    if (voice) utter.voice = voice;
+    if (btn) {{ btn.classList.add('playing'); currentBtn = btn; }}
+    utter.onend = function() {{ if (btn) btn.classList.remove('playing'); currentBtn = null; }};
+    utter.onerror = function() {{ if (btn) btn.classList.remove('playing'); currentBtn = null; }};
+    currentUtterance = utter;
+    window.speechSynthesis.speak(utter);
+  }}
+  window.speakFr = speakFr;
+
+  function addInlinePlayButtons() {{
+    document.querySelectorAll('.fr-word, .hero-sentence .fr, .fr-line').forEach(function(el) {{
+      if (el.querySelector('.shadow-btn')) return;
+      var text = el.textContent.trim();
+      if (!text || text.length < 2) return;
+      if (!/[a-zA-Zéèêëàâäùûüôöîïçœæ]/.test(text)) return;
+      var btn = document.createElement('span');
+      btn.className = 'shadow-btn';
+      btn.innerHTML = SPEAKER_SVG;
+      btn.title = '클릭하여 발음 듣기';
+      btn.addEventListener('click', function(e) {{ e.stopPropagation(); speakFr(text, this); }});
+      el.appendChild(btn);
+    }});
+  }}
+
+  var shadowPhrases = [];
+  var shadowIndex = 0;
+  var shadowPlaying = false;
+
+  function collectPhrases() {{
+    var phrases = [];
+    var heroFr = document.querySelector('.hero-sentence .fr')?.textContent?.trim();
+    var heroIpa = document.querySelector('.hero-sentence .ipa')?.textContent?.trim() || '';
+    var heroKo = document.querySelector('.hero-sentence .ko')?.textContent?.trim() || '';
+    if (heroFr) phrases.push({{ fr: heroFr, ipa: heroIpa, ko: heroKo }});
+    document.querySelectorAll('.expr-table tbody tr').forEach(function(row) {{
+      var cells = row.querySelectorAll('td');
+      if (cells.length >= 4) {{
+        var frText = cells[0]?.textContent?.trim().replace(/\s+/g, ' ');
+        var ipaText = cells[1]?.textContent?.trim() || '';
+        var koText = cells[3]?.textContent?.trim() || '';
+        if (frText && /[a-zA-Zéèêëàâäùûüôöîïçœæ]/.test(frText)) {{
+          phrases.push({{ fr: frText, ipa: ipaText, ko: koText }});
+        }}
+      }}
+    }});
+    return phrases;
+  }}
+
+  function buildShadowingSection() {{
+    shadowPhrases = collectPhrases();
+    if (shadowPhrases.length === 0) return;
+    var tracker = document.querySelector('.tracker');
+    var container = document.querySelector('.container');
+    if (!container) return;
+    var section = document.createElement('div');
+    section.className = 'shadowing-section';
+    section.id = 'shadowingPractice';
+    var itemsHTML = shadowPhrases.map(function(p, i) {{
+      return '<div class="shadow-item" data-idx="' + i + '">' +
+        '<div class="num">' + String(i+1).padStart(2,'0') + '</div>' +
+        '<div class="phrase-text">' +
+        '<div class="phrase-fr">' + p.fr + '</div>' +
+        (p.ipa ? '<div class="phrase-ipa">' + p.ipa + '</div>' : '') +
+        (p.ko ? '<div class="phrase-ko">' + p.ko + '</div>' : '') +
+        '</div>' +
+        '<span class="shadow-btn" onclick="speakFr('' + p.fr.replace(/'/g, "\\'") + '', this)">' + SPEAKER_SVG + '</span>' +
+        '</div>';
+    }}).join('');
+    section.innerHTML = '<h3>&#127911; 쉐도잉 연습 &mdash; Shadowing Practice</h3>' +
+      '<p class="desc">프랑스어 음성을 듣고 &rarr; 3초 대기 &rarr; 따라 말하기를 반복합니다.</p>' +
+      '<div class="shadow-controls">' +
+      '<button class="shadow-ctrl-btn" id="shadowPlayAll" onclick="shadowStartAll()">' + PLAY_SVG + ' 전체 쉐도잉 시작</button>' +
+      '<button class="shadow-ctrl-btn" id="shadowStop" onclick="shadowStopAll()">' + STOP_SVG + ' 정지</button>' +
+      '<div class="shadow-speed"><span>속도:</span><input type="range" id="shadowSpeed" min="0.4" max="1.2" step="0.1" value="0.8"><span id="shadowSpeedLabel">0.8x</span></div>' +
+      '</div><div id="voiceSelectorContainer"></div>' +
+      '<div id="shadowItems">' + itemsHTML + '</div>' +
+      '<div class="shadow-progress"><div class="shadow-progress-bar"><div class="shadow-progress-fill" id="shadowProgressFill"></div></div><div class="shadow-progress-text" id="shadowProgressText">0/' + shadowPhrases.length + '</div></div>' +
+      '<div class="shadow-status" id="shadowStatus"></div>';
+    if (tracker) tracker.parentNode.insertBefore(section, tracker);
+    else container.appendChild(section);
+    var speedSlider = document.getElementById('shadowSpeed');
+    var speedLabel = document.getElementById('shadowSpeedLabel');
+    if (speedSlider) speedSlider.addEventListener('input', function() {{ speedLabel.textContent = this.value + 'x'; }});
+    buildVoiceSelector(document.getElementById('voiceSelectorContainer'));
+  }}
+
+  function buildVoiceSelector(container) {{
+    if (!container) return;
+    var frVoices = getAllFrenchVoices();
+    if (frVoices.length <= 1) return;
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:var(--text-dim);margin-bottom:0.75rem;';
+    wrapper.innerHTML = '<span>&#127467;&#127479; 음성:</span>';
+    var sel = document.createElement('select');
+    sel.style.cssText = 'background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:0.3rem 0.5rem;font-size:0.8rem;cursor:pointer;';
+    frVoices.forEach(function(v, i) {{
+      var opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = v.name + (v.localService ? ' (로컬)' : ' (온라인)');
+      if (v === selectedFrVoice) opt.selected = true;
+      sel.appendChild(opt);
+    }});
+    sel.addEventListener('change', function() {{ selectedFrVoice = frVoices[parseInt(this.value)]; speakFr('Bonjour', null, 0.9); }});
+    wrapper.appendChild(sel);
+    container.appendChild(wrapper);
+  }}
+
+  window.shadowStartAll = function() {{
+    shadowPlaying = true; shadowIndex = 0;
+    document.querySelectorAll('.shadow-item').forEach(function(el) {{ el.classList.remove('active-phrase', 'done-phrase'); }});
+    document.getElementById('shadowPlayAll')?.classList.add('active');
+    document.getElementById('shadowStatus').textContent = '&#127911; 쉐도잉 시작...';
+    playShadowPhrase(0);
+  }};
+  
+  window.shadowStopAll = function() {{
+    shadowPlaying = false; window.speechSynthesis.cancel();
+    document.getElementById('shadowPlayAll')?.classList.remove('active');
+    document.getElementById('shadowStatus').textContent = '&#9209; 정지됨';
+    document.querySelectorAll('.shadow-item').forEach(function(el) {{ el.classList.remove('active-phrase'); }});
+  }};
+
+  function playShadowPhrase(idx) {{
+    if (!shadowPlaying || idx >= shadowPhrases.length) {{
+      if (idx >= shadowPhrases.length) {{
+        document.getElementById('shadowStatus').textContent = '&#10004; 쉐도잉 연습 완료!';
+        document.getElementById('shadowPlayAll')?.classList.remove('active');
+      }}
+      shadowPlaying = false; return;
+    }}
+    var phrase = shadowPhrases[idx];
+    var items = document.querySelectorAll('.shadow-item');
+    items.forEach(function(el) {{ el.classList.remove('active-phrase'); }});
+    if (items[idx]) {{ items[idx].classList.add('active-phrase'); items[idx].scrollIntoView({{ behavior: 'smooth', block: 'center' }}); }}
+    var fill = document.getElementById('shadowProgressFill');
+    var text = document.getElementById('shadowProgressText');
+    if (fill) fill.style.width = ((idx + 1) / shadowPhrases.length * 100) + '%';
+    if (text) text.textContent = (idx + 1) + '/' + shadowPhrases.length;
+    document.getElementById('shadowStatus').textContent = '&#128264; 듣기: ' + phrase.fr;
+    var utter = new SpeechSynthesisUtterance(phrase.fr);
+    utter.lang = 'fr-FR';
+    utter.rate = parseFloat(document.getElementById('shadowSpeed')?.value || '0.8');
+    var voice = getFrenchVoice();
+    if (voice) utter.voice = voice;
+    utter.onend = function() {{
+      if (!shadowPlaying) return;
+      document.getElementById('shadowStatus').textContent = '&#127908; 따라 말해보세요: ' + phrase.fr;
+      setTimeout(function() {{
+        if (!shadowPlaying) return;
+        if (items[idx]) {{ items[idx].classList.remove('active-phrase'); items[idx].classList.add('done-phrase'); }}
+        playShadowPhrase(idx + 1);
+      }}, 3000);
+    }};
+    window.speechSynthesis.speak(utter);
+  }}
+
+  function init() {{
+    function waitForVoices(cb) {{
+      var voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {{ cb(); return; }}
+      var tries = 0;
+      var interval = setInterval(function() {{
+        voices = window.speechSynthesis.getVoices(); tries++;
+        if (voices.length > 0 || tries > 20) {{ clearInterval(interval); cb(); }}
+      }}, 100);
+      window.speechSynthesis.addEventListener('voiceschanged', function() {{ clearInterval(interval); cb(); }}, {{ once: true }});
+    }}
+    waitForVoices(function() {{ initFrenchVoice(); addInlinePlayButtons(); buildShadowingSection(); }});
+  }}
+  
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+}})();
+</script>
+
+</body>
+</html>

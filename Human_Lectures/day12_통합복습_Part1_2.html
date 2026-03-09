@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 12 — 통합 복습 (Part 1-2) | 인간 탐구</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #8A6ABF;
+            --gold: #C9A84C;
+            --green: #6BBF8A;
+            --red: #BF6B6B;
+            --cyan: #6BB5BF;
+            --bg: #0A0C10;
+            --card: #12151C;
+            --card2: #161A24;
+            --text1: #E8E9F3;
+            --text2: #9EA0B8;
+            --border: rgba(138, 106, 191, 0.15);
+            --glow: rgba(138, 106, 191, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--bg);
+            color: var(--text1);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* STICKY HEADER */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.1), rgba(201, 168, 76, 0.05));
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+        }
+
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--purple), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--card);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 54.5%;
+            background: linear-gradient(90deg, var(--purple), var(--gold));
+            border-radius: 3px;
+        }
+
+        .progress-text {
+            font-size: 0.75rem;
+            color: var(--text2);
+            margin-top: 0.25rem;
+            text-align: right;
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .meta-badge {
+            background: rgba(138, 106, 191, 0.2);
+            border: 1px solid var(--purple);
+            color: var(--purple);
+            padding: 0.35rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            padding: 2rem 1.5rem;
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.08), rgba(201, 168, 76, 0.04));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .gauge-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gauge {
+            width: 180px;
+            height: 180px;
+        }
+
+        .hero-content h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--purple), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-content p {
+            color: var(--text2);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .review-question {
+            background: rgba(138, 106, 191, 0.15);
+            border-left: 4px solid var(--purple);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 6px;
+        }
+
+        .review-question strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .review-question p {
+            color: var(--text1);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .keyword-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .keyword-badge {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--text2);
+        }
+
+        .keyword-badge.part1 {
+            border-color: var(--purple);
+            color: var(--purple);
+        }
+
+        .keyword-badge.part2 {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+
+        /* LEARNING STRATEGY */
+        .learning-strategy {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .learning-strategy h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--gold);
+        }
+
+        .strategy-timeline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .timeline-item {
+            background: var(--card2);
+            border-left: 4px solid var(--purple);
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .timeline-item strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .timeline-item p {
+            color: var(--text2);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* CONCEPT CARDS */
+        .concept-section {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .concepts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .concept-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .concept-card:hover {
+            border-color: var(--purple);
+            background: var(--card2);
+            transform: translateY(-2px);
+        }
+
+        .concept-card h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            color: var(--purple);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .concept-card.part2 h3 {
+            color: var(--cyan);
+        }
+
+        .concept-card p {
+            color: var(--text2);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .concept-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .concept-keyword {
+            background: rgba(138, 106, 191, 0.2);
+            color: var(--purple);
+            padding: 0.3rem 0.6rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .concept-card.part2 .concept-keyword {
+            background: rgba(107, 181, 191, 0.2);
+            color: var(--cyan);
+        }
+
+        /* SVG DIAGRAM */
+        .diagram-section {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .diagram-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+        }
+
+        .diagram-container {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .concept-map-svg {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* QUIZ SECTION */
+        .quiz-section {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .quiz-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+        }
+
+        .quiz-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .quiz-item {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .quiz-item h3 {
+            color: var(--purple);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .quiz-item p {
+            color: var(--text2);
+            margin-bottom: 1.25rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .quiz-option {
+            background: rgba(138, 106, 191, 0.1);
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-option:hover {
+            background: rgba(138, 106, 191, 0.2);
+            border-color: var(--purple);
+        }
+
+        .quiz-option input[type="radio"] {
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        .quiz-option label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .quiz-button {
+            background: linear-gradient(135deg, var(--purple), var(--gold));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .quiz-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(138, 106, 191, 0.3);
+        }
+
+        .quiz-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .quiz-result.correct {
+            background: rgba(107, 191, 138, 0.2);
+            border: 1px solid var(--green);
+            color: var(--green);
+        }
+
+        .quiz-result.incorrect {
+            background: rgba(191, 107, 107, 0.2);
+            border: 1px solid var(--red);
+            color: var(--red);
+        }
+
+        /* CHECKLIST */
+        .checklist-section {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .checklist-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+        }
+
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .checklist-item {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .checklist-item:hover {
+            border-color: var(--purple);
+            background: rgba(138, 106, 191, 0.1);
+        }
+
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--purple);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: all 0.2s ease;
+        }
+
+        .checklist-item.checked .checklist-checkbox {
+            background: var(--purple);
+            border-color: var(--purple);
+        }
+
+        .checklist-item.checked .checklist-checkbox::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .checklist-item.checked .checklist-text {
+            color: var(--text2);
+            text-decoration: line-through;
+        }
+
+        .checklist-text {
+            flex: 1;
+            color: var(--text1);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* JOURNAL */
+        .journal-section {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .journal-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+        }
+
+        .journal-prompts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .journal-prompt {
+            background: var(--card2);
+            border-left: 4px solid var(--cyan);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .journal-prompt strong {
+            color: var(--cyan);
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .journal-prompt p {
+            color: var(--text2);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .journal-textarea {
+            width: 100%;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(138, 106, 191, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text1);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .journal-textarea:focus {
+            outline: none;
+            border-color: var(--cyan);
+            background: rgba(107, 181, 191, 0.1);
+        }
+
+        /* FOOTER */
+        .footer {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text2);
+            font-size: 0.9rem;
+        }
+
+        .series-banner {
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.2), rgba(107, 181, 191, 0.1));
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .series-banner strong {
+            font-size: 1.1rem;
+            color: var(--gold);
+        }
+
+        .series-banner p {
+            color: var(--text2);
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* ANIMATIONS */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ani {
+            animation: slideIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 700px) {
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .gauge-container {
+                order: 2;
+            }
+
+            .hero-content {
+                order: 1;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-title {
+                font-size: 1.2rem;
+            }
+
+            .header-meta {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .progress-bar-container {
+                max-width: none;
+            }
+
+            .concepts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quiz-container {
+                grid-template-columns: 1fr;
+            }
+
+            .checklist-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .journal-prompts {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .timeline-item {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 500px) {
+            body {
+                font-size: 14px;
+            }
+
+            .header-title {
+                font-size: 1rem;
+            }
+
+            .meta-badge {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.6rem;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+
+            .hero-content h1 {
+                font-size: 1.3rem;
+            }
+
+            .concepts-grid {
+                gap: 1rem;
+            }
+
+            .concept-card {
+                padding: 1rem;
+            }
+
+            .quiz-item {
+                padding: 1rem;
+            }
+
+            .checklist-item {
+                padding: 0.75rem;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .keyword-badges {
+                gap: 0.4rem;
+            }
+
+            .keyword-badge {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.6rem;
+            }
+
+            .gauge {
+                width: 150px;
+                height: 150px;
+            }
+
+            .strategy-timeline {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .timeline-item {
+                padding: 0.75rem;
+            }
+
+            .diagram-container {
+                padding: 1rem;
+            }
+
+            .header-meta {
+                flex-direction: column;
+                width: 100%;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- STICKY HEADER -->
+    <div class="sticky-header">
+        <div class="header-content">
+            <div class="header-title">인간 탐구</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="progress-text">Day 12/22 (54.5%)</div>
+            </div>
+            <div class="header-meta">
+                <span class="meta-badge">복습</span>
+                <span class="meta-badge">25분</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES BANNER -->
+    <div style="max-width: 1200px; margin: 1.5rem auto; padding: 0 1.5rem;">
+        <div class="series-banner">
+            <strong>Part 1-2 통합 복습 | Day 12 of 22</strong>
+            <p>감정의 신경과학 & 인간관계 심리학 핵심 개념 종합 정리</p>
+        </div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem;">
+        <div class="hero ani">
+            <div class="gauge-container">
+                <svg class="gauge" viewBox="0 0 200 200">
+                    <defs>
+                        <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#8A6ABF;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#C9A84C;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Background circle -->
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(138,106,191,0.2)" stroke-width="12"/>
+                    <!-- Progress circle (54.5%) -->
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="url(#gaugeGradient)" stroke-width="12"
+                            stroke-dasharray="310 570" stroke-dashoffset="0" transform="rotate(-90 100 100)"
+                            style="transition: stroke-dasharray 0.5s ease;"/>
+                    <!-- Text -->
+                    <text x="100" y="100" text-anchor="middle" dy="0.3em" fill="#E8E9F3" font-size="32" font-weight="700">54.5%</text>
+                    <text x="100" y="125" text-anchor="middle" dy="0.3em" fill="#9EA0B8" font-size="12">진행 상황</text>
+                </svg>
+            </div>
+            <div class="hero-content">
+                <h1>Part 1 & 2 통합 복습</h1>
+                <p>지난 11일간 배운 감정의 신경과학과 인간관계 심리학의 모든 핵심 개념을 한 자리에서 복습합니다. 개념들 간의 연결고리를 이해하고, 실제 생활에서 어떻게 활용할 수 있는지 탐색합니다.</p>
+                <div class="review-question">
+                    <strong>이번 복습의 질문</strong>
+                    <p>감정 조절에서 배운 신경생물학적 메커니즘이 어떻게 더 나은 인간관계를 만드는가?</p>
+                </div>
+                <div class="keyword-badges">
+                    <div class="keyword-badge part1">편도체 & PFC</div>
+                    <div class="keyword-badge part1">코르티솔</div>
+                    <div class="keyword-badge part1">인지적 재평가</div>
+                    <div class="keyword-badge part2">옥시토신</div>
+                    <div class="keyword-badge part2">공감</div>
+                    <div class="keyword-badge part2">어서티브 커뮤니케이션</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEARNING STRATEGY -->
+    <div class="learning-strategy ani">
+        <h2>오늘의 복습 전략</h2>
+        <div class="strategy-timeline">
+            <div class="timeline-item">
+                <strong>0-5분: 회상 테스트</strong>
+                <p>Part 1과 Part 2의 핵심 개념들을 빠르게 떠올려봅니다. 어디가 약한지 파악합니다.</p>
+            </div>
+            <div class="timeline-item">
+                <strong>5-12분: 개념 연결</strong>
+                <p>신경과학 개념이 심리학과 어떻게 연결되는지 보고, 종합 퀴즈를 풀어봅니다.</p>
+            </div>
+            <div class="timeline-item">
+                <strong>12-20분: 적용 시나리오</strong>
+                <p>배운 개념을 직장과 일상에서 실제로 어떻게 사용할 수 있는지 생각해봅니다.</p>
+            </div>
+            <div class="timeline-item">
+                <strong>20-25분: 개인 성장 저널</strong>
+                <p>지난 2주간 변화한 자신의 감정 처리 방식과 인간관계 패턴을 되돌아봅니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PART 1 CONCEPT REVIEW -->
+    <div class="concept-section ani">
+        <h2 class="section-title">Part 1: 감정의 신경과학 (Days 01-06)</h2>
+        <div class="concepts-grid">
+            <div class="concept-card">
+                <h3>🧠 편도체 & PFC 시스템</h3>
+                <p>감정은 편도체에서 빠르게 생성되고, 전전두피질(PFC)에서 조절됩니다. 이 두 뇌 영역 간의 상호작용이 감정 처리의 핵심입니다. 스트레스 상황에서 PFC 기능이 약해지면 편도체가 과도하게 활성화됩니다.</p>
+                <div class="concept-keywords">
+                    <span class="concept-keyword">편도체</span>
+                    <span class="concept-keyword">PFC</span>
+                    <span class="concept-keyword">신경회로</span>
+                    <span class="concept-keyword">감정처리</span>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <h3>⚡ HPA축 & 코르티솔</h3>
+                <p>스트레스에 반응하는 시상하부-뇌하수체-부신축(HPA축)은 코르티솔 호르몬을 분비합니다. 만성적 스트레스는 코르티솔 수치를 높이고, 이는 감정 조절 능력을 저하시킵니다. 올바른 휴식과 호흡이 코르티솔 감소에 필수적입니다.</p>
+                <div class="concept-keywords">
+                    <span class="concept-keyword">HPA축</span>
+                    <span class="concept-keyword">코르티솔</span>
+                    <span class="concept-keyword">스트레스 반응</span>
+                    <span class="concept-keyword">호르몬</span>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <h3>🎯 INFP의 감정처리 특성</h3>
+                <p>INFP는 내향적이고 느낌 중심의 성격으로, 감정을 깊이 있게 처리합니다. 강한 가치관과 일관성을 추구하며, 감정적 진정성을 중시합니다. 다만 감정을 내재화하는 경향이 있어 표현 능력 개발이 중요합니다.</p>
+                <div class="concept-keywords">
+                    <span class="concept-keyword">INFP</span>
+                    <span class="concept-keyword">내향성</span>
+                    <span class="concept-keyword">감정처리</span>
+                    <span class="concept-keyword">가치</span>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <h3>🔄 인지적 재평가</h3>
+                <p>상황을 다르게 해석하여 감정 반응을 조절하는 전략입니다. 부정적인 상황도 배움의 기회로 보면 감정적 임팩트가 감소합니다. 전전두피질을 활성화하는 가장 효과적인 감정 조절 기법입니다.</p>
+                <div class="concept-keywords">
+                    <span class="concept-keyword">재평가</span>
+                    <span class="concept-keyword">인지전략</span>
+                    <span class="concept-keyword">감정조절</span>
+                    <span class="concept-keyword">PFC활성화</span>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <h3>🧠 메타인지</h3>
+                <p>자신의 사고 과정을 관찰하고 조절하는 능력입니다. '나는 왜 이렇게 느끼는가?'를 객관적으로 바라보면, 감정에 지배당하지 않을 수 있습니다. 명상과 성찰 활동이 메타인지를 발달시킵니다.</p>
+                <div class="concept-keywords">
+                    <span class="concept-keyword">메타인지</span>
+                    <span class="concept-keyword">자기관찰</span>
+                    <span class="concept-keyword">성찰</span>
+                    <span class="concept-keyword">객관성</span>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <h3>💼 직장 감정조절</h3>
+                <p>직장은 감정 조절을 가장 크게 도전하는 환경입니다. 상사의 피드백, 팀 갈등, 업무 압박에서 감정적으로 반응하지 않으려면 신경과학적 전략이 필수입니다. 마음챙김과 호흡 운동이 효과적입니다.</p>
+                <div class="concept-keywords">
+                    <span class="concept-keyword">직장스트레스</span>
+                    <span class="concept-keyword">전문성</span>
+                    <span class="concept-keyword">호흡</span>
+                    <span class="concept-keyword">마음챙김</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PART 2 CONCEPT REVIEW -->
+    <div class="concept-section ani">
+        <h2 class="section-title">Part 2: 인간관계 심리학 (Days 07-11)</h2>
+        <div class="concepts-grid">
+            <div class="concept-card part2">
+                <h3>❤️ 옥시토신 & 신뢰</h3>
+                <p>옥시토신은 '신뢰의 호르몬'으로, 상대방과의 안전한 연결감을 만듭니다. 눈 맞춤, 신체 접촉, 정직한 소통이 옥시토신 분비를 증가시킵니다. 신뢰가 깊은 관계에서 심리적 안정감이 생깁니다.</p>
+                <div class="concept-keywords">
+                    <span class="concept-keyword">옥시토신</span>
+                    <span class="concept-keyword">신뢰</span>
+                    <span class="concept-keyword">연결감</span>
+                    <span class="concept-keyword">안전</span>
+                </div>
+            </div>
+
+            <div class="concept-card part2">
+                <h3>🤝 공감의 신경과학</h3>
+                <p>공감은 두 가지입니다: 인지적 공감(상대의 입장 이해)과 정서적 공감(감정 공유). 거울 신경세포가 상대방의 행동과 감정을 우리 뇌에 반영합니다. 양쪽 공감 능력을 모두 발달시켜야 건강한 관계가 만들어집니다.</p>
+                <div class="concept-keywords">
+                    <span class="concept-keyword">공감</span>
+                    <span class="concept-keyword">거울신경</span>
+                    <span class="concept-keyword">이해</span>
+                    <span class="concept-keyword">감정공유</span>
+                </div>
+            </div>
+
+            <div class="concept-card part2">
+                <h3>💬 어서티브 커뮤니케이션</h3>
+                <p>자신의 감정과 필요를 명확하게 표현하면서 상대를 존중하는 소통 방식입니다. 공격적이지도, 수동적이지도 않은 균형 잡힌 표현이 핵심입니다. '나'를 중심으로 느낌과 필요를 전달합니다.</p>
+                <div class="concept-keywords">
+                    <span class="concept-keyword">어서티브</span>
+                    <span class="concept-keyword">표현</span>
+                    <span class="concept-keyword">소통</span>
+                    <span class="concept-keyword">경계</span>
+                </div>
+            </div>
+
+            <div class="concept-card part2">
+                <h3>⚔️ 갈등의 신경과학</h3>
+                <p>갈등 상황에서 뇌는 위협 반응을 일으키고, 편도체가 활성화되며, PFC는 억제됩니다. 호흡과 일시 정지를 통해 신경계를 진정시킨 후 대화하면 훨씬 생산적인 결과를 얻습니다.</p>
+                <div class="concept-keywords">
+                    <span class="concept-keyword">갈등</span>
+                    <span class="concept-keyword">위협반응</span>
+                    <span class="concept-keyword">신경진정</span>
+                    <span class="concept-keyword">해결</span>
+                </div>
+            </div>
+
+            <div class="concept-card part2">
+                <h3>📋 피드백의 기술</h3>
+                <p>피드백은 관계를 파괴하거나 성장시킬 수 있습니다. 긍정적 피드백은 상대의 신뢰감을 높이고, 비판적 피드백은 '샌드위치 기법'으로 포장하면 더 잘 받아들여집니다. 의도와 진정성이 중요합니다.</p>
+                <div class="concept-keywords">
+                    <span class="concept-keyword">피드백</span>
+                    <span class="concept-keyword">비판</span>
+                    <span class="concept-keyword">성장</span>
+                    <span class="concept-keyword">건설적</span>
+                </div>
+            </div>
+
+            <div class="concept-card part2">
+                <h3>🌍 문화 간 이해</h3>
+                <p>서양 문화와의 충돌은 관계 패턴의 차이에서 비롯됩니다. 직설적 표현, 개인주의적 가치, 개인적 경계에 대한 이해가 필요합니다. 문화 차이를 존중하면서도 자신의 가치를 지키는 균형이 중요합니다.</p>
+                <div class="concept-keywords">
+                    <span class="concept-keyword">문화차이</span>
+                    <span class="concept-keyword">이해</span>
+                    <span class="concept-keyword">존중</span>
+                    <span class="concept-keyword">갈등해소</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPREHENSIVE CONCEPT MAP -->
+    <div class="diagram-section ani">
+        <h2>핵심 개념 통합 맵</h2>
+        <div class="diagram-container">
+            <svg class="concept-map-svg" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#8A6ABF"/>
+                    </marker>
+                    <marker id="arrowhead-cyan" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#6BB5BF"/>
+                    </marker>
+                </defs>
+
+                <!-- Part 1 Section -->
+                <text x="150" y="30" font-size="16" font-weight="700" fill="#C9A84C" text-anchor="middle">Part 1: 감정의 신경과학</text>
+
+                <!-- Central neurons -->
+                <circle cx="150" cy="100" r="35" fill="rgba(138,106,191,0.3)" stroke="#8A6ABF" stroke-width="2"/>
+                <text x="150" y="105" font-size="13" font-weight="600" fill="#E8E9F3" text-anchor="middle">편도체 & PFC</text>
+
+                <!-- HPA Axis -->
+                <circle cx="50" cy="180" r="30" fill="rgba(201,168,76,0.2)" stroke="#C9A84C" stroke-width="2"/>
+                <text x="50" y="183" font-size="11" font-weight="600" fill="#E8E9F3" text-anchor="middle">HPA축</text>
+
+                <!-- Cortisol -->
+                <circle cx="150" cy="180" r="30" fill="rgba(201,168,76,0.2)" stroke="#C9A84C" stroke-width="2"/>
+                <text x="150" y="183" font-size="11" font-weight="600" fill="#E8E9F3" text-anchor="middle">코르티솔</text>
+
+                <!-- INFP -->
+                <circle cx="250" cy="180" r="30" fill="rgba(138,106,191,0.2)" stroke="#8A6ABF" stroke-width="2"/>
+                <text x="250" y="185" font-size="12" font-weight="600" fill="#E8E9F3" text-anchor="middle">INFP</text>
+
+                <!-- Cognitive Reappraisal -->
+                <circle cx="100" cy="280" r="30" fill="rgba(138,106,191,0.2)" stroke="#8A6ABF" stroke-width="2"/>
+                <text x="100" y="283" font-size="11" font-weight="600" fill="#E8E9F3" text-anchor="middle">인지적</text>
+                <text x="100" y="295" font-size="11" font-weight="600" fill="#E8E9F3" text-anchor="middle">재평가</text>
+
+                <!-- Metacognition -->
+                <circle cx="200" cy="280" r="30" fill="rgba(138,106,191,0.2)" stroke="#8A6ABF" stroke-width="2"/>
+                <text x="200" y="283" font-size="11" font-weight="600" fill="#E8E9F3" text-anchor="middle">메타인지</text>
+
+                <!-- Workplace -->
+                <circle cx="300" cy="280" r="30" fill="rgba(138,106,191,0.2)" stroke="#8A6ABF" stroke-width="2"/>
+                <text x="300" y="283" font-size="11" font-weight="600" fill="#E8E9F3" text-anchor="middle">직장</text>
+
+                <!-- Connections Part 1 -->
+                <line x1="150" y1="135" x2="50" y2="150" stroke="#8A6ABF" stroke-width="2" marker-end="url(#arrowhead)"/>
+                <line x1="150" y1="135" x2="150" y2="150" stroke="#8A6ABF" stroke-width="2" marker-end="url(#arrowhead)"/>
+                <line x1="150" y1="135" x2="250" y2="150" stroke="#8A6ABF" stroke-width="2" marker-end="url(#arrowhead)"/>
+                <line x1="150" y1="135" x2="100" y2="250" stroke="#C9A84C" stroke-width="2" marker-end="url(#arrowhead)"/>
+                <line x1="150" y1="135" x2="200" y2="250" stroke="#C9A84C" stroke-width="2" marker-end="url(#arrowhead)"/>
+                <line x1="150" y1="135" x2="300" y2="250" stroke="#C9A84C" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+                <!-- Part 2 Section -->
+                <text x="750" y="30" font-size="16" font-weight="700" fill="#C9A84C" text-anchor="middle">Part 2: 인간관계 심리학</text>
+
+                <!-- Central hub Part 2 -->
+                <circle cx="750" cy="100" r="35" fill="rgba(107,181,191,0.3)" stroke="#6BB5BF" stroke-width="2"/>
+                <text x="750" y="105" font-size="13" font-weight="600" fill="#E8E9F3" text-anchor="middle">신뢰 & 공감</text>
+
+                <!-- Oxytocin -->
+                <circle cx="650" cy="180" r="30" fill="rgba(107,181,191,0.2)" stroke="#6BB5BF" stroke-width="2"/>
+                <text x="650" y="183" font-size="11" font-weight="600" fill="#E8E9F3" text-anchor="middle">옥시토신</text>
+
+                <!-- Empathy -->
+                <circle cx="750" cy="180" r="30" fill="rgba(107,181,191,0.2)" stroke="#6BB5BF" stroke-width="2"/>
+                <text x="750" y="185" font-size="11" font-weight="600" fill="#E8E9F3" text-anchor="middle">공감</text>
+
+                <!-- Culture -->
+                <circle cx="850" cy="180" r="30" fill="rgba(107,181,191,0.2)" stroke="#6BB5BF" stroke-width="2"/>
+                <text x="850" y="185" font-size="11" font-weight="600" fill="#E8E9F3" text-anchor="middle">문화이해</text>
+
+                <!-- Assertive -->
+                <circle cx="700" cy="280" r="30" fill="rgba(107,181,191,0.2)" stroke="#6BB5BF" stroke-width="2"/>
+                <text x="700" y="283" font-size="11" font-weight="600" fill="#E8E9F3" text-anchor="middle">어서티브</text>
+
+                <!-- Conflict -->
+                <circle cx="800" cy="280" r="30" fill="rgba(107,181,191,0.2)" stroke="#6BB5BF" stroke-width="2"/>
+                <text x="800" y="283" font-size="11" font-weight="600" fill="#E8E9F3" text-anchor="middle">갈등해소</text>
+
+                <!-- Feedback -->
+                <circle cx="850" cy="280" r="30" fill="rgba(107,181,191,0.2)" stroke="#6BB5BF" stroke-width="2"/>
+                <text x="850" y="283" font-size="11" font-weight="600" fill="#E8E9F3" text-anchor="middle">피드백</text>
+
+                <!-- Connections Part 2 -->
+                <line x1="750" y1="135" x2="650" y2="150" stroke="#6BB5BF" stroke-width="2" marker-end="url(#arrowhead-cyan)"/>
+                <line x1="750" y1="135" x2="750" y2="150" stroke="#6BB5BF" stroke-width="2" marker-end="url(#arrowhead-cyan)"/>
+                <line x1="750" y1="135" x2="850" y2="150" stroke="#6BB5BF" stroke-width="2" marker-end="url(#arrowhead-cyan)"/>
+                <line x1="750" y1="135" x2="700" y2="250" stroke="#C9A84C" stroke-width="2" marker-end="url(#arrowhead-cyan)"/>
+                <line x1="750" y1="135" x2="800" y2="250" stroke="#C9A84C" stroke-width="2" marker-end="url(#arrowhead-cyan)"/>
+                <line x1="750" y1="135" x2="850" y2="250" stroke="#C9A84C" stroke-width="2" marker-end="url(#arrowhead-cyan)"/>
+
+                <!-- Integration Connection -->
+                <path d="M 185 100 Q 450 100 715 100" stroke="#E8E9F3" stroke-width="3" fill="none" stroke-dasharray="10,5"/>
+                <text x="450" y="85" font-size="12" font-weight="700" fill="#C9A84C" text-anchor="middle">신경계 통합 → 관계의 질 향상</text>
+
+                <!-- Bottom Integration -->
+                <circle cx="450" cy="400" r="40" fill="rgba(138,106,191,0.2)" stroke="#8A6ABF" stroke-width="2"/>
+                <text x="450" y="400" font-size="12" font-weight="600" fill="#E8E9F3" text-anchor="middle" dy="0.3em">통합 실천</text>
+
+                <!-- Arrows to integration -->
+                <line x1="300" y1="310" x2="420" y2="360" stroke="#E8E9F3" stroke-width="2" marker-end="url(#arrowhead)"/>
+                <line x1="850" y1="310" x2="480" y2="360" stroke="#E8E9F3" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+                <!-- Result -->
+                <circle cx="450" cy="500" r="35" fill="rgba(107,191,138,0.3)" stroke="#6BBF8A" stroke-width="2"/>
+                <text x="450" y="505" font-size="12" font-weight="600" fill="#E8E9F3" text-anchor="middle">자기 이해</text>
+
+                <!-- Final arrow -->
+                <line x1="450" y1="440" x2="450" y2="465" stroke="#6BBF8A" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+                <!-- Legend -->
+                <text x="50" y="550" font-size="10" fill="#9EA0B8">━ Part 1 신경과학</text>
+                <text x="250" y="550" font-size="10" fill="#9EA0B8">━ Part 2 관계심리</text>
+                <text x="500" y="550" font-size="10" fill="#9EA0B8">━ ━ 통합 연결</text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- COMPREHENSIVE QUIZ -->
+    <div class="quiz-section ani">
+        <h2>종합 퀴즈 - Part 1 & 2 복습</h2>
+        <div class="quiz-container">
+            <div class="quiz-item">
+                <h3>1. 감정 조절의 신경생물학적 근거</h3>
+                <p>스트레스 상황에서 우리 뇌에 일어나는 변화는? (복수선택 가능)</p>
+                <div class="quiz-options">
+                    <div class="quiz-option">
+                        <input type="radio" id="q1a" name="q1" value="incorrect">
+                        <label for="q1a">편도체가 억제되고 PFC가 활성화된다</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" id="q1b" name="q1" value="correct">
+                        <label for="q1b">편도체가 활성화되고 PFC 기능이 약해진다</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" id="q1c" name="q1" value="incorrect">
+                        <label for="q1c">HPA축이 비활성화되어 코르티솔이 감소한다</label>
+                    </div>
+                </div>
+                <button class="quiz-button" onclick="checkAns(this, 'q1b')">확인</button>
+                <div class="quiz-result"></div>
+            </div>
+
+            <div class="quiz-item">
+                <h3>2. 인지적 재평가와 메타인지</h3>
+                <p>인지적 재평가와 메타인지의 차이점은?</p>
+                <div class="quiz-options">
+                    <div class="quiz-option">
+                        <input type="radio" id="q2a" name="q2" value="correct">
+                        <label for="q2a">재평가는 상황 해석을 바꾸는 것, 메타인지는 생각 자체를 관찰하는 것</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" id="q2b" name="q2" value="incorrect">
+                        <label for="q2b">둘은 같은 개념으로 혼용할 수 있다</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" id="q2c" name="q2" value="incorrect">
+                        <label for="q2c">메타인지는 감정 조절에 효과가 없다</label>
+                    </div>
+                </div>
+                <button class="quiz-button" onclick="checkAns(this, 'q2a')">확인</button>
+                <div class="quiz-result"></div>
+            </div>
+
+            <div class="quiz-item">
+                <h3>3. 옥시토신과 신뢰</h3>
+                <p>옥시토신 분비를 증가시키는 방법은?</p>
+                <div class="quiz-options">
+                    <div class="quiz-option">
+                        <input type="radio" id="q3a" name="q3" value="correct">
+                        <label for="q3a">눈 맞춤, 신체 접촉, 정직한 소통</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" id="q3b" name="q3" value="incorrect">
+                        <label for="q3b">경쟁적 환경과 거리 유지</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" id="q3c" name="q3" value="incorrect">
+                        <label for="q3c">감정 표현 억제</label>
+                    </div>
+                </div>
+                <button class="quiz-button" onclick="checkAns(this, 'q3a')">확인</button>
+                <div class="quiz-result"></div>
+            </div>
+
+            <div class="quiz-item">
+                <h3>4. 공감의 두 종류</h3>
+                <p>인지적 공감과 정서적 공감의 차이를 설명하시오.</p>
+                <div class="quiz-options">
+                    <div class="quiz-option">
+                        <input type="radio" id="q4a" name="q4" value="correct">
+                        <label for="q4a">인지적 공감은 상대를 이해하는 것, 정서적 공감은 감정을 함께하는 것</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" id="q4b" name="q4" value="incorrect">
+                        <label for="q4b">정서적 공감이 더 중요하고 인지적 공감은 불필요하다</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" id="q4c" name="q4" value="incorrect">
+                        <label for="q4c">두 공감은 같은 뇌 영역에서 일어난다</label>
+                    </div>
+                </div>
+                <button class="quiz-button" onclick="checkAns(this, 'q4a')">확인</button>
+                <div class="quiz-result"></div>
+            </div>
+
+            <div class="quiz-item">
+                <h3>5. 어서티브 커뮤니케이션</h3>
+                <p>어서티브 표현의 핵심은?</p>
+                <div class="quiz-options">
+                    <div class="quiz-option">
+                        <input type="radio" id="q5a" name="q5" value="incorrect">
+                        <label for="q5a">상대를 설득하고 이기는 것</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" id="q5b" name="q5" value="correct">
+                        <label for="q5b">자신의 느낌과 필요를 명확히 하면서 상대를 존중하는 것</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" id="q5c" name="q5" value="incorrect">
+                        <label for="q5c">감정을 최대한 억제하고 객관적으로만 말하는 것</label>
+                    </div>
+                </div>
+                <button class="quiz-button" onclick="checkAns(this, 'q5b')">확인</button>
+                <div class="quiz-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRACTICE CHECKLIST -->
+    <div class="checklist-section ani">
+        <h2>지난 11일의 핵심 실천 체크리스트</h2>
+        <div class="checklist-grid">
+            <div class="checklist-item" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <div class="checklist-text">
+                    <strong>Day 1:</strong> 편도체와 PFC의 역할 이해하기
+                </div>
+            </div>
+
+            <div class="checklist-item" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <div class="checklist-text">
+                    <strong>Day 2:</strong> 코르티솔 수치 낮추는 호흡법 연습 (4-7-8 호흡)
+                </div>
+            </div>
+
+            <div class="checklist-item" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <div class="checklist-text">
+                    <strong>Day 3:</strong> 자신의 INFP 감정 처리 패턴 인식하기
+                </div>
+            </div>
+
+            <div class="checklist-item" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <div class="checklist-text">
+                    <strong>Day 4:</strong> 부정적 상황을 다르게 해석해보기 (재평가 연습)
+                </div>
+            </div>
+
+            <div class="checklist-item" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <div class="checklist-text">
+                    <strong>Day 5:</strong> 일일 성찰 시간 갖기 (메타인지 발전)
+                </div>
+            </div>
+
+            <div class="checklist-item" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <div class="checklist-text">
+                    <strong>Day 6:</strong> 직장에서 감정 조절 전략 적용하기
+                </div>
+            </div>
+
+            <div class="checklist-item" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <div class="checklist-text">
+                    <strong>Day 7:</strong> 신뢰 구축을 위한 '깊은 대화' 실천
+                </div>
+            </div>
+
+            <div class="checklist-item" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <div class="checklist-text">
+                    <strong>Day 8:</strong> 상대의 입장을 이해하려는 노력 (공감 연습)
+                </div>
+            </div>
+
+            <div class="checklist-item" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <div class="checklist-text">
+                    <strong>Day 9:</strong> 어서티브하게 자신의 필요 표현하기
+                </div>
+            </div>
+
+            <div class="checklist-item" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <div class="checklist-text">
+                    <strong>Day 10:</strong> 갈등에서 호흡을 통해 신경 진정시키기
+                </div>
+            </div>
+
+            <div class="checklist-item" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <div class="checklist-text">
+                    <strong>Day 11:</strong> 건설적인 피드백 주고받기 연습
+                </div>
+            </div>
+
+            <div class="checklist-item" onclick="toggleChecklist(this)">
+                <div class="checklist-checkbox"></div>
+                <div class="checklist-text">
+                    <strong>추가:</strong> 문화 차이를 존중하면서 경계 지키기
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GROWTH JOURNAL -->
+    <div class="journal-section ani">
+        <h2>성장 저널: 나의 변화 되돌아보기</h2>
+        <div class="journal-prompts">
+            <div class="journal-prompt">
+                <strong>Q1. 감정 인식의 변화</strong>
+                <p>지난 11일 동안 자신의 감정에 대해 더 잘 이해하게 된 점은 무엇인가요? 특히 어떤 상황에서 편도체가 활성화되는 자신을 발견했나요?</p>
+                <textarea class="journal-textarea" placeholder="당신의 답변을 여기 입력하세요..."></textarea>
+            </div>
+
+            <div class="journal-prompt">
+                <strong>Q2. 관계의 질적 변화</strong>
+                <p>신뢰와 공감에 대해 배운 내용을 실제로 적용하면서, 누군가와의 관계가 어떻게 개선되었나요?</p>
+                <textarea class="journal-textarea" placeholder="당신의 답변을 여기 입력하세요..."></textarea>
+            </div>
+
+            <div class="journal-prompt">
+                <strong>Q3. 직장 상황에서의 성장</strong>
+                <p>감정 조절 능력과 어서티브 커뮤니케이션을 직장에서 어떻게 활용했나요? 이전과 달라진 점이 있다면?</p>
+                <textarea class="journal-textarea" placeholder="당신의 답변을 여기 입력하세요..."></textarea>
+            </div>
+
+            <div class="journal-prompt">
+                <strong>Q4. 문화 이해와 개인적 경계</strong>
+                <p>서양 문화와의 차이를 이해하면서, 자신의 가치를 지키기 위해 어떤 시도를 했나요?</p>
+                <textarea class="journal-textarea" placeholder="당신의 답변을 여기 입력하세요..."></textarea>
+            </div>
+
+            <div class="journal-prompt">
+                <strong>Q5. 다음 파트를 향한 다짐</strong>
+                <p>Part 3를 시작하기 전에, 이번 복습을 통해 강화하고 싶은 영역은 무엇인가요? 그리고 앞으로의 성장 목표는?</p>
+                <textarea class="journal-textarea" placeholder="당신의 답변을 여기 입력하세요..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer ani">
+        <p><strong>지난 2주간의 학습을 마치셨습니다!</strong></p>
+        <p style="margin-top: 1rem; color: var(--text1);">다음 파트 3에서는 더 깊은 자기 이해와 성장의 길을 함께 탐색하게 됩니다.<br>당신의 인간 탐구 여정에 응원을 보냅니다.</p>
+        <p style="margin-top: 2rem; font-size: 0.85rem;">인간 탐구 시리즈 | Day 12/22 | 신경과학 × 심리학 × 철학</p>
+    </div>
+
+    <script>
+        // Toggle checklist items
+        function toggleChecklist(el) {
+            el.classList.toggle('checked');
+        }
+
+        // Check answers
+        function checkAns(btn, correctId) {
+            const selectedInput = btn.parentElement.querySelector('input[type="radio"]:checked');
+            const resultDiv = btn.parentElement.querySelector('.quiz-result');
+
+            if (!selectedInput) {
+                resultDiv.textContent = '답변을 선택해주세요.';
+                resultDiv.style.display = 'block';
+                return;
+            }
+
+            if (selectedInput.id === correctId) {
+                resultDiv.classList.remove('incorrect');
+                resultDiv.classList.add('correct');
+                resultDiv.textContent = '✓ 정답입니다!';
+            } else {
+                resultDiv.classList.remove('correct');
+                resultDiv.classList.add('incorrect');
+                resultDiv.textContent = '✗ 다시 한번 생각해보세요.';
+            }
+
+            resultDiv.style.display = 'block';
+        }
+
+        // Intersection Observer for animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            document.querySelectorAll('.ani').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

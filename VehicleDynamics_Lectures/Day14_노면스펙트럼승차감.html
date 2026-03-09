@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 14 — 노면 스펙트럼·승차감 지표 | YS 진동학 마스터</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600;700&family=Noto+Sans+KR:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0C10;--surface:#12151C;--surface2:#1A1E28;--border:#252A38;--gold:#C9A84C;--gold-light:#E8C96A;--blue:#4A9EBF;--green:#4ABF8A;--purple:#8A6ABF;--orange:#BF6A4A;--text:#D8D3C8;--text-dim:#7A7A8A;--text-bright:#F0EBE0}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-weight:300;line-height:1.8;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+.sticky-header{position:sticky;top:0;z-index:100;background:rgba(10,12,16,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 0}
+.header-inner{max-width:960px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
+.header-brand{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:16px;color:var(--gold)}
+.header-progress-wrap{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-dim)}
+.header-progress-bar{width:120px;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
+.header-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px}
+.container{max-width:960px;margin:0 auto;padding:0 24px 80px}
+.series-info{text-align:center;padding:16px 0 0;font-size:13px;color:var(--text-dim);letter-spacing:.5px}
+.hero{text-align:center;padding:60px 0 48px;animation:fadeUp .8s ease both}
+.hero-day{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px}
+.hero-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:42px;color:var(--text-bright);line-height:1.2;margin-bottom:6px}
+.hero-title-en{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:20px;color:var(--text-dim);margin-bottom:32px}
+
+
+.gauge-wrap{display:flex;justify-content:center;margin-bottom:28px}
+.gauge-svg{width:100px;height:100px}
+.gauge-bg{fill:none;stroke:var(--surface2);stroke-width:6}
+.gauge-fill{fill:none;stroke:var(--gold);stroke-width:6;stroke-linecap:round;stroke-dasharray:251;transition:stroke-dashoffset 1s ease}
+.gauge-text{font-family:'JetBrains Mono',monospace;font-size:16px;fill:var(--gold-light);text-anchor:middle}
+.gauge-label{font-size:9px;fill:var(--text-dim);text-anchor:middle}
+.meta-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.meta-badge{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:13px;color:var(--text-dim)}
+.meta-badge span{color:var(--text-bright);font-weight:400}
+.section{margin-top:56px;animation:fadeUp .6s ease both}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.section-title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:28px;color:var(--text-bright);margin-bottom:20px}
+.brain-box{background:linear-gradient(135deg,rgba(138,106,191,.1),rgba(138,106,191,.04));border:1px solid rgba(138,106,191,.3);border-radius:16px;padding:28px 32px}
+.brain-box h3{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--purple);margin-bottom:16px}
+.brain-box p,.brain-box li{font-size:14px;color:var(--text);margin-bottom:8px}
+.brain-box ul{padding-left:20px}
+.brain-box li::marker{color:var(--purple)}
+.time-split{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.time-block{background:rgba(138,106,191,.08);border:1px solid rgba(138,106,191,.2);border-radius:8px;padding:10px;text-align:center;font-size:12px}
+.time-block .t-range{color:var(--purple);font-weight:700;font-size:13px;display:block;margin-bottom:2px}
+.time-block .t-desc{color:var(--text-dim)}
+.intuition-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 32px}
+.intuition-card p{font-size:15px;margin-bottom:12px}
+.highlight{color:var(--gold-light);font-weight:400}
+.deriv-card{background:var(--surface);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;padding:24px 28px;margin-bottom:20px}
+.deriv-step-num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+
+
+.deriv-explain{font-size:14px;color:var(--text)}
+.deriv-explain .label{color:var(--blue);font-weight:400}
+.deriv-explain p{margin-bottom:8px}
+.arrow-connector{text-align:center;color:var(--gold);font-size:24px;margin:-8px 0 12px;opacity:.5}
+.checkpoint{background:rgba(74,191,138,.08);border:1px solid rgba(74,191,138,.25);border-radius:10px;padding:14px 20px;margin:24px 0;font-size:14px;color:var(--green)}
+.param-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table.param-table{width:100%;border-collapse:collapse;font-size:13px}
+table.param-table th{background:var(--surface2);color:var(--gold);font-family:'JetBrains Mono',monospace;font-weight:500;padding:12px 14px;text-align:left;border-bottom:1px solid var(--border);font-size:11px;letter-spacing:1px;text-transform:uppercase}
+table.param-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+table.param-table tr:last-child td{border-bottom:none}
+.sym{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:15px}
+.simpack-module{background:var(--surface);border:1px solid rgba(74,158,191,.3);border-radius:16px;overflow:hidden}
+.simpack-header{background:linear-gradient(135deg,rgba(74,158,191,.15),rgba(74,158,191,.05));padding:16px 28px;border-bottom:1px solid rgba(74,158,191,.2);display:flex;align-items:center;gap:10px}
+.simpack-badge{background:var(--blue);color:#fff;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;padding:3px 10px;border-radius:4px;letter-spacing:1px}
+.simpack-header span{color:var(--blue);font-weight:400;font-size:15px}
+.simpack-body{padding:24px 28px}
+.simpack-row{background:var(--surface2);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.simpack-row .sp-sym{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:16px;font-weight:500}
+.simpack-row .sp-path{font-family:'JetBrains Mono',monospace;color:var(--blue);font-size:12px;margin:6px 0}
+.simpack-row .sp-detail{font-size:13px;color:var(--text-dim)}
+.sp-warn{background:rgba(191,106,74,.1);border:1px solid rgba(191,106,74,.3);border-radius:8px;padding:10px 14px;margin-top:8px;font-size:12px;color:var(--orange)}
+.accordion{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.accordion-toggle{width:100%;background:var(--surface);border:none;padding:18px 24px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;color:var(--text-bright);font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:400}
+.accordion-toggle:hover{background:var(--surface2)}
+.accordion-arrow{color:var(--gold);font-size:18px;transition:transform .3s}
+.accordion-content{max-height:0;overflow:hidden;transition:max-height .4s ease;background:var(--surface)}
+.accordion-content.open{max-height:5000px}
+.accordion-inner{padding:0 24px 24px}
+.accordion-inner p{font-size:14px;margin-bottom:10px}
+.accordion-inner .deriv-equation{margin-top:12px}
+.quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:16px}
+.quiz-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:10px}
+.quiz-q{font-size:15px;color:var(--text-bright);margin-bottom:16px;font-weight:400}
+.quiz-options{display:grid;gap:8px}
+.quiz-opt{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;cursor:pointer;font-size:14px;color:var(--text);transition:all .2s}
+.quiz-opt:hover{border-color:var(--gold);color:var(--text-bright)}
+.quiz-opt.correct{background:rgba(74,191,138,.12);border-color:var(--green);color:var(--green)}
+.quiz-opt.wrong{background:rgba(191,74,74,.12);border-color:#bf4a4a;color:#bf4a4a}
+.quiz-opt.disabled{pointer-events:none;opacity:.7}
+.quiz-feedback{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.correct-fb{background:rgba(74,191,138,.08);color:var(--green)}
+.quiz-feedback.wrong-fb{background:rgba(191,74,74,.08);color:#bf4a4a}
+.solution-panel{display:none;margin-top:16px;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.2);border-radius:12px;overflow:hidden;animation:solReveal .4s ease}
+.solution-panel.show{display:block}
+@keyframes solReveal{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.sol-header{background:rgba(201,168,76,.1);padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);font-weight:500;letter-spacing:1px;border-bottom:1px solid rgba(201,168,76,.15)}
+.sol-step{padding:10px 20px;font-size:13px;color:var(--text);border-bottom:1px solid rgba(201,168,76,.08);display:flex;align-items:baseline;gap:12px}
+.sol-step:last-of-type{border-bottom:none}
+.sol-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);font-weight:500;min-width:50px;letter-spacing:1px;flex-shrink:0}
+.sol-step.highlight-step{background:rgba(201,168,76,.08)}
+.sol-insight{padding:16px 20px;background:rgba(74,191,138,.06);border-top:1px solid rgba(74,191,138,.15);font-size:13px;color:var(--text);line-height:1.9}
+.sol-insight strong{color:var(--green)}
+.sr-track{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+.sr-dot{width:52px;height:52px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;font-family:'JetBrains Mono',monospace}
+.sr-dot.today{background:var(--gold);color:var(--bg);font-weight:700}
+.sr-dot.future{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim)}
+.sr-dot .sr-label{font-size:8px}
+.next-preview{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:20px 24px;margin-top:24px}
+.next-preview h4{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:18px;color:var(--gold);margin-bottom:8px}
+.next-preview p{font-size:14px;color:var(--text-dim)}
+.footer{text-align:center;padding:40px 0 20px;font-size:12px;color:var(--text-dim);border-top:1px solid var(--border);margin-top:60px}
+.placeholder-box{background:var(--surface);border:2px dashed var(--border);border-radius:16px;padding:40px;text-align:center;color:var(--text-dim);font-size:14px;margin:20px 0}
+.placeholder-box .ph-icon{font-size:36px;margin-bottom:12px;display:block}
+.nav-links{display:flex;justify-content:space-between;margin-top:40px;font-size:14px}
+.nav-links a{color:var(--gold);text-decoration:none;padding:8px 16px;border:1px solid var(--border);border-radius:8px;transition:all .2s}
+.nav-links a:hover{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.diagram-wrap{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin:20px 0;text-align:center;overflow-x:auto}
+.diagram-wrap svg{max-width:100%;height:auto}
+.diagram-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;text-align:center}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.hero-equation code{font-size:18px}.container{padding:0 16px 60px}.time-split{grid-template-columns:repeat(2,1fr)}.deriv-equation code{font-size:16px}}
+
+@media print{body{background:#fff;color:#222}.sticky-header{display:none}.hero{padding:20px 0}.section{margin-top:24px;break-inside:avoid}.diagram-wrap{border:1px solid #ccc}.quiz-opt{border:1px solid #999}code{color:#333}}
+.memory-hook{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:14px}
+.memory-hook strong{color:var(--gold-light)}
+.vehicle-example{background:linear-gradient(135deg,rgba(74,158,191,.08),rgba(74,158,191,.02));border:1px solid rgba(74,158,191,.25);border-radius:12px;padding:20px 24px;margin-top:20px}
+.vehicle-example h4{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:17px;color:var(--blue);margin-bottom:12px}
+.vehicle-example p{font-size:13px;margin-bottom:6px}
+.vehicle-example .calc{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:13px;background:#0D1017;padding:6px 12px;border-radius:6px;display:inline-block;margin:4px 0}
+
+
+/* 인라인 수식도 부드럽게 */
+
+/* ══════ Mobile KaTeX Fix ══════ */
+.deriv-equation{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.deriv-equation code{white-space:normal;word-wrap:break-word}
+.katex{font-size:1.1em}
+@media(max-width:640px){
+  .hero-equation{padding:16px 20px !important;max-width:100%;overflow-x:auto !important;display:block !important;text-align:center}
+    .hero-equation code{font-size:15px !important;white-space:normal !important;word-break:break-all}
+  .deriv-equation{padding:12px 14px !important;margin-bottom:12px}
+    .deriv-equation code{font-size:14px !important}
+  .deriv-equation::before{width:2px}
+    .eq-tooltip{max-width:280px !important;font-size:12px !important}
+}
+@media(max-width:380px){
+      .hero-equation{padding:12px 14px !important}
+}
+
+/* ══════ Interactive Formula Explorer ══════ */
+.eq-explorer{position:relative;cursor:pointer}
+.eq-tooltip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1A1E28,#12151C);border:1px solid var(--gold);border-radius:10px;padding:12px 16px;min-width:220px;max-width:340px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 12px rgba(201,168,76,.15);animation:tooltipIn .2s ease;pointer-events:none}
+.eq-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--gold)}
+.eq-explorer:hover .eq-tooltip,.eq-explorer:focus .eq-tooltip,.eq-explorer.active .eq-tooltip{display:block}
+@keyframes tooltipIn{from{opacity:0;transform:translateX(-50%) translateY(4px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.eq-tooltip .tt-symbol{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--gold-light);font-weight:700;margin-bottom:6px}
+.eq-tooltip .tt-name{font-size:13px;color:var(--text-bright);font-weight:400;margin-bottom:4px}
+.eq-tooltip .tt-unit{font-size:11px;color:var(--blue);font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+.eq-tooltip .tt-xm3{font-size:12px;color:var(--green);padding:6px 8px;background:rgba(74,191,138,.08);border-radius:6px;margin-top:6px}
+.eq-tooltip .tt-xm3::before{content:'🚗 Ref: ';font-weight:700}
+.eq-tooltip .tt-meaning{font-size:12px;color:var(--text-dim);margin-top:4px;line-height:1.6}
+
+
+</style>
+
+<!-- KaTeX Math Rendering -->
+<style id="katex-inline-css">@font-face{font-display:block;font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_AMS-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Script-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size1-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size2-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size3-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size4-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0;text-rendering:auto}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.16.38"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathboldfrak,.katex .textboldfrak{font-family:KaTeX_Fraktur;font-weight:700}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .mathsfit,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .smash{display:inline;line-height:0}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.2777777778em;margin-right:-.5555555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.1666666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.6666666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.4566666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.1466666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.7142857143em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.8571428571em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.1428571429em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.2857142857em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.4285714286em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.7142857143em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.0571428571em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.4685714286em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.9628571429em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.5542857143em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.7777777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.8888888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.1111111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.3044444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.7644444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.5833333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.7283333333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.0733333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.4861111111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.4402777778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.7277777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.2893518519em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.4050925926em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.462962963em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.5208333333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.2002314815em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.4398148148em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.2410800386em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.2892960463em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.337512054em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.3857280617em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.4339440694em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.4821600771em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.5785920926em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.6943105111em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.8331726133em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.1996142719em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.2009646302em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.2411575563em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.2813504823em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.3215434084em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.3617363344em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.4019292605em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.4823151125em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.578778135em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.6945337621em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.8336012862em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex svg{fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+</style>
+<style id="math-enhanced-style">
+/* ══════ KaTeX Pre-rendered Math Styling ══════ */
+/* Hero equation - 메인 수식 */
+.hero-equation .katex-display{margin:0!important;padding:0!important}
+.hero-equation .katex{font-size:1.5em!important;color:#E8C96A!important}
+.hero-equation .katex .mord{color:#E8C96A!important}
+.hero-equation .katex .mbin{color:#4A9EBF!important}
+.hero-equation .katex .mrel{color:#4ABF8A!important}
+.hero-equation .katex .mop{color:#E8C96A!important}
+.hero-equation .katex .mopen,.hero-equation .katex .mclose{color:#BF8A4A!important}
+.hero-equation .katex .sqrt .sqrt-sign{color:#C9A84C!important}
+.hero-equation .katex .frac-line{border-bottom-color:#C9A84C!important}
+.hero-equation .katex .accent-body{color:#E8C96A!important}
+
+/* Derivation equation - 유도 단계 수식 */
+.deriv-equation .katex-display{margin:0!important;padding:0!important}
+.deriv-equation .katex{font-size:1.15em!important;color:#E8C96A!important}
+.deriv-equation .katex .mord{color:#E8C96A!important}
+.deriv-equation .katex .mord.mathnormal{color:#E8C96A!important}
+.deriv-equation .katex .mbin{color:#4A9EBF!important}
+.deriv-equation .katex .mrel{color:#4ABF8A!important}
+.deriv-equation .katex .mop{color:#E8C96A!important}
+.deriv-equation .katex .sqrt .sqrt-sign{color:#C9A84C!important}
+.deriv-equation .katex .sqrt .vlist{color:#E8C96A!important}
+.deriv-equation .katex .frac-line{border-bottom-color:#C9A84C!important}
+.deriv-equation .katex .mopen,.deriv-equation .katex .mclose{color:#BF8A4A!important}
+.deriv-equation .katex .accent-body{color:#E8C96A!important}
+
+/* 일반 영역 수식 */
+.katex{color:#E8C96A!important}
+.katex .mord{color:#E8C96A!important}
+.katex .mbin{color:#4A9EBF!important}
+.katex .mrel{color:#4ABF8A!important}
+.katex .mop{color:#E8C96A!important}
+.katex .frac-line{border-bottom-color:rgba(201,168,76,0.6)!important}
+.katex .sqrt .sqrt-sign{color:#C9A84C!important}
+
+/* katex-display 블록 스타일 */
+.katex-display{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:4px 0}
+.katex-display>.katex{text-align:center!important}
+
+/* Hero equation 박스 강화 */
+.hero-equation{display:inline-block;background:linear-gradient(135deg,#0D1017 0%,#151A25 100%);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:24px 48px;margin-bottom:32px;box-shadow:0 4px 20px rgba(201,168,76,0.1),0 0 40px rgba(201,168,76,0.03);position:relative;overflow:visible;max-width:100%}
+.hero-equation::before{content:'';position:absolute;inset:-1px;border-radius:16px;background:linear-gradient(135deg,rgba(201,168,76,0.2),transparent,rgba(201,168,76,0.1));z-index:0;pointer-events:none}
+
+/* Deriv equation 박스 강화 */
+.deriv-equation{background:linear-gradient(135deg,rgba(13,16,23,0.8),rgba(21,26,37,0.6));border-left:3px solid #C9A84C;border-radius:0 12px 12px 0;padding:16px 20px;margin:12px 0;box-shadow:0 2px 12px rgba(0,0,0,0.3);transition:border-color 0.3s,box-shadow 0.3s}
+.deriv-equation:hover{border-left-color:#E8C96A;box-shadow:0 4px 16px rgba(201,168,76,0.15)}
+
+/* 모바일 반응형 */
+@media(max-width:640px){
+  .hero-equation{padding:16px 20px!important;max-width:100%;overflow-x:auto!important;display:block!important}
+  .hero-equation .katex{font-size:1.1em!important}
+  .deriv-equation .katex{font-size:0.95em!important}
+  .deriv-equation{padding:12px 14px;margin:8px 0}
+}
+@media(max-width:380px){
+  .hero-equation .katex{font-size:0.9em!important}
+  .deriv-equation .katex{font-size:0.85em!important}
+}
+
+/* 체크포인트/파라미터 테이블 내 수식 */
+.checkpoint .katex{font-size:0.9em!important}
+.param-table .katex{font-size:0.95em!important}
+td .katex,th .katex{font-size:0.9em!important}
+
+/* 수식 에러 폴백 */
+.katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
+</style>
+</head>
+<body>
+
+<!-- ① STICKY HEADER -->
+<header class="sticky-header">
+  <div class="header-inner">
+    <div class="header-brand"><a href="index.html" style="color:inherit;text-decoration:none;">YS · 진동학 마스터</a> / Day 14</div>
+    <div class="header-progress-wrap">
+      <span>14 / 33</span>
+      <div class="header-progress-bar"><div class="header-progress-fill" style="width:42%"></div></div>
+      <span>42%</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+<div class="series-info">이 시리즈 예상 총 Day: 33일 &nbsp;|&nbsp; PART 2 — 차량 진동 모델</div>
+
+<!-- ② HERO -->
+<section class="hero">
+  <div class="hero-day">— DAY 14 —</div>
+  <h1 class="hero-title">노면 스펙트럼·승차감 지표</h1>
+  <p class="hero-title-en">Road Spectrum (PSD) &amp; Ride Comfort Index (ISO 2631)</p>
+  <div class="hero-equation"><span class="katex-eq"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>S</mi><mi>z</mi></msub><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>S</mi><mi>z</mi></msub><mo stretchy="false">(</mo><msub><mi>n</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>⋅</mo><mo stretchy="false">(</mo><mi>n</mi><mi mathvariant="normal">/</mi><msub><mi>n</mi><mn>0</mn></msub><msup><mo stretchy="false">)</mo><mo stretchy="false">(</mo></msup><mo>−</mo><mi>w</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><msub><mi>a</mi><mi>w</mi></msub><mo>=</mo><msqrt><mrow><msup><mstyle mathcolor="#cc0000"><mtext>\intW</mtext></mstyle><mn>2</mn></msup><mo stretchy="false">(</mo><mi>f</mi></mrow></msqrt><mo>⋅</mo><msub><mi>S</mi><mi>a</mi></msub><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo><mi>d</mi><mi>f</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">S_z(n) = S_z(n_0)\cdot (n/n_0)^(-w), a_w = \sqrt{\intW^2(f}\cdot S_a(f)df)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">z</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">z</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.188em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mord">/</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.938em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mopen mtight">(</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.84em;vertical-align:-0.4541em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3859em;"><span class="svg-align" style="top:-3.8em;"><span class="pstrut" style="height:3.8em;"></span><span class="mord" style="padding-left:1em;"><span class="mord"><span class="mord text" style="color:#cc0000;"><span class="mord" style="color:#cc0000;">\intW</span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.954em;"><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span></span><span style="top:-3.3459em;"><span class="pstrut" style="height:3.8em;"></span><span class="hide-tail" style="min-width:1.02em;height:1.88em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.88em" viewBox="0 0 400000 1944" preserveAspectRatio="xMinYMin slice"><path d="M983 90
+l0 -0
+c4,-6.7,10,-10,18,-10 H400000v40
+H1013.1s-83.4,268,-264.1,840c-180.7,572,-277,876.3,-289,913c-4.7,4.7,-12.7,7,-24,7
+s-12,0,-12,0c-1.3,-3.3,-3.7,-11.7,-7,-25c-35.3,-125.3,-106.7,-373.3,-214,-744
+c-10,12,-21,25,-33,39s-32,39,-32,39c-6,-5.3,-15,-14,-27,-26s25,-30,25,-30
+c26.7,-32.7,52,-63,76,-91s52,-60,52,-60s208,722,208,722
+c56,-175.3,126.3,-397.3,211,-666c84.7,-268.7,153.8,-488.2,207.5,-658.5
+c53.7,-170.3,84.5,-266.8,92.5,-289.5z
+M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4541em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.10764em;">df</span><span class="mclose">)</span></span></span></span></span></span></div>
+  <div class="gauge-wrap">
+    <svg class="gauge-svg" viewBox="0 0 100 100">
+      <circle class="gauge-bg" cx="50" cy="50" r="40"/>
+      <circle class="gauge-fill" cx="50" cy="50" r="40" transform="rotate(-90 50 50)" style="stroke-dashoffset:146"/>
+      <text class="gauge-text" x="50" y="48">42%</text>
+      <text class="gauge-label" x="50" y="62">DAY 14/33</text>
+    </svg>
+  </div>
+  <div class="meta-badges">
+    <div class="meta-badge">⏱ 포모도로 <span>25분</span></div>
+    <div class="meta-badge">📐 수식 <span>4단계</span></div>
+    <div class="meta-badge">⭐ 난이도 <span>★★★★☆</span></div>
+    <div class="meta-badge">🔁 복습 <span>D+1, D+3, D+7</span></div>
+  </div>
+</section>
+
+<div style="max-width:960px;margin:0 auto;padding:0 24px">
+  <div style="background:linear-gradient(135deg,rgba(74,158,191,.08),rgba(74,158,191,.03));border:1px solid rgba(74,158,191,.2);border-radius:10px;padding:12px 18px;margin-top:-20px;margin-bottom:24px;font-size:13px;color:var(--text-dim);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:18px">🔍</span>
+    <span><strong style="color:var(--blue)">수식 탐색기</strong> — 파라미터 테이블의 기호나 계산식 위에 <strong style="color:var(--text-bright)">마우스를 올리거나 터치</strong>하면 물리적 의미·단위·레퍼런스 실차값이 표시됩니다.</span>
+  </div>
+</div>
+
+
+<!-- ③ 뇌과학 학습 전략 -->
+<section class="section">
+  <div class="section-label">Learning Strategy</div>
+  <div class="brain-box">
+    <h3>🧠 뇌과학 기반 수식 학습 전략</h3>
+    
+        <p><strong style="color:var(--purple);">수식 보기 전 30초 루틴</strong> — 오늘 출근길에 지나온 도로를 떠올리세요. 고속도로 = 매끈(ISO A-B등급), 도심 도로 = 약간 거친(ISO C-D), 비포장 = 매우 거친(ISO E-F). 이 &#x27;거칠기&#x27;를 숫자로 표현하는 것이 노면 PSD. 이 PSD를 쿼터카에 통과시키면 차체 가속도의 PSD가 나오고, ISO 2631로 승차감 점수가 됩니다.</p>
+        <p><strong style="color:var(--purple);">오늘의 학습 기법:</strong> 현실-수식 연결(Real-World Anchoring)</p>
+    <div class="time-split">
+      <div class="time-block"><span class="t-range">0~5분</span><span class="t-desc">물리적 직관</span></div>
+      <div class="time-block"><span class="t-range">5~18분</span><span class="t-desc">수식 유도</span></div>
+      <div class="time-block"><span class="t-range">18~23분</span><span class="t-desc">Simpack 매핑</span></div>
+      <div class="time-block"><span class="t-range">23~25분</span><span class="t-desc">퀴즈 복습</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ④ 물리적 직관 -->
+<section class="section">
+  <div class="section-label">Step 1 — Physical Intuition</div>
+  <h2 class="section-title">왜 이 수식이 필요한가?</h2>
+    <div style="background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:14px 20px;margin:20px 0;font-size:13px;">
+      <strong style="color:var(--gold);">💡 수식 유도 읽는 법</strong> — 각 STEP의 <span style="color:var(--blue);">파란색 라벨</span>은 "왜 이 변환을 하는가"를 설명합니다. 수식만 보지 말고 <span style="color:var(--gold-light);">동기 → 변환 → 의미</span> 순서로 읽으세요. 눈으로 3번 읽는 것보다 <strong>손으로 1번 쓰는 것</strong>이 기억에 4배 효과적입니다.
+    </div>
+
+  <div class="intuition-card">
+    <p>지금까지 깔끔한 cos(ωt) 입력만 다뤘지만, 실제 노면은 무수히 많은 주파수가 섞인 랜덤 입력입니다. 이를 다루는 도구가 PSD(Power Spectral Density, 파워스펙트럼밀도). 노면 PSD는 ISO 8608로 표준화되어 있고, 이를 전달함수에 통과시키면 차체 응답 PSD를 얻습니다. 최종적으로 ISO 2631 가중함수를 적용하면 승차감 지표 a_w(weighted RMS acceleration)를 계산할 수 있습니다.</p>
+  </div>
+  
+</section>
+
+<!-- ⑤ 수식 단계별 풀이 -->
+<section class="section">
+  <div class="section-label">Step 2 — Derivation</div>
+  <h2 class="section-title">수식 한 줄씩 유도</h2>
+  
+    <div class="deriv-card">
+      <div class="deriv-step-num">STEP 1 — 노면 PSD 모델 (ISO 8608)</div>
+      <div class="deriv-equation"><span class="katex-eq"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>S</mi><mi>z</mi></msub><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>S</mi><mi>z</mi></msub><mo stretchy="false">(</mo><msub><mi>n</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>×</mo><mo stretchy="false">(</mo><mi>n</mi><mi mathvariant="normal">/</mi><msub><mi>n</mi><mn>0</mn></msub><msup><mo stretchy="false">)</mo><mo stretchy="false">(</mo></msup><mo>−</mo><mi>w</mi><mo stretchy="false">)</mo><msub><mi>n</mi><mn>0</mn></msub><mo>=</mo><mn>0.1</mn><mi>c</mi><mi>y</mi><mi>c</mi><mi>l</mi><mi>e</mi><mi mathvariant="normal">/</mi><mi>m</mi><mo separator="true">,</mo><mi>w</mi><mo>≈</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">S_z(n) = S_z(n_0) \times (n/n_0)^(-w)
+n_0 = 0.1 cycle/m, w \approx 2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">z</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">z</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.188em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mord">/</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.938em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mopen mtight">(</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mclose">)</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0.1</span><span class="mord mathnormal" style="margin-right:0.03588em;">cy</span><span class="mord mathnormal">c</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">e</span><span class="mord">/</span><span class="mord mathnormal">m</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span></span></span></div>
+      <div class="deriv-explain">
+        <p><span class="label">이 항의 의미:</span> n은 공간주파수(cycle/m), S_z(n₀)는 기준 공간주파수에서의 PSD 값. 도로 등급(A~H)에 따라 S_z(n₀) 값이 다름.</p>
+        <p><span class="label">부호/변환 이유:</span> 지수 −w ≈ −2: 저주파(긴 파장)가 에너지의 대부분. 고주파(짧은 파장)는 에너지가 작음. 이것이 노면의 기본 특성.</p>
+        <p><span class="label">이전 단계와의 연결:</span> 공간주파수 n → 시간주파수 f = n × V (V=차속). 속도가 빠를수록 같은 요철이 높은 주파수 가진이 됨.</p>
+      </div>
+    </div>
+    <div class="arrow-connector">↓</div>
+
+    <div class="deriv-card">
+      <div class="deriv-step-num">STEP 2 — 응답 PSD 계산</div>
+      <div class="deriv-equation"><span class="katex-eq"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>S</mi><mi>a</mi></msub><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="normal">∣</mi><msub><mi>H</mi><mrow><mi>a</mi><mi>c</mi><mi>c</mi></mrow></msub><mo stretchy="false">(</mo><mi>j</mi><mn>2</mn><mi>π</mi><mi>f</mi><mo stretchy="false">)</mo><msup><mi mathvariant="normal">∣</mi><mn>2</mn></msup><mo>×</mo><msub><mi>S</mi><mrow><mi>z</mi><mo separator="true">,</mo><mi>i</mi><mi>n</mi><mi>p</mi><mi>u</mi><mi>t</mi></mrow></msub><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">S_a(f) = |H_{acc}(j2\pi f)|^2 \times S_{z,input}(f)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1141em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0813em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">cc</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span><span class="mord"><span class="mord">∣</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.04398em;">z</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">in</span><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span></span></span></span></span></span></div>
+      <div class="deriv-explain">
+        <p><span class="label">이 항의 의미:</span> 시스템의 출력 PSD = |전달함수|² × 입력 PSD. H_acc는 가속도 전달함수(= (j2πf)²·H(j2πf)). Day 12의 전달함수를 활용.</p>
+        <p><span class="label">부호/변환 이유:</span> 제곱 |H|²: PSD는 에너지 밀도이므로 진폭이 아닌 파워(진폭²)로 전달.</p>
+        <p><span class="label">이전 단계와의 연결:</span> Day 12: H(s) = (c_s·s+kₛ)/(mₛ·s²+c_s·s+kₛ). 여기에 s=j2πf, ×s²(가속도).</p>
+      </div>
+    </div>
+    <div class="arrow-connector">↓</div>
+
+    <div class="deriv-card">
+      <div class="deriv-step-num">STEP 3 — ISO 2631 가중 RMS 가속도</div>
+      <div class="deriv-equation"><span class="katex-eq"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>a</mi><mi>w</mi></msub><mo>=</mo><msqrt><mrow><msubsup><mo>∫</mo><mn>0</mn><mi mathvariant="normal">∞</mi></msubsup><msup><mi>W</mi><mn>2</mn></msup><mo stretchy="false">(</mo><mi>f</mi></mrow></msqrt><mo>⋅</mo><msub><mi>S</mi><mi>a</mi></msub><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo><mi>d</mi><mi>f</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">a_w = \sqrt{\int_0^\infty W^2(f} \cdot S_a(f) df)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.04em;vertical-align:-1.155em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.885em;"><span class="svg-align" style="top:-5em;"><span class="pstrut" style="height:5em;"></span><span class="mord" style="padding-left:1em;"><span class="mop"><span class="mop op-symbol large-op" style="margin-right:0.44445em;position:relative;top:-0.0011em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4143em;"><span style="top:-1.7881em;margin-left:-0.4445em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span><span style="top:-3.8129em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">∞</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9119em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span></span><span style="top:-3.845em;"><span class="pstrut" style="height:5em;"></span><span class="hide-tail" style="min-width:1.02em;height:3.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="3.08em" viewBox="0 0 400000 3240" preserveAspectRatio="xMinYMin slice"><path d="M473,2793
+c339.3,-1799.3,509.3,-2700,510,-2702 l0 -0
+c3.3,-7.3,9.3,-11,18,-11 H400000v40H1017.7
+s-90.5,478,-276.2,1466c-185.7,988,-279.5,1483,-281.5,1485c-2,6,-10,9,-24,9
+c-8,0,-12,-0.7,-12,-2c0,-1.3,-5.3,-32,-16,-92c-50.7,-293.3,-119.7,-693.3,-207,-1200
+c0,-1.3,-5.3,8.7,-16,30c-10.7,21.3,-21.3,42.7,-32,64s-16,33,-16,33s-26,-26,-26,-26
+s76,-153,76,-153s77,-151,77,-151c0.7,0.7,35.7,202,105,604c67.3,400.7,102,602.7,104,
+606zM1001 80h400000v40H1017.7z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.155em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.10764em;">df</span><span class="mclose">)</span></span></span></span></span></span></div>
+      <div class="deriv-explain">
+        <p><span class="label">이 항의 의미:</span> W(f)는 ISO 2631의 주파수 가중함수. 인체가 민감한 4~8 Hz 대역에 가중치를 크게 부여. a_w가 승차감의 최종 숫자.</p>
+        <p><span class="label">부호/변환 이유:</span> 적분 → 전 주파수 대역의 에너지를 합산. 루트 → RMS(Root Mean Square). a_w &lt; 0.315 m/s²이면 &#x27;쾌적&#x27;.</p>
+        <p><span class="label">이전 단계와의 연결:</span> Day 13의 전달률로 방진 성능을 평가했다면, 여기서는 실제 도로에서의 승차감 점수를 계산.</p>
+      </div>
+    </div>
+    
+    <div class="checkpoint"><strong>✓ 물리적 직관 체크:</strong> 이 수식에서 각 항의 물리적 의미를 손가락으로 짚으며 설명할 수 있나요? "이 항은 ___를 의미하고, 저 항은 ___의 영향"이라고 말해보세요.</div>
+    <div class="arrow-connector">↓</div>
+
+    <div class="deriv-card">
+      <div class="deriv-step-num">STEP 4 — 승차감 등급 판정 (ISO 2631)</div>
+      <div class="deriv-equation"><span class="katex-eq"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>a</mi><mi>w</mi></msub><mo>&lt;</mo><mn>0.315</mn><mo>:</mo><mtext>쾌적</mtext><mn>0.315</mn><mtext> </mtext><mn>0.63</mn><mo>:</mo><mtext>약간 불쾌</mtext><mn>0.63</mn><mtext> </mtext><mn>1.0</mn><mo>:</mo><mtext>불쾌</mtext><mo>&gt;</mo><mn>1.0</mn><mo>:</mo><mtext>매우 불쾌</mtext></mrow><annotation encoding="application/x-tex">a_w &lt; 0.315: \text{쾌적}
+0.315~0.63: \text{약간 불쾌}
+0.63~1.0: \text{불쾌}
+&gt; 1.0: \text{매우 불쾌}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6891em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.315</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord hangul_fallback">쾌적</span></span><span class="mord">0.315</span><span class="mspace nobreak"> </span><span class="mord">0.63</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord hangul_fallback">약간</span><span class="mord"> </span><span class="mord hangul_fallback">불쾌</span></span><span class="mord">0.63</span><span class="mspace nobreak"> </span><span class="mord">1.0</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord text"><span class="mord hangul_fallback">불쾌</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1.0</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord hangul_fallback">매우</span><span class="mord"> </span><span class="mord hangul_fallback">불쾌</span></span></span></span></span></span></span></div>
+      <div class="deriv-explain">
+        <p><span class="label">이 항의 의미:</span> a_w 값으로 승차감을 객관적으로 등급화. 서스펜션 튜닝의 최종 목표: 타겟 도로에서 a_w를 허용 범위 이내로.</p>
+        <p><span class="label">부호/변환 이유:</span> 단위 m/s². 중력가속도 g ≈ 9.81 m/s² 대비 ~3%~10% 수준이 체감 영역.</p>
+        <p><span class="label">이전 단계와의 연결:</span> 이 지표가 K&amp;C 시험, 실차 주행 평가, Simpack 가상 시험의 공통 평가 척도.</p>
+      </div>
+    </div>
+</section>
+
+<!-- ⑥ 파라미터 테이블 -->
+<section class="section">
+  <div class="section-label">Step 3 — Parameter Mapping</div>
+  <h2 class="section-title">수식 파라미터 완전 해부</h2>
+  
+    <div class="param-table-wrap">
+      <table class="param-table">
+        <thead><tr>
+          <th>기호</th><th>명칭 (한/영)</th><th>단위</th><th>물리적 의미</th><th>차량 부품</th><th>전형적 범위</th>
+        </tr></thead>
+        <tbody>
+        <tr>
+          <td><span class="sym">S_z(n₀)</span></td>
+          <td>노면 PSD 기준값 / Road PSD Reference</td>
+          <td>m³/cycle</td>
+          <td>n₀=0.1 cycle/m에서의 PSD. 도로 등급 결정</td>
+          <td>ISO 8608 A~H 등급</td>
+          <td>A: 1×10⁻⁶, C: 16×10⁻⁶, E: 256×10⁻⁶</td>
+        </tr>
+        <tr>
+          <td><span class="sym">a_w</span></td>
+          <td>가중 RMS 가속도 / Weighted RMS Acceleration</td>
+          <td>m/s²</td>
+          <td>ISO 2631 승차감 최종 지표</td>
+          <td>승차감 타겟 스펙</td>
+          <td>&lt; 0.315(쾌적), 0.315~0.63(약간 불쾌)</td>
+        </tr>
+        <tr>
+          <td><span class="sym">W(f)</span></td>
+          <td>ISO 2631 가중함수 / ISO 2631 Weighting Function</td>
+          <td>무차원</td>
+          <td>인체 주파수별 민감도 가중치</td>
+          <td>4~8 Hz 피크</td>
+          <td>W_k(수직), W_d(수평)</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+</section>
+
+<!-- ⑦ SVG 다이어그램 B -->
+<section class="section">
+  <div class="section-label">Response Visualization</div>
+  <h2 class="section-title">응답 곡선 / 주요 그래프</h2>
+  
+  <div class="diagram-wrap">
+    <div class="diagram-label">Diagram B — 응답 곡선</div>
+    <svg viewBox="0 0 480 260" width="480" height="260" xmlns="http://www.w3.org/2000/svg">
+    <defs><pattern id="gridP" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1A1E28" stroke-width="0.5"/>
+    </pattern></defs>
+    <rect x="50" y="10" width="410" height="220" fill="url(#gridP)"/>
+    <line x1="50" y1="230" x2="460" y2="230" stroke="#7A7A8A" stroke-width="1"/>
+    <line x1="50" y1="10" x2="50" y2="230" stroke="#7A7A8A" stroke-width="1"/>
+    <text x="460" y="248" font-family="JetBrains Mono" font-size="11" fill="#E8C96A">f [Hz]</text>
+    <text x="15" y="15" font-family="JetBrains Mono" font-size="11" fill="#E8C96A">PSD</text>
+    <!-- Road PSD (log-log straight line approximation) -->
+    <path d="M80,30 L200,120 L350,190 L460,225" fill="none" stroke="#7A7A8A" stroke-width="2"/>
+    <text x="100" y="50" font-family="JetBrains Mono" font-size="10" fill="#7A7A8A">ISO 8608 노면</text>
+    <!-- Vehicle response -->
+    <path d="M80,200 C100,195 130,160 150,80 C160,50 163,42 167,50 C175,80 190,150 220,190 C250,205 300,210 340,215 C380,218 430,220 460,222" fill="none" stroke="#E8C96A" stroke-width="2.5"/>
+    <text x="170" y="38" font-family="JetBrains Mono" font-size="10" fill="#E8C96A">차체 응답 PSD</text>
+    <!-- 1-80 Hz annotation -->
+    <rect x="85" y="230" width="350" height="18" rx="4" fill="#4ABF8A" opacity="0.1"/>
+    <text x="260" y="243" font-family="JetBrains Mono" font-size="9" fill="#4ABF8A" text-anchor="middle">ISO 2631 가중 범위: 1~80 Hz</text>
+  </svg>
+  </div>
+</section>
+
+<!-- ⑧ Simpack 매핑 -->
+<section class="section">
+  <div class="section-label">Step 4 — Simpack Mapping</div>
+  <h2 class="section-title">Simpack 입력 매핑</h2>
+  
+    <div class="simpack-module">
+      <div class="simpack-header">
+        <span class="simpack-badge">SIMPACK</span>
+        <span>Day 14 파라미터 입력 가이드</span>
+      </div>
+      <div class="simpack-body">
+
+      <div class="sp-workflow">
+        <div class="sp-wf-step">
+          <span class="wf-num">①</span>
+          <span class="wf-title">모델 생성</span>
+          <span class="wf-desc">Body + Joint + Force 정의</span>
+        </div>
+        <div class="sp-wf-step">
+          <span class="wf-num">②</span>
+          <span class="wf-title">해석 실행</span>
+          <span class="wf-desc">시간영역/주파수영역 선택</span>
+        </div>
+        <div class="sp-wf-step">
+          <span class="wf-num">③</span>
+          <span class="wf-title">결과 검증</span>
+          <span class="wf-desc">해석해와 수치 비교</span>
+        </div>
+      </div>
+
+      <div class="simpack-row">
+        <div class="sp-sym">노면 입력 (Road Profile)</div>
+        <div class="sp-path">Excitations → Road → ISO 8608 / Measured Profile</div>
+        <div class="sp-detail"><strong>필드:</strong> Road Class, Vehicle Speed [km/h]<br><strong>단위:</strong> m, km/h</div>
+        <div class="sp-warn">⚠ Simpack에서 ISO 8608 노면을 생성하거나 실측 데이터(.rdf)를 입력. 차속에 따라 시간 영역 가진이 달라짐. 동일 노면이라도 속도↑ → 가진 주파수↑.</div>
+      </div>
+      <div class="simpack-row">
+        <div class="sp-sym">a_w (승차감 출력)</div>
+        <div class="sp-path">Results → Post-Processing → ISO 2631 Filter</div>
+        <div class="sp-detail"><strong>필드:</strong> Weighted RMS Acceleration [m/s²]<br><strong>단위:</strong> m/s²</div>
+        <div class="sp-warn">⚠ Simpack 후처리에서 ISO 2631 가중 필터를 적용하여 a_w 계산 가능. 센서 위치(CG, 시트, 스티어링 휠)에 따라 값이 다름. 실차 비교 시 센서 위치 일치 필수.</div>
+      </div>
+      </div>
+    </div>
+</section>
+
+<!-- ⑨ Deep Dive -->
+<section class="section">
+  <div class="section-label">Deep Dive</div>
+  <h2 class="section-title">심화 학습</h2>
+  
+    <div class="accordion">
+      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <span>💡 PART 2 총정리 — 쿼터카→하프카→전달함수→승차감 평가 체계 — 클릭하여 펼치기</span>
+        <span class="accordion-arrow">▼</span>
+      </button>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+        <p>7일간의 PART 2 학습 체계:</p>
+        <p>Day 08-09: 쿼터카 2DOF → 바디 바운스/휠 홉 주파수
+Day 10-11: 하프카 4DOF → 바운스/피치 연성, flat ride
+Day 12: 전달함수 H(s) → 입출력 관계의 주파수 영역 표현
+Day 13: 전달률 T(ω) → 방진 설계, √2 교차점
+Day 14: 노면 PSD + ISO 2631 → 승차감 최종 평가</p>
+        <p>이 체계가 서스펜션 엔지니어의 핵심 워크플로우:
+1. 차량 파라미터 설정 → 2. 모델 구축(쿼터카/하프카) → 3. 고유진동수 확인
+4. 전달함수/전달률 분석 → 5. 실제 노면 가진 적용 → 6. 승차감 지표 평가</p>
+        <p>PART 3(Day 15~)에서는 서스펜션 하드웨어 구성요소(스프링, 댐퍼, 부시, 스태빌라이저)의 비선형 특성과 모델링을 배웁니다.</p>
+        </div>
+      </div>
+    
+    <div class="accordion" style="margin-top:12px">
+      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <span>💡 ISO 8608 노면 등급 — A~H 클래스</span>
+        <span class="accordion-arrow">▼</span>
+      </button>
+      <div class="accordion-content" id="deepdive2">
+        <div class="accordion-inner">
+        <p><strong>■ 노면 분류 체계</strong></p>
+<p>기준 주파수 n₀ = 0.1 cycle/m에서의 PSD 값으로 등급 결정:</p>
+<p>A (매우 좋음): S(n₀) = 1×10⁻⁶ m³ — 신축 고속도로</p>
+<p>B (좋음): 4×10⁻⁶ — 일반 고속도로</p>
+<p>C (보통): 16×10⁻⁶ — 시내 도로</p>
+<p>D (나쁨): 64×10⁻⁶ — 노후 도로</p>
+<p><strong>■ 실무 적용</strong></p>
+<p>OEM 승차감 평가: B~C 등급 노면 사용</p>
+<p>Simpack Road Profile: ISO 8608 기반 랜덤 노면 자동 생성 가능</p>
+        </div>
+      </div>
+    </div>
+</div>
+</section>
+
+
+<!-- Vehicle Example -->
+<section class="section">
+  <div class="section-label">Vehicle Application</div>
+  <h2 class="section-title">실차 적용</h2>
+  <div class="vehicle-example">
+  <h4>🚗 레퍼런스 차량 승차감 평가 시나리오</h4>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0">
+    <div><p>노면: ISO B등급</p><p>차속: 80 km/h (22.2 m/s)</p></div>
+    <div><p>평가 기준: ISO 2631</p><p>타겟: a_w < 0.4 m/s²</p></div>
+  </div>
+  <p><strong>가진 주파수 범위:</strong></p>
+  <div class="calc">n = 0.01~10 cycle/m → f = 0.22~222 Hz (@80km/h)</div>
+  <p><strong>인체 민감 대역:</strong></p>
+  <div class="calc">4~8 Hz (ISO W_k 가중) → 노면 n = 0.18~0.36 cycle/m에 해당</div>
+</div>
+</section>
+
+<!-- Memory Hook -->
+<section class="section">
+  <div class="section-label">Memory Hook</div>
+  <h2 class="section-title">기억 고리</h2>
+  <div class="memory-hook">
+  <strong>🧠 암기법 — "PSD = Pizza Size Distribution"</strong><br>
+  🍕 큰 피자(저주파) = 큰 요철 / 🍕 작은 피자(고주파) = 잔 요철<br>
+  노면 PSD = 피자 크기별 분포도! 속도(V)가 빠르면 피자가 빨리 지나감 → f = n×V
+</div>
+</section>
+
+<!-- ⑩ 퀴즈 -->
+<section class="section">
+  <div class="section-label">Quiz</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
+  
+    <div class="quiz-card">
+      <div class="quiz-num">QUESTION 01 — 수식 빈칸 채우기</div>
+      <p class="quiz-q">노면 PSD의 공간주파수 n을 시간주파수 f로 변환하는 식은 f = n × ___?</p>
+      <div class="quiz-options" id="q1">
+      <div class="quiz-opt" onclick="checkAnswer('q1',this,false)">A. ωₙ</div>
+      <div class="quiz-opt" onclick="checkAnswer('q1',this,true)">B. V (차속)</div>
+      <div class="quiz-opt" onclick="checkAnswer('q1',this,false)">C. 2π</div>
+      <div class="quiz-opt" onclick="checkAnswer('q1',this,false)">D. k/m</div>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    <div class="solution-panel" id="q1-sol">
+  <div class="sol-header">📝 풀이: 공간→시간 주파수 변환</div>
+  <div class="sol-step"><span class="sol-num">1</span>n: 공간주파수 [cycle/m] — 도로 위의 파형</div>
+  <div class="sol-step"><span class="sol-num">2</span>f: 시간주파수 [Hz] — 차에 전달되는 진동</div>
+  <div class="sol-step"><span class="sol-num">3</span>차가 V [m/s]로 달리면: 1초에 V미터 이동</div>
+  <div class="sol-step highlight-step"><span class="sol-num">✓</span>f = n × V → 정답: B (차속)</div>
+  <div class="sol-insight">💡 같은 노면도 속도가 다르면 다른 주파수로 느껴짐! 고속 → 고주파</div>
+</div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-num">QUESTION 02 — 물리적 의미 연결</div>
+      <p class="quiz-q">ISO 2631에서 a_w = 0.5 m/s²의 승차감 등급은?</p>
+      <div class="quiz-options" id="q2">
+      <div class="quiz-opt" onclick="checkAnswer('q2',this,false)">A. 쾌적</div>
+      <div class="quiz-opt" onclick="checkAnswer('q2',this,true)">B. 약간 불쾌</div>
+      <div class="quiz-opt" onclick="checkAnswer('q2',this,false)">C. 불쾌</div>
+      <div class="quiz-opt" onclick="checkAnswer('q2',this,false)">D. 매우 불쾌</div>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    <div class="solution-panel" id="q2-sol">
+  <div class="sol-header">📝 풀이: ISO 2631 승차감 등급</div>
+  <div class="sol-step"><span class="sol-num">1</span>a_w < 0.315: 쾌적 (Not uncomfortable)</div>
+  <div class="sol-step"><span class="sol-num">2</span>0.315 ≤ a_w < 0.63: 약간 불쾌 (A little uncomfortable)</div>
+  <div class="sol-step highlight-step"><span class="sol-num">✓</span>a_w = 0.5 m/s² → 0.315~0.63 범위 → 약간 불쾌 → 정답: B</div>
+  <div class="sol-insight">💡 승용차 타겟: a_w < 0.4 m/s² (쾌적~약간불쾌 경계)</div>
+</div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-num">QUESTION 03 — Simpack 적용</div>
+      <p class="quiz-q">Simpack에서 노면 가진을 설정할 때 반드시 함께 지정해야 하는 파라미터는?</p>
+      <div class="quiz-options" id="q3">
+      <div class="quiz-opt" onclick="checkAnswer('q3',this,false)">A. 온도</div>
+      <div class="quiz-opt" onclick="checkAnswer('q3',this,true)">B. 차량 속도</div>
+      <div class="quiz-opt" onclick="checkAnswer('q3',this,false)">C. 풍속</div>
+      <div class="quiz-opt" onclick="checkAnswer('q3',this,false)">D. 노면 마찰계수</div>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    <div class="solution-panel" id="q3-sol">
+  <div class="sol-header">📝 풀이: Simpack 노면 가진 설정</div>
+  <div class="sol-step"><span class="sol-num">1</span>노면 프로파일: 공간주파수 n 기반 S(n)</div>
+  <div class="sol-step"><span class="sol-num">2</span>f = n × V → 차속이 있어야 시간 영역 변환 가능</div>
+  <div class="sol-step highlight-step"><span class="sol-num">✓</span>차량 속도를 반드시 함께 지정 → 정답: B</div>
+  <div class="sol-insight">💡 Simpack에서 Road > Random > ISO 8608 선택 후, Vehicle Speed 필수 입력!</div>
+</div>
+    </div>
+</section>
+
+<!-- ⑪ 간격 반복 + 내일 예고 -->
+<section class="section">
+  <div class="section-label">Spaced Repetition</div>
+  <h2 class="section-title">간격 반복 스케줄</h2>
+  <div class="sr-track">
+    <div class="sr-dot today"><span>D+0</span><span class="sr-label">오늘</span></div>
+    <div class="sr-dot future"><span>D+1</span><span class="sr-label">내일</span></div>
+    <div class="sr-dot future"><span>D+3</span><span class="sr-label">3일후</span></div>
+    <div class="sr-dot future"><span>D+7</span><span class="sr-label">7일후</span></div>
+    <div class="sr-dot future"><span>D+14</span><span class="sr-label">14일후</span></div>
+  </div>
+  
+    <div class="next-preview">
+      <h4>→ Day 15 미리보기 — PART 3 시작!</h4>
+      <p>서스펜션 스프링 모델링 — 선형 스프링 vs 비선형(progressive) 스프링. 스프링 특성 곡선 F-δ와 Simpack Force Element 설정.</p>
+    </div>
+</section>
+
+<!-- Navigation -->
+<div class="nav-links">
+  <a href="Day13_전달률방진설계.html">← Day 13: 전달률과 방진 설계</a>
+  <a href="index.html">📋 목차</a>
+  <a href="Day15_Part2복습.html">Day 15: Part 2 통합 복습 →</a>
+</div>
+
+<div class="footer">
+  YS · Vehicle Dynamics Study Series — Day 14 of 33<br>
+  Designed for 25-min Pomodoro sessions · Vehicle Dynamics Study
+</div>
+
+</div>
+
+<script>
+function toggleAccordion(btn){
+  const c=btn.nextElementSibling;const a=btn.querySelector('.accordion-arrow');
+  c.classList.toggle('open');a.style.transform=c.classList.contains('open')?'rotate(180deg)':'rotate(0deg)';
+}
+function toggleAnswer(qId){
+  const fb=document.getElementById(qId+'-fb');
+  if(fb.style.display==='none'){fb.style.display='block';}else{fb.style.display='none';}
+}
+function checkAnswer(qId,el,isCorrect){
+  const opts=document.querySelectorAll('#'+qId+' .quiz-opt');
+  const fb=document.getElementById(qId+'-fb');
+  const sol=document.getElementById(qId+'-sol');
+  opts.forEach(o=>{
+    o.classList.add('disabled');
+    if(o===el) o.classList.add(isCorrect?'correct':'wrong');
+    if(!isCorrect&&o.getAttribute('onclick')&&o.getAttribute('onclick').includes('true')) o.classList.add('correct');
+  });
+  fb.classList.add('show');
+  fb.classList.add(isCorrect?'correct-fb':'wrong-fb');
+  fb.textContent=isCorrect?'✅ 정답입니다! 아래에서 상세 풀이를 확인하세요.':'❌ 오답입니다. 아래 풀이를 통해 정답을 확인하세요.';
+  if(sol) sol.classList.add('show');
+});
+  fb.classList.add('show');
+  fb.classList.add(isCorrect?'correct-fb':'wrong-fb');
+  
+    if(qId==='q1'){
+      if(isCorrect) fb.textContent='정답! f = n × V. 차속이 빠를수록 같은 요철이 높은 시간주파수로 변환.';
+      else fb.textContent='오답. 정답은 B. 공간주파수 × 차속 = 시간주파수. f[Hz] = n[cycle/m] × V[m/s].';
+    }
+    if(qId==='q2'){
+      if(isCorrect) fb.textContent='정답! 0.315 &lt; 0.5 &lt; 0.63이므로 &#x27;약간 불쾌&#x27; 등급.';
+      else fb.textContent='오답. 정답은 B. a_w=0.5는 0.315~0.63 범위 → &#x27;약간 불쾌&#x27;.';
+    }
+    if(qId==='q3'){
+      if(isCorrect) fb.textContent='정답! 차속이 공간주파수→시간주파수 변환을 결정. 동일 노면도 속도에 따라 가진이 다름.';
+      else fb.textContent='오답. 정답은 B. 노면 공간 프로파일이 같아도 차속에 따라 시간 가진이 달라짐.';
+    }
+}
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.style.opacity='1';x.target.style.transform='translateY(0)'}});},{threshold:.1});
+document.querySelectorAll('.section').forEach(s=>{s.style.opacity='0';s.style.transform='translateY(24px)';s.style.transition='opacity .6s ease, transform .6s ease';obs.observe(s);});
+</script>
+
+
+
+<script>
+/* ══════ Interactive Formula Explorer ══════ */
+const EQ_DATA = {
+  'ω': {sym:'ω', name:'각진동수 (Angular Frequency)', unit:'rad/s', xm3:'', meaning:'1초 동안 회전하는 라디안 수. 2πf와 같음'},
+  'ωₙ': {sym:'ωₙ', name:'고유진동수 (Natural Frequency)', unit:'rad/s', xm3:'8.04 rad/s (바운스)', meaning:'외력 없이 시스템이 자유진동하는 고유한 주파수'},
+  'ω_n': {sym:'ωₙ', name:'고유진동수 (Natural Frequency)', unit:'rad/s', xm3:'8.04 rad/s (바운스)', meaning:'외력 없이 시스템이 자유진동하는 고유한 주파수'},
+  'fₙ': {sym:'fₙ', name:'고유주파수 (Natural Freq in Hz)', unit:'Hz (= cycles/s)', xm3:'1.28 Hz', meaning:'ωₙ/2π. 1초 동안 진동 왕복 횟수'},
+  'f_n': {sym:'fₙ', name:'고유주파수 (Natural Freq in Hz)', unit:'Hz (= cycles/s)', xm3:'1.28 Hz', meaning:'ωₙ/2π. 1초 동안 진동 왕복 횟수'},
+  'ζ': {sym:'ζ (제타)', name:'감쇠비 (Damping Ratio)', unit:'무차원', xm3:'0.512', meaning:'임계감쇠 대비 실제 감쇠의 비율. 0=무감쇠, 1=임계감쇠'},
+  'mₛ': {sym:'mₛ', name:'스프링상 질량 (Sprung Mass)', unit:'kg', xm3:'340 kg (¼차량)', meaning:'서스펜션 위의 차체 질량. 승차감의 관성 결정'},
+  'm_s': {sym:'mₛ', name:'스프링상 질량 (Sprung Mass)', unit:'kg', xm3:'340 kg (¼차량)', meaning:'서스펜션 위의 차체 질량. 승차감의 관성 결정'},
+  'mᵤ': {sym:'mᵤ', name:'스프링하 질량 (Unsprung Mass)', unit:'kg', xm3:'45 kg', meaning:'서스펜션 아래의 휠+타이어+너클 질량'},
+  'm_u': {sym:'mᵤ', name:'스프링하 질량 (Unsprung Mass)', unit:'kg', xm3:'45 kg', meaning:'서스펜션 아래의 휠+타이어+너클 질량'},
+  'kₛ': {sym:'kₛ', name:'스프링 강성 (Spring Rate)', unit:'N/mm', xm3:'22 N/mm', meaning:'단위 변위당 복원력. 높으면 딱딱, 낮으면 부드러움'},
+  'k_s': {sym:'kₛ', name:'스프링 강성 (Spring Rate)', unit:'N/mm', xm3:'22 N/mm', meaning:'단위 변위당 복원력. 높으면 딱딱, 낮으면 부드러움'},
+  'kₜ': {sym:'kₜ', name:'타이어 강성 (Tire Stiffness)', unit:'N/mm', xm3:'220 N/mm', meaning:'타이어의 수직 강성. 스프링의 약 10배'},
+  'k_t': {sym:'kₜ', name:'타이어 강성 (Tire Stiffness)', unit:'N/mm', xm3:'220 N/mm', meaning:'타이어의 수직 강성. 스프링의 약 10배'},
+  'cₛ': {sym:'cₛ', name:'댐퍼 감쇠계수 (Damping Coeff)', unit:'N·s/m', xm3:'2,800 N·s/m', meaning:'속도에 비례하는 감쇠력 계수. 에너지 소산율 결정'},
+  'c_s': {sym:'cₛ', name:'댐퍼 감쇠계수 (Damping Coeff)', unit:'N·s/m', xm3:'2,800 N·s/m', meaning:'속도에 비례하는 감쇠력 계수. 에너지 소산율 결정'},
+  'c': {sym:'c', name:'감쇠계수 (Damping Coefficient)', unit:'N·s/m', xm3:'2,800 N·s/m', meaning:'속도에 비례하는 저항력 계수'},
+  'k': {sym:'k', name:'강성 (Stiffness)', unit:'N/m', xm3:'22,000 N/m', meaning:'단위 변위당 복원력의 크기'},
+  'm': {sym:'m', name:'질량 (Mass)', unit:'kg', xm3:'340 kg', meaning:'관성의 척도. 클수록 가속이 어려움'},
+  'x': {sym:'x(t)', name:'변위 (Displacement)', unit:'m (또는 mm)', xm3:'—', meaning:'평형 위치로부터의 거리. 시간의 함수'},
+  'ẋ': {sym:'ẋ = dx/dt', name:'속도 (Velocity)', unit:'m/s', xm3:'—', meaning:'변위의 시간 미분. 운동 방향과 빠르기'},
+  'ẍ': {sym:'ẍ = d²x/dt²', name:'가속도 (Acceleration)', unit:'m/s²', xm3:'—', meaning:'속도의 시간 미분. 힘에 비례 (F=ma)'},
+  'Tₙ': {sym:'Tₙ', name:'고유주기 (Natural Period)', unit:'s', xm3:'0.78 s', meaning:'1/fₙ. 한 번 완전히 왕복하는 데 걸리는 시간'},
+  'T_n': {sym:'Tₙ', name:'고유주기 (Natural Period)', unit:'s', xm3:'0.78 s', meaning:'1/fₙ. 한 번 완전히 왕복하는 데 걸리는 시간'},
+  'δ': {sym:'δ', name:'정적 처짐 (Static Deflection)', unit:'mm', xm3:'~15 mm', meaning:'중력에 의한 스프링 처짐. mg/k'},
+  'φ': {sym:'φ', name:'위상각 (Phase Angle)', unit:'rad', xm3:'—', meaning:'입력 대비 응답의 시간 지연을 각도로 표현'},
+  'H': {sym:'H(ω)', name:'주파수응답함수 (FRF)', unit:'무차원 또는 mm/N', xm3:'—', meaning:'주파수별 입력 대비 출력의 크기와 위상'},
+  'PSD': {sym:'PSD', name:'파워스펙트럼밀도', unit:'g²/Hz 또는 m²/s³', xm3:'—', meaning:'주파수 대역별 에너지 분포. 노면 거칠기 표현'},
+};
+
+// 터치 디바이스 지원
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.eq-explorer').forEach(el => {
+    el.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      // 다른 모든 활성 툴팁 닫기
+      document.querySelectorAll('.eq-explorer.active').forEach(a => {
+        if (a !== el) a.classList.remove('active');
+      });
+      el.classList.toggle('active');
+    });
+  });
+  // 빈 곳 터치하면 모든 툴팁 닫기
+  document.addEventListener('touchstart', function(e) {
+    if (!e.target.closest('.eq-explorer')) {
+      document.querySelectorAll('.eq-explorer.active').forEach(a => a.classList.remove('active'));
+    }
+  });
+});
+
+// 파라미터 테이블의 .sym 요소에 탐색기 기능 자동 부착
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.sym, .calc').forEach(el => {
+    const text = el.textContent.trim();
+    // EQ_DATA에서 매칭 시도
+    for (const [key, data] of Object.entries(EQ_DATA)) {
+      if (text.includes(key) || text === key) {
+        el.classList.add('eq-explorer');
+        el.style.position = 'relative';
+        el.setAttribute('tabindex', '0');
+        el.setAttribute('role', 'button');
+        el.setAttribute('aria-label', data.name);
+        const tooltip = document.createElement('div');
+        tooltip.className = 'eq-tooltip';
+        tooltip.innerHTML = '<div class="tt-symbol">' + data.sym + '</div>'
+          + '<div class="tt-name">' + data.name + '</div>'
+          + '<div class="tt-unit">단위: ' + data.unit + '</div>'
+          + (data.xm3 ? '<div class="tt-xm3">' + data.xm3 + '</div>' : '')
+          + '<div class="tt-meaning">' + data.meaning + '</div>';
+        el.appendChild(tooltip);
+        break;
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>

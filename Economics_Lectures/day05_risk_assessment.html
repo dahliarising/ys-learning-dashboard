@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 05 | 위험 수용도 진단 & 자산 배분 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #9A9890;
+  --text-dim: #5A584F;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 05 / 23</span>
+    <span class="header-title">위험 수용도 진단 & 자산 배분</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 1 · 부자 마인드셋 & 자산 기초</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 1 — 부자 마인드셋 & 자산 기초</div>
+  <h1 class="hero-day">Day 05</h1>
+  <h2 class="hero-subtitle">위험 수용도 진단 & 자산 배분</h2>
+  <p class="hero-quote">"리스크는 당신이 무엇을 하고 있는지 모를 때 온다." — 워런 버핏</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 1: 01~07</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:21.7%"></div></div>
+    <div class="progress-label"><span>Day 05</span><span>5 / 23 완료 (21.7%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 편도체와 위험 인식</h3>
+    <p>편도체는 금전적 손실에 이익보다 2배 강하게 반응합니다(Kahneman의 전망 이론). 이를 이해하면 자신의 위험 수용도를 객관적으로 진단할 수 있습니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">0–7분</td><td>위험 수용도 자가 진단 테스트</td><td>개념 카드</td></tr>
+<tr><td class="time-col">7–14분</td><td>연령·부채·목표별 자산 배분 원칙</td><td>수식 + 원칙</td></tr>
+<tr><td class="time-col">14–20분</td><td>현재 포트폴리오 진단 SVG</td><td>시각화 분석</td></tr>
+<tr><td class="time-col">20–23분</td><td>목표 포트폴리오 설계</td><td>자기 적용</td></tr>
+<tr><td class="time-col">23–25분</td><td>복습 퀴즈</td><td>능동적 회상</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">위험 수용도 진단 & 자산 배분</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">위험 수용도 진단 — 5가지 질문</div>
+      <div class="card-body"><p>자신의 투자 성향을 객관적으로 파악합니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">위험 수용도 진단 매트릭스 (학습자 적용):</div>
+<br>
+<div class="formula-line">  ① 연령 점수: 38세 → 100-38 = <span class="formula-highlight">62점</span> (주식 비율 기준)</div>
+<div class="formula-line">  ② 부채 비율: 57% → <span class="formula-blue">감점 -10</span> (50% 초과 시)</div>
+<div class="formula-line">  ③ 비상금: 6개월분 미보유 → <span class="formula-blue">감점 -5</span></div>
+<div class="formula-line">  ④ 안정 소득: 맞벌이 직장인 → <span class="formula-highlight">가점 +10</span></div>
+<div class="formula-line">  ⑤ 투자 지식: 분석적 성향(엔지니어) → <span class="formula-highlight">가점 +5</span></div>
+<br>
+<div class="formula-line">  종합 점수: 62 - 10 - 5 + 10 + 5 = <span class="formula-highlight">62점</span></div>
+<div class="formula-comment">// 60~70점: "균형 성장형" — 주식 55~65%, 안전자산 35~45% 권장</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">자산 배분 원칙 — 연령 기반 공식</div>
+      <div class="card-body"><p>글로벌 자산 배분의 기본 프레임워크입니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">전통적 공식 (Princeton Vanguard):</div>
+<div class="formula-line">  주식 비율 = 100 - 나이 = 100 - 38 = <span class="formula-highlight">62%</span></div>
+<div class="formula-line">  채권/안전자산 = 나이 = <span class="formula-blue">38%</span></div>
+<br>
+<div class="formula-highlight">현대적 수정 공식 (기대수명 증가 반영):</div>
+<div class="formula-line">  주식 비율 = 110 - 나이 = 110 - 38 = <span class="formula-highlight">72%</span></div>
+<div class="formula-line">  안전자산 = 나이 - 8 = <span class="formula-blue">30%</span></div>
+<br>
+<div class="formula-highlight">학습자 권장 배분 (부채 58% 반영):</div>
+<div class="formula-line">  주식/ETF:     <span class="formula-highlight">55~60%</span> (변동성 감내력 있음)</div>
+<div class="formula-line">  부동산 (자가): <span class="formula-blue">현재 비중 유지</span> (담보자산 역할)</div>
+<div class="formula-line">  채권/예금:    <span class="formula-highlight">15~20%</span> (안정성)</div>
+<div class="formula-line">  현금 비상금:  <span class="formula-highlight">10~15%</span> (4억 대출 상환 대비)</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">현재 vs 목표 포트폴리오 비교</div>
+      <div class="card-body"><p>학습자 자산(3억 2,800만)의 구성을 진단합니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>자산 유형</th><th>현재 배분</th><th>금액(만원)</th><th>권장 비율</th><th>목표금액</th><th>진단</th></tr></thead>
+<tbody>
+<tr><td>부동산 자가</td><td style="color:var(--blue)">90.9%</td><td>~298M</td><td>40~50%</td><td>131~164M</td><td style="color:var(--gold)">중기 조정</td></tr>
+<tr><td>주식 포트폴리오</td><td style="color:var(--red)">8.5%</td><td>2,800만</td><td>30~40%</td><td>99~131M</td><td style="color:var(--red)">확대 필요</td></tr>
+<tr><td>채권/예금</td><td style="color:var(--red)">0.6%</td><td>2M</td><td>15~20%</td><td>49~66M</td><td style="color:var(--red)">구축 필요</td></tr>
+<tr><td>현금</td><td>미확인</td><td>?</td><td>10~15%</td><td>33~49M</td><td style="color:var(--gold)">중요</td></tr>
+</tbody></table></div>
+<p style="color:var(--gold);font-size:0.85rem;margin-top:0.8rem;"><strong>핵심 진단:</strong> 부동산 90.9%에 집중. 금리 인상 환경에서 월 부채 상환부담(적어도 1,500만/월)을 고려하면 주식 비중 확대가 시급합니다.</p></div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  <div class="chart-container">
+    <div class="chart-title">현재 vs 권장 자산 배분 비교 (학습자 3억 2,800만)</div>
+    <svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+      <!-- 제목 & 범례 -->
+      <text x="400" y="25" fill="#E8E6E1" font-family="Noto Sans KR" font-size="14" text-anchor="middle" font-weight="600">포트폴리오 리밸런싱 전략</text>
+
+      <!-- 현재 배분 (왼쪽) -->
+      <text x="200" y="60" fill="#E8E6E1" font-family="Noto Sans KR" font-size="13" text-anchor="middle" font-weight="500">현재 배분</text>
+      <circle cx="200" cy="180" r="110" fill="none" stroke="#5A584F" stroke-width="1"/>
+      <!-- 부동산 90.9% = 327도 -->
+      <path d="M200,70 A110,110 0 1,1 204,290 L200,180 Z" fill="rgba(74,158,191,0.7)"/>
+      <!-- 주식 8.5% = 30.6도 -->
+      <path d="M204,290 A110,110 0 0,1 235,295 L200,180 Z" fill="rgba(201,168,76,0.8)"/>
+      <!-- 채금 0.6% = 2.16도 -->
+      <path d="M235,295 A110,110 0 0,1 238,295 L200,180 Z" fill="rgba(74,191,122,0.6)"/>
+
+      <text x="140" y="180" fill="#E8E6E1" font-family="Noto Sans KR" font-size="11" text-anchor="middle">부동산</text>
+      <text x="140" y="200" fill="#E8E6E1" font-family="JetBrains Mono" font-size="14" text-anchor="middle" font-weight="600">90.9%</text>
+      <text x="235" y="315" fill="#C9A84C" font-family="JetBrains Mono" font-size="10" text-anchor="middle">주식 8.5%</text>
+
+      <!-- 화살표 -->
+      <g>
+        <path d="M330,180 L420,180" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+        <text x="375" y="165" fill="#C9A84C" font-family="Noto Sans KR" font-size="11" text-anchor="middle" font-weight="500">리밸런싱 목표</text>
+      </g>
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+          <polygon points="0 0, 10 5, 0 10" fill="#C9A84C"/>
+        </marker>
+      </defs>
+
+      <!-- 권장 배분 (오른쪽) -->
+      <text x="600" y="60" fill="#E8E6E1" font-family="Noto Sans KR" font-size="13" text-anchor="middle" font-weight="500">권장 배분</text>
+      <circle cx="600" cy="180" r="110" fill="none" stroke="#5A584F" stroke-width="1"/>
+      <!-- 부동산 45% = 162도 -->
+      <path d="M600,70 A110,110 0 0,1 754,190 L600,180 Z" fill="rgba(74,158,191,0.6)"/>
+      <!-- 주식 35% = 126도 -->
+      <path d="M754,190 A110,110 0 0,1 652,289 L600,180 Z" fill="rgba(201,168,76,0.7)"/>
+      <!-- 채권 12% = 43.2도 -->
+      <path d="M652,289 A110,110 0 0,1 714,318 L600,180 Z" fill="rgba(74,191,122,0.6)"/>
+      <!-- 현금 8% = 28.8도 -->
+      <path d="M714,318 A110,110 0 0,1 754,290 L600,180 Z" fill="rgba(255,255,255,0.12)"/>
+
+      <text x="540" y="200" fill="#4A9EBF" font-family="Noto Sans KR" font-size="11" text-anchor="middle">부동산</text>
+      <text x="540" y="220" fill="#4A9EBF" font-family="JetBrains Mono" font-size="12" text-anchor="middle" font-weight="600">45%</text>
+      <text x="720" y="130" fill="#C9A84C" font-family="Noto Sans KR" font-size="11" text-anchor="middle">주식 35%</text>
+      <text x="710" y="310" fill="#4ABF7A" font-family="JetBrains Mono" font-size="9" text-anchor="start">채권 12%</text>
+      <text x="770" y="280" fill="#9A9890" font-family="JetBrains Mono" font-size="9" text-anchor="start">현금 8%</text>
+
+      <!-- 그리드 라인 -->
+      <line x1="50" y1="340" x2="750" y2="340" stroke="#2A2D36" stroke-width="1"/>
+      <text x="50" y="340" dy="20" fill="#5A584F" font-family="JetBrains Mono" font-size="9">주택 담보대출 4억, 월 부채상환 1,500M+ 고려 필수</text>
+    </svg>
+</div>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  <details class="deep-dive">
+    <summary>현대 포트폴리오 이론(MPT) 기초 — 위험과 수익의 최적 조합</summary>
+    <div class="deep-dive-content">
+      <p><strong>Markowitz의 현대 포트폴리오 이론(MPT):</strong> 투자자는 주어진 위험 수준에서 최대 기대수익을 추구해야 합니다.</p>
+      <p><strong>핵심 개념:</strong></p>
+      <ul style="list-style-position: inside; color: var(--text-secondary); line-height: 1.8;">
+        <li>• <strong>효율의 경계(Efficient Frontier):</strong> 위험 대비 최고 수익을 제공하는 포트폴리오들의 집합</li>
+        <li>• <strong>상관계수(Correlation):</strong> 자산 간 가격 움직임의 독립성 (주식과 부동산은 0.3~0.5로 낮음 = 분산 효과)</li>
+        <li>• <strong>샤프지수(Sharpe Ratio):</strong> 위험단위당 초과수익 = (포트폴리오 수익 - 무위험율) / 표준편차</li>
+      </ul>
+      <p><strong>학습자 상황 적용:</strong> 부동산 90.9%는 단일자산 집중으로 샤프지수 낮음. 주식(수익성) + 채권(안정성)을 추가하면 전체 포트폴리오의 효율성 향상.</p>
+      <div class="formula-block" style="margin-top: 1rem;">
+        <div class="formula-highlight">샤프지수 계산 (가정):</div>
+        <div class="formula-line">  부동산 수익률: 3~4% / 표준편차: 8%</div>
+        <div class="formula-line">  Sharpe = (3.5% - 2.5%) / 8% = <span class="formula-highlight">0.125</span></div>
+        <div class="formula-line">  → 주식 + 채권 혼합 비율로 0.18~0.22 달성 가능</div>
+      </div>
+    </div>
+  </details>
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  <div class="sim-box">
+    <h3>목표 포트폴리오 구축 실행 계획 (3.28억 → 리밸런싱)</h3>
+    <ul class="checklist">
+      <li>Step 1: 현금 비상금 확인 및 구축 (3~6개월 생활비, 약 4,500~9,000만)</li>
+      <li>Step 2: 주식 포트폴리오 확대 계획 (반도체 기존 2,800만 + 신규 5,000만, 총 7,800만 목표)</li>
+      <li>Step 3: 채권/안정자산 추가 (연 3~4% 수익, 현금인출부채 감소 시 우선)</li>
+      <li>Step 4: 6개월마다 리밸런싱 (부동산 가격 변화, 금리 변화에 따른 조정)</li>
+      <li>Step 5: 월부 1,500만원 중 50% 이상을 투자자산으로 분류 (세금 절감)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    <div class="bias-name">손실 회피(Loss Aversion)</div>
+    <p>투자 손실에 대한 고통은 이익의 기쁨보다 약 2배 강합니다. 이것이 부동산 90.9% 집중으로 이어집니다.</p>
+    <span class="neuro-tag">편도체 활성화 (두려움)</span>
+    <span class="engineer-tag">엔지니어 주의: 확률 회피</span>
+    <p><strong>극복 규칙:</strong> "확률로 생각하기" — 개별 자산(부동산) 리스크는 높지만, 포트폴리오 전체로 보면 주식+채권 조합이 표준편차를 낮춥니다. 월부 1,500만 상황에서 주식 35% 추가는 오히려 총 위험을 줄입니다.</p>
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 학습자의 위험 수용도 점수(62점)에 따른 권장 주식 비율은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 40~50%</li>
+<li onclick="checkAnswer(this,'q1',true)">② 55~65%</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 70~80%</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 85~95%</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>60~70점 '균형 성장형'은 주식 55~65% 권장. 안정적 직장(맞벌이) + 분석적 성향이 있지만, 부채 58%를 감안하면 중도적 포지션.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 현대적 자산 배분 공식(110-나이)을 따르면 38세의 권장 주식 비율은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 38%</li>
+<li onclick="checkAnswer(this,'q2',false)">② 62%</li>
+<li onclick="checkAnswer(this,'q2',true)">③ 72%</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 80%</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ③</strong><br>110 - 38 = 72%. 이는 기대수명 증가를 반영한 현대식 공식입니다. 전통(100-38=62%)보다 10% 높습니다.</div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. 학습자가 부동산 90.9%에 집중한 이유로 가장 그릴 것은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 높은 수익률</li>
+<li onclick="checkAnswer(this,'q3',true)">② 손실 회피 편향</li>
+<li onclick="checkAnswer(this,'q3',false)">③ 담보대출 압박</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 분산 투자의 이해</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ②</strong><br>손실 회피는 투자 손실에 대한 공포로 인해 변동성이 낮아 보이는 부동산에 집중하게 합니다. 실제로는 단일자산 리스크가 높습니다.</div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. 부동산과 주식의 상관계수가 0.4일 때, 포트폴리오 리스크의 이점은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① 분산 효과가 거의 없음</li>
+<li onclick="checkAnswer(this,'q4',true)">② 약 30~40% 위험 감소</li>
+<li onclick="checkAnswer(this,'q4',false)">③ 완벽한 헤지 가능</li>
+<li onclick="checkAnswer(this,'q4',false)">④ 부동산만 보유하는 것이 최적</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ②</strong><br>상관계수 0.4는 중간 정도. 부동산 90% + 주식 10%보다 부동산 45% + 주식 35% + 채권 12% + 현금 8%이 전체 포트폴리오 표준편차를 약 30~40% 낮춥니다.</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 05</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 12일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 14일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 18일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">03월 25일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 10일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day04_mortgage_optimization.html">← Day 04</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 05 / 23</span>
+  <a class="nav-btn" href="day06_behavioral_finance.html">Day 06 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 05 - 5-7세 인지 발달 — 마법적 사고와 논리 싹</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            background-color: #0A0C10;
+            color: #E0E0E0;
+            font-family: 'Noto Sans KR', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0A0C10;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #4ABF8A;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2d8c5f;
+        }
+        
+        /* Fade Up Animation */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-up {
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-bottom: 2px solid #4ABF8A;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(74, 191, 138, 0.15);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4ABF8A;
+            letter-spacing: 1px;
+        }
+        
+        .header-day {
+            background: #181C24;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border-left: 3px solid #C9A84C;
+            font-weight: 600;
+            color: #C9A84C;
+        }
+        
+        .timer-btn {
+            background: linear-gradient(135deg, #4ABF8A 0%, #2d8c5f 100%);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(74, 191, 138, 0.3);
+        }
+        
+        .timer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(74, 191, 138, 0.4);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            margin: 50vh auto;
+            transform: translateY(-50%);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            border: 2px solid #4ABF8A;
+            box-shadow: 0 8px 24px rgba(74, 191, 138, 0.25);
+        }
+        
+        .modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: #4ABF8A;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .timer-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3rem;
+            text-align: center;
+            color: #C9A84C;
+            margin: 1.5rem 0;
+            font-weight: 700;
+        }
+        
+        .timer-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        
+        .timer-controls button {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .start-btn {
+            background: #4ABF8A;
+            color: white;
+        }
+        
+        .start-btn:hover {
+            background: #2d8c5f;
+        }
+        
+        .close-btn {
+            background: #E85D5D;
+            color: white;
+        }
+        
+        .close-btn:hover {
+            background: #c93d3d;
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+            border-left: 5px solid #4ABF8A;
+            box-shadow: 0 4px 12px rgba(74, 191, 138, 0.15);
+        }
+        
+        .part-label {
+            color: #C9A84C;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #4ABF8A;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .hero-subtitle {
+            color: #B0B0B0;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+        
+        .hero-oneliner {
+            color: #E0E0E0;
+            font-size: 1rem;
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            border-left: 3px solid #C9A84C;
+        }
+        
+        .badges {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #181C24;
+            border: 2px solid #4ABF8A;
+            color: #4ABF8A;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        /* Section */
+        .section {
+            margin-bottom: 3rem;
+        }
+        
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: #4ABF8A;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #C9A84C;
+        }
+        
+        /* Strategy Box */
+        .strategy-box {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-left: 5px solid #C9A84C;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(201, 168, 76, 0.1);
+        }
+        
+        .strategy-title {
+            color: #C9A84C;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .strategy-content {
+            color: #D0D0D0;
+            line-height: 1.8;
+        }
+        
+        /* Time Table */
+        .time-table {
+            background: #12151B;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            border: 1px solid #4ABF8A;
+        }
+        
+        .time-row {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            border-bottom: 1px solid #2a3038;
+            padding: 1rem;
+        }
+        
+        .time-row:last-child {
+            border-bottom: none;
+        }
+        
+        .time-col-time {
+            color: #C9A84C;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            padding-right: 1rem;
+        }
+        
+        .time-col-activity {
+            color: #D0D0D0;
+        }
+        
+        /* Science Cards */
+        .science-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (min-width: 768px) {
+            .science-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .science-card {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 2px solid #4ABF8A;
+            box-shadow: 0 4px 12px rgba(74, 191, 138, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .science-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(74, 191, 138, 0.25);
+        }
+        
+        .science-card-title {
+            color: #4ABF8A;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .science-card-content {
+            color: #D0D0D0;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+        
+        .why-box {
+            background: #0A0C10;
+            border-left: 4px solid #C9A84C;
+            padding: 1rem;
+            border-radius: 6px;
+            color: #E0E0E0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .why-label {
+            color: #C9A84C;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* SVG Diagram */
+        .diagram-container {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 2px solid #4ABF8A;
+            overflow-x: auto;
+        }
+        
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Practice Guide */
+        .practice-section {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            border-left: 5px solid #4ABF8A;
+        }
+        
+        .script-container {
+            margin-bottom: 2rem;
+        }
+        
+        .script-box {
+            background: #0A0C10;
+            border-left: 4px solid #4ABF8A;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .script-label {
+            color: #C9A84C;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        }
+        
+        .dialogue {
+            color: #D0D0D0;
+            line-height: 1.8;
+        }
+        
+        .character {
+            color: #4ABF8A;
+            font-weight: 700;
+        }
+        
+        .do-dont {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .do-dont {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .do-box, .dont-box {
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .do-box {
+            background: rgba(74, 191, 138, 0.15);
+            border-left: 4px solid #4ABF8A;
+        }
+        
+        .dont-box {
+            background: rgba(232, 93, 93, 0.15);
+            border-left: 4px solid #E85D5D;
+        }
+        
+        .do-title, .dont-title {
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+        
+        .do-title {
+            color: #4ABF8A;
+        }
+        
+        .dont-title {
+            color: #E85D5D;
+        }
+        
+        .do-content, .dont-content {
+            color: #D0D0D0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        /* Tip Box */
+        .tip-box {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            border-left: 5px solid #C9A84C;
+            box-shadow: 0 4px 12px rgba(201, 168, 76, 0.1);
+            margin-bottom: 3rem;
+        }
+        
+        .tip-title {
+            color: #C9A84C;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tip-content {
+            color: #D0D0D0;
+            line-height: 1.8;
+        }
+        
+        /* Quiz Section */
+        .quiz-container {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 2px solid #4ABF8A;
+            margin-bottom: 2rem;
+        }
+        
+        .quiz-title {
+            color: #4ABF8A;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .quiz-question {
+            color: #E0E0E0;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .quiz-option {
+            background: #0A0C10;
+            border: 2px solid #2a3038;
+            color: #D0D0D0;
+            padding: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quiz-option:hover {
+            border-color: #4ABF8A;
+        }
+        
+        .quiz-option.selected {
+            background: #4ABF8A;
+            color: #0A0C10;
+            border-color: #4ABF8A;
+            font-weight: 600;
+        }
+        
+        .quiz-option.correct {
+            background: #4ABF8A;
+            border-color: #4ABF8A;
+            color: #0A0C10;
+        }
+        
+        .quiz-option.incorrect {
+            background: #E85D5D;
+            border-color: #E85D5D;
+            color: white;
+        }
+        
+        .quiz-feedback {
+            color: #C9A84C;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #0A0C10;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .quiz-feedback.show {
+            display: block;
+        }
+        
+        .submit-btn {
+            background: #4ABF8A;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background: #2d8c5f;
+        }
+        
+        /* Spaced Repetition */
+        .spaced-rep {
+            background: #0A0C10;
+            border: 2px solid #C9A84C;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .rep-label {
+            color: #C9A84C;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .rep-schedule {
+            color: #D0D0D0;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .header-left {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .modal-content {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-left">
+            <div class="header-title">과학적 육아 스터디</div>
+            <div class="header-day">DAY 05 / 21</div>
+        </div>
+        <button class="timer-btn" onclick="openTimerModal()">🍅 25분 Pomodoro</button>
+    </header>
+    
+    <!-- Timer Modal -->
+    <div id="timerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Pomodoro Timer</div>
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            <div class="timer-controls">
+                <button class="start-btn" id="startBtn" onclick="startTimer()">START</button>
+                <button class="close-btn" onclick="closeTimerModal()">CLOSE</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero fade-up">
+            <div class="part-label">PART 1 — 발달심리 기초</div>
+            <h1 class="hero-title">5-7세 인지 발달<br>— 마법적 사고와 논리 싹</h1>
+            <p class="hero-subtitle">Piaget 전조작기에서 구체적 조작기로의 전환</p>
+            <p class="hero-oneliner">"6살 아이의 '왜요?' 질문은 인지 발달의 가장 아름다운 신호다"</p>
+            <div class="badges">
+                <span class="badge">첫째(5-7세)</span>
+            </div>
+        </section>
+        
+        <!-- Section 1: Learning Strategy -->
+        <section class="section fade-up">
+            <h2 class="section-title">① 학습 전략</h2>
+            <div class="strategy-box">
+                <div class="strategy-title">오늘의 학습 포인트</div>
+                <div class="strategy-content">
+                    5-7세 아이는 Jean Piaget의 발달 단계에서 전조작기(Preoperational)에서 
+                    구체적 조작기(Concrete Operational)로 전환하는 시기입니다. 
+                    이 시기의 특징인 마법적 사고, 자기중심성, 보존 개념의 미발달을 이해하고, 
+                    아이의 끝없는 "왜요?" 질문에 발달에 맞게 응답하는 방법을 배웁니다. 
+                    형제자매와의 갈등이 이 인지 발달 특성과 어떻게 연결되는지도 탐색합니다.
+                </div>
+            </div>
+            
+            <div class="time-table">
+                <div class="time-row">
+                    <div class="time-col-time">0-3분</div>
+                    <div class="time-col-activity">Piaget 인지 발달 단계 개요</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col-time">3-8분</div>
+                    <div class="time-col-activity">마법적 사고: "나의 생각이 현실을 만든다"</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col-time">8-13분</div>
+                    <div class="time-col-activity">자기중심성과 보존 개념</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col-time">13-18분</div>
+                    <div class="time-col-activity">"왜요?" 질문 폭발: 인지 발달의 신호</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col-time">18-23분</div>
+                    <div class="time-col-activity">다양한 "왜?" 질문 응답 스크립트</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col-time">23-25분</div>
+                    <div class="time-col-activity">퀴즈 및 정리</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 2: Science Cards -->
+        <section class="section fade-up">
+            <h2 class="section-title">② 5-7세 인지 발달의 특징</h2>
+            <div class="science-cards">
+                <div class="science-card">
+                    <div class="science-card-title">🧠 전조작기 → 구체적 조작기</div>
+                    <div class="science-card-content">
+                        5-7세는 두 인지 단계의 중간에 있습니다. 
+                        여전히 마법적 사고를 하지만, 이제 논리적 사고의 싹이 튼 시기입니다. 
+                        구체적인 물체나 상황에서는 논리를 적용할 수 있지만, 
+                        추상적인 개념에서는 여전히 어려움을 겪습니다.
+                    </div>
+                    <div class="why-box">
+                        <div class="why-label">이래서 아이가 이렇게 행동해요</div>
+                        우리가 "철학적인 질문"이라고 생각하는 것들(죽음, 신, 시간 등)을 
+                        갑자기 묻기 시작하고, 때론 매우 실질적인 답을 기대합니다.
+                    </div>
+                </div>
+                
+                <div class="science-card">
+                    <div class="science-card-title">✨ 마법적 사고 (Magical Thinking)</div>
+                    <div class="science-card-content">
+                        5-7세 아이는 자신의 생각이 현실을 만들 수 있다고 믿습니다. 
+                        "엄마가 아프면 안 된다고 생각했는데도 아파졌어" 
+                        → 자신의 생각이 나쁜 일을 초래했다고 믿습니다.
+                    </div>
+                    <div class="why-box">
+                        <div class="why-label">이래서 아이가 이렇게 행동해요</div>
+                        형제자매에게 화내고 난 후 형제가 아프면 극심한 죄책감을 느낍니다. 
+                        "내가 '죽어'라고 생각했기 때문"이라고 진지하게 믿습니다.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="science-cards">
+                <div class="science-card">
+                    <div class="science-card-title">🔍 자기중심성 (Egocentrism)</div>
+                    <div class="science-card-content">
+                        5-7세는 자신의 관점이 유일하다고 생각합니다. 
+                        다른 사람의 입장에서 생각하는 것이 매우 어렵습니다. 
+                        하지만 7-8세가 되면서 점차 "탈중심화(decentration)"가 일어납니다.
+                    </div>
+                    <div class="why-box">
+                        <div class="why-label">이래서 아이가 이렇게 행동해요</div>
+                        형제가 놀고 싶어할 때 자신의 기분에만 집중하고, 
+                        "동생이 슬퍼할 수 있다"는 생각을 하지 못합니다. 
+                        형제 갈등의 핵심 원인입니다.
+                    </div>
+                </div>
+                
+                <div class="science-card">
+                    <div class="science-card-title">📦 보존 개념 (Conservation)</div>
+                    <div class="science-card-content">
+                        "모양이 변해도 양은 같다"는 개념이 아직 미발달했습니다. 
+                        예: 긴 잔의 물을 넓은 컵에 붓으면 "줄어들었다"고 생각합니다. 
+                        이는 8세경에 획득되는 개념입니다.
+                    </div>
+                    <div class="why-box">
+                        <div class="why-label">이래서 아이가 이렇게 행동해요</div>
+                        손가락 두 개로 받은 과자가 "더 적다"고 생각하고, 
+                        공평하게 나눴는데도 "불공평하다"고 투정을 부립니다.
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 3: SVG Diagram -->
+        <section class="section fade-up">
+            <h2 class="section-title">③ Piaget 인지 발달 단계 (5-7세 위치 표시)</h2>
+            <div class="diagram-container">
+                <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Title -->
+                    <text x="450" y="30" text-anchor="middle" font-size="20" font-weight="bold" fill="#4ABF8A">
+                        Piaget 인지 발달 4단계
+                    </text>
+                    
+                    <!-- Stage 1: Sensorimotor -->
+                    <rect x="50" y="80" width="180" height="380" rx="8" fill="#181C24" stroke="#4ABF8A" stroke-width="2"/>
+                    <text x="140" y="110" text-anchor="middle" font-size="13" font-weight="bold" fill="#4ABF8A">
+                        감각운동기
+                    </text>
+                    <text x="140" y="130" text-anchor="middle" font-size="11" fill="#D0D0D0">
+                        (0-2세)
+                    </text>
+                    <text x="140" y="160" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 감각과 움직임
+                    </text>
+                    <text x="140" y="180" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 대상 영속성
+                    </text>
+                    <text x="140" y="200" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 도구 사용
+                    </text>
+                    <text x="140" y="220" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 언어 시작
+                    </text>
+                    <text x="140" y="240" text-anchor="middle" font-size="10" fill="#B0B0B0">
+                        구체적 행동만
+                    </text>
+                    <text x="140" y="260" text-anchor="middle" font-size="10" fill="#B0B0B0">
+                        가능
+                    </text>
+                    
+                    <!-- Stage 2: Preoperational -->
+                    <rect x="260" y="80" width="180" height="380" rx="8" fill="#181C24" stroke="#C9A84C" stroke-width="2"/>
+                    <text x="350" y="110" text-anchor="middle" font-size="13" font-weight="bold" fill="#C9A84C">
+                        전조작기
+                    </text>
+                    <text x="350" y="130" text-anchor="middle" font-size="11" fill="#D0D0D0">
+                        (2-7세)
+                    </text>
+                    <text x="350" y="160" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 상징 사용
+                    </text>
+                    <text x="350" y="180" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 마법적 사고
+                    </text>
+                    <text x="350" y="200" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 자기중심성
+                    </text>
+                    <text x="350" y="220" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 보존 불가
+                    </text>
+                    
+                    <!-- Marker for 6yo -->
+                    <circle cx="350" cy="300" r="8" fill="#4ABF8A" stroke="#E0E0E0" stroke-width="2"/>
+                    <text x="350" y="330" text-anchor="middle" font-size="12" font-weight="bold" fill="#4ABF8A">
+                        5-7세 여기!
+                    </text>
+                    
+                    <!-- Stage 3: Concrete Operational -->
+                    <rect x="470" y="80" width="180" height="380" rx="8" fill="#181C24" stroke="#4ABF8A" stroke-width="2"/>
+                    <text x="560" y="110" text-anchor="middle" font-size="13" font-weight="bold" fill="#4ABF8A">
+                        구체적 조작기
+                    </text>
+                    <text x="560" y="130" text-anchor="middle" font-size="11" fill="#D0D0D0">
+                        (7-11세)
+                    </text>
+                    <text x="560" y="160" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 논리적 사고
+                    </text>
+                    <text x="560" y="180" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 보존 개념
+                    </text>
+                    <text x="560" y="200" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 탈중심화
+                    </text>
+                    <text x="560" y="220" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 구체적 범위
+                    </text>
+                    <text x="560" y="240" text-anchor="middle" font-size="10" fill="#B0B0B0">
+                        에서만 논리적
+                    </text>
+                    
+                    <!-- Stage 4: Formal Operational -->
+                    <rect x="680" y="80" width="180" height="380" rx="8" fill="#181C24" stroke="#4ABF8A" stroke-width="2"/>
+                    <text x="770" y="110" text-anchor="middle" font-size="13" font-weight="bold" fill="#4ABF8A">
+                        형식적 조작기
+                    </text>
+                    <text x="770" y="130" text-anchor="middle" font-size="11" fill="#D0D0D0">
+                        (11세 이상)
+                    </text>
+                    <text x="770" y="160" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 추상적 사고
+                    </text>
+                    <text x="770" y="180" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 가정과 검증
+                    </text>
+                    <text x="770" y="200" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 철학적 질문
+                    </text>
+                    <text x="770" y="220" text-anchor="middle" font-size="10" fill="#D0D0D0">
+                        • 미래 계획
+                    </text>
+                    
+                    <!-- Arrow showing transition -->
+                    <path d="M 440 300 Q 460 250 480 300" stroke="#4ABF8A" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                    <text x="460" y="265" text-anchor="middle" font-size="10" fill="#4ABF8A" font-weight="bold">
+                        전환 중
+                    </text>
+                    
+                    <!-- Arrow marker definition -->
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                            <polygon points="0 0, 10 5, 0 10" fill="#4ABF8A" />
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+        </section>
+        
+        <!-- Section 4: Why Questions Strategies -->
+        <section class="section fade-up">
+            <h2 class="section-title">④ "왜요?" 질문 폭발</h2>
+            <div class="science-card" style="margin-bottom: 2rem;">
+                <div class="science-card-title">🤔 5-7세의 "왜?" 질문은 뇌 발달 신호</div>
+                <div class="science-card-content">
+                    5-7세부터 시작되는 끝없는 "왜?" 질문은 아이의 뇌가 인과관계를 이해하려고 노력하는 증거입니다. 
+                    이는 정상적이고 건강한 발달의 신호이며, 부모가 응답하는 방식이 
+                    아이의 논리적 사고 발달에 큰 영향을 미칩니다.
+                </div>
+            </div>
+            
+            <div class="science-cards">
+                <div class="science-card">
+                    <div class="science-card-title">📚 3가지 "왜?" 질문 유형</div>
+                    <div class="science-card-content">
+                        <strong>1) 인과관계 묻기</strong><br>
+                        "왜 비가 내려?" = 인과관계 이해 시도<br><br>
+                        
+                        <strong>2) 규칙 묻기</strong><br>
+                        "왜 그래야 해?" = 사회적 규칙 이해<br><br>
+                        
+                        <strong>3) 철학적 질문</strong><br>
+                        "왜 죽어?" = 존재의 의미 탐색
+                    </div>
+                </div>
+                
+                <div class="science-card">
+                    <div class="science-card-title">✅ 응답 원칙</div>
+                    <div class="science-card-content">
+                        <strong>1) 단순하게</strong><br>
+                        추상적 개념 피하기<br><br>
+                        
+                        <strong>2) 구체적으로</strong><br>
+                        아이가 경험한 것과 연결<br><br>
+                        
+                        <strong>3) 개방적으로</strong><br>
+                        아이의 추가 질문 환영
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 5: Practical Guide -->
+        <section class="section fade-up">
+            <h2 class="section-title">⑤ 실전 가이드: "왜?" 질문 응답 5가지 스크립트</h2>
+            <div class="practice-section">
+                <div class="script-container">
+                    <div class="script-box">
+                        <div class="script-label">상황 1: 인과관계 질문 "왜 비가 내려?"</div>
+                        <div class="dialogue">
+                            <div><span class="character">아이:</span> "왜 비가 내려?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "하늘의 구름에 물이 모여 있다가, 너무 많아지면 떨어지는 거야."</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">아이:</span> "아... 그럼 구름은?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "구름은 아주 작은 물 입자들이 모여 있는 거야. 마치 너의 숨이 거울에 뿌옇게 서리는 것처럼."</div>
+                        </div>
+                    </div>
+                    
+                    <div class="script-box">
+                        <div class="script-label">상황 2: 규칙 질문 "왜 학교 가야 해?"</div>
+                        <div class="dialogue">
+                            <div><span class="character">아이:</span> "왜 학교를 가야 해?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "학교에서 너는 많은 친구들을 만나고, 새로운 것들을 배워. 그게 너를 더 똑똑하고 강하게 만들어."</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">아이:</span> "내가 이미 똑똑한데?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "맞아, 너는 이미 똑똑해. 그런데 학교에 가면 더 많은 걸 배울 수 있어. 엄마/아빠도 계속 배우고 있어."</div>
+                        </div>
+                    </div>
+                    
+                    <div class="script-box">
+                        <div class="script-label">상황 3: 철학적 질문 "왜 사람은 죽어?"</div>
+                        <div class="dialogue">
+                            <div><span class="character">아이:</span> "왜 사람은 죽어?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "모든 생물은 일정한 시간을 살다가 생을 마치는 거야. 마치 꽃도 피었다가 져버리듯이."</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">아이:</span> "그럼... 엄마/아빠도 죽어?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "그래, 모든 사람이 그래. 하지만 우리는 지금 함께 있고, 그래서 우리가 함께할 시간이 아주 소중한 거야."</div>
+                        </div>
+                    </div>
+                    
+                    <div class="script-box">
+                        <div class="script-label">상황 4: 기술 질문 "어떻게 전등이 켜져?"</div>
+                        <div class="dialogue">
+                            <div><span class="character">아이:</span> "전등은 어떻게 켜져?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "전기가 흐르면서 불이 나는 거야. 마치 우리가 손을 비비면 따뜻해지듯이."</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">아이:</span> "그럼 전기가 뭔데?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "전기는 아주 빠르게 움직이는 작은 에너지 같은 거야. 우리 몸에도 있어서 우리가 움직일 수 있어."</div>
+                        </div>
+                    </div>
+                    
+                    <div class="script-box">
+                        <div class="script-label">상황 5: 감정 질문 "왜 내가 화내면 안 돼?"</div>
+                        <div class="dialogue">
+                            <div><span class="character">아이:</span> "왜 내가 화내면 안 돼? 나 화났는데?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "화내는 건 나빠가 아니야. 화날 수 있지. 하지만 화날 때 다른 사람을 때리거나 소리치면 그들이 상해."</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">아이:</span> "그럼 뭐 해야 돼?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "화날 땐 엄마/아빠에게 말하거나, 베개를 안아주거나, 깊게 숨을 쉬면 돼."</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="do-dont">
+                    <div class="do-box">
+                        <div class="do-title">✓ 해야 할 것</div>
+                        <div class="do-content">
+                            • 아이의 질문 진지하게 받기<br>
+                            • 정확하지만 단순한 답<br>
+                            • "좋은 질문이야"라고 격려<br>
+                            • 아이의 추가 질문 환영<br>
+                            • 모르면 "함께 찾아보자" 하기
+                        </div>
+                    </div>
+                    <div class="dont-box">
+                        <div class="dont-title">✗ 피해야 할 것</div>
+                        <div class="dont-content">
+                            • 너무 복잡한 설명<br>
+                            • "나중에 물어봐" 자주 하기<br>
+                            • "그냥 그래"라고 끝내기<br>
+                            • 철학적 질문 회피<br>
+                            • 거짓말로 답하기
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 6: Sibling Tip -->
+        <section class="section fade-up">
+            <h2 class="section-title">⑥ 형제자매 팁</h2>
+            <div class="tip-box">
+                <div class="tip-title">5-7세의 자기중심성이 형제자매 갈등을 초래하는 이유</div>
+                <div class="tip-content">
+                    <strong>상황: 5-7세 형이 2-4세 동생과 싸웠을 때</strong><br><br>
+                    
+                    <strong>문제의 근본:</strong><br>
+                    5-7세는 여전히 자신의 입장만 이해합니다. 
+                    "내가 원하는 것 = 옳은 것"이고, 동생이 자신과 다른 욕구를 가진다는 걸 
+                    아직 완전히 이해하지 못합니다.<br><br>
+                    
+                    <strong>5-7세가 느끼는 감정:</strong><br>
+                    동생이 자신의 장난감을 만지는 것 = 자신을 무시하는 것<br>
+                    부모가 동생에게 더 주의를 주는 것 = 자신을 사랑하지 않는 것<br><br>
+                    
+                    <strong>부모의 응답:</strong><br>
+                    "동생이 네 기분을 알 수 없어. 넌 이해했지만, 동생은 아직 어려. 
+                    동생이 뭘 원하는지 보여줄 수 있을까?"<br><br>
+                    
+                    <strong>발달 선물:</strong><br>
+                    매년 조금씩 "탈중심화"가 일어나서, 7-8세부터는 
+                    동생의 입장을 더 잘 이해하게 됩니다.
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 7: Quizzes -->
+        <section class="section fade-up">
+            <h2 class="section-title">⑦ 학습 점검 퀴즈</h2>
+            
+            <div class="quiz-container">
+                <div class="quiz-title">퀴즈 1: 마법적 사고</div>
+                <div class="quiz-question">
+                    5-7세 아이가 보이는 "마법적 사고"의 특징은 무엇인가?
+                </div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ① 자신의 생각이나 말이 현실을 만들 수 있다고 믿음
+                    </div>
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ② 실제 마법을 배워서 현실을 바꾸려고 함
+                    </div>
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ③ 상상력이 매우 뛰어나 거짓말을 자주 함
+                    </div>
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ④ 마법사처럼 행동하면서 논리를 무시함
+                    </div>
+                </div>
+                <button class="submit-btn" onclick="checkAnswer(this, 0)">정답 확인</button>
+                <div class="quiz-feedback">
+                    정답: ① 자신의 생각이나 말이 현실을 만들 수 있다고 믿음<br>
+                    이것이 마법적 사고의 핵심입니다. 부정적인 생각이 나쁜 일을 초래한다고 
+                    진정으로 믿기 때문에 죄책감을 크게 느끼기도 합니다.
+                </div>
+            </div>
+            
+            <div class="quiz-container">
+                <div class="quiz-title">퀴즈 2: 보존 개념</div>
+                <div class="quiz-question">
+                    "모양이 변해도 양은 같다"는 보존 개념이 발달하는 나이는?
+                </div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ① 4-5세 (전조작기 초)
+                    </div>
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ② 7-8세경 (구체적 조작기 진입)
+                    </div>
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ③ 10-11세 (형식적 조작기)
+                    </div>
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ④ 3-4세 (감각운동기)
+                    </div>
+                </div>
+                <button class="submit-btn" onclick="checkAnswer(this, 1)">정답 확인</button>
+                <div class="quiz-feedback">
+                    정답: ② 7-8세경 (구체적 조작기 진입)<br>
+                    5-7세 아이는 여전히 보존 개념이 미발달되어 있어서, 
+                    같은 양이라도 다르게 보이면 다르다고 생각합니다. 
+                    이것이 형제자매 갈등의 원인이 되기도 합니다.
+                </div>
+            </div>
+            
+            <div class="spaced-rep">
+                <div class="rep-label">🔄 간격 반복(Spaced Repetition) 추천 일정</div>
+                <div class="rep-schedule">
+                    1차: 오늘 (학습 완료) | 2차: 1일 후 | 3차: 3일 후 | 4차: 1주 후 | 5차: 2주 후
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        let timerInterval;
+        let timeRemaining = 1500;
+        
+        function openTimerModal() {
+            document.getElementById('timerModal').style.display = 'block';
+            updateTimerDisplay();
+        }
+        
+        function closeTimerModal() {
+            document.getElementById('timerModal').style.display = 'none';
+            if (timerInterval) clearInterval(timerInterval);
+            timeRemaining = 1500;
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+        
+        function startTimer() {
+            const startBtn = document.getElementById('startBtn');
+            if (startBtn.textContent === 'START') {
+                startBtn.textContent = 'PAUSE';
+                timerInterval = setInterval(() => {
+                    if (timeRemaining > 0) {
+                        timeRemaining--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        alert('✓ 25분 집중 완료!');
+                        timeRemaining = 1500;
+                        startBtn.textContent = 'START';
+                        updateTimerDisplay();
+                    }
+                }, 1000);
+            } else {
+                startBtn.textContent = 'START';
+                clearInterval(timerInterval);
+            }
+        }
+        
+        function selectOption(elem) {
+            const container = elem.parentElement.parentElement;
+            container.querySelectorAll('.quiz-option').forEach(el => el.classList.remove('selected'));
+            elem.classList.add('selected');
+        }
+        
+        function checkAnswer(button, correctIndex) {
+            const container = button.parentElement;
+            const options = container.querySelectorAll('.quiz-option');
+            const feedback = container.querySelector('.quiz-feedback');
+            
+            let isCorrect = false;
+            options.forEach((opt, idx) => {
+                opt.classList.remove('correct', 'incorrect');
+                if (opt.classList.contains('selected')) {
+                    if (idx === correctIndex) {
+                        opt.classList.add('correct');
+                        isCorrect = true;
+                    } else {
+                        opt.classList.add('incorrect');
+                    }
+                }
+            });
+            
+            if (!isCorrect) {
+                options[correctIndex].classList.add('correct');
+            }
+            
+            feedback.classList.add('show');
+        }
+        
+        // Intersection Observer for fade-up animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const delay = Array.from(document.querySelectorAll('.fade-up')).indexOf(entry.target) * 0.1;
+                    entry.target.style.animationDelay = delay + 's';
+                    entry.target.classList.remove('fade-up');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('timerModal');
+            if (event.target === modal) {
+                closeTimerModal();
+            }
+        }
+    </script>
+</body>
+</html>

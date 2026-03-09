@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAY 03: 아빠 놀이의 신경과학</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0A0C10;
+            --bg-card-light: #12151B;
+            --bg-card-dark: #181C24;
+            --green: #4ABF8A;
+            --gold: #C9A84C;
+            --danger: #E85D5D;
+            --text-primary: #E8E8E8;
+            --text-secondary: #A0A0A0;
+            --border: #2A2D35;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-card-light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--green);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3BA075;
+        }
+
+        /* Fade-Up Animation */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: linear-gradient(to bottom, var(--bg-card-dark), rgba(24, 28, 36, 0.95));
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+        }
+
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--green);
+        }
+
+        .header-day {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+        }
+
+        .pomodoro-btn {
+            background: linear-gradient(135deg, var(--gold), #B8942B);
+            border: none;
+            color: var(--bg-primary);
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: transform 0.2s;
+        }
+
+        .pomodoro-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .timer-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 4rem;
+            color: var(--green);
+            margin: 1.5rem 0;
+            font-weight: 700;
+        }
+
+        .timer-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+
+        .timer-btn {
+            background: var(--green);
+            border: none;
+            color: var(--bg-primary);
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .timer-btn:hover {
+            background: #3BA075;
+        }
+
+        .timer-btn.stop {
+            background: var(--danger);
+        }
+
+        .timer-btn.stop:hover {
+            background: #D74444;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--bg-card-dark), var(--bg-card-light));
+            border-bottom: 2px solid var(--green);
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .hero-part {
+            display: inline-block;
+            background: rgba(74, 191, 138, 0.15);
+            color: var(--green);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .hero-oneliner {
+            font-size: 1.1rem;
+            color: var(--gold);
+            font-style: italic;
+            margin-bottom: 1.5rem;
+        }
+
+        .badges {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(201, 168, 76, 0.15);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* ===== SECTIONS ===== */
+        .section {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            opacity: 0;
+        }
+
+        .section.fade-up {
+            opacity: 0;
+            animation: fadeUp 0.6s ease-out forwards;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-number {
+            display: inline-flex;
+            width: 40px;
+            height: 40px;
+            background: rgba(74, 191, 138, 0.2);
+            border: 2px solid var(--green);
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* ===== STRATEGY BOX ===== */
+        .strategy-box {
+            background: var(--bg-card-light);
+            border-left: 4px solid var(--green);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .strategy-title {
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .time-table {
+            background: var(--bg-card-dark);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .time-row {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+        }
+
+        .time-row:last-child {
+            border-bottom: none;
+        }
+
+        .time-label {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .time-activity {
+            color: var(--text-primary);
+            padding-left: 1rem;
+        }
+
+        /* ===== SCIENCE CARDS ===== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .science-card {
+            background: linear-gradient(135deg, var(--bg-card-light), var(--bg-card-dark));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .science-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--green);
+        }
+
+        .card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .card-content {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .insight-box {
+            background: rgba(74, 191, 138, 0.1);
+            border-left: 3px solid var(--green);
+            padding: 1rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+        }
+
+        .insight-title {
+            color: var(--green);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== DEEP DIVE COLLAPSIBLE ===== */
+        .deep-dive {
+            background: var(--bg-card-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .deep-dive-header {
+            background: linear-gradient(135deg, rgba(74, 191, 138, 0.1), rgba(201, 168, 76, 0.1));
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: background 0.3s;
+        }
+
+        .deep-dive-header:hover {
+            background: linear-gradient(135deg, rgba(74, 191, 138, 0.15), rgba(201, 168, 76, 0.15));
+        }
+
+        .deep-dive-title {
+            font-weight: 600;
+            color: var(--green);
+            font-size: 1rem;
+        }
+
+        .deep-dive-toggle {
+            color: var(--gold);
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+
+        .deep-dive.open .deep-dive-toggle {
+            transform: rotate(180deg);
+        }
+
+        .deep-dive-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 1.5rem;
+        }
+
+        .deep-dive.open .deep-dive-content {
+            max-height: 500px;
+            padding: 1.5rem;
+        }
+
+        .deep-dive-text {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* ===== SVG DIAGRAM ===== */
+        .diagram-container {
+            background: var(--bg-card-light);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .diagram-title {
+            font-weight: 600;
+            color: var(--green);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        svg {
+            display: inline-block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* ===== PRACTICE GUIDE ===== */
+        .practice-guide {
+            background: var(--bg-card-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .age-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .age-tab {
+            background: none;
+            border: none;
+            padding: 1rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .age-tab.active {
+            color: var(--green);
+            border-bottom-color: var(--green);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .dialog-box {
+            background: var(--bg-card-dark);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--gold);
+        }
+
+        .dialog-label {
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .dialog-text {
+            color: var(--text-primary);
+            font-style: italic;
+            padding-left: 1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .dialog-response {
+            background: rgba(74, 191, 138, 0.1);
+            padding: 1rem;
+            border-left: 3px solid var(--green);
+            border-radius: 4px;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .dialog-response strong {
+            color: var(--green);
+        }
+
+        .dialog-followup {
+            background: rgba(201, 168, 76, 0.1);
+            padding: 1rem;
+            border-left: 3px solid var(--gold);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .dialog-followup strong {
+            color: var(--gold);
+        }
+
+        .do-dont {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .do-box, .dont-box {
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .do-box {
+            background: rgba(74, 191, 138, 0.15);
+            border-left: 3px solid var(--green);
+            color: var(--text-primary);
+        }
+
+        .dont-box {
+            background: rgba(232, 93, 93, 0.15);
+            border-left: 3px solid var(--danger);
+            color: var(--text-primary);
+        }
+
+        .do-box::before {
+            content: "✓ DO";
+            display: block;
+            color: var(--green);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .dont-box::before {
+            content: "✗ DON'T";
+            display: block;
+            color: var(--danger);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== TIP BOX ===== */
+        .tip-box {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.1), rgba(74, 191, 138, 0.1));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tip-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 0.8rem;
+        }
+
+        .tip-content {
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+
+        .marriage-note {
+            background: rgba(74, 191, 138, 0.08);
+            border: 1px solid rgba(74, 191, 138, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .marriage-note strong {
+            color: var(--green);
+        }
+
+        /* ===== QUIZ ===== */
+        .quiz-container {
+            background: var(--bg-card-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .quiz-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: var(--gold);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .quiz-question {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .quiz-option {
+            background: var(--bg-card-dark);
+            border: 1px solid var(--border);
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-primary);
+        }
+
+        .quiz-option:hover {
+            border-color: var(--green);
+            background: rgba(74, 191, 138, 0.1);
+        }
+
+        .quiz-option input {
+            margin-right: 0.8rem;
+            cursor: pointer;
+        }
+
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .quiz-feedback.correct {
+            background: rgba(74, 191, 138, 0.15);
+            border-left: 3px solid var(--green);
+            color: var(--green);
+            display: block;
+        }
+
+        .quiz-feedback.incorrect {
+            background: rgba(232, 93, 93, 0.15);
+            border-left: 3px solid var(--danger);
+            color: var(--danger);
+            display: block;
+        }
+
+        .spaced-repetition {
+            background: var(--bg-card-dark);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .sr-title {
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .sr-bar {
+            background: var(--border);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .sr-progress {
+            background: var(--green);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .do-dont {
+                grid-template-columns: 1fr;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-content">
+            <div>
+                <div class="header-title">과학적 육아 스터디</div>
+                <div class="header-day">DAY 03 / 21</div>
+            </div>
+            <button class="pomodoro-btn" onclick="openPomodoroModal()">⏱️ 25분 타이머</button>
+        </div>
+    </header>
+
+    <!-- POMODORO MODAL -->
+    <div class="modal" id="pomodoroModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closePomodoroModal()">✕</button>
+            <div class="modal-title">Pomodoro</div>
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            <div class="timer-buttons">
+                <button class="timer-btn" id="startBtn" onclick="startTimer()">시작</button>
+                <button class="timer-btn stop" id="stopBtn" onclick="stopTimer()" style="display:none;">중지</button>
+                <button class="timer-btn" onclick="resetTimer()">리셋</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-part">PART 1 — 발달심리 기초</div>
+            <h1 class="hero-title">아빠 놀이의 신경과학</h1>
+            <p class="hero-subtitle">거친 놀이(Rough-and-Tumble Play)가 뇌 발달에 미치는 과학적 영향</p>
+            <p class="hero-oneliner">"아빠와의 거친 놀이는 아이의 스트레스 회로를 강화하는 훈련이다"</p>
+            <div class="badges">
+                <span class="badge">첫째(5-7세)</span>
+                <span class="badge">둘째(2-4세)</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 1: LEARNING STRATEGY -->
+    <section class="section">
+        <h2 class="section-title">
+            <span class="section-number">1</span>학습 전략
+        </h2>
+        <div class="strategy-box">
+            <div class="strategy-title">오늘의 핵심 학습 경로</div>
+            <p style="margin-bottom: 1rem; color: var(--text-secondary);">25분 집중 학습으로 거친 놀이의 신경생물학적 이점을 이해하고, 연령별 실전 놀이 방법을 습득합니다.</p>
+            <div class="time-table">
+                <div class="time-row">
+                    <div class="time-label">0-5분</div>
+                    <div class="time-activity">거친 놀이(Rough-and-Tumble Play)의 정의와 아빠 역할의 진화</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-label">5-10분</div>
+                    <div class="time-activity">뇌 발달: PFC, HPA축, 도파민 회로, 스트레스 회복력</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-label">10-15분</div>
+                    <div class="time-activity">Paquette의 "Activation Relationship" & 신경과학적 차이</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-label">15-20분</div>
+                    <div class="time-activity">5가지 구체적 놀이법 (5-7세 3가지, 2-4세 2가지) - 3회차 대화 스크립트</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-label">20-25분</div>
+                    <div class="time-activity">형제자매 함께 놀이 & 부부 협력 & 퀴즈</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: SCIENCE CARDS -->
+    <section class="section">
+        <h2 class="section-title">
+            <span class="section-number">2</span>과학적 근거
+        </h2>
+        <div class="cards-grid">
+            <div class="science-card">
+                <div class="card-title">거친 놀이의 뇌과학</div>
+                <div class="card-content">
+                    거친 놀이(R&T play)는 단순한 즐거움이 아닙니다:
+                    <ul style="margin: 1rem 0 0 1.5rem; color: var(--text-secondary);">
+                        <li><strong style="color: var(--green);">전전두피질(PFC)</strong>: 의사결정, 감정 조절, 위험 판단 발달</li>
+                        <li><strong style="color: var(--gold);">HPA축 강화</strong>: 스트레스 호르몬(코르티솔) 처리 능력 향상</li>
+                        <li><strong style="color: var(--green);">뇌간(Brainstem)</strong>: 위험 감지 및 대응 회로 발달</li>
+                        <li><strong style="color: var(--gold);">도파민 보상</strong>: "흥분→진정" 사이클 반복이 신경 경로 형성</li>
+                    </ul>
+                </div>
+                <div class="insight-box">
+                    <div class="insight-title">이래서 아이가 이렇게 행동해요</div>
+                    아빠와 거친 놀이를 경험한 아이는 스트레스 상황에서 더 빨리 진정되고, 새로운 도전에 더 쉽게 도전합니다. 뇌의 회복 탄력성이 강화되어 있기 때문입니다.
+                </div>
+            </div>
+
+            <div class="science-card">
+                <div class="card-title">아빠 놀이 vs 엄마 놀이</div>
+                <div class="card-content">
+                    신경생물학적으로 다른 역할 (Daniel Paquette, 2004):
+                    <ul style="margin: 1rem 0 0 1.5rem; color: var(--text-secondary);">
+                        <li><strong style="color: var(--green);">엄마 놀이</strong>: 안정적, 예측 가능, 옥시토신 중심 (사랑 호르몬)</li>
+                        <li><strong style="color: var(--gold);">아빠 놀이</strong>: 역동적, 예측 불가능, 도파민/노르에피네프린</li>
+                        <li>아빠: 리스크 감수, 탐색, 독립성 발달 촉진</li>
+                        <li>연구 결과: 아버지가 없는 아이는 스트레스 회처 능력 40% 저하</li>
+                    </ul>
+                </div>
+                <div class="insight-box">
+                    <div class="insight-title">이래서 아이가 이렇게 행동해요</div>
+                    아빠와 충분한 거친 놀이를 한 아이는 학교 가는 것을 덜 두려워하고, 또래와의 다툼에서 자신감 있게 대응합니다.
+                </div>
+            </div>
+
+            <div class="science-card">
+                <div class="card-title">놀이 시간과 신경 화학</div>
+                <div class="card-content">
+                    놀이 중 뇌에서 일어나는 화학 변화:
+                    <ul style="margin: 1rem 0 0 1.5rem; color: var(--text-secondary);">
+                        <li><strong style="color: var(--green);">도파민 방출</strong>: 보상, 동기, 학습 강화 (보상회로)</li>
+                        <li><strong style="color: var(--gold);">노르에피네프린</strong>: 주의집중, 흥분 상태 유지, 기억 고정</li>
+                        <li>놀이 중 높아진 심박수 = 뇌 신경회로 성장 신호</li>
+                        <li>10분의 충분한 아빠 놀이 = 학습 효율 2배 상승 (집중력, 기억력)</li>
+                    </ul>
+                </div>
+                <div class="insight-box">
+                    <div class="insight-title">이래서 아이가 이렇게 행동해요</div>
+                    아빠와 적극적으로 놀이한 날 아이는 더 집중력이 좋고, 학습 능력도 높아집니다. 또한 감정 조절이 더 잘됩니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- DEEP DIVE: Paquette Theory -->
+        <div class="deep-dive" id="deepDive1">
+            <div class="deep-dive-header" onclick="toggleDeepDive('deepDive1')">
+                <span class="deep-dive-title">🔬 Deep Dive: Daniel Paquette의 Activation Relationship (활성화 관계)</span>
+                <span class="deep-dive-toggle">▼</span>
+            </div>
+            <div class="deep-dive-content">
+                <div class="deep-dive-text">
+                    <p style="margin-bottom: 1rem;">
+                        <strong>Activation Relationship</strong>는 아버지가 아이의 신경계를 "활성화"시키고 "조절"하는 방식을 설명합니다. 엄마는 아이를 진정시키는 반면, 아빠는 의도적으로 아이를 "흥분" 상태로 끌어올렸다가 다시 진정시킵니다.
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <strong>메커니즘:</strong>
+                        <br>1. <strong>활성화 단계</strong>: 거친 놀이 → 심박수 증가 → 도파민 분비
+                        <br>2. <strong>조절 단계</strong>: 놀이 중단 → 아이가 스스로 진정 배우기
+                        <br>3. <strong>재활성화</strong>: 다시 놀이 시작 → 반복 학습
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <strong>신경과학적 효과:</strong> 이 반복은 HPA축(스트레스 반응 시스템)을 "운동"시킵니다. 마치 근력 운동처럼, 스트레스 호르몬을 분비했다가 빠르게 회복하는 능력이 강화됩니다. 결과적으로 아이는 어려운 상황에서 더 빨리 회복됩니다.
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <strong>연구 결과:</strong> 활성화 관계가 풍부한 아이들은:
+                        <br>• 교사 평가에서 더 나은 자제력 보유
+                        <br>• 또래와의 사회 상호작용에서 더 적응적
+                        <br>• 새로운 환경에 대한 두려움이 25% 낮음
+                        <br>• 학습 능력 및 창의성이 향상됨
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: SVG DIAGRAM -->
+    <section class="section">
+        <h2 class="section-title">
+            <span class="section-number">3</span>놀이 → 뇌 발달 경로
+        </h2>
+        <div class="diagram-container">
+            <div class="diagram-title">거친 놀이가 뇌 발달에 미치는 경로 (3단계)</div>
+            <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
+                <defs>
+                    <marker id="arrow1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#4ABF8A"/>
+                    </marker>
+                    <marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#C9A84C"/>
+                    </marker>
+                    <marker id="arrow3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#E85D5D"/>
+                    </marker>
+                </defs>
+
+                <!-- LEVEL 1: Activity Type -->
+                <text x="30" y="25" font-family="Noto Sans KR" font-size="15" font-weight="700" fill="#4ABF8A">LEVEL 1: 놀이 유형</text>
+
+                <rect x="40" y="45" width="120" height="65" rx="8" fill="#12151B" stroke="#4ABF8A" stroke-width="2"/>
+                <text x="100" y="68" font-family="Noto Sans KR" font-size="12" font-weight="600" text-anchor="middle" fill="#E8E8E8">우주 비행사</text>
+                <text x="100" y="88" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">(회전+높이)</text>
+                <text x="100" y="102" font-family="Noto Sans KR" font-size="9" text-anchor="middle" fill="#4ABF8A" font-weight="600">5-7세</text>
+
+                <rect x="180" y="45" width="120" height="65" rx="8" fill="#12151B" stroke="#4ABF8A" stroke-width="2"/>
+                <text x="240" y="68" font-family="Noto Sans KR" font-size="12" font-weight="600" text-anchor="middle" fill="#E8E8E8">술래잡기</text>
+                <text x="240" y="88" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">(추격+예측)</text>
+                <text x="240" y="102" font-family="Noto Sans KR" font-size="9" text-anchor="middle" fill="#4ABF8A" font-weight="600">5-7세</text>
+
+                <rect x="320" y="45" width="120" height="65" rx="8" fill="#12151B" stroke="#4ABF8A" stroke-width="2"/>
+                <text x="380" y="68" font-family="Noto Sans KR" font-size="12" font-weight="600" text-anchor="middle" fill="#E8E8E8">역할극</text>
+                <text x="380" y="88" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">(상상+통제)</text>
+                <text x="380" y="102" font-family="Noto Sans KR" font-size="9" text-anchor="middle" fill="#4ABF8A" font-weight="600">5-7세</text>
+
+                <rect x="460" y="45" width="120" height="65" rx="8" fill="#12151B" stroke="#4ABF8A" stroke-width="2"/>
+                <text x="520" y="68" font-family="Noto Sans KR" font-size="12" font-weight="600" text-anchor="middle" fill="#E8E8E8">숨바꼭질</text>
+                <text x="520" y="88" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">(탐색+안정)</text>
+                <text x="520" y="102" font-family="Noto Sans KR" font-size="9" text-anchor="middle" fill="#4ABF8A" font-weight="600">2-4세</text>
+
+                <rect x="600" y="45" width="120" height="65" rx="8" fill="#12151B" stroke="#4ABF8A" stroke-width="2"/>
+                <text x="660" y="68" font-family="Noto Sans KR" font-size="12" font-weight="600" text-anchor="middle" fill="#E8E8E8">역할극</text>
+                <text x="660" y="88" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">(간단한)</text>
+                <text x="660" y="102" font-family="Noto Sans KR" font-size="9" text-anchor="middle" fill="#4ABF8A" font-weight="600">2-4세</text>
+
+                <rect x="740" y="45" width="120" height="65" rx="8" fill="#12151B" stroke="#4ABF8A" stroke-width="2"/>
+                <text x="800" y="68" font-family="Noto Sans KR" font-size="12" font-weight="600" text-anchor="middle" fill="#E8E8E8">레고/블록</text>
+                <text x="800" y="88" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">(전략+창의)</text>
+                <text x="800" y="102" font-family="Noto Sans KR" font-size="9" text-anchor="middle" fill="#4ABF8A" font-weight="600">함께</text>
+
+                <!-- LEVEL 2: Brain Activation -->
+                <text x="30" y="155" font-family="Noto Sans KR" font-size="15" font-weight="700" fill="#C9A84C">LEVEL 2: 뇌 활성화 (Paquette Activation)</text>
+
+                <rect x="50" y="175" width="110" height="60" rx="8" fill="#12151B" stroke="#C9A84C" stroke-width="2"/>
+                <text x="105" y="198" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#C9A84C">전전두피질</text>
+                <text x="105" y="214" font-family="Noto Sans KR" font-size="9" text-anchor="middle" fill="#A0A0A0">(의사결정)</text>
+
+                <rect x="180" y="175" width="110" height="60" rx="8" fill="#12151B" stroke="#C9A84C" stroke-width="2"/>
+                <text x="235" y="198" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#C9A84C">HPA축</text>
+                <text x="235" y="214" font-family="Noto Sans KR" font-size="9" text-anchor="middle" fill="#A0A0A0">(스트레스)</text>
+
+                <rect x="310" y="175" width="110" height="60" rx="8" fill="#12151B" stroke="#C9A84C" stroke-width="2"/>
+                <text x="365" y="198" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#C9A84C">도파민</text>
+                <text x="365" y="214" font-family="Noto Sans KR" font-size="9" text-anchor="middle" fill="#A0A0A0">(보상회로)</text>
+
+                <rect x="440" y="175" width="110" height="60" rx="8" fill="#12151B" stroke="#C9A84C" stroke-width="2"/>
+                <text x="495" y="198" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#C9A84C">편도체</text>
+                <text x="495" y="214" font-family="Noto Sans KR" font-size="9" text-anchor="middle" fill="#A0A0A0">(두려움)</text>
+
+                <rect x="570" y="175" width="110" height="60" rx="8" fill="#12151B" stroke="#C9A84C" stroke-width="2"/>
+                <text x="625" y="198" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#C9A84C">해마</text>
+                <text x="625" y="214" font-family="Noto Sans KR" font-size="9" text-anchor="middle" fill="#A0A0A0">(기억)</text>
+
+                <rect x="700" y="175" width="110" height="60" rx="8" fill="#12151B" stroke="#C9A84C" stroke-width="2"/>
+                <text x="755" y="198" font-family="Noto Sans KR" font-size="10" font-weight="600" text-anchor="middle" fill="#C9A84C">운동피질</text>
+                <text x="755" y="214" font-family="Noto Sans KR" font-size="9" text-anchor="middle" fill="#A0A0A0">(조절)</text>
+
+                <!-- Curved arrows from Level 1 to Level 2 -->
+                <path d="M 100 110 Q 100 140 105 175" stroke="#4ABF8A" stroke-width="2" fill="none" marker-end="url(#arrow1)"/>
+                <path d="M 240 110 Q 240 140 235 175" stroke="#4ABF8A" stroke-width="2" fill="none" marker-end="url(#arrow1)"/>
+                <path d="M 380 110 Q 365 140 365 175" stroke="#4ABF8A" stroke-width="2" fill="none" marker-end="url(#arrow1)"/>
+                <path d="M 520 110 Q 495 140 495 175" stroke="#4ABF8A" stroke-width="2" fill="none" marker-end="url(#arrow1)"/>
+                <path d="M 660 110 Q 625 140 625 175" stroke="#4ABF8A" stroke-width="2" fill="none" marker-end="url(#arrow1)"/>
+                <path d="M 800 110 Q 755 140 755 175" stroke="#4ABF8A" stroke-width="2" fill="none" marker-end="url(#arrow1)"/>
+
+                <!-- LEVEL 3: Development Outcomes -->
+                <text x="30" y="300" font-family="Noto Sans KR" font-size="15" font-weight="700" fill="#E85D5D">LEVEL 3: 발달 결과</text>
+
+                <rect x="50" y="320" width="130" height="75" rx="8" fill="#12151B" stroke="#E85D5D" stroke-width="2"/>
+                <text x="115" y="345" font-family="Noto Sans KR" font-size="11" font-weight="600" text-anchor="middle" fill="#E85D5D">회복탄력성</text>
+                <text x="115" y="362" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">스트레스</text>
+                <text x="115" y="377" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">회복 빨라짐</text>
+
+                <rect x="200" y="320" width="130" height="75" rx="8" fill="#12151B" stroke="#E85D5D" stroke-width="2"/>
+                <text x="265" y="345" font-family="Noto Sans KR" font-size="11" font-weight="600" text-anchor="middle" fill="#E85D5D">의사결정능력</text>
+                <text x="265" y="362" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">위험 판단</text>
+                <text x="265" y="377" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">향상</text>
+
+                <rect x="350" y="320" width="130" height="75" rx="8" fill="#12151B" stroke="#E85D5D" stroke-width="2"/>
+                <text x="415" y="345" font-family="Noto Sans KR" font-size="11" font-weight="600" text-anchor="middle" fill="#E85D5D">사회성발달</text>
+                <text x="415" y="362" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">또래 관계</text>
+                <text x="415" y="377" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">자신감</text>
+
+                <rect x="500" y="320" width="130" height="75" rx="8" fill="#12151B" stroke="#E85D5D" stroke-width="2"/>
+                <text x="565" y="345" font-family="Noto Sans KR" font-size="11" font-weight="600" text-anchor="middle" fill="#E85D5D">학습능력</text>
+                <text x="565" y="362" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">집중력</text>
+                <text x="565" y="377" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">+40%</text>
+
+                <rect x="650" y="320" width="130" height="75" rx="8" fill="#12151B" stroke="#E85D5D" stroke-width="2"/>
+                <text x="715" y="345" font-family="Noto Sans KR" font-size="11" font-weight="600" text-anchor="middle" fill="#E85D5D">독립심</text>
+                <text x="715" y="362" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">새로운 도전</text>
+                <text x="715" y="377" font-family="Noto Sans KR" font-size="10" text-anchor="middle" fill="#A0A0A0">시도</text>
+
+                <!-- Arrows from Level 2 to Level 3 -->
+                <path d="M 105 235 L 115 320" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+                <path d="M 235 235 L 265 320" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+                <path d="M 365 235 L 415 320" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+                <path d="M 495 235 L 565 320" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+                <path d="M 625 235 L 715 320" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+
+                <!-- Title annotation -->
+                <text x="30" y="450" font-family="Noto Sans KR" font-size="11" fill="#A0A0A0" font-style="italic">
+                    Paquette의 Activation Relationship: "흥분→진정→흥분" 사이클이 신경회로를 형성합니다.
+                </text>
+            </svg>
+        </div>
+    </section>
+
+    <!-- SECTION 4: PRACTICE GUIDE -->
+    <section class="section">
+        <h2 class="section-title">
+            <span class="section-number">4</span>실전 가이드 (3회차 대화)
+        </h2>
+        <div class="practice-guide">
+            <div class="age-tabs">
+                <button class="age-tab active" onclick="switchTab(event, 'age6')">첫째 (5-7세)</button>
+                <button class="age-tab" onclick="switchTab(event, 'age3')">둘째 (2-4세)</button>
+            </div>
+
+            <!-- Age 6 Content -->
+            <div id="age6" class="tab-content active">
+                <h3 style="color: var(--green); margin-bottom: 1.5rem; font-weight: 600;">5-7세 아이: 3가지 놀이 방법 (각 10분)</h3>
+
+                <!-- Play 1 -->
+                <div class="dialog-box">
+                    <div class="dialog-label">▶ 놀이 1: 우주 비행사 (Airplane Play)</div>
+                    <div class="dialog-text">
+                        <strong style="color: var(--gold);">아빠:</strong> "자, 이제 우주 비행사가 돼! 아빠 손에 잡혀."
+                    </div>
+                    <div class="dialog-response">
+                        <strong>아이:</strong> "어? 진짜? 오오! 어디로 날아가요?"
+                    </div>
+                    <div class="dialog-followup">
+                        <strong style="color: var(--gold);">아빠:</strong> "좋은 질문! 달로 가자. 빙글빙글!" [천천히 회전시킴. 30초 회전 → 15초 멈춤 → 반복]
+                        <br><br>
+                        <em>신경과학 설명: 아이의 손가락 끝이 지상에서 15cm 떨어진 높이로 유지. 회전 중 전정기관(내이) 활성화 → 뇌간 자극 → HPA축 활성화. 멈춤 단계에서 아이가 스스로 안정화 능력 배우기. 반복되면서 신경계가 "흥분-회복 사이클"을 학습.</em>
+                    </div>
+                </div>
+
+                <!-- Play 2 -->
+                <div class="dialog-box">
+                    <div class="dialog-label">▶ 놀이 2: 술래잡기 (Chase Play)</div>
+                    <div class="dialog-text">
+                        <strong style="color: var(--gold);">아빠:</strong> "좋아, 이제 나한테 잡혀야 돼! 출발!"
+                    </div>
+                    <div class="dialog-response">
+                        <strong>아이:</strong> [도망치기 시작] "아빠 못 잡아! 훼훼훼!"
+                    </div>
+                    <div class="dialog-followup">
+                        <strong style="color: var(--gold);">아빠:</strong> "아, 빠르네! 어디로... 어어어!" [일부러 느리게 추격. 가까워질 때마다 "아, 거의 잡힐 뻔했네!"라고 반응. 아이를 잡으면 "와, 이제 내가 도망쳐야 해!" 하면서 역할 교대]
+                        <br><br>
+                        <em>신경과학: 도망칠 때 도파민 방출(보상감). 잡힐 뻔할 때 스트레스 호르몬(노르에피네프린) 분비. 잡혀도 웃고 있으니 "안전한 스트레스"라고 뇌가 학습. 이 반복이 HPA축을 강화. 현실의 어려운 상황에서도 "이건 극복할 수 있다"는 신경 패턴 형성.</em>
+                    </div>
+                </div>
+
+                <!-- Play 3 -->
+                <div class="dialog-box">
+                    <div class="dialog-label">▶ 놀이 3: 역할극 격투 (Role-Play Combat)</div>
+                    <div class="dialog-text">
+                        <strong style="color: var(--gold);">아빠:</strong> "우리 슈퍼맨이 돼서 싸워보자! 아빠는 약한 악당이야."
+                    </div>
+                    <div class="dialog-response">
+                        <strong>아이:</strong> [웃으면서] "에이! 나한테 맞으면 날아가! 펀치!"
+                    </div>
+                    <div class="dialog-followup">
+                        <strong style="color: var(--gold);">아빠:</strong> "어어어! 아파! 많이 아파!" [극적으로 반응하되, 웃으면서. 계속 아이를 자극해서 "공격"하게 함. 충돌 직전에 멈추기. 아이가 통제감 느끼도록 의도적으로 "약하게" 역할 수행]
+                        <br><br>
+                        <em>신경과학: 안전한 환경에서 공격성을 표현하는 훈련. 아이는 "나는 강하다", "내가 상황을 통제할 수 있다"는 자신감 개발. PFC가 활성화되어 "내가 할 수 있는 것과 없는 것"의 경계를 배우기. 더 나아가 "다른 사람을 해치지 않으면서도 내 생각을 표현할 수 있다"는 사회적 기술 습득.</em>
+                    </div>
+                </div>
+
+                <div class="do-dont">
+                    <div class="do-box">
+                        충돌 직전에 멈추기. 아이의 페이스 따라가기. 안전한 환경 확보 (소파/쿠션). 아이의 신호 읽기 - 웃음과 진짜 두려움의 차이.
+                    </div>
+                    <div class="dont-box">
+                        휴대폰 보면서 하기. 실제로 때리게 강요하기. 아이가 울거나 무서워할 때 즉시 멈추지 않기. 너무 오래 놀이 계속하기 (피로 → 감정 조절 어려움).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Age 3 Content -->
+            <div id="age3" class="tab-content">
+                <h3 style="color: var(--green); margin-bottom: 1.5rem; font-weight: 600;">2-4세 아이: 2가지 놀이 방법 (각 10분)</h3>
+
+                <!-- Play 1 -->
+                <div class="dialog-box">
+                    <div class="dialog-label">▶ 놀이 1: 숨바꼭질 (Hide & Seek Peek-a-Boo)</div>
+                    <div class="dialog-text">
+                        <strong style="color: var(--gold);">아빠:</strong> "우리 아빠 찾아봐!" [큰 쿠션 뒤에 숨음]
+                    </div>
+                    <div class="dialog-response">
+                        <strong>아이:</strong> [조심스럽게 찾기 시작] "어디... 어디있어...?" [쿠션을 살짝 들어봄]
+                    </div>
+                    <div class="dialog-followup">
+                        <strong style="color: var(--gold);">아빠:</strong> "어! 찾았구나!" [쑥 나타나기. 아이와 눈을 마주치며 크게 웃기]
+                        <br><br>
+                        <em>신경과학: 2-4세는 "물체 영속성"(물건이 안 보여도 존재한다)을 아직 완전히 습득 중. 아빠가 안 보일 때 약간의 "분리 불안" 경험. 하지만 다시 나타나면서 "아빠는 항상 돌아온다"는 신경 패턴 형성 = 안전 애착. 불안을 경험했다가 진정되면서 편도체(두려움)와 HPA축이 약간 활성화되었다가 회복되는 미세한 스트레스 훈련. 너무 강하지 않으면서도 효과적.</em>
+                    </div>
+                </div>
+
+                <!-- Play 2 -->
+                <div class="dialog-box">
+                    <div class="dialog-label">▶ 놀이 2: 역할극 (Simple Role-Play)</div>
+                    <div class="dialog-text">
+                        <strong style="color: var(--gold);">아빠:</strong> "아빠 코끼리야! 넌 작은 코끼리 아기지!" [손가락을 '코'처럼 움직이며 포효] "으어어어어!"
+                    </div>
+                    <div class="dialog-response">
+                        <strong>아이:</strong> [웃으면서 따라하려고] "으어어... 흐흐흐!" [손가락으로 따라 해보려고 함]
+                    </div>
+                    <div class="dialog-followup">
+                        <strong style="color: var(--gold);">아빠:</strong> "좋아! 우리 같이 물 마시자" [코를 물처럼 움직이며 음료 소리 내기] "쪽쪽쪽쪽!" [아이가 따라하도록 유도. 간단한 상황(풀 먹기, 누워 자기) 반복 - 극복한 상황만 2-3번]
+                        <br><br>
+                        <em>신경과학: 2-4세는 "제어된 거칠기"가 필요. 너무 드라마틱하면 무서워함. 대신 단순하고 반복적인 역할극이 좋음. 아이가 "상상 능력"을 개발하면서 동시에 아빠와의 공동 참여(동기화)를 경험. 이것이 뇌의 "미러 뉴런" 체계를 활성화 → 공감 능력, 사회적 학습 발달.</em>
+                    </div>
+                </div>
+
+                <div class="do-dont">
+                    <div class="do-box">
+                        자주 나타나주기 (분리 불안 최소화). 아이가 웃을 때까지 반복 (학습 강화). 아이의 두려움 신호 즉시 캐치 및 변경. 단순함 유지 (2-3개의 동작만).
+                    </div>
+                    <div class="dont-box">
+                        너무 오래 숨기 (분리 불안 증가 위험). 큰 소리로 갑자기 놀래키기. 아이가 싫어하면 강요하기. 복잡한 스토리 만들기 (주의 산만).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: SIBLING & MARRIAGE -->
+    <section class="section">
+        <h2 class="section-title">
+            <span class="section-number">5</span>형제자매 & 부부 협력
+        </h2>
+
+        <!-- Sibling Tip -->
+        <div class="tip-box">
+            <div class="tip-title">둘 함께 놀이하기</div>
+            <div class="tip-content">
+                <p style="margin-bottom: 1rem;">같은 시간에 두 아이와 놀이할 수 있습니다. 첫째가 주도적으로 역할하고, 둘째는 옆에서 관찰하게 하세요. 둘째는 형이 하는 거친 놀이를 보면서 "이게 안전하다"는 신호를 받습니다.</p>
+                
+                <p style="margin-bottom: 1rem;"><strong style="color: var(--green);">구체적 전략:</strong></p>
+                <p style="margin-bottom: 1rem;">
+                    <em>"우주 비행사 놀이"를 할 때, 첫째를 먼저 돌린 후 (30초 회전) "둘째 차례!" 하면서 둘째도 같은 강도로 하되, 속도는 조금 느리게 (나이에 맞게 조정). 형이 웃는 모습을 보는 것이 둘째의 안정감 신호입니다.</em>
+                </p>
+                <p style="margin-bottom: 1rem;">
+                    둘째는 독립적으로 할 준비가 안 되어도, 형과 함께 있으면 더 용감해집니다. 특히 "흥분→안정" 사이클을 형을 통해 학습하게 됩니다.
+                </p>
+
+                <p style="margin-bottom: 1rem;"><strong style="color: var(--green);">형제자매 뇌 발달:</strong></p>
+                <p>
+                    • 형이 아빠 놀이를 먼저 경험 → 둘째는 모방 학습<br>
+                    • 둘이 함께하면 경쟁 요소 추가 → PFC 발달 더 강화<br>
+                    • 형의 "안전한 스트레스 경험"이 둘째에게 전달 → 세대 간 신경 적응
+                </p>
+            </div>
+        </div>
+
+        <!-- Marriage Collaboration -->
+        <div class="marriage-note">
+            <strong>💑 부부 협력: "아빠 역할"을 지지하는 엄마의 역할</strong>
+            <p style="margin-top: 0.8rem;">
+                아빠의 거친 놀이가 효과적이려면 <strong>엄마의 지지</strong>가 필수입니다.
+            </p>
+            <p style="margin-top: 0.8rem;">
+                <strong style="color: var(--green);">엄마가 해야 할 일:</strong><br>
+                1. 아빠의 놀이 스타일을 "위험하다"고 제지하지 않기<br>
+                2. 놀이 후 아이가 피곤해 보여도 "일반적"이라고 이해<br>
+                3. 아빠에게 주 3-4회, 하루 15-20분 "독립적 놀이 시간" 확보<br>
+                4. 아이가 안 보일 때 아빠를 칭찬하기 ("아빠는 정말 좋은 아빠야")
+            </p>
+            <p style="margin-top: 0.8rem;">
+                <strong style="color: var(--gold);">이렇게 하면:</strong> 부부가 "아이를 위한 보완적 역할"을 한다는 공동 목표 형성. 부부 갈등 감소. 아이는 "안전한 애착(엄마)" + "도전적 성장(아빠)"을 동시에 경험.
+            </p>
+        </div>
+    </section>
+
+    <!-- SECTION 6: DEEP DIVE 2 -->
+    <section class="section">
+        <div class="deep-dive" id="deepDive2">
+            <div class="deep-dive-header" onclick="toggleDeepDive('deepDive2')">
+                <span class="deep-dive-title">🧠 Deep Dive: 아버지가 없는 경우의 신경생물학적 영향</span>
+                <span class="deep-dive-toggle">▼</span>
+            </div>
+            <div class="deep-dive-content">
+                <div class="deep-dive-text">
+                    <p style="margin-bottom: 1rem;">
+                        <strong>연구 배경:</strong> Paquette와 그의 팀은 아버지의 부재가 아이의 신경계에 어떤 영향을 미치는지 추적했습니다.
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <strong>발견 사항:</strong>
+                        <br>• 아버지 부재 아동: HPA축 활성화 과도하고 회복이 느림 (40% 이상 저하)
+                        <br>• PFC 발달 지연: 의사결정 능력, 감정 조절, 위험 평가 능력이 발달 단계보다 뒤쳐짐
+                        <br>• 편도체 과활성화: 새로운 상황에서 두려움과 불안이 과도하게 반응
+                        <br>• 도파민 체계 변화: 보상에 대한 동기 부여가 낮아짐
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <strong>행동적 증상:</strong>
+                        <br>• 새로운 환경 적응 어려움 (학교 입학, 낯선 사람과의 만남)
+                        <br>• 충동성 증가 (PFC 약화로 인한 결과)
+                        <br>• 리스크 회피 행동 (너무 안전하게만 행동)
+                        <br>• 또래와의 갈등 처리 능력 약화
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <strong>보상 메커니즘:</strong> 다행히, 이는 완전히 되돌릴 수 있습니다!
+                        <br>• 어머니가 "아빠 같은 역할"을 할 수 있습니다 (거친 놀이, 도전적 활동)
+                        <br>• 다른 남성 성인 (할아버지, 삼촌, 코치, 선생님)과의 관계 형성
+                        <br>• 아이 자신이 청소년기에 "활성화 놀이"를 더 많이 추구하면서 자체 조절
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 7: QUIZZES -->
+    <section class="section">
+        <h2 class="section-title">
+            <span class="section-number">6</span>학습 확인
+        </h2>
+
+        <div class="quiz-container">
+            <div class="quiz-number">Quiz 1</div>
+            <div class="quiz-question">거친 놀이(Rough-and-Tumble Play)가 주로 발달시키는 뇌 영역은?</div>
+            <div class="quiz-options">
+                <label class="quiz-option">
+                    <input type="radio" name="quiz1" value="a" onchange="checkQuiz1('a')"> 소뇌(Cerebellum)만
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz1" value="b" onchange="checkQuiz1('b')"> 전전두피질(PFC)과 HPA축 (스트레스 회복)
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz1" value="c" onchange="checkQuiz1('c')"> 후각 피질
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz1" value="d" onchange="checkQuiz1('d')"> 청각 피질
+                </label>
+            </div>
+            <div id="feedback1" class="quiz-feedback"></div>
+            <div class="spaced-repetition">
+                <div class="sr-title">학습 진도</div>
+                <div class="sr-bar">
+                    <div class="sr-progress" id="progress1" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quiz-container">
+            <div class="quiz-number">Quiz 2</div>
+            <div class="quiz-question">Daniel Paquette의 "Activation Relationship"의 핵심은?</div>
+            <div class="quiz-options">
+                <label class="quiz-option">
+                    <input type="radio" name="quiz2" value="a" onchange="checkQuiz2('a')"> 아이를 항상 조용하고 진정된 상태로 유지하는 것
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz2" value="b" onchange="checkQuiz2('b')"> 아이의 신경계를 "활성화"시켜 흥분하게 한 후, 회복하도록 유도하는 사이클
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz2" value="c" onchange="checkQuiz2('c')"> 엄마의 역할과 완전히 같음
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz2" value="d" onchange="checkQuiz2('d')"> 아이에게 물리적 힘을 사용하는 것
+                </label>
+            </div>
+            <div id="feedback2" class="quiz-feedback"></div>
+            <div class="spaced-repetition">
+                <div class="sr-title">학습 진도</div>
+                <div class="sr-bar">
+                    <div class="sr-progress" id="progress2" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quiz-container">
+            <div class="quiz-number">Quiz 3</div>
+            <div class="quiz-question">5-7세 아이와 2-4세 아이의 거친 놀이 방식의 가장 큰 차이는?</div>
+            <div class="quiz-options">
+                <label class="quiz-option">
+                    <input type="radio" name="quiz3" value="a" onchange="checkQuiz3('a')"> 5-7세는 할 수 있지만 2-4세는 안 됨
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz3" value="b" onchange="checkQuiz3('b')"> 2-4세는 복잡하고 오래 지속되는 놀이가 필요함
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz3" value="c" onchange="checkQuiz3('c')"> 5-7세는 역동적이고 복잡, 2-4세는 단순하고 반복적이어야 함 (분리 불안 고려)
+                </label>
+                <label class="quiz-option">
+                    <input type="radio" name="quiz3" value="d" onchange="checkQuiz3('d')"> 성별에 따라 다름
+                </label>
+            </div>
+            <div id="feedback3" class="quiz-feedback"></div>
+            <div class="spaced-repetition">
+                <div class="sr-title">학습 진도</div>
+                <div class="sr-bar">
+                    <div class="sr-progress" id="progress3" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Intersection Observer for Fade-Up Animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-up');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.section').forEach(section => {
+                observer.observe(section);
+            });
+        });
+
+        // Pomodoro Timer
+        let timerInterval = null;
+        let timeLeft = 25 * 60;
+
+        function openPomodoroModal() {
+            document.getElementById('pomodoroModal').classList.add('active');
+        }
+
+        function closePomodoroModal() {
+            document.getElementById('pomodoroModal').classList.remove('active');
+            if (timerInterval) clearInterval(timerInterval);
+            timeLeft = 25 * 60;
+            updateTimerDisplay();
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'block';
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    alert('25분 완료! 수고하셨습니다.');
+                    document.getElementById('startBtn').style.display = 'block';
+                    document.getElementById('stopBtn').style.display = 'none';
+                    timeLeft = 25 * 60;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+        }
+
+        function resetTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+            timeLeft = 25 * 60;
+            updateTimerDisplay();
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timerDisplay').textContent =
+                String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        }
+
+        // Age Tab Switching
+        function switchTab(event, tabId) {
+            event.preventDefault();
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.age-tab').forEach(tab => tab.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Deep Dive Toggle
+        function toggleDeepDive(deepDiveId) {
+            const deepDive = document.getElementById(deepDiveId);
+            deepDive.classList.toggle('open');
+        }
+
+        // Quiz Functions
+        function checkQuiz1(answer) {
+            const feedback = document.getElementById('feedback1');
+            const correct = answer === 'b';
+
+            if (correct) {
+                feedback.textContent = '✓ 정답입니다! 거친 놀이는 PFC와 HPA축을 발달시켜 감정 조절과 스트레스 회복 능력을 키웁니다.';
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                document.getElementById('progress1').style.width = '100%';
+            } else {
+                feedback.textContent = '✗ 다시 한 번 생각해보세요. 거친 놀이는 의사결정(PFC)과 스트레스 처리(HPA축) 능력을 발달시킵니다.';
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                document.getElementById('progress1').style.width = '30%';
+            }
+        }
+
+        function checkQuiz2(answer) {
+            const feedback = document.getElementById('feedback2');
+            const correct = answer === 'b';
+
+            if (correct) {
+                feedback.textContent = '✓ 정답입니다! Activation Relationship은 "흥분-회복" 사이클을 반복하면서 신경계를 훈련시키는 개념입니다.';
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                document.getElementById('progress2').style.width = '100%';
+            } else {
+                feedback.textContent = '✗ 다시 한 번 생각해보세요. 아빠는 아이의 신경계를 의도적으로 활성화했다가 회복하도록 돕습니다.';
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                document.getElementById('progress2').style.width = '30%';
+            }
+        }
+
+        function checkQuiz3(answer) {
+            const feedback = document.getElementById('feedback3');
+            const correct = answer === 'c';
+
+            if (correct) {
+                feedback.textContent = '✓ 정답입니다! 2-4세는 분리 불안이 있어서 단순하고 반복적이어야 안전감을 느낍니다.';
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                document.getElementById('progress3').style.width = '100%';
+            } else {
+                feedback.textContent = '✗ 다시 한 번 생각해보세요. 발달 단계에 맞는 놀이의 강도와 복잡도가 다릅니다.';
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                document.getElementById('progress3').style.width = '30%';
+            }
+        }
+    </script>
+</body>
+</html>

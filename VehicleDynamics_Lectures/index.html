@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YS · 진동학 마스터 — 33일 완성 커리큘럼</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600;700&family=Noto+Sans+KR:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0C10;--surface:#12151C;--surface2:#1A1E28;--border:#252A38;--gold:#C9A84C;--gold-light:#E8C96A;--blue:#4A9EBF;--green:#4ABF8A;--purple:#8A6ABF;--orange:#BF6A4A;--text:#D8D3C8;--text-dim:#7A7A8A;--text-bright:#F0EBE0}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-weight:300;line-height:1.8;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+
+.container{max-width:960px;margin:0 auto;padding:0 24px 80px}
+
+/* HERO */
+.index-hero{text-align:center;padding:60px 0 40px;animation:fadeUp .8s ease both}
+.logo{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:18px;color:var(--gold);letter-spacing:4px;text-transform:uppercase;margin-bottom:8px}
+.index-hero h1{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:48px;color:var(--text-bright);line-height:1.2;margin-bottom:8px}
+.index-hero .sub{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:20px;color:var(--text-dim);margin-bottom:32px}
+.stats-row{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:16px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 24px;text-align:center;min-width:120px}
+.stat-card .num{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:500;color:var(--gold-light);display:block}
+.stat-card .lbl{font-size:12px;color:var(--text-dim)}
+
+/* PROGRESS BAR */
+.global-progress{margin:32px 0;text-align:center}
+.gp-bar{width:100%;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin:8px 0}
+.gp-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--gold-light));transition:width .6s}
+.gp-label{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text-dim)}
+
+/* PART SECTIONS */
+.part{margin-top:56px;animation:fadeUp .6s ease both}
+.part-header{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.part-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bg);background:var(--gold);padding:4px 12px;border-radius:4px;letter-spacing:2px;font-weight:500}
+.part-title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:24px;color:var(--text-bright)}
+.part-desc{font-size:14px;color:var(--text-dim);margin-bottom:20px}
+
+/* DAY CARDS */
+.day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.day-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all .25s;text-decoration:none;display:block;position:relative;overflow:hidden}
+.day-card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,168,76,.08)}
+.day-card.completed{border-left:3px solid var(--green)}
+.day-card.current{border-left:3px solid var(--gold);background:rgba(201,168,76,.04)}
+.day-card.locked{opacity:.5;pointer-events:none}
+.dc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.dc-day{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);letter-spacing:1px}
+.dc-diff{font-size:11px;color:var(--text-dim)}
+.dc-title{font-size:15px;font-weight:400;color:var(--text-bright);margin-bottom:6px}
+.dc-eq{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold-light);background:#0D1017;padding:4px 10px;border-radius:4px;display:inline-block;margin-bottom:8px}
+.dc-tags{display:flex;gap:6px;flex-wrap:wrap}
+.dc-tag{font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid var(--border);color:var(--text-dim)}
+.dc-tag.math{border-color:rgba(201,168,76,.3);color:var(--gold)}
+.dc-tag.sim{border-color:rgba(74,158,191,.3);color:var(--blue)}
+.dc-tag.review{border-color:rgba(74,191,138,.3);color:var(--green)}
+.dc-status{position:absolute;top:12px;right:12px;font-size:14px}
+
+/* ROADMAP */
+.roadmap{margin-top:56px;padding:32px;background:var(--surface);border:1px solid var(--border);border-radius:16px}
+.roadmap h3{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:22px;color:var(--text-bright);margin-bottom:16px}
+.rm-track{display:flex;align-items:center;gap:4px;overflow-x:auto;padding:16px 0}
+.rm-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:8px;flex-shrink:0}
+.rm-dot.done{background:var(--green);color:var(--bg)}
+.rm-dot.active{background:var(--gold);color:var(--bg);box-shadow:0 0 12px rgba(201,168,76,.4)}
+.rm-dot.future{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim)}
+.rm-line{width:8px;height:2px;flex-shrink:0}
+.rm-line.done{background:var(--green)}
+.rm-line.future{background:var(--border)}
+.rm-legend{display:flex;gap:20px;margin-top:12px;font-size:12px;color:var(--text-dim)}
+.rm-legend span{display:flex;align-items:center;gap:6px}
+.rm-legend .dot-sm{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+/* FOOTER */
+.footer{text-align:center;padding:40px 0 20px;font-size:12px;color:var(--text-dim);border-top:1px solid var(--border);margin-top:60px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:640px){.index-hero h1{font-size:32px}.day-grid{grid-template-columns:1fr}.stats-row{gap:12px}.stat-card{min-width:100px;padding:12px 16px}.stat-card .num{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ═══ HERO ═══ -->
+<section class="index-hero">
+  <div class="logo">YS · Vehicle Dynamics</div>
+  <h1>진동학 마스터</h1>
+  <p class="sub">33일 완성 — 수식 원리부터 Simpack 디지털 트윈까지</p>
+  <div class="stats-row">
+    <div class="stat-card"><span class="num">33</span><span class="lbl">총 Day 수</span></div>
+    <div class="stat-card"><span class="num">5</span><span class="lbl">PART 구성</span></div>
+    <div class="stat-card"><span class="num">25분</span><span class="lbl">포모도로/Day</span></div>
+    <div class="stat-card"><span class="num">~50</span><span class="lbl">핵심 수식</span></div>
+  </div>
+</section>
+
+<!-- ═══ GLOBAL PROGRESS ═══ -->
+<div class="global-progress">
+  <div class="gp-label">전체 진행률: <strong id="progressPct">3%</strong> (1 / 33 완료)</div>
+  <div class="gp-bar"><div class="gp-fill" id="progressFill" style="width:3%"></div></div>
+</div>
+
+<!-- ═══ VISUAL ROADMAP ═══ -->
+<div class="roadmap">
+  <h3>📍 학습 로드맵</h3>
+  <div class="rm-track" id="roadmapTrack"></div>
+  <div class="rm-legend">
+    <span><span class="dot-sm" style="background:var(--green)"></span> 완료</span>
+    <span><span class="dot-sm" style="background:var(--gold)"></span> 현재</span>
+    <span><span class="dot-sm" style="background:var(--surface2);border:1px solid var(--border)"></span> 예정</span>
+  </div>
+</div>
+
+<!-- ═══ PART 1 ═══ -->
+<section class="part">
+  <div class="part-header">
+    <span class="part-num">PART 1</span>
+    <span class="part-title">1자유도 진동계 기초</span>
+  </div>
+  <p class="part-desc">단일 질량-스프링-댐퍼 시스템의 운동방정식 유도부터 공진 해석까지. 모든 차량 진동 모델의 주춧돌.</p>
+  <div class="day-grid">
+    <a class="day-card completed" href="Day01_운동방정식유도.html">
+      <span class="dc-status">✅</span>
+      <div class="dc-top"><span class="dc-day">DAY 01</span><span class="dc-diff">★★☆☆☆</span></div>
+      <div class="dc-title">운동방정식 유도</div>
+      <div class="dc-eq">mx'' + cx' + kx = F(t)</div>
+      <div class="dc-tags"><span class="dc-tag math">수식유도</span><span class="dc-tag sim">Simpack</span></div>
+    </a>
+    <a class="day-card current" href="Day02_비감쇠자유진동.html">
+      <span class="dc-status">🔶</span>
+      <div class="dc-top"><span class="dc-day">DAY 02</span><span class="dc-diff">★★☆☆☆</span></div>
+      <div class="dc-title">비감쇠 자유진동 — 고유진동수</div>
+      <div class="dc-eq">ω_n = √(k/m)</div>
+      <div class="dc-tags"><span class="dc-tag math">특성방정식</span><span class="dc-tag math">허근</span></div>
+    </a>
+    <a class="day-card locked" href="Day03_감쇠비정의.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 03</span><span class="dc-diff">★★☆☆☆</span></div>
+      <div class="dc-title">감쇠비 ζ 정의와 분류</div>
+      <div class="dc-eq">ζ = c / (2√(km))</div>
+      <div class="dc-tags"><span class="dc-tag math">임계감쇠</span><span class="dc-tag">차량예시</span></div>
+    </a>
+    <a class="day-card locked" href="Day04_부족감쇠자유진동.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 04</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">부족감쇠 자유진동 해</div>
+      <div class="dc-eq">x(t) = e^(−ζω_n·t)[A cos ω_d·t + B sin ω_d·t]</div>
+      <div class="dc-tags"><span class="dc-tag math">지수감쇠</span><span class="dc-tag math">감쇠진동수</span></div>
+    </a>
+    <a class="day-card locked" href="Day05_강제조화진동.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 05</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">강제 조화 진동 — 진폭비</div>
+      <div class="dc-eq">X/X_st = 1/√((1−r²)²+(2ζr)²)</div>
+      <div class="dc-tags"><span class="dc-tag math">주파수비</span><span class="dc-tag math">진폭비</span></div>
+    </a>
+    <a class="day-card locked" href="Day06_위상각유도.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 06</span><span class="dc-diff">★★☆☆☆</span></div>
+      <div class="dc-title">위상각 φ 유도</div>
+      <div class="dc-eq">φ = arctan(2ζr / (1−r²))</div>
+      <div class="dc-tags"><span class="dc-tag math">위상지연</span></div>
+    </a>
+    <a class="day-card locked" href="Day07_공진조건분석.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 07</span><span class="dc-diff">★★☆☆☆</span></div>
+      <div class="dc-title">공진 조건 분석</div>
+      <div class="dc-eq">ω ≈ ω_n → 진폭 극대화</div>
+      <div class="dc-tags"><span class="dc-tag math">공진</span><span class="dc-tag">댐핑역할</span></div>
+    </a>
+    <a class="day-card locked" href="Day08_Part1복습.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 08</span><span class="dc-diff">★☆☆☆☆</span></div>
+      <div class="dc-title">Part 1 통합 복습</div>
+      <div class="dc-eq">1DOF 수식 흐름도 정리</div>
+      <div class="dc-tags"><span class="dc-tag review">복습</span><span class="dc-tag review">퀴즈강화</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══ PART 2 ═══ -->
+<section class="part">
+  <div class="part-header">
+    <span class="part-num">PART 2</span>
+    <span class="part-title">차량 진동 모델</span>
+  </div>
+  <p class="part-desc">Quarter Car → Half Car → Full Vehicle. 모델 복잡도를 단계적으로 올리며 행렬 운동방정식과 상태공간 표현을 익힙니다.</p>
+  <div class="day-grid">
+    <a class="day-card locked" href="Day09_QuarterCar.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 09</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">Quarter Car Model 운동방정식</div>
+      <div class="dc-eq">[M]x'' + [C]x' + [K]x = F</div>
+      <div class="dc-tags"><span class="dc-tag math">2DOF</span><span class="dc-tag math">행렬조립</span></div>
+    </a>
+    <a class="day-card locked" href="Day10_상태공간.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 10</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">상태공간 표현</div>
+      <div class="dc-eq">{q'} = [A]{q} + [B]{u}</div>
+      <div class="dc-tags"><span class="dc-tag math">상태벡터</span><span class="dc-tag sim">Simpack</span></div>
+    </a>
+    <a class="day-card locked" href="Day11_전달함수.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 11</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">라플라스 변환 & 전달함수</div>
+      <div class="dc-eq">H(s) = X(s)/F(s)</div>
+      <div class="dc-tags"><span class="dc-tag math">특성다항식</span></div>
+    </a>
+    <a class="day-card locked" href="Day12_노면입력.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 12</span><span class="dc-diff">★★☆☆☆</span></div>
+      <div class="dc-title">노면 입력 모델링</div>
+      <div class="dc-eq">PSD S_xx(f), ISO 8608</div>
+      <div class="dc-tags"><span class="dc-tag math">PSD</span><span class="dc-tag">랜덤노면</span></div>
+    </a>
+    <a class="day-card locked" href="Day13_HalfCar.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 13</span><span class="dc-diff">★★★★☆</span></div>
+      <div class="dc-title">Half Car Model — 피치·바운스 연성</div>
+      <div class="dc-eq">관성모멘트 I_y 포함 연성방정식</div>
+      <div class="dc-tags"><span class="dc-tag math">피치</span><span class="dc-tag math">바운스</span></div>
+    </a>
+    <a class="day-card locked" href="Day14_FullVehicle.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 14</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">Full Vehicle 7DOF 개요</div>
+      <div class="dc-eq">[M], [C], [K] 행렬 구조</div>
+      <div class="dc-tags"><span class="dc-tag math">7DOF</span><span class="dc-tag">구조이해</span></div>
+    </a>
+    <a class="day-card locked" href="Day15_Part2복습.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 15</span><span class="dc-diff">★☆☆☆☆</span></div>
+      <div class="dc-title">Part 2 통합 복습</div>
+      <div class="dc-eq">모델 복잡도별 비교 정리</div>
+      <div class="dc-tags"><span class="dc-tag review">복습</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══ PART 3 ═══ -->
+<section class="part">
+  <div class="part-header">
+    <span class="part-num">PART 3</span>
+    <span class="part-title">서스펜션 세부 수식</span>
+  </div>
+  <p class="part-desc">스프링, 댐퍼, 부싱, 타이어 — 각 부품의 수식 모델과 실무 파라미터를 깊이 다룹니다.</p>
+  <div class="day-grid">
+    <a class="day-card locked" href="Day16_스프링특성.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 16</span><span class="dc-diff">★★☆☆☆</span></div>
+      <div class="dc-title">스프링 특성</div>
+      <div class="dc-eq">F=kx, 등가강성 직렬·병렬</div>
+      <div class="dc-tags"><span class="dc-tag math">등가강성</span><span class="dc-tag">비선형</span></div>
+    </a>
+    <a class="day-card locked" href="Day17_댐퍼모델.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 17</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">댐퍼(쇽업쇼버) 모델</div>
+      <div class="dc-eq">F=cv, Maxwell, F-v 선도</div>
+      <div class="dc-tags"><span class="dc-tag math">Maxwell</span><span class="dc-tag sim">Simpack</span></div>
+    </a>
+    <a class="day-card locked" href="Day18_부싱복소강성.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 18</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">부싱 복소강성</div>
+      <div class="dc-eq">K*=K'(1+iη)</div>
+      <div class="dc-tags"><span class="dc-tag math">복소수</span><span class="dc-tag math">손실각</span></div>
+    </a>
+    <a class="day-card locked" href="Day19_타이어수직동특성.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 19</span><span class="dc-diff">★★☆☆☆</span></div>
+      <div class="dc-title">타이어 수직 동특성</div>
+      <div class="dc-eq">f_t = (1/2π)√(k_t/m_u)</div>
+      <div class="dc-tags"><span class="dc-tag math">접지공진</span></div>
+    </a>
+    <a class="day-card locked" href="Day20_TireHop.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 20</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">언스프렁 질량 & Tire Hop</div>
+      <div class="dc-eq">f_hop = (1/2π)√((k_s+k_t)/m_u)</div>
+      <div class="dc-tags"><span class="dc-tag math">Tire Hop</span><span class="dc-tag sim">Simpack</span></div>
+    </a>
+    <a class="day-card locked" href="Day21_승차감트레이드오프.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 21</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">승차감 vs 조종안정성 트레이드오프</div>
+      <div class="dc-eq">ζ_opt, 스카이훅 이론</div>
+      <div class="dc-tags"><span class="dc-tag math">최적감쇠</span><span class="dc-tag">Skyhook</span></div>
+    </a>
+    <a class="day-card locked" href="Day22_Part3복습.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 22</span><span class="dc-diff">★☆☆☆☆</span></div>
+      <div class="dc-title">Part 3 복습</div>
+      <div class="dc-eq">부품별 수식 비교 정리</div>
+      <div class="dc-tags"><span class="dc-tag review">복습</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══ PART 4 ═══ -->
+<section class="part">
+  <div class="part-header">
+    <span class="part-num">PART 4</span>
+    <span class="part-title">주파수 영역 해석</span>
+  </div>
+  <p class="part-desc">푸리에 변환, PSD, FRF, 고유치 문제, 모드 중첩법 — 주파수 영역에서 진동을 바라보는 눈을 키웁니다.</p>
+  <div class="day-grid">
+    <a class="day-card locked" href="Day23_푸리에변환.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 23</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">푸리에 변환 원리</div>
+      <div class="dc-eq">X(f) = ∫x(t)e^(−i2πft)dt</div>
+      <div class="dc-tags"><span class="dc-tag math">FFT</span><span class="dc-tag math">역변환</span></div>
+    </a>
+    <a class="day-card locked" href="Day24_PSD.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 24</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">PSD 정의와 해석</div>
+      <div class="dc-eq">S_xx(f) = |X(f)|²/T</div>
+      <div class="dc-tags"><span class="dc-tag math">PSD</span><span class="dc-tag">단위해석</span></div>
+    </a>
+    <a class="day-card locked" href="Day25_FRF.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 25</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">FRF 측정과 해석</div>
+      <div class="dc-eq">H(ω) = X(ω)/F(ω), γ²</div>
+      <div class="dc-tags"><span class="dc-tag math">코히런스</span><span class="dc-tag">모달해석</span></div>
+    </a>
+    <a class="day-card locked" href="Day26_고유치문제.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 26</span><span class="dc-diff">★★★★☆</span></div>
+      <div class="dc-title">고유치 문제</div>
+      <div class="dc-eq">[K − ω²M]{φ} = {0}</div>
+      <div class="dc-tags"><span class="dc-tag math">고유값</span><span class="dc-tag math">고유벡터</span></div>
+    </a>
+    <a class="day-card locked" href="Day27_모드중첩법.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 27</span><span class="dc-diff">★★★★☆</span></div>
+      <div class="dc-title">모드 중첩법</div>
+      <div class="dc-eq">모달좌표 변환 → 응답 재구성</div>
+      <div class="dc-tags"><span class="dc-tag math">모달</span><span class="dc-tag math">중첩</span></div>
+    </a>
+    <a class="day-card locked" href="Day28_Part4복습.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 28</span><span class="dc-diff">★☆☆☆☆</span></div>
+      <div class="dc-title">Part 4 복습</div>
+      <div class="dc-eq">주파수 영역 전체 흐름 정리</div>
+      <div class="dc-tags"><span class="dc-tag review">복습</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══ PART 5 ═══ -->
+<section class="part">
+  <div class="part-header">
+    <span class="part-num">PART 5</span>
+    <span class="part-title">Simpack 완전 통합</span>
+  </div>
+  <p class="part-desc">이론 수식을 Simpack 모델로 1:1 구현하고, 실측 데이터와 비교·검증하여 디지털 트윈을 완성합니다.</p>
+  <div class="day-grid">
+    <a class="day-card locked" href="Day29_수식Simpack매핑.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 29</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">수식 → Simpack 완전 매핑</div>
+      <div class="dc-eq">기호↔입력필드 1:1 테이블</div>
+      <div class="dc-tags"><span class="dc-tag sim">Simpack</span><span class="dc-tag">매핑</span></div>
+    </a>
+    <a class="day-card locked" href="Day30_QuarterCar구현.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 30</span><span class="dc-diff">★★★★☆</span></div>
+      <div class="dc-title">Quarter Car → Simpack 구현 & 검증</div>
+      <div class="dc-eq">이론값 vs 시뮬레이션 비교</div>
+      <div class="dc-tags"><span class="dc-tag sim">Simpack</span><span class="dc-tag">검증</span></div>
+    </a>
+    <a class="day-card locked" href="Day31_FRF상관성.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 31</span><span class="dc-diff">★★★★☆</span></div>
+      <div class="dc-title">FRF 시뮬레이션 vs 실측 상관성</div>
+      <div class="dc-eq">Correlation Analysis</div>
+      <div class="dc-tags"><span class="dc-tag sim">Simpack</span><span class="dc-tag">실측비교</span></div>
+    </a>
+    <a class="day-card locked" href="Day32_CoSimulation.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 32</span><span class="dc-diff">★★★★☆</span></div>
+      <div class="dc-title">MATLAB/Simulink Co-Simulation</div>
+      <div class="dc-eq">상태공간 모델 연결</div>
+      <div class="dc-tags"><span class="dc-tag sim">Simpack</span><span class="dc-tag">MATLAB</span></div>
+    </a>
+    <a class="day-card locked" href="Day33_디지털트윈완성.html">
+      <span class="dc-status">🔒</span>
+      <div class="dc-top"><span class="dc-day">DAY 33</span><span class="dc-diff">★★★☆☆</span></div>
+      <div class="dc-title">디지털 트윈 완성 워크플로우</div>
+      <div class="dc-eq">End-to-End Pipeline 총정리</div>
+      <div class="dc-tags"><span class="dc-tag sim">디지털트윈</span><span class="dc-tag review">총정리</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div class="footer">
+  YS · Vehicle Dynamics Study Series — 33-Day Masterclass<br>
+  수식 원리 → Simpack 디지털 트윈 · Renault Korea Suspension Engineer<br>
+  <span style="color:var(--gold);">파일 생성: generate_days.py 실행으로 전체 Day HTML 자동 생성</span>
+</div>
+
+</div>
+
+<script>
+// Build roadmap dots
+const track = document.getElementById('roadmapTrack');
+const completed = 1;
+for(let i=1; i<=33; i++){
+  if(i>1){
+    const line = document.createElement('div');
+    line.className = 'rm-line ' + (i<=completed?'done':'future');
+    track.appendChild(line);
+  }
+  const dot = document.createElement('div');
+  dot.className = 'rm-dot ' + (i<completed?'done': i===completed?'done': i===completed+1?'active':'future');
+  if(i===1) dot.className = 'rm-dot done';
+  if(i===2) dot.className = 'rm-dot active';
+  dot.textContent = i;
+  track.appendChild(dot);
+}
+
+// Fade-in on scroll
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)'}});
+},{threshold:.1});
+document.querySelectorAll('.part').forEach(s=>{
+  s.style.opacity='0';s.style.transform='translateY(24px)';s.style.transition='opacity .6s ease, transform .6s ease';
+  obs.observe(s);
+});
+</script>
+</body>
+</html>

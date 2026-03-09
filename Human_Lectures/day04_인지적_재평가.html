@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인간 탐구 Day 04 — 인지적 재평가</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--purple:#8A6ABF;--gold:#C9A84C;--green:#6BBF8A;--red:#BF6B6B;--cyan:#6BB5BF;
+--bg:#0A0C10;--card:#12151C;--card2:#161A24;--text1:#E8E9F3;--text2:#9EA0B8;
+--border:rgba(138,106,191,0.15);--glow:rgba(138,106,191,0.08);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text1);line-height:1.85;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--purple);border-radius:3px}
+
+/* ── Header ── */
+header{position:sticky;top:0;z-index:1000;background:rgba(10,12,16,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:.85rem 2rem}
+.hdr{max-width:860px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+.hdr-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:700;background:linear-gradient(135deg,var(--purple),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr-sub{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--text2)}
+.hdr-progress{height:2px;background:linear-gradient(90deg,var(--purple),var(--gold));position:absolute;bottom:0;left:0;width:18.2%}
+
+/* ── Series Banner ── */
+.series-banner{max-width:860px;margin:1.5rem auto 0;padding:.6rem 1.2rem;background:rgba(138,106,191,0.06);border:1px solid var(--border);border-radius:8px;display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--text2)}
+.series-banner strong{color:var(--gold);font-family:'JetBrains Mono',monospace}
+
+/* ── Main ── */
+main{max-width:860px;margin:0 auto;padding:2rem 1.5rem 4rem}
+
+/* ── Hero ── */
+.hero{text-align:center;padding:3.5rem 2rem;margin-bottom:3rem;background:linear-gradient(160deg,rgba(138,106,191,0.07),rgba(201,168,76,0.05));border:1px solid var(--border);border-radius:16px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 40%,rgba(138,106,191,0.04),transparent 50%);pointer-events:none}
+.gauge-wrap{display:flex;justify-content:center;align-items:center;gap:1.2rem;margin-bottom:2rem;flex-wrap:wrap}
+.gauge{width:100px;height:100px;border-radius:50%;position:relative}
+.gauge svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gauge-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge-val{font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:600;color:var(--gold)}
+.gauge-txt{font-size:.65rem;color:var(--text2);margin-top:2px}
+.meta-badges{display:flex;flex-direction:column;gap:.4rem;align-items:flex-start}
+.meta-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .65rem;background:rgba(138,106,191,0.12);border:1px solid rgba(138,106,191,0.25);border-radius:12px;font-size:.72rem;color:var(--purple);font-family:'JetBrains Mono',monospace}
+.meta-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--purple)}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-weight:600;line-height:1.35;margin-bottom:1rem}
+.hero-q{font-size:1.15rem;color:var(--text2);line-height:1.6;font-style:italic;margin-bottom:2rem}
+.kw-badges{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+.kw{padding:.45rem 1rem;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:20px;font-size:.82rem;color:var(--gold)}
+
+/* ── Section Titles ── */
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:600;margin-bottom:1.8rem;padding-bottom:.8rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.8rem}
+.sec-title .icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+
+/* ── Learning Strategy ── */
+.strategy{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:3rem}
+.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+@media(max-width:700px){.time-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:450px){.time-grid{grid-template-columns:1fr}}
+.tslot{padding:1rem;background:rgba(138,106,191,0.06);border-left:3px solid var(--purple);border-radius:0 8px 8px 0;transition:transform .2s}
+.tslot:hover{transform:translateX(4px)}
+.tslot-time{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--gold);margin-bottom:.4rem}
+.tslot-desc{font-size:.88rem;color:var(--text2);line-height:1.6}
+.strat-note{padding:1.2rem;background:rgba(107,191,138,0.06);border-left:3px solid var(--green);border-radius:0 8px 8px 0;font-size:.9rem;color:var(--text2);line-height:1.7}
+.strat-note strong{color:var(--green)}
+
+/* ── Concept Cards ── */
+.concepts{display:grid;gap:1.5rem;margin-bottom:3rem}
+.ccard{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .3s}
+.ccard:hover{border-color:rgba(138,106,191,0.35)}
+.ccard-head{padding:1.5rem 2rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.ccard-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600;color:var(--gold)}
+.ccard-num{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text2);background:rgba(201,168,76,0.1);padding:.2rem .6rem;border-radius:10px}
+.ccard-toggle{font-size:1.2rem;color:var(--text2);transition:transform .3s}
+.ccard.open .ccard-toggle{transform:rotate(180deg)}
+.ccard-body{padding:0 2rem;max-height:0;overflow:hidden;transition:max-height .5s ease,padding .3s}
+.ccard.open .ccard-body{max-height:3000px;padding:0 2rem 2rem}
+.ccard-summary{padding:0 2rem 1.5rem;font-size:.95rem;color:var(--text2)}
+.ccard-body h4{font-size:.95rem;color:var(--purple);margin:1.2rem 0 .6rem;font-weight:600}
+.ccard-body p,.ccard-body li{font-size:.92rem;color:var(--text2);line-height:1.75}
+.ccard-body ul,.ccard-body ol{margin-left:1.2rem;margin-bottom:.8rem}
+.ccard-body li{margin-bottom:.3rem}
+.deep-dive{margin-top:1.5rem;padding:1.2rem;background:rgba(138,106,191,0.05);border:1px dashed rgba(138,106,191,0.2);border-radius:8px}
+.deep-dive summary{cursor:pointer;font-size:.88rem;color:var(--purple);font-weight:500;margin-bottom:.8rem}
+.deep-dive p{font-size:.85rem;color:var(--text2);line-height:1.7}
+
+/* ── SVG Diagram ── */
+.diagram-section{margin-bottom:3rem}
+.diagram-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;overflow-x:auto}
+.diagram-wrap svg{width:100%;max-width:780px;margin:0 auto;display:block}
+.diagram-caption{margin-top:1.2rem;font-size:.88rem;color:var(--text2);line-height:1.7;padding:0 .5rem}
+
+/* ── Practice ── */
+.practice{margin-bottom:3rem}
+.proutine{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:1.2rem;overflow:hidden}
+.proutine-head{padding:1.2rem 1.8rem;display:flex;align-items:center;gap:1rem;border-bottom:1px solid var(--border)}
+.proutine-time{font-family:'JetBrains Mono',monospace;font-size:.85rem;padding:.35rem .8rem;border-radius:8px;font-weight:600;min-width:60px;text-align:center}
+.proutine-time.t30{background:rgba(191,107,107,0.15);color:var(--red)}
+.proutine-time.t5{background:rgba(201,168,76,0.15);color:var(--gold)}
+.proutine-time.tday{background:rgba(107,191,138,0.15);color:var(--green)}
+.proutine-name{font-size:1rem;font-weight:500}
+.proutine-body{padding:1.8rem}
+.proutine-body ol{margin-left:1.3rem;font-size:.92rem;color:var(--text2);line-height:1.8}
+.proutine-body ol li{margin-bottom:.6rem}
+.proutine-body ol li strong{color:var(--text1)}
+.reappraisal-script{background:rgba(107,191,138,0.08);border-left:3px solid var(--green);padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0;font-size:.9rem;line-height:1.7}
+.reappraisal-script strong{color:var(--green)}
+.scenario-box{background:rgba(138,106,191,0.05);border:1px solid rgba(138,106,191,0.15);padding:1.2rem;border-radius:8px;margin:1rem 0;font-size:.9rem;line-height:1.7}
+.do-dont{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem}
+@media(max-width:500px){.do-dont{grid-template-columns:1fr}}
+.do-box,.dont-box{padding:1rem;border-radius:8px;font-size:.88rem;line-height:1.6}
+.do-box{background:rgba(107,191,138,0.08);border:1px solid rgba(107,191,138,0.2);color:var(--text2)}
+.do-box strong{color:var(--green);display:block;margin-bottom:.4rem}
+.dont-box{background:rgba(191,107,107,0.08);border:1px solid rgba(191,107,107,0.2);color:var(--text2)}
+.dont-box strong{color:var(--red);display:block;margin-bottom:.4rem}
+
+/* ── Philosophy ── */
+.philo{margin-bottom:3rem}
+.philosopher{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:1.2rem}
+.philosopher h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);margin-bottom:1rem}
+.philosopher blockquote{padding:1rem 1.5rem;border-left:3px solid var(--gold);background:rgba(201,168,76,0.05);border-radius:0 8px 8px 0;font-style:italic;font-size:.95rem;color:var(--text2);margin-bottom:1rem;line-height:1.7}
+.philosopher .analysis{font-size:.9rem;color:var(--text2);line-height:1.75}
+.night-q{background:linear-gradient(135deg,rgba(138,106,191,0.08),rgba(201,168,76,0.06));border:1px solid var(--border);border-radius:14px;padding:2rem;text-align:center;margin-top:1.5rem}
+.night-q h4{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gold);margin-bottom:.8rem}
+.night-q p{font-size:1rem;font-style:italic;color:var(--text2);line-height:1.6}
+
+/* ── Quiz ── */
+.quiz{margin-bottom:3rem}
+.quiz-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:1.2rem}
+.quiz-card h4{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--purple);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.5px}
+.quiz-card .q-text{font-size:1rem;margin-bottom:1.5rem;line-height:1.7}
+.q-options{display:flex;flex-direction:column;gap:.6rem}
+.q-opt{padding:.8rem 1.2rem;background:rgba(138,106,191,0.06);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:.9rem;color:var(--text2);transition:all .3s}
+.q-opt:hover{border-color:var(--purple);background:rgba(138,106,191,0.12);color:var(--text1)}
+.q-opt.correct{border-color:var(--green);background:rgba(107,191,138,0.12);color:var(--green)}
+.q-opt.wrong{border-color:var(--red);background:rgba(191,107,107,0.12);color:var(--red)}
+.q-explain{margin-top:1rem;padding:1rem;background:rgba(107,191,138,0.06);border-radius:8px;font-size:.88rem;color:var(--text2);line-height:1.7;display:none}
+.q-explain.show{display:block}
+
+/* ── Spaced Repetition ── */
+.sr-tracker{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:3rem}
+.sr-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;margin-top:1rem}
+@media(max-width:500px){.sr-grid{grid-template-columns:repeat(3,1fr)}}
+.sr-day{padding:.7rem;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;transition:all .3s;font-size:.8rem}
+.sr-day:hover{border-color:var(--purple)}
+.sr-day.done{background:rgba(107,191,138,0.15);border-color:var(--green);color:var(--green)}
+.sr-day small{display:block;font-size:.65rem;color:var(--text2);margin-bottom:.2rem}
+
+/* ── Footer Nav ── */
+footer{border-top:1px solid var(--border);padding:2rem 1.5rem;max-width:860px;margin:0 auto}
+.foot-nav{display:flex;justify-content:space-between;gap:1rem}
+@media(max-width:500px){.foot-nav{flex-direction:column}}
+.foot-nav a{flex:1;padding:1rem;color:var(--text2);text-decoration:none;border:1px solid var(--border);border-radius:8px;text-align:center;transition:all .3s;font-size:.9rem}
+.foot-nav a:hover{border-color:var(--purple);color:var(--text1);background:rgba(138,106,191,0.08)}
+
+/* ── Animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.ani{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.ani.vis{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<header>
+<div class="hdr">
+<div class="hdr-title">인간 탐구 | DAY 04</div>
+<div class="hdr-sub">PART 1 — 정서 조절의 과학</div>
+</div>
+<div class="hdr-progress"></div>
+</header>
+
+<div class="series-banner">
+<span>이 시리즈 예상 총 Day: <strong>22일</strong></span>
+<span>Day 04 of 22 · 진행률 <strong>18.2%</strong></span>
+</div>
+
+<main>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero ani">
+<div class="gauge-wrap">
+<div class="gauge">
+<svg viewBox="0 0 100 100">
+<circle cx="50" cy="50" r="42" fill="none" stroke="rgba(138,106,191,0.15)" stroke-width="6"/>
+<circle cx="50" cy="50" r="42" fill="none" stroke="url(#gaugeGrad)" stroke-width="6" stroke-dasharray="264" stroke-dashoffset="116" stroke-linecap="round"/>
+<defs><linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+<stop offset="0%" stop-color="#BF6B6B"/><stop offset="50%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#6BBF8A"/>
+</linearGradient></defs>
+</svg>
+<div class="gauge-label"><span class="gauge-val">04</span><span class="gauge-txt">DAY</span></div>
+</div>
+<div class="meta-badges">
+<span class="meta-badge"><span class="dot"></span>난이도: 중급</span>
+<span class="meta-badge"><span class="dot" style="background:var(--cyan)"></span>인지 신경과학</span>
+<span class="meta-badge"><span class="dot" style="background:var(--green)"></span>25분 완결</span>
+</div>
+</div>
+<h1>당신의 뇌가 상황을 다시 보는 순간,<br>편도체는 왜 조용해질까?</h1>
+<p class="hero-q">"Situation → Interpretation → Response. 중간의 해석(Interpretation)을<br>의식적으로 통제할 수 있다면, 당신은 정서의 주인이 된다."</p>
+<div class="kw-badges">
+<span class="kw">인지적 재평가</span>
+<span class="kw">fMRI 근거</span>
+<span class="kw">PFC-Amygdala 상호작용</span>
+<span class="kw">직장 스트레스 대처</span>
+</div>
+</section>
+
+<!-- ═══ LEARNING STRATEGY ═══ -->
+<section class="strategy ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(138,106,191,0.15)">⏱</span>학습 로드맵 — 25분 완결 구성</h2>
+<div class="time-grid">
+<div class="tslot">
+<div class="tslot-time">5분</div>
+<div class="tslot-desc"><strong>핵심 개념 이해</strong> — 재평가란 무엇인가?</div>
+</div>
+<div class="tslot">
+<div class="tslot-time">7분</div>
+<div class="tslot-desc"><strong>fMRI 근거</strong> — 뇌에서 일어나는 일</div>
+</div>
+<div class="tslot">
+<div class="tslot-time">8분</div>
+<div class="tslot-desc"><strong>3단계 프로세스</strong> — 실전 적용 체계</div>
+</div>
+<div class="tslot">
+<div class="tslot-time">5분</div>
+<div class="tslot-desc"><strong>직장 시나리오</strong> — 르노 상황에 맞춘 스크립트</div>
+</div>
+</div>
+<div class="strat-note"><strong>✓ 팁:</strong> 오늘 학습 후 내일(Day 05)부터 "메타인지"로 더 깊이 파고듭니다. 재평가가 작동하려면, 재평가 자체를 관찰할 수 있는 메타인지가 필요합니다 — 이것이 Day 05의 주제입니다.</div>
+</section>
+
+<!-- ═══ CORE CONCEPTS ═══ -->
+<section class="concepts ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(201,168,76,0.15)">🧠</span>3가지 핵심 개념</h2>
+
+<div class="ccard">
+<div class="ccard-head" onclick="toggleCard('c1')">
+<div><span class="ccard-title">개념 01: 인지적 재평가란?</span></div>
+<div class="ccard-num">기초</div>
+<div class="ccard-toggle">▼</div>
+</div>
+<div class="ccard-summary">
+상황 자체를 바꿀 수 없으면, 그 상황을 바라보는 관점(해석)을 바꾼다. 이것이 인지적 재평가입니다.
+</div>
+<div class="ccard-body" id="c1">
+<h4>정의</h4>
+<p>인지적 재평가(Cognitive Reappraisal)는 정서적 반응을 조절하기 위해 상황의 의미를 재해석하는 전략입니다. Gross & John(2003)의 정서 조절 모델에 따르면, 감정의 발생 과정에서 가장 일찍 개입할 수 있는 전략입니다.</p>
+
+<h4>예시</h4>
+<ul>
+<li><strong>상황:</strong> 팀장이 팀 회의에서 당신의 제안을 비판했습니다.</li>
+<li><strong>자동 해석(재평가 전):</strong> "내가 능력이 없다는 걸 다시 증명했다. 승진도 못 할 거야."</li>
+<li><strong>재평가된 해석:</strong> "좋은 피드백이다. 내 설계에 빈틈이 있었다는 것을 알 수 있어서 다행이다. 다음 버전은 더 강할 것이다."</li>
+</ul>
+
+<h4>작동 원리</h4>
+<p>재평가는 <strong>상황 자체를 바꾸지 않고</strong>, 그 상황에 부여하는 <strong>의미를 변경</strong>합니다. 같은 팀장의 비판이 "능력 부족의 증거"에서 "성장의 기회"로 전환되는 것입니다. 이 변경이 뇌의 어느 부분에서 일어날까요? Day 01에서 배운 PFC(전전두엽)입니다.</p>
+
+<details class="deep-dive">
+<summary>🔍 Deep Dive: 신경 경제학적 비용</summary>
+<p>흥미롭게도, 재평가는 "무료"가 아닙니다. 인지적 노력이 필요합니다. 뇌가 활동하면 포도당을 소비합니다. 따라서 재평가는 <strong>초기에는 에너지 비용이 높지만</strong>, 반복하면 습관화되어 자동적으로 작동하게 됩니다. 이것이 바로 Day 04-06을 통해 "훈련"하는 이유입니다. 당신의 PFC가 점점 더 효율적으로 작동하도록 강화하는 것입니다.</p>
+</details>
+</div>
+</div>
+
+<div class="ccard">
+<div class="ccard-head" onclick="toggleCard('c2')">
+<div><span class="ccard-title">개념 02: fMRI 근거 — PFC가 Amygdala를 억제한다</span></div>
+<div class="ccard-num">증거 기반</div>
+<div class="ccard-toggle">▼</div>
+</div>
+<div class="ccard-summary">
+재평가를 시행할 때, PFC(전전두엽)의 활성화가 증가하고 동시에 편도체(Amygdala)의 활성화가 감소합니다. 이는 fMRI로 직접 확인된 사실입니다.
+</div>
+<div class="ccard-body" id="c2">
+<h4>landmark 연구: Ochsner et al. (2002)</h4>
+<p>감정적 이미지를 본 후, 피험자들에게 두 가지 조건을 제시했습니다:</p>
+<ul>
+<li><strong>통제 조건:</strong> "이 이미지를 자연스럽게 봅니다" (재평가 없음)</li>
+<li><strong>재평가 조건:</strong> "이 이미지를 긍정적으로 다시 해석합니다" (재평가 시행)</li>
+</ul>
+<p>결과는 명확했습니다:</p>
+<ul>
+<li><strong>재평가 조건에서:</strong> PFC(특히 배외측전전두엽, dlPFC)의 활성화 ↑</li>
+<li><strong>동시에:</strong> 편도체의 활성화 ↓</li>
+<li><strong>행동 지표:</strong> 재평가 그룹이 더 낮은 정서적 반응(심박수, 피부 전도도)</li>
+</ul>
+
+<h4>신경학적 의미</h4>
+<p>이것은 <strong>하향식 통제(Top-Down Control)</strong>의 증거입니다. PFC가 편도체에게 신호를 보내어, "지금 반응하지 마. 다시 생각해봐"라고 말하는 것입니다. Day 01에서 배운 "6초 창"이 바로 이 하향식 통제가 작동하는 시간 대입니다.</p>
+
+<details class="deep-dive">
+<summary>🔍 Deep Dive: INFP의 PFC는 특별한가?</summary>
+<p>INFP는 직관(N)과 감정(F)이 우위이므로, 편도체와 감정 처리 영역이 매우 활성입니다. 좋은 소식은, 이것이 재평가에서 <strong>INFP가 불리하다는 뜻은 아니라는 것</strong>입니다. 오히려 감정을 <strong>깊이 있게 이해</strong>하는 능력이 재평가의 질을 높입니다. 예를 들어, 팀장의 비판을 받았을 때, INFP는 "이것이 내 자존감을 건드렸다"는 미묘한 감정을 감지합니다. 이 민감성을 <strong>알아차린다(awareness)</strong>면, PFC의 재평가가 더욱 정밀하게 작동합니다.</p>
+</details>
+</div>
+</div>
+
+<div class="ccard">
+<div class="ccard-head" onclick="toggleCard('c3')">
+<div><span class="ccard-title">개념 03: 3단계 재평가 프로세스</span></div>
+<div class="ccard-num">실전</div>
+<div class="ccard-toggle">▼</div>
+</div>
+<div class="ccard-summary">
+상황(Situation) → 해석(Interpretation) → 반응(Response). 이 3단계 중 "해석"을 의도적으로 수정하는 것이 재평가의 핵심입니다.
+</div>
+<div class="ccard-body" id="c3">
+<h4>Stage 1: 상황 인식 (Situation Recognition)</h4>
+<p>감정을 유발하는 상황을 발생하는 즉시 "라벨링"합니다. 이것이 중요한 이유는, 상황을 명확히 명명하는 것만으로도 PFC가 활성화되기 때문입니다 (감정 라벨링 효과).</p>
+<p><strong>예:</strong> "지금 팀장과의 피드백 상황이다. 나의 편도체가 이것을 '위협'으로 해석하고 있다."</p>
+
+<h4>Stage 2: 해석 재구성 (Reinterpretation)</h4>
+<p>상황의 의미를 <strong>의도적으로 다르게 해석</strong>합니다. 이것이 재평가의 핵심입니다. 여러 해석 전략이 있습니다:</p>
+<ul>
+<li><strong>맥락 확대:</strong> "이것은 나를 판단하는 것이 아니라, 설계 피드백이다."</li>
+<li><strong>성장 마인드셋:</strong> "이것은 배움의 기회다."</li>
+<li><strong>객관화:</strong> "팀장도 부족함이 있다. 피드백도 100% 맞지 않을 수 있다."</li>
+<li><strong>시간 원근감:</strong> "3년 후에 이 피드백을 다시 생각하면, 결국 나를 강하게 했을 것이다."</li>
+</ul>
+
+<h4>Stage 3: 반응 조절 (Response Regulation)</h4>
+<p>재평가된 해석에 따라 신체와 행동의 반응을 조절합니다. 이제 자동적인 반응(싸움/도망) 대신 선택된 반응이 가능합니다.</p>
+<p><strong>예:</strong> "감사합니다. 정말 좋은 지적입니다. 다시 검토해보겠습니다."</p>
+
+<h4>순서가 중요한 이유</h4>
+<p>이 3단계는 선형입니다. 상황을 제대로 인식하지 못하면(Stage 1 생략), 재평가도 맞지 않습니다(Stage 2 실패). 재평가를 하지 않으면, 반응 조절도 진정으로 내발적이지 않습니다(Stage 3 표면적).</p>
+
+<details class="deep-dive">
+<summary>🔍 Deep Dive: INFP와 직관의 함정</summary>
+<p>INFP는 직관(Ni)이 있어서 "맥락 확대"(Stage 2의 첫 번째 전략)를 매우 잘합니다. 문제는 이 직관이 때때로 과도하게 비판적일 수 있다는 것입니다. 예를 들어, "팀장의 피드백은 사실 나에 대한 거부감 때문일 수도"라는 식으로 해석을 넓혀버리면, 재평가가 아니라 새로운 불안만 생깁니다. 재평가의 핵심은 <strong>긍정적 방향으로의 재해석</strong>입니다. 이는 의식적 훈련이 필요합니다.</p>
+</details>
+</div>
+</div>
+
+</section>
+
+<!-- ═══ SVG NEURAL PATHWAY DIAGRAM ═══ -->
+<section class="diagram-section ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(138,106,191,0.15)">🔄</span>인지적 재평가의 신경 경로</h2>
+<div class="diagram-wrap">
+<svg viewBox="0 0 800 580" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern id="grid2" width="20" height="20" patternUnits="userSpaceOnUse">
+<path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(138,106,191,0.04)" stroke-width="0.5"/>
+</pattern>
+<marker id="arrR2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#BF6B6B"/></marker>
+<marker id="arrG2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#6BBF8A"/></marker>
+<marker id="arrP2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#8A6ABF"/></marker>
+<marker id="arrGo2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#C9A84C"/></marker>
+<filter id="glow2"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="800" height="580" fill="var(--card)" rx="12"/>
+<rect width="800" height="580" fill="url(#grid2)"/>
+
+<text x="400" y="35" font-family="Cormorant Garamond,serif" font-size="18" fill="#C9A84C" text-anchor="middle" font-weight="600">인지적 재평가: 상황 해석 변경을 통한 정서 조절</text>
+
+<!-- COLUMN 1: WITHOUT Reappraisal -->
+<text x="200" y="70" font-family="Cormorant Garamond,serif" font-size="14" fill="#BF6B6B" text-anchor="middle" font-weight="600">재평가 없음</text>
+
+<rect x="80" y="95" width="240" height="50" rx="8" fill="rgba(191,107,107,0.12)" stroke="#BF6B6B" stroke-width="1.5"/>
+<text x="200" y="118" font-family="Noto Sans KR" font-size="12" fill="#BF6B6B" text-anchor="middle" font-weight="600">상황: 팀장의 공개 비판</text>
+<text x="200" y="135" font-family="JetBrains Mono" font-size="9" fill="#9EA0B8" text-anchor="middle">"너 이건 분석을 안 했나?"</text>
+
+<path d="M200,145 L200,180" stroke="#BF6B6B" stroke-width="2" fill="none" marker-end="url(#arrR2)"/>
+
+<rect x="80" y="180" width="240" height="60" rx="8" fill="rgba(191,107,107,0.15)" stroke="#BF6B6B" stroke-width="2" filter="url(#glow2)"/>
+<text x="200" y="205" font-family="Noto Sans KR" font-size="12" fill="#BF6B6B" text-anchor="middle" font-weight="600">편도체 & 해석</text>
+<text x="200" y="223" font-family="Noto Sans KR" font-size="10" fill="#9EA0B8" text-anchor="middle">"나는 부족하다. 실패자다."</text>
+<text x="200" y="238" font-family="JetBrains Mono" font-size="8" fill="#BF6B6B" text-anchor="middle">Amygdala 고활성</text>
+
+<path d="M200,240 L200,275" stroke="#BF6B6B" stroke-width="2.5" fill="none" marker-end="url(#arrR2)"/>
+
+<rect x="80" y="275" width="240" height="65" rx="8" fill="rgba(191,107,107,0.12)" stroke="#BF6B6B" stroke-width="1.5"/>
+<text x="200" y="302" font-family="Noto Sans KR" font-size="12" fill="#BF6B6B" text-anchor="middle" font-weight="600">신체 & 행동 반응</text>
+<text x="200" y="320" font-family="Noto Sans KR" font-size="9" fill="#9EA0B8" text-anchor="middle">심장 박동 빠름, 방어적 언어</text>
+<text x="200" y="336" font-family="JetBrains Mono" font-size="8" fill="#BF6B6B" text-anchor="middle">"아니, 내 분석이 맞았어"</text>
+
+<!-- Arrow to outcome -->
+<path d="M200,340 L200,370" stroke="#BF6B6B" stroke-width="2" fill="none" marker-end="url(#arrR2)"/>
+
+<rect x="80" y="370" width="240" height="50" rx="8" fill="rgba(191,107,107,0.15)" stroke="#BF6B6B" stroke-width="2"/>
+<text x="200" y="393" font-family="Noto Sans KR" font-size="11" fill="#BF6B6B" text-anchor="middle" font-weight="600">결과</text>
+<text x="200" y="410" font-family="Noto Sans KR" font-size="9" fill="#9EA0B8" text-anchor="middle">관계 손상, 신뢰 하락, 밤새 후회</text>
+
+<!-- COLUMN 2: WITH Reappraisal -->
+<text x="600" y="70" font-family="Cormorant Garamond,serif" font-size="14" fill="#6BBF8A" text-anchor="middle" font-weight="600">재평가 실행</text>
+
+<rect x="480" y="95" width="240" height="50" rx="8" fill="rgba(107,191,138,0.12)" stroke="#6BBF8A" stroke-width="1.5"/>
+<text x="600" y="118" font-family="Noto Sans KR" font-size="12" fill="#6BBF8A" text-anchor="middle" font-weight="600">상황: 팀장의 공개 비판</text>
+<text x="600" y="135" font-family="JetBrains Mono" font-size="9" fill="#9EA0B8" text-anchor="middle">"너 이건 분석을 안 했나?"</text>
+
+<path d="M600,145 L600,180" stroke="#6BBF8A" stroke-width="2" fill="none" marker-end="url(#arrG2)"/>
+
+<rect x="480" y="180" width="240" height="60" rx="8" fill="rgba(138,106,191,0.15)" stroke="#8A6ABF" stroke-width="2" filter="url(#glow2)"/>
+<text x="600" y="205" font-family="Noto Sans KR" font-size="12" fill="#8A6ABF" text-anchor="middle" font-weight="600">PFC 개입 & 재평가</text>
+<text x="600" y="223" font-family="Noto Sans KR" font-size="10" fill="#9EA0B8" text-anchor="middle">"좋은 피드백이다. 설계를"</text>
+<text x="600" y="238" font-family="JetBrains Mono" font-size="8" fill="#8A6ABF" text-anchor="middle">dlPFC 고활성 + Amygdala 억제</text>
+
+<path d="M600,240 L600,275" stroke="#6BBF8A" stroke-width="2.5" fill="none" marker-end="url(#arrG2)"/>
+
+<rect x="480" y="275" width="240" height="65" rx="8" fill="rgba(107,191,138,0.12)" stroke="#6BBF8A" stroke-width="1.5"/>
+<text x="600" y="302" font-family="Noto Sans KR" font-size="12" fill="#6BBF8A" text-anchor="middle" font-weight="600">신체 & 행동 반응</text>
+<text x="600" y="320" font-family="Noto Sans KR" font-size="9" fill="#9EA0B8" text-anchor="middle">호흡 안정, 개방적 언어</text>
+<text x="600" y="336" font-family="JetBrains Mono" font-size="8" fill="#6BBF8A" text-anchor="middle">"감사합니다, 검토하겠습니다"</text>
+
+<!-- Arrow to outcome -->
+<path d="M600,340 L600,370" stroke="#6BBF8A" stroke-width="2" fill="none" marker-end="url(#arrG2)"/>
+
+<rect x="480" y="370" width="240" height="50" rx="8" fill="rgba(107,191,138,0.15)" stroke="#6BBF8A" stroke-width="2"/>
+<text x="600" y="393" font-family="Noto Sans KR" font-size="11" fill="#6BBF8A" text-anchor="middle" font-weight="600">결과</text>
+<text x="600" y="410" font-family="Noto Sans KR" font-size="9" fill="#9EA0B8" text-anchor="middle">신뢰 강화, 성장 학습, 평온함</text>
+
+<!-- Brain regions legend -->
+<rect x="30" y="450" width="740" height="110" rx="8" fill="rgba(0,0,0,0.3)"/>
+<text x="50" y="475" font-family="Noto Sans KR" font-size="12" fill="#E8E9F3" font-weight="600">뇌 구조별 역할</text>
+
+<rect x="50" y="490" width="160" height="60" rx="6" fill="rgba(191,107,107,0.1)" stroke="rgba(191,107,107,0.3)" stroke-width="1"/>
+<text x="130" y="510" font-family="Noto Sans KR" font-size="10" fill="#BF6B6B" text-anchor="middle" font-weight="600">편도체 (Amygdala)</text>
+<text x="130" y="528" font-family="JetBrains Mono" font-size="8" fill="#9EA0B8" text-anchor="middle">"즉시 반응 신호"</text>
+<text x="130" y="542" font-family="Noto Sans KR" font-size="8" fill="#9EA0B8" text-anchor="middle">재평가로 억제됨</text>
+
+<rect x="230" y="490" width="160" height="60" rx="6" fill="rgba(138,106,191,0.1)" stroke="rgba(138,106,191,0.3)" stroke-width="1"/>
+<text x="310" y="510" font-family="Noto Sans KR" font-size="10" fill="#8A6ABF" text-anchor="middle" font-weight="600">PFC (배외측)</text>
+<text x="310" y="528" font-family="JetBrains Mono" font-size="8" fill="#9EA0B8" text-anchor="middle">dlPFC</text>
+<text x="310" y="542" font-family="Noto Sans KR" font-size="8" fill="#9EA0B8" text-anchor="middle">재평가 중추</text>
+
+<rect x="410" y="490" width="160" height="60" rx="6" fill="rgba(107,191,138,0.1)" stroke="rgba(107,191,138,0.3)" stroke-width="1"/>
+<text x="490" y="510" font-family="Noto Sans KR" font-size="10" fill="#6BBF8A" text-anchor="middle" font-weight="600">안와전두피질</text>
+<text x="490" y="528" font-family="JetBrains Mono" font-size="8" fill="#9EA0B8" text-anchor="middle">OFC</text>
+<text x="490" y="542" font-family="Noto Sans KR" font-size="8" fill="#9EA0B8" text-anchor="middle">가치 판단</text>
+
+<rect x="590" y="490" width="160" height="60" rx="6" fill="rgba(201,168,76,0.1)" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+<text x="670" y="510" font-family="Noto Sans KR" font-size="10" fill="#C9A84C" text-anchor="middle" font-weight="600">미주신경</text>
+<text x="670" y="528" font-family="JetBrains Mono" font-size="8" fill="#9EA0B8" text-anchor="middle">Vagus</text>
+<text x="670" y="542" font-family="Noto Sans KR" font-size="8" fill="#9EA0B8" text-anchor="middle">진정 신호</text>
+
+</svg>
+</div>
+<p class="diagram-caption">
+인지적 재평가는 상황(Situation)을 변경하지 않지만, 그 상황에 부여하는 해석(Interpretation)을 변경합니다. <strong style="color:var(--red)">재평가 없이</strong>는 편도체가 지배적이고, <strong style="color:var(--green)">재평가 시행 시</strong> PFC의 배외측전전두엽(dlPFC)이 활성화되어 편도체를 의도적으로 억제합니다. 그 결과 신체 반응과 행동 선택이 완전히 달라집니다.
+</p>
+</section>
+
+<!-- ═══ PRACTICE GUIDE ═══ -->
+<section class="practice ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(191,107,107,0.15)">⚡</span>실전 적용 가이드 — 회사 직장 상황별</h2>
+
+<div class="proutine">
+<div class="proutine-head">
+<span class="proutine-time t30">30초</span>
+<span class="proutine-name">즉각 재평가 — 상황 발생 직후</span>
+</div>
+<div class="proutine-body">
+<p style="font-size:.9rem;margin-bottom:1rem;color:var(--text2)"><strong>언제 사용:</strong> 팀장의 비판/피드백, 동료 간의 의견 충돌, 예기치 않은 프로젝트 변경이 발생한 직후 (편도체 활성 상태).</p>
+
+<ol>
+<li><strong>인식 라벨 (3초):</strong> "지금 나의 편도체가 반응하고 있다"고 속으로 명명합니다.</li>
+<li><strong>3단계 재평가 자동 운영 (15초):</strong>
+   <div class="reappraisal-script">
+   <strong>상황 확인:</strong> "이것은 내 능력 전체에 대한 판단이 아니라, 특정 설계 부분에 대한 기술적 피드백이다."<br><br>
+   <strong>해석 재구성:</strong> "좋다. 이것은 내 설계를 더 강하게 만들 수 있는 기회다. 팀장도 내가 배우길 원하기 때문에 이 피드백을 준 것이다."<br><br>
+   <strong>반응 계획:</strong> 편도체의 방어적 반응을 보류하고, "감사합니다, 검토하겠습니다"라고 응답하기로 마음을 정합니다.
+   </div>
+</li>
+<li><strong>신체 신호 (12초):</strong> 심호흡 1회, 어깨 이완, 얼굴 표정 확인 (방어적이 아닌가?).</li>
+</ol>
+
+<div class="scenario-box">
+<strong>실제 시나리오 1: 팀장 피드백 상황</strong><br><br>
+<strong>상황:</strong> 팀장이 차량 제어 알고리즘 제안 중에 "이 부분은 라지안 대신 도 단위로 해야 하지 않나?"라고 물었습니다. (약간의 비판이 섞여 있음)<br><br>
+<strong>자동 반응 (재평가 전):</strong> "아, 내가 또 실수했나. 기초적인 것도 못 했네. 팀장에게 무능하게 보일 것 같다."<br><br>
+<strong>재평가 스크립트:</strong><br>
+상황: "이것은 기술적 검토이다. 라디안/도 변환은 컨벤션 문제일 수 있다."<br>
+해석: "팀장이 꼼꼼하게 검토해주고 있다. 좋은 기회다. 내가 다시 확인할 기회를 줬다."<br>
+반응: "좋은 질문입니다. 라지안 유지가 더 정확할 것 같은데, 팀의 컨벤션을 먼저 확인하겠습니다."
+</strong>
+</div>
+
+<div class="do-dont">
+<div class="do-box"><strong>✓ INFP 체크리스트</strong>
+□ "이 피드백은 내 전체 가치에 대한 것이 아니다"라고 명시적으로 구분하기<br>
+□ 팀장의 의도를 긍정적으로 해석 (당신의 성장을 돕고 싶음)<br>
+□ 즉시 방어하지 않기 — 대신 "확인하겠습니다" 취하기
+</div>
+<div class="dont-box"><strong>✗ 금지 사항</strong>편도체 상태에서 메시지 작성 금지. "왜 그렇게까지 지적하세요?" 같은 반박성 메시지를 쓸 가능성이 높습니다.
+</div>
+</div>
+</div>
+</div>
+
+<div class="proutine">
+<div class="proutine-head">
+<span class="proutine-time t5">5분</span>
+<span class="proutine-name">심화 재평가 — 점심시간 또는 퇴근 전</span>
+</div>
+<div class="proutine-body">
+<p style="font-size:.9rem;margin-bottom:1rem;color:var(--text2)"><strong>언제 사용:</strong> 오늘 경험한 스트레스 상황을 더 깊이 있게 재평가하고, 내일에 대한 예상 시나리오를 미리 재평가합니다.</p>
+
+<ol>
+<li><strong>오늘의 트리거 사건 되돌이기 (2분):</strong>
+   <div class="scenario-box">
+   <strong>예시:</strong> 오전 10시에 팀 회의에서 팀장의 피드백을 받았습니다. 그 당시의 감정을 0-10 척도로 평가하세요. (편도체 활성 수준)<br>
+   → 당시 불안/분노: 8/10
+   </div>
+</li>
+
+<li><strong>3가지 재평가 전략 시도 (2분):</strong>
+   <div class="reappraisal-script">
+   <strong>① 맥락 확대 (Broadening Context):</strong> "이 피드백은 6개월 동안의 평가일 뿐, 내 전체 역량을 판단하는 것이 아니다. 특히 V2.3 설계에서는 내가 문제를 해결했다."<br><br>
+   <strong>② 성장 마인드셋 (Growth Mindset):</strong> "내가 이 영역에서 약하다는 것을 알았다. 3개월 뒤에 같은 질문을 받으면, 내가 더 나은 답을 줄 수 있다."<br><br>
+   <strong>③ 미래 관점 (Future Perspective):</strong> "2027년 유럽 전직 때, 이 경험이 나를 더 단단하게 만들었다고 생각할 거다. 지금은 그 과정이다."
+   </div>
+</li>
+
+<li><strong>감정 재평가 점수 매기기 (1분):</strong>
+   재평가 후 같은 상황을 다시 떠올렸을 때의 감정이 몇으로 내려왔나요?<br>
+   → 현재 불안/분노: 3/10 (또는 그 이상의 개선)
+</li>
+
+<li><strong>내일의 위험 시나리오 미리 재평가 (1분):</strong>
+   <div class="scenario-box">
+   <strong>내일의 예상 상황:</strong> "내일은 월요일 전체 팀 회의가 있고, 팀장이 지난주 프로젝트 진행 현황을 검토할 거다. 내 서스펜션 제어 알고리즘이 우선순위가 낮아질 가능성이 있다."<br><br>
+   <strong>미리 재평가:</strong> "알고리즘이 우선순위에서 밀린다면, 그것은 내 설계의 질이 낮다는 뜻이 아니다. 프로젝트 일정 변경은 흔한 일이고, 사실 내 설계는 기술적으로 탄탄하다. 이렇게 생각하면, 내일 회의에서 더 차분히 참여할 수 있다."
+   </div>
+</li>
+</ol>
+
+<div class="do-dont">
+<div class="do-box"><strong>✓ 추천</strong>
+손 쓰기로 기록하세요. 특히 3가지 재평가 전략을 종이에 쓰는 행위 자체가 PFC 활성화를 강화합니다.
+</div>
+<div class="dont-box"><strong>✗ 주의</strong>
+"나는 문제없다"는 식의 과도한 긍정이 아닙니다. 실제 약점은 인정하되, 그것이 성장의 기회라는 해석으로 바꾸는 것입니다.
+</div>
+</div>
+</div>
+</div>
+
+<div class="proutine">
+<div class="proutine-head">
+<span class="proutine-time tday">하루</span>
+<span class="proutine-name">저녁 통합 검토 — 아이들 자고 난 후 10분</span>
+</div>
+<div class="proutine-body">
+<p style="font-size:.9rem;margin-bottom:1rem;color:var(--text2)"><strong>목표:</strong> 하루 동안의 재평가 실행 내역을 기록하고, 패턴을 파악합니다.</p>
+
+<ol>
+<li><strong>오늘의 "3단계 재평가" 성공 사례 1개 (3분):</strong>
+   <div class="scenario-box">
+   <strong>예시:</strong><br>
+   상황: 오후 2시, 동료가 내 설계 리뷰에서 "이 부분은 복잡하지 않나?"라고 물었다.<br>
+   재평가 전 반응: "내 설계가 불필요하게 복잡하다고 생각하는 건가. 나는 못해."<br>
+   재평가 후 반응: "타당한 지적이다. 내가 비용 절감 방안을 놓쳤나? 다시 검토해보자."<br>
+   결과: 더 단순한 대안 1개 발견. 동료에게 감사 표현.
+   </strong>
+   </div>
+</li>
+
+<li><strong>오늘 어려웠던 순간 (2분):</strong>
+   <div class="scenario-box">
+   <strong>예시:</strong> "오전 회의 후 약 1시간 동안 해석을 바꾸지 못했다. 재평가를 시도했지만 마음이 내키지 않았다. 이것은 정상이다. PFC의 강화가 필요한 신호다."
+   </strong>
+   </div>
+</li>
+
+<li><strong>내일을 위한 특정 트리거 예상 (2분):</strong>
+   내일 화를 유발할 가능성이 있는 상황을 미리 예측합니다:<br>
+   - 팀장 미팅<br>
+   - 아이 등원 시간<br>
+   - 배우자와의 저녁 대화<br>
+   각각에 대해, 미리 "만약 이런 피드백을 받는다면, 나는 이렇게 재평가할 것이다"라고 준비합니다.
+
+<li><strong>하나의 감사 (1분):</strong>
+   오늘 "PFC의 재평가" 덕분에 피할 수 있었던 실수 또는 개선된 관계 1개를 기록합니다.
+</li>
+</ol>
+
+<div class="do-dont">
+<div class="do-box"><strong>✓ INFP 자기 자비 팁</strong>
+"완벽하게 재평가하지 못했다"는 자책은 금물입니다. 오늘 재평가를 1회라도 시행한 것 자체가 성공입니다. 뇌 가소성은 점진적입니다.
+</div>
+<div class="dont-box"><strong>✗ 금지</strong>
+일지 작성을 "의무"로 만들지 마세요. INFP는 의무감이 크면 오히려 회피합니다. "자신의 성장을 관찰하는 즐거움"으로 재구성하세요.
+</div>
+</div>
+</div>
+</div>
+
+</section>
+
+<!-- ═══ PHILOSOPHY ═══ -->
+<section class="philo ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(201,168,76,0.15)">📖</span>철학적 성찰 코너</h2>
+
+<div class="philosopher">
+<h3>아르투르 쇼펜하우어 (Arthur Schopenhauer, 1788-1860)</h3>
+<blockquote>"인간이 직접 통제할 수 없는 것은 그의 이성에 맡겨야 한다.<br>우리가 통제할 수 있는 것은 오직 우리의 판단과 관점뿐이다."<br><span style="font-size:.8rem;color:var(--text2)">— 『의지와 표상으로서의 세계』</span></blockquote>
+<div class="analysis">
+<p><strong>신경학적 해석:</strong> 쇼펜하우어가 말하는 "판단과 관점"은 정확히 당신의 PFC(전전두엽)가 하는 일입니다. 팀장의 비판(상황)을 바꿀 수는 없지만, 그것을 어떻게 해석하는가(판단)는 전적으로 당신의 몫입니다. 이것이 인지적 재평가의 철학적 기초입니다.</p>
+<p style="margin-top:.8rem"><strong>엔지니어 적용:</strong> 자동차 서스펜션은 노면의 요철(상황)을 직접 제거할 수 없습니다. 대신 감쇠기(PFC)가 그 요철을 어떻게 해석하고 반응하는가로 차체의 편안함을 결정합니다. 당신의 정서도 동일합니다.</p>
+</div>
+</div>
+
+<div class="philosopher">
+<h3>빅토르 프랭클 (Viktor Frankl, 1905-1997)</h3>
+<blockquote>"절대적으로 변경 불가능한 상황 속에서, 인간은 여전히 '이 상황의 의미를 어떻게 볼 것인가'를 선택할 수 있다.<br>이것이 자유의 마지막 형태이며, 누구도 앗아갈 수 없는 것이다."<br><span style="font-size:.8rem;color:var(--text2)">— 『죽음의 수용소에서의 삶』 (1946)</span></blockquote>
+<div class="analysis">
+<p><strong>핵심 통찰:</strong> 프랭클은 나치 강제수용소에서의 경험을 바탕으로 이 말을 했습니다. 상황을 바꿀 수 없을 때, 마지막 자유는 "그 상황을 어떻게 의미화할 것인가"입니다. 인지적 재평가는 프랭클의 이 철학을 신경과학으로 입증한 것입니다.</p>
+<p style="margin-top:.8rem"><strong>INFP로서의 당신에게:</strong> 2027년 유럽 전직은 불가피합니다. 아이들의 새로운 학교 적응도 리스크입니다. 하지만 당신은 이 상황을 어떻게 의미화할지를 선택할 수 있습니다. "가족의 새로운 도전" 또는 "아이들의 글로벌 경험"으로 재해석하는 능력 — 이것이 바로 당신의 자유입니다.</p>
+</div>
+</div>
+
+<div class="night-q">
+<h4>🌙 오늘 자기 전 물을 질문</h4>
+<p>"오늘 내가 상황을 바꿀 수 없었던 순간이 있었는가?<br>그 순간에 나는 '해석'을 통제할 수 있었는가?<br>내일은 그것을 의도적으로 시도해볼까?"</p>
+</div>
+</section>
+
+<!-- ═══ QUIZ ═══ -->
+<section class="quiz ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(138,106,191,0.15)">✏️</span>복습 퀴즈</h2>
+
+<div class="quiz-card" id="q1">
+<h4>Quiz 01</h4>
+<p class="q-text">인지적 재평가의 핵심은 다음 중 무엇인가?</p>
+<div class="q-options">
+<div class="q-opt" onclick="checkAns(this,'q1',false)">A. 상황 자체를 변경하는 것</div>
+<div class="q-opt" onclick="checkAns(this,'q1',true)">B. 상황의 의미를 의도적으로 재해석하는 것</div>
+<div class="q-opt" onclick="checkAns(this,'q1',false)">C. 감정을 억압하는 것</div>
+<div class="q-opt" onclick="checkAns(this,'q1',false)">D. 편도체를 완전히 비활성화하는 것</div>
+</div>
+<div class="q-explain" id="q1-exp">
+<strong>정답: B.</strong> 인지적 재평가는 상황(팀장의 비판)은 변경하지 않지만, 그 상황에 부여하는 의미("능력 부족의 증거" → "성장의 기회")를 변경합니다. 이것이 PFC(전전두엽)의 핵심 기능입니다.
+</div>
+</div>
+
+<div class="quiz-card" id="q2">
+<h4>Quiz 02</h4>
+<p class="q-text">Ochsner et al. (2002)의 fMRI 연구에서 인지적 재평가 시행 시, 어떤 뇌 영역이 활성화되고 어디가 억제되었는가?</p>
+<div class="q-options">
+<div class="q-opt" onclick="checkAns(this,'q2',false)">A. 편도체 활성화, PFC 억제</div>
+<div class="q-opt" onclick="checkAns(this,'q2',true)">B. PFC(배외측전전두엽) 활성화, 편도체 억제</div>
+<div class="q-opt" onclick="checkAns(this,'q2',false)">C. 감각 피질 활성화, 시상 억제</div>
+<div class="q-opt" onclick="checkAns(this,'q2',false)">D. 뇌의 모든 영역이 동시에 활성화</div>
+</div>
+<div class="q-explain" id="q2-exp">
+<strong>정답: B.</strong> 재평가를 시행할 때, PFC의 배외측전전두엽(dlPFC)이 강하게 활성화되고, 동시에 편도체의 활성화가 감소합니다. 이것은 하향식 통제(Top-Down Control)의 신경학적 증거입니다.
+</div>
+</div>
+
+<div class="quiz-card" id="q3">
+<h4>Quiz 03</h4>
+<p class="q-text">인지적 재평가의 3단계는 어떤 순서인가?</p>
+<div class="q-options">
+<div class="q-opt" onclick="checkAns(this,'q3',true)">A. 상황 인식 → 해석 재구성 → 반응 조절</div>
+<div class="q-opt" onclick="checkAns(this,'q3',false)">B. 반응 조절 → 해석 재구성 → 상황 인식</div>
+<div class="q-opt" onclick="checkAns(this,'q3',false)">C. 해석 재구성 → 상황 인식 → 반응 조절</div>
+<div class="q-opt" onclick="checkAns(this,'q3',false)">D. 순서는 중요하지 않다</div>
+</div>
+<div class="q-explain" id="q3-exp">
+<strong>정답: A.</strong> 3단계의 순서는 선형입니다. 먼저 상황을 명확히 인식해야 (Stage 1), 그 다음에 해석을 재구성할 수 있고 (Stage 2), 마지막에 그 재해석에 기반한 반응을 선택할 수 있습니다 (Stage 3). 순서를 뒤바꾸면 작동하지 않습니다.
+</div>
+</div>
+</section>
+
+<!-- ═══ SPACED REPETITION ═══ -->
+<section class="sr-tracker ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(107,191,138,0.15)">📅</span>간격 반복 트래커</h2>
+<p style="font-size:.88rem;color:var(--text2);margin-bottom:1rem">Day 04 학습 내용을 장기 기억에 정착시키기 위한 복습 일정입니다. 클릭하여 완료 표시하세요.</p>
+<div class="sr-grid">
+<div class="sr-day" onclick="this.classList.toggle('done')"><small>1일 후</small>Day 05</div>
+<div class="sr-day" onclick="this.classList.toggle('done')"><small>3일 후</small>Day 07</div>
+<div class="sr-day" onclick="this.classList.toggle('done')"><small>7일 후</small>Day 11</div>
+<div class="sr-day" onclick="this.classList.toggle('done')"><small>14일 후</small>Day 18</div>
+<div class="sr-day" onclick="this.classList.toggle('done')"><small>30일 후</small>완료 ✓</div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="foot-nav">
+<a href="day03_INFP_감정처리_패턴.html">← Day 03: INFP 감정처리 패턴</a>
+<a href="day05_메타인지_훈련.html">Day 05: 메타인지 훈련 →</a>
+</div>
+</footer>
+
+<script>
+function toggleCard(id){
+const c=document.getElementById(id);
+c.classList.toggle('open');
+}
+
+function checkAns(el,qid,correct){
+const card=document.getElementById(qid);
+if(card.dataset.answered) return;
+card.dataset.answered='true';
+const opts=card.querySelectorAll('.q-opt');
+opts.forEach(o=>{
+o.style.pointerEvents='none';
+if(o===el) o.classList.add(correct?'correct':'wrong');
+});
+if(!correct){
+opts.forEach(o=>{
+if(o.onclick && o.onclick.toString().includes('true')) o.classList.add('correct');
+});
+}
+document.getElementById(qid+'-exp').classList.add('show');
+}
+
+const obs=new IntersectionObserver((entries)=>{
+entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');obs.unobserve(e.target)}});
+},{threshold:0.1});
+document.querySelectorAll('.ani').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

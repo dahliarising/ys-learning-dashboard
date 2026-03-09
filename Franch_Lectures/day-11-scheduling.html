@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 11 — 일정 조율 & 약속 (Scheduling & Appointments)</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════ RESET & BASE ═══════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-alt: #181C26;
+  --terracotta: #BF6A4A;
+  --gold: #C9A84C;
+  --text: #E8E4DF;
+  --text-dim: #8A8680;
+  --text-bright: #F5F2ED;
+  --accent-glow: rgba(191,106,74,0.15);
+  --gold-glow: rgba(201,168,76,0.12);
+  --border: #2A2D35;
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Noto Sans KR', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+}
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.75;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--terracotta); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ═══════════════════ STICKY HEADER ═══════════════════ */
+.sticky-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sticky-header .logo {
+  font-family: var(--font-heading);
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--terracotta);
+  letter-spacing: 0.05em;
+}
+.sticky-header .day-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--gold);
+  background: var(--gold-glow);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid rgba(201,168,76,0.25);
+}
+.sticky-header .series-info {
+  font-size: 0.7rem; color: var(--text-dim);
+}
+
+/* ═══════════════════ HERO SECTION ═══════════════════ */
+.hero {
+  text-align: center;
+  padding: 4rem 1.5rem 3rem;
+  background: linear-gradient(180deg, rgba(191,106,74,0.08) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+}
+.hero .overline {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 0.4rem;
+  line-height: 1.2;
+}
+.hero .subtitle {
+  font-size: 1rem; color: var(--text-dim);
+  margin-bottom: 2rem;
+}
+.hero-sentence {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+.hero-sentence::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--terracotta), var(--gold));
+}
+.hero-sentence .fr {
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.3rem;
+}
+.hero-sentence .ipa {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--gold);
+  font-style: italic;
+  margin-bottom: 0.4rem;
+}
+.hero-sentence .ko {
+  font-size: 1rem; color: var(--text-dim);
+}
+
+/* ═══════════════════ SECTION LAYOUT ═══════════════════ */
+.container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+section { padding: 3rem 0; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 1.8rem; font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 1.5rem;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+.card-alt { background: var(--bg-card-alt); }
+
+/* ═══════════════════ BRAIN SCIENCE BOX ═══════════════════ */
+.brain-box {
+  background: linear-gradient(135deg, rgba(191,106,74,0.08), rgba(201,168,76,0.06));
+  border: 1px solid rgba(191,106,74,0.2);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.brain-box h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.brain-box .strategy {
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--terracotta);
+}
+.brain-box .strategy strong { color: var(--gold); font-weight: 500; }
+.brain-box .strategy p { font-size: 0.9rem; color: var(--text-dim); margin-top: 0.2rem; }
+.tip-highlight { color: var(--terracotta); font-weight: 500; }
+.time-table {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(10,12,16,0.5);
+  border-radius: 8px;
+}
+.time-table .time { font-family: var(--font-mono); color: var(--gold); font-size: 0.8rem; }
+.time-table .task { color: var(--text); }
+
+/* ═══════════════════ 5-COLUMN EXPRESSION TABLE ═══════════════════ */
+.expr-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.expr-table th {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 0.8rem 0.6rem;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+  background: var(--bg-card-alt);
+}
+.expr-table td {
+  padding: 1rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.expr-table tr:hover { background: rgba(191,106,74,0.04); }
+.expr-table .fr-col { font-family: var(--font-heading); font-size: 1rem; color: var(--terracotta); font-weight: 600; }
+.expr-table .ipa-col { font-family: var(--font-mono); font-size: 0.85rem; color: var(--gold); font-style: italic; }
+.expr-table .ko-approx-col { font-family: var(--font-body); font-size: 0.9rem; color: var(--text); }
+.expr-table .ko-mean-col { font-size: 0.95rem; color: var(--text-dim); }
+.expr-table .context-col { font-size: 0.85rem; color: var(--text-dim); font-style: italic; }
+
+/* ═══════════════════ GRAMMAR SVG SECTION ═══════════════════ */
+.grammar-box {
+  background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(10,12,16,1));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.grammar-box h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem; font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+.grammar-explanation {
+  font-size: 0.95rem; color: var(--text-dim); margin-bottom: 1.5rem;
+  line-height: 1.8;
+}
+.grammar-svg {
+  background: rgba(0,0,0,0.3);
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 1.5rem 0;
+  text-align: center;
+  overflow-x: auto;
+}
+.grammar-svg svg {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+}
+.grammar-highlight {
+  background: rgba(201,168,76,0.2);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--gold);
+  margin-top: 1rem;
+}
+.grammar-highlight strong { color: var(--gold); }
+
+/* ═══════════════════ DIALOGUE REVIEW BOX ═══════════════════ */
+.dialogue-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.dialogue-section h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 1.5rem;
+}
+.dialogue-review-box {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.dialogue-review-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: linear-gradient(180deg, var(--terracotta), var(--gold));
+}
+.dialogue-title {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+  padding-left: 1rem;
+}
+.dialogue-line {
+  margin-bottom: 1.2rem;
+  padding-left: 1rem;
+}
+.dialogue-speaker {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--gold);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+.dialogue-fr {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  color: var(--text-bright);
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+.dialogue-ko {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.dialogue-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1.5rem 0;
+}
+
+/* ═══════════════════ PRONUNCIATION DRILLS ═══════════════════ */
+.pron-section {
+  background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(10,12,16,1));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.pron-section h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem; font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+.pron-section > p {
+  font-size: 0.95rem; color: var(--text-dim); margin-bottom: 1.5rem;
+}
+.pron-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem;
+  margin-bottom: 0.8rem;
+  border-left: 3px solid var(--terracotta);
+}
+.pron-item .pron-fr {
+  font-family: var(--font-heading);
+  font-size: 1.1rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.3rem;
+}
+.pron-item .pron-ko {
+  font-size: 0.9rem; color: var(--text-dim);
+  margin-bottom: 0.4rem;
+}
+.pron-item .pron-ipa {
+  font-family: var(--font-mono);
+  font-size: 0.85rem; color: var(--gold);
+  font-style: italic;
+  background: rgba(201,168,76,0.1);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+/* ═══════════════════ SHADOWING SYSTEM ═══════════════════ */
+.shadow-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  background: rgba(191,106,74,0.15);
+  border: 1px solid rgba(191,106,74,0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.shadow-btn:hover {
+  background: rgba(191,106,74,0.3);
+  border-color: var(--terracotta);
+  transform: scale(1.1);
+}
+.shadow-btn.playing {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  animation: pulse-glow 1.2s infinite;
+}
+.shadow-btn svg { width: 14px; height: 14px; fill: var(--terracotta); }
+.shadow-btn.playing svg { fill: #fff; }
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(191,106,74,0.4); }
+  50% { box-shadow: 0 0 12px 4px rgba(191,106,74,0.25); }
+}
+
+.shadowing-section {
+  background: linear-gradient(135deg, rgba(191,106,74,0.06), rgba(201,168,76,0.04));
+  border: 1px solid rgba(191,106,74,0.2);
+  border-radius: 14px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+.shadowing-section h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.shadowing-section .desc {
+  font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem;
+}
+.shadow-controls {
+  display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+}
+.shadow-ctrl-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.shadow-ctrl-btn:hover {
+  border-color: var(--terracotta);
+  background: rgba(191,106,74,0.1);
+}
+.shadow-ctrl-btn.active {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  color: #fff;
+}
+.shadow-ctrl-btn svg { width: 16px; height: 16px; fill: currentColor; }
+.shadow-speed {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.8rem; color: var(--text-dim);
+}
+.shadow-speed input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  width: 100px; height: 4px;
+  background: var(--border); border-radius: 2px;
+  outline: none;
+}
+.shadow-speed input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--terracotta);
+  cursor: pointer;
+}
+.shadow-item {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.6rem;
+  transition: all 0.3s;
+}
+.shadow-item.active-phrase {
+  border-color: var(--terracotta);
+  background: rgba(191,106,74,0.08);
+  box-shadow: 0 0 20px rgba(191,106,74,0.1);
+}
+.shadow-item.done-phrase {
+  border-color: rgba(201,168,76,0.3);
+  opacity: 0.7;
+}
+.shadow-item .num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  min-width: 24px;
+}
+.shadow-item .phrase-text { flex: 1; }
+.shadow-item .phrase-fr {
+  font-family: var(--font-heading);
+  font-size: 1.1rem; font-weight: 600;
+  color: var(--terracotta);
+}
+.shadow-item .phrase-ipa {
+  font-family: var(--font-mono);
+  font-size: 0.8rem; color: var(--gold);
+  font-style: italic;
+}
+.shadow-item .phrase-ko {
+  font-size: 0.85rem; color: var(--text-dim);
+  margin-top: 2px;
+}
+.shadow-progress {
+  margin-top: 1rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.shadow-progress-bar {
+  flex: 1; height: 4px;
+  background: var(--border); border-radius: 2px;
+  overflow: hidden;
+}
+.shadow-progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--terracotta), var(--gold));
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+.shadow-progress-text {
+  font-family: var(--font-mono);
+  font-size: 0.7rem; color: var(--text-dim);
+  min-width: 40px;
+}
+.shadow-status {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--gold);
+  margin-top: 0.5rem;
+  min-height: 1.2em;
+}
+
+/* ═══════════════════ QUIZ SECTION ═══════════════════ */
+.quiz-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.quiz-section h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem; font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+}
+.quiz-question {
+  background: var(--bg-card-alt);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 10px;
+  border-left: 3px solid var(--terracotta);
+}
+.quiz-question p { font-size: 0.95rem; margin-bottom: 1rem; }
+.quiz-question label {
+  display: block;
+  margin: 0.6rem 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.quiz-question input[type="radio"] {
+  margin-right: 0.6rem;
+  accent-color: var(--terracotta);
+  cursor: pointer;
+}
+.quiz-btn {
+  background: linear-gradient(90deg, var(--terracotta), var(--gold));
+  color: #0A0C10;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  transition: transform 0.2s;
+  margin-top: 1rem;
+}
+.quiz-btn:hover { transform: scale(1.05); }
+.quiz-result {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  display: none;
+}
+.quiz-result.correct {
+  background: rgba(76,175,80,0.2);
+  border: 1px solid #4CAF50;
+  color: #81C784;
+}
+.quiz-result.incorrect {
+  background: rgba(244,67,54,0.2);
+  border: 1px solid #F44336;
+  color: #EF5350;
+}
+
+/* ═══════════════════ TRACKER ═══════════════════ */
+.tracker-section {
+  background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(10,12,16,1));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+.tracker-section h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem; font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+}
+.tracker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  gap: 8px;
+}
+.tracker-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(191,106,74,0.2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.tracker-day:hover { transform: scale(1.05); }
+.tracker-day.completed {
+  background: linear-gradient(135deg, var(--terracotta), var(--gold));
+  border-color: var(--gold);
+  color: #0A0C10;
+}
+.tracker-day.current {
+  background: linear-gradient(135deg, var(--gold), var(--terracotta));
+  border-color: var(--text-bright);
+  color: #0A0C10;
+  font-weight: 700;
+  box-shadow: 0 0 20px rgba(201,168,76,0.5);
+}
+
+/* ═══════════════════ FOOTER ═══════════════════ */
+footer {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  border-top: 1px solid var(--border);
+  margin-top: 4rem;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+footer p { margin: 0.5rem 0; }
+footer .next-day {
+  margin-top: 1rem;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+}
+footer a { font-weight: 600; }
+
+/* ═══════════════════ RESPONSIVE ═══════════════════ */
+@media (max-width: 768px) {
+  .sticky-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .hero h1 { font-size: 1.8rem; }
+  .section-title { font-size: 1.4rem; }
+  .expr-table { font-size: 0.85rem; }
+  .expr-table th, .expr-table td { padding: 0.6rem 0.4rem; }
+  .tracker-grid { grid-template-columns: repeat(13, 1fr); gap: 6px; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="logo">RENAULT KOREA FRENCH</div>
+  <div class="day-tag">DAY 11 / 26</div>
+  <div class="series-info">Scheduling & Appointments</div>
+</header>
+
+<div class="hero">
+  <div class="overline">메인 표현</div>
+  <h1>Pourriez-vous décaler la réunion à jeudi ?</h1>
+  <div class="subtitle">회의를 목요일로 옮겨주실 수 있나요?</div>
+  <div class="hero-sentence">
+    <div class="fr">Pourriez-vous décaler la réunion à jeudi ?<span class="shadow-btn" onclick="speakFr('Pourriez-vous décaler la réunion à jeudi ?', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></div>
+    <div class="ipa">/pu.ʁje vu de.ka.le la ʁe.y.njɔ̃ a ʒø.di/</div>
+    <div class="ko">회의를 목요일로 옮겨 주실 수 있나요?</div>
+  </div>
+</div>
+
+<div class="container">
+
+<section class="brain-box">
+  <h3>뇌과학: 청킹 (Chunking)</h3>
+  <div class="strategy">
+    <strong>핵심 전략:</strong>
+    <p>복잡한 일정 조율 표현을 "요청 → 대안 → 확인"이라는 3가지 구조로 나누어 배웁니다. 이렇게 하면 장기 기억(long-term memory)에 더 오래 남습니다.</p>
+  </div>
+  <div class="time-table">
+    <div class="time">0-5분</div><div class="task">일정 조율 용어 (5가지)</div>
+    <div class="time">5-12분</div><div class="task">시간 표현 & 재조율 동사</div>
+    <div class="time">12-18분</div><div class="task">조건법 문법 (SVG 해설)</div>
+    <div class="time">18-25분</div><div class="task">실전 대화 3가지</div>
+    <div class="time">25-30분</div><div class="task">발음 드릴 + 퀴즈</div>
+  </div>
+</section>
+
+<section>
+  <div class="section-label">일정 조율 표현 13개</div>
+  <div class="section-title">5-Column Pronunciation Table</div>
+  <table class="expr-table">
+    <thead>
+      <tr>
+        <th>프랑스어</th>
+        <th>IPA</th>
+        <th>한국어 근사음</th>
+        <th>한국어 뜻</th>
+        <th>사용 상황</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="fr-col">Pourriez-vous...?<span class="shadow-btn" onclick="speakFr('Pourriez-vous...?', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></td>
+        <td class="ipa-col">/pu.ʁje vu/</td>
+        <td class="ko-approx-col">뿌리에 뷔</td>
+        <td class="ko-mean-col">...해주실 수 있나요? (정중한 요청)</td>
+        <td class="context-col">회의 변경 요청</td>
+      </tr>
+      <tr>
+        <td class="fr-col">Est-ce disponible...?<span class="shadow-btn" onclick="speakFr('Est-ce disponible...?', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></td>
+        <td class="ipa-col">/ɛs kə dis.po.nibl/</td>
+        <td class="ko-approx-col">에스쿠 디스포니블</td>
+        <td class="ko-mean-col">...이 이용 가능한가요?</td>
+        <td class="context-col">시간 확인</td>
+      </tr>
+      <tr>
+        <td class="fr-col">Lundi à 14h<span class="shadow-btn" onclick="speakFr('Lundi à 14h', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></td>
+        <td class="ipa-col">/lœ̃.di a katorz œʁ/</td>
+        <td class="ko-approx-col">롱디 아 까또르즈 올</td>
+        <td class="ko-mean-col">월요일 오후 2시</td>
+        <td class="context-col">구체적 시간 제시</td>
+      </tr>
+      <tr>
+        <td class="fr-col">Ça vous convient ?<span class="shadow-btn" onclick="speakFr('Ça vous convient ?', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></td>
+        <td class="ipa-col">/sa vu kɔ̃.vjɛ/</td>
+        <td class="ko-approx-col">싸 뷔 꼬비에</td>
+        <td class="ko-mean-col">괜찮으신가요?</td>
+        <td class="context-col">시간 동의 확인</td>
+      </tr>
+      <tr>
+        <td class="fr-col">Je vous propose le...<span class="shadow-btn" onclick="speakFr('Je vous propose le...', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></td>
+        <td class="ipa-col">/ʒə vu pʁo.poz lə/</td>
+        <td class="ko-approx-col">쥬 뷔 쁘로포즈 르</td>
+        <td class="ko-mean-col">제가 ...을 제안합니다</td>
+        <td class="context-col">대안 시간 제시</td>
+      </tr>
+      <tr>
+        <td class="fr-col">Décaler à jeudi<span class="shadow-btn" onclick="speakFr('Décaler à jeudi', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></td>
+        <td class="ipa-col">/de.ka.le a ʒø.di/</td>
+        <td class="ko-approx-col">더깔레 아 쬬디</td>
+        <td class="ko-mean-col">목요일로 옮기기</td>
+        <td class="context-col">일정 변경</td>
+      </tr>
+      <tr>
+        <td class="fr-col">Reporter à la semaine prochaine<span class="shadow-btn" onclick="speakFr('Reporter à la semaine prochaine', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></td>
+        <td class="ipa-col">/ʁə.por.te a lə sə.mɛn pʁo.ʃɛn/</td>
+        <td class="ko-approx-col">르뽀르떼 아 르 슈메느 쁘로셰느</td>
+        <td class="ko-mean-col">다음 주로 연기하기</td>
+        <td class="context-col">일정 연기 (장기)</td>
+      </tr>
+      <tr>
+        <td class="fr-col">Avancer de 1 heure<span class="shadow-btn" onclick="speakFr('Avancer de 1 heure', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></td>
+        <td class="ipa-col">/a.vɑ̃.se də yn œʁ/</td>
+        <td class="ko-approx-col">아봉쎄 드 응 올</td>
+        <td class="ko-mean-col">1시간 앞당기기</td>
+        <td class="context-col">시간 조정 (앞)</td>
+      </tr>
+      <tr>
+        <td class="fr-col">Annuler la réunion<span class="shadow-btn" onclick="speakFr('Annuler la réunion', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></td>
+        <td class="ipa-col">/a.ny.le la ʁe.y.njɔ̃/</td>
+        <td class="ko-approx-col">아뉼레 라 르유니옹</td>
+        <td class="ko-mean-col">회의 취소하기</td>
+        <td class="context-col">회의 취소 공지</td>
+      </tr>
+      <tr>
+        <td class="fr-col">Je confirme ma présence<span class="shadow-btn" onclick="speakFr('Je confirme ma présence', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></td>
+        <td class="ipa-col">/ʒə kɔ̃.fiʁm ma pʁe.zɑ̃s/</td>
+        <td class="ko-approx-col">쥬 꼼피르므 마 쁘레장스</td>
+        <td class="ko-mean-col">참석을 확인합니다</td>
+        <td class="context-col">참석 최종 확정</td>
+      </tr>
+      <tr>
+        <td class="fr-col">Malheureusement, ce n'est pas possible<span class="shadow-btn" onclick="speakFr('Malheureusement, ce n'est pas possible', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></td>
+        <td class="ipa-col">/mal.ø.ʁø.zə.mɑ̃ sə nɛ pa pɔ.sibl/</td>
+        <td class="ko-approx-col">말뢰뢰즈망 스 네 빠 쁘시블</td>
+        <td class="ko-mean-col">불행히도, 불가능합니다</td>
+        <td class="context-col">일정 거절</td>
+      </tr>
+      <tr>
+        <td class="fr-col">L'ordre du jour est...<span class="shadow-btn" onclick="speakFr('L'ordre du jour est...', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></td>
+        <td class="ipa-col">/lɔʁdr dy ʒuʁ ɛ/</td>
+        <td class="ko-approx-col">로르드 뒤 쭈르 에</td>
+        <td class="ko-mean-col">안건(의제)은 ...입니다</td>
+        <td class="context-col">회의 안건 제시</td>
+      </tr>
+      <tr>
+        <td class="fr-col">À quelle heure vous convient le mieux ?<span class="shadow-btn" onclick="speakFr('À quelle heure vous convient le mieux ?', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></td>
+        <td class="ipa-col">/a kɛl œʁ vu kɔ̃.vjɛ lə mjø/</td>
+        <td class="ko-approx-col">아 켈 올 뷔 꼬비에 르 미올</td>
+        <td class="ko-mean-col">몇 시가 가장 잘 맞으신가요?</td>
+        <td class="context-col">유연한 시간 제안</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="grammar-box">
+  <h3>문법: 조건법 (Conditionnel) — "Pourriez-vous" vs "Pouvez-vous"</h3>
+  <div class="grammar-explanation">
+    프랑스 비즈니스에서는 <strong>"Pourriez-vous"</strong> (조건법 과거)를 거의 모든 요청에 사용합니다. 원형 동사 "Pouvez-vous"는 명령조처럼 들려 직접적이고 예의 없이 느껴집니다.
+  </div>
+  <div class="grammar-svg">
+    <svg width="100%" height="280" viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+      <text x="350" y="25" font-size="18" font-weight="bold" fill="#C9A84C" text-anchor="middle">조건법 (Conditionnel) — 비즈니스에서의 예의</text>
+      
+      <rect x="20" y="50" width="320" height="210" fill="rgba(191,106,74,0.3)" stroke="#BF6A4A" stroke-width="2" rx="8"/>
+      <text x="180" y="75" font-size="13" font-weight="bold" fill="#BF6A4A" text-anchor="middle">❌ 직접적 (피해야 함)</text>
+      <text x="180" y="100" font-size="12" fill="#E0E0E0" text-anchor="middle">Present: "Pouvez-vous...?"</text>
+      <text x="180" y="125" font-size="11" fill="#B0B0B0" text-anchor="middle">(Can you...?)</text>
+      
+      <text x="35" y="160" font-size="11" font-weight="600" fill="#C9A84C">원 동사 형태</text>
+      <text x="35" y="180" font-size="11" fill="#E0E0E0">직접적이고 명령조에 가까움</text>
+      <text x="35" y="200" font-size="11" fill="#E0E0E0">프랑스인들이 예의 없음으로 느낌</text>
+      <text x="35" y="220" font-size="10" font-style="italic" fill="#909090">실제: "Pouvez-vous...?" → 거의 사용 안 함</text>
+      <text x="35" y="240" font-size="10" font-style="italic" fill="#909090">(비즈니스에서는 금기에 가까움)</text>
+      
+      <rect x="360" y="50" width="320" height="210" fill="rgba(201,168,76,0.3)" stroke="#C9A84C" stroke-width="2" rx="8"/>
+      <text x="520" y="75" font-size="13" font-weight="bold" fill="#C9A84C" text-anchor="middle">✓ 조건법 (정중함)</text>
+      <text x="520" y="100" font-size="12" fill="#E0E0E0" text-anchor="middle">Conditionnel: "Pourriez-vous...?"</text>
+      <text x="520" y="125" font-size="11" fill="#B0B0B0" text-anchor="middle">(Could you...? / Would you...?)</text>
+      
+      <text x="375" y="160" font-size="11" font-weight="600" fill="#BF6A4A">조건법 과거</text>
+      <text x="375" y="180" font-size="11" fill="#E0E0E0">매우 정중하고 존경스러움</text>
+      <text x="375" y="200" font-size="11" fill="#E0E0E0">모든 비즈니스 상황에서 기본</text>
+      <text x="375" y="220" font-size="10" font-style="italic" fill="#909090">실제: "Pourriez-vous...?" → 비즈니스 표준</text>
+      <text x="375" y="240" font-size="10" font-style="italic" fill="#909090">(이메일, 회의, 공식 문서)</text>
+    </svg>
+  </div>
+  <div class="grammar-highlight">
+    <strong>황금 규칙:</strong> Renault 내부 이메일에서 일정 조율할 때는 거의 항상 <strong>"Pourriez-vous"</strong>를 사용하세요. 이것이 Renault Korea 문화에서 기대하는 표준입니다.
+  </div>
+</section>
+
+<section class="dialogue-section">
+  <h3>실전 대화: 일정 조율 3가지 상황</h3>
+  
+  <div class="dialogue-review-box">
+    <div class="dialogue-title">상황 1: 회의 요청 — 신규 일정 제안</div>
+    <div class="dialogue-line">
+      <div class="dialogue-speaker">Ingénieur (vous / 한국 엔지니어)</div>
+      <div class="dialogue-fr">Bonjour Olivier,<br>Je vous propose de nous rencontrer pour discuter du projet d'amortisseur. Serait-il possible lundi à 10h ?<span class="shadow-btn" onclick="speakFr('Bonjour Olivier, Je vous propose de nous rencontrer pour discuter du projet d'amortisseur. Serait-il possible lundi à 10h ?', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></div>
+      <div class="dialogue-ko">안녕하세요 올리비에,<br>쇼크업소버 프로젝트를 논의하기 위해 만날 것을 제안합니다. 월요일 오전 10시가 가능할까요?</div>
+    </div>
+    <div class="dialogue-divider"></div>
+    <div class="dialogue-line">
+      <div class="dialogue-speaker">Collègue (Olivier / 프랑스 동료)</div>
+      <div class="dialogue-fr">Merci pour cette proposition. Lundi à 10h convient parfaitement ! À bientôt.<span class="shadow-btn" onclick="speakFr('Merci pour cette proposition. Lundi à 10h convient parfaitement ! À bientôt.', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></div>
+      <div class="dialogue-ko">이 제안 감사합니다. 월요일 오전 10시가 완벽합니다! 곧 봐요.</div>
+    </div>
+  </div>
+
+  <div class="dialogue-review-box">
+    <div class="dialogue-title">상황 2: 회의 변경 — 일정 조율</div>
+    <div class="dialogue-line">
+      <div class="dialogue-speaker">Ingénieur (vous / 한국 엔지니어)</div>
+      <div class="dialogue-fr">Olivier,<br>Pourriez-vous décaler la réunion à jeudi à 14h ? Malheureusement, lundi n'est pas possible pour moi. Merci de confirmer.<span class="shadow-btn" onclick="speakFr('Olivier, Pourriez-vous décaler la réunion à jeudi à 14h ? Malheureusement, lundi n'est pas possible pour moi. Merci de confirmer.', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></div>
+      <div class="dialogue-ko">올리비에,<br>회의를 목요일 오후 2시로 옮겨주실 수 있나요? 불행히도 월요일은 제게 불가능합니다. 확인해주세요.</div>
+    </div>
+    <div class="dialogue-divider"></div>
+    <div class="dialogue-line">
+      <div class="dialogue-speaker">Collègue (Olivier / 프랑스 동료)</div>
+      <div class="dialogue-fr">Pas de problème. Jeudi à 14h convient très bien. Je confirme la réunion pour cette date. À jeudi !<span class="shadow-btn" onclick="speakFr('Pas de problème. Jeudi à 14h convient très bien. Je confirme la réunion pour cette date. À jeudi !', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></div>
+      <div class="dialogue-ko">문제없습니다. 목요일 오후 2시가 매우 잘 맞습니다. 이날을 위한 회의를 확인합니다. 목요일에 봐요!</div>
+    </div>
+  </div>
+
+  <div class="dialogue-review-box">
+    <div class="dialogue-title">상황 3: 회의 확정 & 의제 제시</div>
+    <div class="dialogue-line">
+      <div class="dialogue-speaker">Collègue (Olivier / 프랑스 동료)</div>
+      <div class="dialogue-fr">Jeudi à 14h, ça y est ! L'ordre du jour : résultats des essais de validation et approbation du design. Veuillez confirmer votre présence.<span class="shadow-btn" onclick="speakFr('Jeudi à 14h, ça y est ! L'ordre du jour : résultats des essais de validation et approbation du design. Veuillez confirmer votre présence.', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></div>
+      <div class="dialogue-ko">목요일 오후 2시 맞춰요! 의제: 검증 시험 결과 및 디자인 승인. 참석을 확인해주세요.</div>
+    </div>
+    <div class="dialogue-divider"></div>
+    <div class="dialogue-line">
+      <div class="dialogue-speaker">Ingénieur (vous / 한국 엔지니어)</div>
+      <div class="dialogue-fr">Merci pour l'organisation. Je confirme ma présence. À bientôt !<span class="shadow-btn" onclick="speakFr('Merci pour l'organisation. Je confirme ma présence. À bientôt !', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></div>
+      <div class="dialogue-ko">조직해주셔서 감사합니다. 참석을 확인합니다. 곧 봐요!</div>
+    </div>
+  </div>
+</section>
+
+<section class="pron-section">
+  <h3>발음 드릴 5개 — 일정 조율</h3>
+  <p>각 표현을 반복 따라 말하기(3회)하고, 스피커 아이콘을 클릭하여 원어민 발음을 들으세요.</p>
+  
+  <div class="pron-item">
+    <div class="pron-fr">1. Pourriez-vous décaler la réunion ?<span class="shadow-btn" onclick="speakFr('Pourriez-vous décaler la réunion ?', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></div>
+    <div class="pron-ko">회의를 옮겨주실 수 있나요?</div>
+    <div class="pron-ipa">/pu.ʁje vu de.ka.le la ʁe.y.njɔ̃/</div>
+  </div>
+
+  <div class="pron-item">
+    <div class="pron-fr">2. Est-ce disponible le lundi à dix heures ?<span class="shadow-btn" onclick="speakFr('Est-ce disponible le lundi à dix heures ?', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></div>
+    <div class="pron-ko">월요일 오전 10시가 이용 가능한가요?</div>
+    <div class="pron-ipa">/ɛs kə dis.po.nibl lə lœ̃.di a dis œʁ/</div>
+  </div>
+
+  <div class="pron-item">
+    <div class="pron-fr">3. Je vous propose le jeudi à quatorze heures.<span class="shadow-btn" onclick="speakFr('Je vous propose le jeudi à quatorze heures.', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></div>
+    <div class="pron-ko">목요일 오후 2시를 제안합니다.</div>
+    <div class="pron-ipa">/ʒə vu pʁo.poz lə ʒø.di a ka.torz œʁ/</div>
+  </div>
+
+  <div class="pron-item">
+    <div class="pron-fr">4. Ça vous convient parfaitement !<span class="shadow-btn" onclick="speakFr('Ça vous convient parfaitement !', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></div>
+    <div class="pron-ko">완벽하게 맞습니다!</div>
+    <div class="pron-ipa">/sa vu kɔ̃.vjɛ paʁ.fɛ.tə.mɑ̃/</div>
+  </div>
+
+  <div class="pron-item">
+    <div class="pron-fr">5. L'ordre du jour est : validation du design et résultats des essais.<span class="shadow-btn" onclick="speakFr('L'ordre du jour est : validation du design et résultats des essais.', this)"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></span></div>
+    <div class="pron-ko">의제는 디자인 검증 및 시험 결과입니다.</div>
+    <div class="pron-ipa">/lɔʁdr dy ʒuʁ ɛ val.i.da.sjɔ̃ dy dɛ.zɛ̃ e ʁe.zyl.ta dez e.sɛ/</div>
+  </div>
+</section>
+
+<section class="shadowing-section">
+  <h3>🎧 쉐도잉 연습 — Shadowing Practice</h3>
+  <p class="desc">프랑스어 음성을 듣고 → 3초 대기 → 따라 말하기를 반복합니다. 속도를 조절하여 자신에게 맞는 페이스로 연습하세요.</p>
+  <div class="shadow-controls">
+    <button class="shadow-ctrl-btn" id="shadowPlayAll" onclick="shadowStartAll()">
+      <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg> 전체 쉐도잉 시작
+    </button>
+    <button class="shadow-ctrl-btn" id="shadowStop" onclick="shadowStopAll()">
+      <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg> 정지
+    </button>
+    <div class="shadow-speed">
+      <span>속도:</span>
+      <input type="range" id="shadowSpeed" min="0.4" max="1.2" step="0.1" value="0.8">
+      <span id="shadowSpeedLabel">0.8x</span>
+    </div>
+  </div>
+  <div id="voiceSelectorContainer"></div>
+  <div id="shadowItems"></div>
+  <div class="shadow-progress">
+    <div class="shadow-progress-bar"><div class="shadow-progress-fill" id="shadowProgressFill"></div></div>
+    <div class="shadow-progress-text" id="shadowProgressText">0/13</div>
+  </div>
+  <div class="shadow-status" id="shadowStatus"></div>
+</section>
+
+<section class="quiz-section">
+  <h3>실력 확인 퀴즈</h3>
+  
+  <div class="quiz-question">
+    <p><strong>문제 1:</strong> Renault 이메일에서 회의 날짜 변경을 가장 정중하게 요청하려면?</p>
+    <label><input type="radio" name="q1" value="a"> A) "Pourriez-vous décaler la réunion à jeudi ?"</label>
+    <label><input type="radio" name="q1" value="b"> B) "Vous devez changer la réunion à jeudi"</label>
+    <label><input type="radio" name="q1" value="c"> C) "La réunion doit être changée"</label>
+  </div>
+
+  <div class="quiz-question">
+    <p><strong>문제 2:</strong> "Ça vous convient ?" 표현의 의미는?</p>
+    <label><input type="radio" name="q2" value="a"> A) 괜찮으신가요? (시간/일정 동의 확인)</label>
+    <label><input type="radio" name="q2" value="b"> B) 이것이 적합한가요? (일반적 질문)</label>
+    <label><input type="radio" name="q2" value="c"> C) 당신은 편한가요? (개인 상태 확인)</label>
+  </div>
+
+  <div class="quiz-question">
+    <p><strong>문제 3:</strong> 조건법 "Pourriez-vous"는 어떤 장점이 있나?</p>
+    <label><input type="radio" name="q3" value="a"> A) 더 빠르게 발음된다</label>
+    <label><input type="radio" name="q3" value="b"> B) 정중하고 존경스러운 톤을 전달한다</label>
+    <label><input type="radio" name="q3" value="c"> C) 명령조에 더 가깝다</label>
+  </div>
+
+  <button class="quiz-btn" onclick="checkQuiz(11)">답 확인</button>
+  <div id="quiz-result-11" class="quiz-result"></div>
+</section>
+
+<section class="tracker-section">
+  <h3>스페이스드 반복 트래커</h3>
+  <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1.5rem;">26일 중 진행 상황을 클릭하여 기록하세요.</p>
+  <div class="tracker-grid" id="tracker-11"></div>
+</section>
+
+</div>
+
+<footer>
+  <p>Renault Korea French Business Communication Course</p>
+  <p style="color: var(--text-dim); font-size: 0.85rem;">일정 조율, 조건법, 회의 의제 제시</p>
+  <div class="next-day">다음: <a href="day-12-presentation.html">Day 12 — 프레젠테이션 도입부 (Présentation d'un projet)</a></div>
+</footer>
+
+<script>
+// ═══════════════════ SHADOWING ENGINE ═══════════════════
+(function(){
+  const PLAY_SVG = '<svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>';
+  const PAUSE_SVG = '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>';
+  const STOP_SVG = '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>';
+  const SPEAKER_SVG = '<svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>';
+
+  let selectedFrVoice = null;
+  const PREFERRED_VOICES = [
+    'Thomas', 'Amelie', 'Amélie', 'Audrey', 'Aurélie', 'Marie',
+    'Google français', 'Google French',
+    'Microsoft Paul', 'Microsoft Hortense', 'Microsoft Julie',
+    'Virginie', 'Siri', 'Chloe', 'Chloé', 'Léa', 'Nicolas'
+  ];
+
+  function getAllFrenchVoices() {
+    return window.speechSynthesis.getVoices().filter(v =>
+      v.lang === 'fr-FR' || v.lang === 'fr_FR' || v.lang === 'fr'
+    );
+  }
+
+  function initFrenchVoice() {
+    const frVoices = getAllFrenchVoices();
+    if (frVoices.length === 0) {
+      const anyFr = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('fr'));
+      if (anyFr.length > 0) selectedFrVoice = anyFr[0];
+      return;
+    }
+    for (const pref of PREFERRED_VOICES) {
+      const match = frVoices.find(v =>
+        v.name.includes(pref) || v.name.toLowerCase().includes(pref.toLowerCase())
+      );
+      if (match) { selectedFrVoice = match; break; }
+    }
+    if (!selectedFrVoice) selectedFrVoice = frVoices[0];
+  }
+
+  function getFrenchVoice() {
+    if (!selectedFrVoice) initFrenchVoice();
+    return selectedFrVoice;
+  }
+
+  function buildVoiceSelector(container) {
+    const frVoices = getAllFrenchVoices();
+    if (frVoices.length <= 1) return;
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:var(--text-dim);margin-top:0.5rem;';
+    wrapper.innerHTML = '<span>🇫🇷 음성:</span>';
+    const sel = document.createElement('select');
+    sel.style.cssText = 'background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:0.3rem 0.5rem;font-size:0.8rem;font-family:var(--font-body);cursor:pointer;';
+    frVoices.forEach((v, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = v.name + (v.localService ? ' (로컬)' : ' (온라인)');
+      if (v === selectedFrVoice) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', function() {
+      selectedFrVoice = frVoices[parseInt(this.value)];
+      speakFr('Bonjour', null, 0.9);
+    });
+    wrapper.appendChild(sel);
+    container.appendChild(wrapper);
+  }
+
+  window.speakFr = function(text, btn, rate) {
+    window.speechSynthesis.cancel();
+    const cleanText = text.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').replace(/[\[\]\(\)]/g, '').trim();
+    if (!cleanText) return;
+    const utter = new SpeechSynthesisUtterance(cleanText);
+    utter.lang = 'fr-FR';
+    utter.rate = rate || parseFloat(document.getElementById('shadowSpeed')?.value || '0.8');
+    utter.pitch = 1.0;
+    const voice = getFrenchVoice();
+    if (voice) utter.voice = voice;
+    if (btn) btn.classList.add('playing');
+    utter.onend = function() { if (btn) btn.classList.remove('playing'); };
+    utter.onerror = function() { if (btn) btn.classList.remove('playing'); };
+    window.speechSynthesis.speak(utter);
+  };
+
+  let shadowPhrases = [];
+  let shadowIndex = 0;
+  let shadowPlaying = false;
+  const shadowPauseTime = 3000;
+
+  function collectPhrases() {
+    const phrases = [];
+    document.querySelectorAll('.expr-table tbody tr').forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if (cells.length >= 2) {
+        const frText = cells[0]?.textContent?.trim().replace(/[
+]/g, ' ').replace(/\s+/g, ' ');
+        const koText = cells[cells.length - 1]?.textContent?.trim();
+        let ipaText = cells[1]?.textContent?.trim() || '';
+        if (frText && /[a-zA-Zéèêëàâäùûüôöîïçœæ]/.test(frText)) {
+          phrases.push({ fr: frText, ipa: ipaText, ko: koText });
+        }
+      }
+    });
+    document.querySelectorAll('.pron-item').forEach(item => {
+      const fr = item.querySelector('.pron-fr')?.textContent?.trim();
+      const ipa = item.querySelector('.pron-ipa')?.textContent?.trim() || '';
+      const ko = item.querySelector('.pron-ko')?.textContent?.trim() || '';
+      if (fr) phrases.push({ fr, ipa, ko });
+    });
+    return phrases;
+  }
+
+  function buildShadowingSection() {
+    shadowPhrases = collectPhrases();
+    if (shadowPhrases.length === 0) return;
+    const container = document.querySelector('.shadowing-section');
+    if (!container) return;
+    let itemsHTML = shadowPhrases.map((p, i) => `
+      <div class="shadow-item" data-idx="${i}" data-fr="${p.fr.replace(/"/g, '&quot;')}">
+        <div class="num">${String(i+1).padStart(2,'0')}</div>
+        <div class="phrase-text">
+          <div class="phrase-fr">${p.fr}</div>
+          ${p.ipa ? '<div class="phrase-ipa">' + p.ipa + '</div>' : ''}
+          ${p.ko ? '<div class="phrase-ko">' + p.ko + '</div>' : ''}
+        </div>
+        <span class="shadow-btn" onclick="speakFr('${p.fr.replace(/'/g, "\'")}', this)">
+          ${SPEAKER_SVG}
+        </span>
+      </div>
+    `).join('');
+    const shadowItemsDiv = document.getElementById('shadowItems');
+    if (shadowItemsDiv) shadowItemsDiv.innerHTML = itemsHTML;
+    const voiceContainer = document.getElementById('voiceSelectorContainer');
+    if (voiceContainer) buildVoiceSelector(voiceContainer);
+  }
+
+  window.shadowStartAll = function() {
+    shadowPlaying = true;
+    shadowIndex = 0;
+    document.querySelectorAll('.shadow-item').forEach(el => {
+      el.classList.remove('active-phrase', 'done-phrase');
+    });
+    document.getElementById('shadowPlayAll')?.classList.add('active');
+    document.getElementById('shadowStatus').textContent = '🎧 쉐도잉 시작...';
+    playShadowPhrase(0);
+  };
+
+  window.shadowStopAll = function() {
+    shadowPlaying = false;
+    window.speechSynthesis.cancel();
+    document.getElementById('shadowPlayAll')?.classList.remove('active');
+    document.getElementById('shadowStatus').textContent = '⏹ 정지됨';
+    document.querySelectorAll('.shadow-item').forEach(el => {
+      el.classList.remove('active-phrase');
+    });
+  };
+
+  function playShadowPhrase(idx) {
+    if (!shadowPlaying || idx >= shadowPhrases.length) {
+      if (idx >= shadowPhrases.length) {
+        document.getElementById('shadowStatus').textContent = '✅ 쉐도잉 연습 완료!';
+        document.getElementById('shadowPlayAll')?.classList.remove('active');
+      }
+      shadowPlaying = false;
+      return;
+    }
+    const phrase = shadowPhrases[idx];
+    const items = document.querySelectorAll('.shadow-item');
+    items.forEach(el => el.classList.remove('active-phrase'));
+    if (items[idx]) {
+      items[idx].classList.add('active-phrase');
+      items[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    const fill = document.getElementById('shadowProgressFill');
+    const text = document.getElementById('shadowProgressText');
+    if (fill) fill.style.width = ((idx + 1) / shadowPhrases.length * 100) + '%';
+    if (text) text.textContent = (idx + 1) + '/' + shadowPhrases.length;
+    document.getElementById('shadowStatus').textContent = '🔊 듣기: ' + phrase.fr;
+    const utter = new SpeechSynthesisUtterance(phrase.fr);
+    utter.lang = 'fr-FR';
+    utter.rate = parseFloat(document.getElementById('shadowSpeed')?.value || '0.8');
+    const voice = getFrenchVoice();
+    if (voice) utter.voice = voice;
+    utter.onend = function() {
+      if (!shadowPlaying) return;
+      document.getElementById('shadowStatus').textContent = '🎤 따라 말해보세요: ' + phrase.fr;
+      setTimeout(function() {
+        if (!shadowPlaying) return;
+        if (items[idx]) {
+          items[idx].classList.remove('active-phrase');
+          items[idx].classList.add('done-phrase');
+        }
+        playShadowPhrase(idx + 1);
+      }, shadowPauseTime);
+    };
+    window.speechSynthesis.speak(utter);
+  }
+
+  function init() {
+    function waitForVoices(cb) {
+      let voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) { cb(); return; }
+      let tries = 0;
+      const interval = setInterval(function() {
+        voices = window.speechSynthesis.getVoices();
+        tries++;
+        if (voices.length > 0 || tries > 20) {
+          clearInterval(interval);
+          cb();
+        }
+      }, 100);
+      window.speechSynthesis.addEventListener('voiceschanged', function() {
+        clearInterval(interval);
+        cb();
+      }, { once: true });
+    }
+    waitForVoices(function() {
+      initFrenchVoice();
+      buildShadowingSection();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+// ═══════════════════ QUIZ ENGINE ═══════════════════
+function checkQuiz(dayNum) {
+  const q1 = document.querySelector('input[name="q1"]:checked');
+  const q2 = document.querySelector('input[name="q2"]:checked');
+  const q3 = document.querySelector('input[name="q3"]:checked');
+  if (!q1 || !q2 || !q3) {
+    alert('모든 문제에 답해주세요.');
+    return;
+  }
+  const correct = q1.value === 'a' && q2.value === 'a' && q3.value === 'b';
+  const resultEl = document.getElementById(`quiz-result-${dayNum}`);
+  if (correct) {
+    resultEl.className = 'quiz-result correct';
+    resultEl.textContent = '완벽합니다! 모든 답이 맞습니다. ✓';
+    saveProgress(dayNum, true);
+  } else {
+    resultEl.className = 'quiz-result incorrect';
+    resultEl.textContent = '다시 한 번 살펴보세요. 정답: 1-A, 2-A, 3-B';
+  }
+  resultEl.style.display = 'block';
+}
+
+function saveProgress(day, completed) {
+  let tracker = JSON.parse(localStorage.getItem('fr-eng-tracker') || '{}');
+  tracker[`day-${day}`] = completed;
+  localStorage.setItem('fr-eng-tracker', JSON.stringify(tracker));
+  initTracker();
+}
+
+function initTracker() {
+  const trackerEl = document.getElementById('tracker-11');
+  if (!trackerEl) return;
+  trackerEl.innerHTML = '';
+  let tracker = JSON.parse(localStorage.getItem('fr-eng-tracker') || '{}');
+  for (let i = 1; i <= 26; i++) {
+    const dayEl = document.createElement('div');
+    dayEl.className = 'tracker-day';
+    dayEl.textContent = i;
+    if (i === 11) {
+      dayEl.classList.add('current');
+    } else if (tracker[`day-${i}`]) {
+      dayEl.classList.add('completed');
+    }
+    dayEl.addEventListener('click', () => {
+      if (tracker[`day-${i}`]) {
+        delete tracker[`day-${i}`];
+      } else {
+        tracker[`day-${i}`] = true;
+      }
+      localStorage.setItem('fr-eng-tracker', JSON.stringify(tracker));
+      initTracker();
+    });
+    trackerEl.appendChild(dayEl);
+  }
+}
+
+window.addEventListener('load', initTracker);
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 15: 맞벌이 부부 대화 기술</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0A0C10;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4ABF8A;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3DA076;
+        }
+
+        body {
+            background-color: #0A0C10;
+            color: #E0E0E0;
+            font-family: 'Noto Sans KR', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Sticky Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(18, 21, 27, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(74, 191, 138, 0.2);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4ABF8A;
+        }
+
+        .header-day {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            color: #C9A84C;
+            font-weight: 600;
+        }
+
+        .timer-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .timer-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            color: #4ABF8A;
+            font-weight: 600;
+            min-width: 80px;
+        }
+
+        .timer-btn {
+            background: #4ABF8A;
+            color: #0A0C10;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .timer-btn:hover {
+            background: #3DA076;
+            transform: translateY(-2px);
+        }
+
+        .timer-btn.running {
+            background: #E85D5D;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 2rem;
+        }
+
+        /* Fade Up Animation */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-left: 4px solid #4ABF8A;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            animation: fadeUp 0.8s ease-out;
+        }
+
+        .hero-label {
+            color: #C9A84C;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: #B0B0B0;
+            margin-bottom: 1rem;
+        }
+
+        .hero-one-liner {
+            color: #4ABF8A;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(74, 191, 138, 0.2);
+            color: #4ABF8A;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid #4ABF8A;
+        }
+
+        /* Card Styles */
+        .card {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 1px solid rgba(74, 191, 138, 0.2);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .card:hover {
+            border-color: #4ABF8A;
+            box-shadow: 0 0 20px rgba(74, 191, 138, 0.1);
+        }
+
+        .card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4ABF8A;
+            margin-bottom: 1rem;
+        }
+
+        /* Learning Strategy */
+        .learning-strategy {
+            background: rgba(201, 168, 76, 0.1);
+            border-left: 4px solid #C9A84C;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 4px;
+            animation: fadeUp 0.6s ease-out 0.2s forwards;
+            opacity: 0;
+        }
+
+        .learning-strategy h3 {
+            color: #C9A84C;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+        }
+
+        .learning-strategy p {
+            margin-bottom: 0.8rem;
+            color: #D0D0D0;
+        }
+
+        /* Time Table */
+        .time-table {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .time-row {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 1rem;
+            align-items: start;
+            padding: 1rem;
+            background: rgba(18, 21, 27, 0.5);
+            border-radius: 4px;
+            border-left: 3px solid #C9A84C;
+        }
+
+        .time-col {
+            color: #D0D0D0;
+        }
+
+        .time {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: #4ABF8A;
+        }
+
+        /* Science Cards */
+        .science-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .science-card {
+            background: rgba(74, 191, 138, 0.05);
+            border: 1px solid rgba(74, 191, 138, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .science-card-title {
+            color: #4ABF8A;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .science-card-content {
+            color: #D0D0D0;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Behavior Boxes */
+        .behavior-box {
+            background: rgba(18, 21, 27, 0.8);
+            border-left: 3px solid #4ABF8A;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            line-height: 1.8;
+        }
+
+        .behavior-box-title {
+            color: #4ABF8A;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+        }
+
+        .behavior-box p {
+            margin-bottom: 0.6rem;
+            color: #D0D0D0;
+        }
+
+        .speaker {
+            color: #4ABF8A;
+            font-weight: 600;
+        }
+
+        /* Do & Don't Boxes */
+        .do-box {
+            background: rgba(74, 191, 138, 0.1);
+            border-left: 4px solid #4ABF8A;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+        }
+
+        .do-box::before {
+            content: '✓ ';
+            color: #4ABF8A;
+            font-weight: 700;
+        }
+
+        .dont-box {
+            background: rgba(232, 93, 93, 0.1);
+            border-left: 4px solid #E85D5D;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+        }
+
+        .dont-box::before {
+            content: '✗ ';
+            color: #E85D5D;
+            font-weight: 700;
+        }
+
+        /* Diagram Section */
+        .diagram-section {
+            background: rgba(18, 21, 27, 0.8);
+            border: 1px solid rgba(74, 191, 138, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+            animation: fadeUp 0.6s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+
+        .diagram-section h4 {
+            color: #4ABF8A;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* SVG Diagram */
+        svg {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Marriage Tip */
+        .marriage-tip {
+            background: linear-gradient(135deg, rgba(74, 191, 138, 0.1), rgba(201, 168, 76, 0.1));
+            border: 1px solid rgba(74, 191, 138, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .marriage-tip-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: #4ABF8A;
+            margin-bottom: 1rem;
+        }
+
+        .marriage-tip-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tip-item {
+            background: rgba(18, 21, 27, 0.8);
+            border-left: 3px solid #C9A84C;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        .tip-number {
+            color: #C9A84C;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .tip-text {
+            color: #D0D0D0;
+            font-size: 0.95rem;
+        }
+
+        /* Deep Dive Collapsible */
+        .deep-dive {
+            margin: 2rem 0;
+        }
+
+        details {
+            background: rgba(18, 21, 27, 0.8);
+            border: 1px solid rgba(74, 191, 138, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        details:hover {
+            border-color: #4ABF8A;
+            background: rgba(18, 21, 27, 0.9);
+        }
+
+        summary {
+            color: #4ABF8A;
+            font-weight: 600;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            user-select: none;
+        }
+
+        summary::marker {
+            color: #4ABF8A;
+        }
+
+        details[open] summary {
+            color: #FFFFFF;
+            margin-bottom: 1rem;
+        }
+
+        .deep-dive-content {
+            color: #D0D0D0;
+            margin-top: 1rem;
+        }
+
+        .deep-dive-content p {
+            margin-bottom: 0.8rem;
+            line-height: 1.8;
+        }
+
+        .deep-dive-content h5 {
+            color: #C9A84C;
+            margin-top: 1.2rem;
+            margin-bottom: 0.6rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+        }
+
+        .deep-dive-content ul {
+            margin-left: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .deep-dive-content li {
+            margin-bottom: 0.4rem;
+        }
+
+        /* Couple Dialog */
+        .couple-dialog {
+            background: rgba(74, 191, 138, 0.05);
+            border: 1px solid rgba(74, 191, 138, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .dialog-turn {
+            margin-bottom: 1.2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(74, 191, 138, 0.1);
+        }
+
+        .dialog-turn:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .dialog-speaker {
+            color: #4ABF8A;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            font-size: 0.95rem;
+        }
+
+        .dialog-text {
+            color: #D0D0D0;
+            margin-left: 1rem;
+            padding-left: 0.8rem;
+            border-left: 2px solid rgba(74, 191, 138, 0.4);
+            line-height: 1.7;
+        }
+
+        /* Practice Card */
+        .practice-card {
+            background: linear-gradient(135deg, rgba(74, 191, 138, 0.1), rgba(201, 168, 76, 0.05));
+            border: 1px solid rgba(201, 168, 76, 0.5);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .practice-title {
+            color: #C9A84C;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .practice-instruction {
+            color: #D0D0D0;
+            margin-bottom: 1.2rem;
+            line-height: 1.8;
+        }
+
+        .practice-steps {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .practice-step {
+            background: rgba(18, 21, 27, 0.8);
+            border-left: 3px solid #C9A84C;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        .practice-step-num {
+            color: #C9A84C;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 0.5rem;
+        }
+
+        .practice-step-content {
+            color: #D0D0D0;
+            font-size: 0.95rem;
+        }
+
+        /* Quiz */
+        .quiz-section {
+            background: #12151B;
+            border: 1px solid rgba(74, 191, 138, 0.2);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .quiz-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            color: #4ABF8A;
+            margin-bottom: 1.5rem;
+        }
+
+        .quiz-item {
+            background: #0A0C10;
+            border: 1px solid rgba(74, 191, 138, 0.2);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quiz-question {
+            color: #E0E0E0;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .quiz-option input {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .quiz-option label {
+            cursor: pointer;
+            color: #D0D0D0;
+        }
+
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+        }
+
+        .quiz-feedback.correct {
+            background: rgba(74, 191, 138, 0.2);
+            color: #4ABF8A;
+            border-left: 4px solid #4ABF8A;
+            padding-left: 1rem;
+        }
+
+        .quiz-feedback.incorrect {
+            background: rgba(232, 93, 93, 0.2);
+            color: #E85D5D;
+            border-left: 4px solid #E85D5D;
+            padding-left: 1rem;
+        }
+
+        /* Tracker */
+        .tracker-section {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 1px solid rgba(74, 191, 138, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .tracker-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: #4ABF8A;
+            margin-bottom: 1.5rem;
+        }
+
+        .tracker-items {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .tracker-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem;
+            background: rgba(18, 21, 27, 0.8);
+            border-radius: 4px;
+            border-left: 2px solid #4ABF8A;
+        }
+
+        .tracker-item input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .tracker-item label {
+            cursor: pointer;
+            color: #D0D0D0;
+            flex: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            main {
+                padding: 1rem;
+            }
+
+            .hero {
+                padding: 2rem 1.5rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .science-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .time-row {
+                grid-template-columns: 80px 1fr;
+            }
+
+            .marriage-tip-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="header-title">과학적 육아 스터디</h1>
+            <span class="header-day">DAY 15 / 21</span>
+            <div class="timer-section">
+                <span class="timer-display" id="timerDisplay">25:00</span>
+                <button class="timer-btn" id="timerBtn">시작</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-label">PART 3 — 부부 관계 강화</div>
+            <h2 class="hero-title">맞벌이 부부 대화 기술</h2>
+            <p class="hero-subtitle">퇴근 후 15분이 결정하는 부부 만족도</p>
+            <p class="hero-one-liner">스트레스 해소와 감정 공유를 분리하고, 육아 분담 불만을 건설적으로 표현하기</p>
+            <div class="badges">
+                <span class="badge">부부</span>
+                <span class="badge">시간 관리</span>
+                <span class="badge">감정 공유</span>
+            </div>
+        </section>
+
+        <section class="learning-strategy">
+            <h3>⏰ 이 강의로 배우는 것</h3>
+            <p>맞벌이 부부가 직면한 최대 문제는 '시간 부족'이 아니라 '감정 소통의 질 저하'입니다. 퇴근 후 15분 전환 의식(Decompression Routine)은 단순한 시간 관리가 아니라 신경계를 리셋하는 생리적 프로세스입니다. 이 강의에서는 Gottman의 연구를 바탕으로 감정 대화와 문제 해결 대화를 분리하고, I-Message로 육아 분담 불만을 건설적으로 표현하는 법을 실습합니다.</p>
+            <div class="time-table">
+                <div class="time-row">
+                    <div class="time-col time">00-05분</div>
+                    <div class="time-col activity">15분 전환 의식(Decompression Routine)과 부교감신경 활성화</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col time">05-10분</div>
+                    <div class="time-col activity">감정 대화 vs 문제 해결 대화 분리 (Gottman의 Dreams Within Conflict)</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col time">10-15분</div>
+                    <div class="time-col activity">I-Message 기법과 육아 분담 협의 스크립트</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col time">15-25분</div>
+                    <div class="time-col activity">실제 상황별 3턴 자연스러운 대화 연습</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2 class="card-title">🔬 핵심 과학 개념</h2>
+            <div class="science-cards">
+                <div class="science-card">
+                    <div class="science-card-title">15분 전환 의식</div>
+                    <div class="science-card-content">
+                        직장 스트레스로 상승한 코르티솔을 낮추고 부교감신경을 활성화하는 신경학적 프로세스. 폴리베이갈 이론(Polyvagal Theory)에 따르면 미주신경의 복측 미주신경 핵(ventral vagal complex)이 활성화되어야 진정한 감정 소통이 가능합니다.
+                    </div>
+                </div>
+                <div class="science-card">
+                    <div class="science-card-title">감정 vs 문제 분리</div>
+                    <div class="science-card-content">
+                        Gottman의 "Dreams Within Conflict" 개념: 부부 갈등 속에는 해결해야 할 실제 문제보다, 먼저 인정받지 못한 감정과 심리적 욕구가 존재합니다. 감정을 먼저 다룬 후 문제를 해결해야 스트레스 호르몬이 정상화됩니다.
+                    </div>
+                </div>
+                <div class="science-card">
+                    <div class="science-card-title">I-Message의 신경과학</div>
+                    <div class="science-card-content">
+                        "You" 메시지(비난)는 상대의 암ygdala를 활성화시켜 방어적 반응을 촉발합니다. "I" 메시지는 상대의 프론탈엽을 활성화시켜 이성적 문제 해결을 가능하게 합니다.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h3 class="card-title">⏰ 퇴근 후 15분 전환 의식 (Decompression Routine)</h3>
+            <p style="margin-bottom: 1.5rem; color: #B0B0B0;">퇴근 후 15분 안에 신경계를 리셋하지 않으면, 직장 스트레스가 가정으로 이전되어 부부 갈등의 뇌 상태에 진입합니다.</p>
+            
+            <div class="behavior-box" style="background: rgba(74, 191, 138, 0.1); border-left-color: #4ABF8A;">
+                <div class="behavior-box-title">구조: 3분 + 6분 + 3분 + 3분</div>
+                <p style="color: #C9A84C; font-weight: 600;">【 첫 3분: 신체 격리 (Physical Transition) 】</p>
+                <p>차에서 내리자마자 또는 현관에 도착해서 스마트폰을 멀리 놓고, 심호흡 3회를 합니다. 깊은 복식호흡은 미주신경을 자극해 코르티솔을 낮춥니다. "지금부터 가족 시간이다"라고 속으로 말합니다.</p>
+            </div>
+
+            <div class="behavior-box" style="background: rgba(74, 191, 138, 0.1); border-left-color: #4ABF8A;">
+                <p style="color: #C9A84C; font-weight: 600;">【 다음 6분: 개인 활동 (Solo Activity) 】</p>
+                <p>샤워, 산책, 스트레칭, 음악 감상 등 혼자만의 활동을 합니다. 이 시간에 직장 감정을 처리합니다. 가족과 대화하지 않습니다. 이 단계는 HPA축(시상하부-뇌하수체-부신축) 회복의 중요한 시간입니다.</p>
+            </div>
+
+            <div class="behavior-box" style="background: rgba(74, 191, 138, 0.1); border-left-color: #4ABF8A;">
+                <p style="color: #C9A84C; font-weight: 600;">【 다음 3분: 신체 접촉 (Physical Connection) 】</p>
+                <p>배우자와 포옹(20초 이상), 아이들과 짧은 대화를 합니다. 신체 접촉은 옥시토신을 분비해 부교감신경을 활성화합니다. "오늘 어땠어?" 정도의 가벼운 질문만 합니다.</p>
+            </div>
+
+            <div class="behavior-box" style="background: rgba(74, 191, 138, 0.1); border-left-color: #4ABF8A;">
+                <p style="color: #C9A84C; font-weight: 600;">【 마지막 3분: 공동 활동 (Shared Activity) 】</p>
+                <p>저녁 식사 준비, 함께 산책 등 협력적 활동을 합니다. 이제 감정 대화를 할 준비가 된 상태입니다.</p>
+            </div>
+
+            <details>
+                <summary>🔬 깊이 있는 학습: 신경계 과학</summary>
+                <div class="deep-dive-content">
+                    <p>Porges의 폴리베이갈 이론에 따르면, 인간의 신경계는 세 층으로 구성됩니다:</p>
+                    <h5>1. 배쪽 미주신경 복합체 (Ventral Vagal Complex) - 사회 참여 상태</h5>
+                    <p>이것은 우리가 안전함을 느낄 때 활성화됩니다. 이 상태에서 우리는 타인의 표정을 읽고, 공감하고, 합리적으로 대화할 수 있습니다. 부부 소통이 이루어지는 뇌 상태입니다.</p>
+                    
+                    <h5>2. 교감신경계 (Sympathetic Nervous System) - 투쟁/도피 상태</h5>
+                    <p>스트레스를 받으면 코르티솔과 아드레날린이 분비되어, 뇌의 편도체(amygdala)가 활성화됩니다. 이 상태에서 우리는 방어적이 되고 상대를 위협으로 인식합니다. 직장 스트레스가 높은 상태로 집에 들어온 배우자는 이 상태입니다.</p>
+                    
+                    <h5>3. 부교감신경계 (Parasympathetic Nervous System) - 동결 상태</h5>
+                    <p>극도의 스트레스에서 우리의 몸은 "동결(freeze)"됩니다. 이것은 신체 보호 메커니즘이지만, 감정 소통을 완전히 차단합니다.</p>
+                    
+                    <p><strong>15분 전환 의식의 신경학적 작동:</strong></p>
+                    <ul>
+                        <li>깊은 호흡 → 미주신경 자극 → 코르티솔 감소</li>
+                        <li>개인 활동 → 전전두피질(prefrontal cortex) 회복</li>
+                        <li>신체 접촉 → 옥시토신 분비 → 신뢰감 회복</li>
+                        <li>공동 활동 → 배쪽 미주신경 활성화 → 사회 참여 상태</li>
+                    </ul>
+                    
+                    <p>이 모든 단계를 거쳐야만 비로소 배우자와 "합리적인 대화"가 가능한 뇌 상태에 도달합니다.</p>
+                </div>
+            </details>
+        </section>
+
+        <section class="card">
+            <h3 class="card-title">💬 감정 대화 vs 문제 해결 대화</h3>
+            <p style="margin-bottom: 1.5rem; color: #B0B0B0;">대부분의 부부 갈등은 실제 문제 해결보다 "감정이 인정받고 싶은 욕구"를 놓칠 때 악화됩니다. Gottman의 연구에 따르면, 먼저 감정을 다룬 부부가 문제 해결도 더 성공적입니다.</p>
+
+            <div style="margin: 1.5rem 0;">
+                <p style="color: #E85D5D; font-weight: 600; margin-bottom: 1rem;">❌ 흔한 실수: 감정 위에 문제 해결을 덮어버리기</p>
+                <div class="behavior-box" style="background: rgba(232, 93, 93, 0.1); border-left-color: #E85D5D;">
+                    <div class="behavior-box-title">상황: 배우자가 오늘 아이 양육으로 스트레스받음</div>
+                    <p style="margin-bottom: 0.8rem;"><span class="speaker">배우자:</span> "오늘 정말 힘들었어. 아이가 하루종일 말을 안 들어서 정신없었고…"</p>
+                    <p style="margin-bottom: 0.8rem; color: #E85D5D; font-weight: 600;">(감정을 표현하는 중)</p>
+                    <p><span class="speaker">당신:</span> "그럼 내일부터 어떻게 할까? 아이 규칙을 다시 세워보자. 시간표를 정해야 할 것 같은데…"</p>
+                    <p style="margin-top: 0.8rem; color: #E85D5D;">(감정을 무시하고 즉시 문제 해결로 넘어감 → 상대는 더 답답함)</p>
+                </div>
+            </div>
+
+            <div style="margin: 1.5rem 0;">
+                <p style="color: #4ABF8A; font-weight: 600; margin-bottom: 1rem;">✓ 올바른 방식: 감정 먼저, 그 다음 문제 해결</p>
+                <div class="behavior-box" style="background: rgba(74, 191, 138, 0.1); border-left-color: #4ABF8A;">
+                    <div class="behavior-box-title">같은 상황, 다른 대응</div>
+                    <p style="margin-bottom: 0.8rem;"><span class="speaker">배우자:</span> "오늘 정말 힘들었어. 아이가 하루종일 말을 안 들어서…"</p>
+                    <p><span class="speaker">당신:</span> "그렇겠네. 하루종일 그러면 정말 스트레스지. 그런 기분 이해돼. 얘기 들어줄게."</p>
+                    <p style="margin-top: 0.8rem; color: #4ABF8A;">(감정 인정, 경청)</p>
+                    <p style="margin-top: 0.8rem;"><span class="speaker">배우자:</span> "응, 계속 혼내도 말을 안 들어서 내가 혼내는 게 맞나 싶고…"</p>
+                    <p><span class="speaker">당신:</span> "그런 생각이 들 수 있지. 아이가 안 들을 때 정말 답답하지. (잠시) 우리가 함께 이 부분을 해결해보면 어떨까?"</p>
+                    <p style="margin-top: 0.8rem; color: #4ABF8A;">(감정 공감 후 → 문제 해결 제안)</p>
+                </div>
+            </div>
+
+            <details>
+                <summary>🔬 깊이 있는 학습: Gottman의 Dreams Within Conflict</summary>
+                <div class="deep-dive-content">
+                    <p>Gottman의 40년 연구에 따르면, 모든 부부 갈등의 69%는 영구적 문제입니다. 즉, 완전히 해결되지 않습니다. 하지만 문제 자체로 이혼에 이르지 않는 부부도 있고, 같은 문제로 이혼하는 부부도 있습니다. 차이가 뭘까요?</p>
+                    
+                    <h5>문제의 "꿈" (Dreams)</h5>
+                    <p>부부 갈등의 진짜 핵심은 표면적 문제(육아 방식, 가사 분담 등) 아래에 숨어 있는 각 사람의 심리적 욕구와 두려움입니다. Gottman은 이것을 "갈등 속의 꿈"이라고 부릅니다.</p>
+                    
+                    <h5>예시 1: 육아 방식 갈등</h5>
+                    <p><strong>표면 문제:</strong> "당신은 아이를 너무 엄하게 혼낸다"</p>
+                    <p><strong>아내의 꿈:</strong> "내 아이가 행복했으면 좋겠어. 그리고 내가 좋은 엄마라고 인정받고 싶어."</p>
+                    <p><strong>남편의 꿈:</strong> "내 자식이 기본 예절과 책임감 있는 아이로 자라길 원해. 그리고 내가 아이의 인생에서 중요한 역할을 하는 아버지라고 느끼고 싶어."</p>
+                    
+                    <p>두 꿈은 모두 정당합니다. 문제 해결의 열쇠는 "누가 맞는가"가 아니라, 각 사람의 "꿈"을 함께 인정하고, 그 꿈을 모두 존중하는 방식으로 육아 방식을 협의하는 것입니다.</p>
+                    
+                    <h5>올바른 갈등 처리 스텝</h5>
+                    <ul>
+                        <li>1단계: 문제의 표면만 다루지 말기</li>
+                        <li>2단계: "이 문제에서 너의 꿈이 뭐야?"라고 물어보기</li>
+                        <li>3단계: 배우자의 꿈을 이해하고 자신의 꿈도 공유하기</li>
+                        <li>4단계: 두 꿈을 모두 담는 타협책 찾기</li>
+                    </ul>
+                </div>
+            </details>
+        </section>
+
+        <section class="diagram-section">
+            <h4>📊 감정 대화 vs 문제 해결 대화의 뇌 활성화 지도</h4>
+            <svg width="100%" height="400" viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background -->
+                <defs>
+                    <linearGradient id="brainGradient1" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#4ABF8A;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#4ABF8A;stop-opacity:0" />
+                    </linearGradient>
+                    <linearGradient id="brainGradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#E85D5D;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#E85D5D;stop-opacity:0" />
+                    </linearGradient>
+                </defs>
+                
+                <!-- Title sections -->
+                <text x="225" y="30" font-family="Noto Sans KR" font-size="18" font-weight="600" fill="#4ABF8A" text-anchor="middle">감정 인정 (GOOD)</text>
+                <text x="675" y="30" font-family="Noto Sans KR" font-size="18" font-weight="600" fill="#E85D5D" text-anchor="middle">감정 무시 (HARMFUL)</text>
+                
+                <!-- Brain areas -->
+                <!-- Left side: Healthy -->
+                <rect x="50" y="70" width="350" height="300" fill="url(#brainGradient1)" stroke="#4ABF8A" stroke-width="2" rx="8"/>
+                
+                <!-- Prefrontal Cortex (LEFT) -->
+                <circle cx="150" cy="120" r="35" fill="none" stroke="#4ABF8A" stroke-width="2"/>
+                <text x="150" y="115" font-family="JetBrains Mono" font-size="12" fill="#4ABF8A" text-anchor="middle" font-weight="600">전전두</text>
+                <text x="150" y="130" font-family="Noto Sans KR" font-size="11" fill="#D0D0D0" text-anchor="middle">피질</text>
+                <text x="150" y="170" font-family="Noto Sans KR" font-size="10" fill="#C0C0C0" text-anchor="middle">활성화 ↑</text>
+                <text x="150" y="185" font-family="Noto Sans KR" font-size="10" fill="#C0C0C0" text-anchor="middle">(이성적 사고)</text>
+                
+                <!-- Vagus Nerve (LEFT) -->
+                <circle cx="270" cy="120" r="35" fill="none" stroke="#4ABF8A" stroke-width="2"/>
+                <text x="270" y="115" font-family="JetBrains Mono" font-size="12" fill="#4ABF8A" text-anchor="middle" font-weight="600">미주신경</text>
+                <text x="270" y="130" font-family="Noto Sans KR" font-size="11" fill="#D0D0D0" text-anchor="middle">복측</text>
+                <text x="270" y="170" font-family="Noto Sans KR" font-size="10" fill="#C0C0C0" text-anchor="middle">활성화 ↑</text>
+                <text x="270" y="185" font-family="Noto Sans KR" font-size="10" fill="#C0C0C0" text-anchor="middle">(안정감)</text>
+                
+                <!-- Oxytocin (LEFT) -->
+                <circle cx="210" cy="250" r="35" fill="none" stroke="#4ABF8A" stroke-width="2"/>
+                <text x="210" y="245" font-family="JetBrains Mono" font-size="12" fill="#4ABF8A" text-anchor="middle" font-weight="600">옥시토신</text>
+                <text x="210" y="270" font-family="Noto Sans KR" font-size="10" fill="#C0C0C0" text-anchor="middle">분비 ↑</text>
+                <text x="210" y="285" font-family="Noto Sans KR" font-size="10" fill="#C0C0C0" text-anchor="middle">(신뢰 회복)</text>
+                
+                <!-- Right side: Harmful -->
+                <rect x="500" y="70" width="350" height="300" fill="url(#brainGradient2)" stroke="#E85D5D" stroke-width="2" rx="8"/>
+                
+                <!-- Amygdala (RIGHT) -->
+                <circle cx="600" cy="120" r="35" fill="none" stroke="#E85D5D" stroke-width="2"/>
+                <text x="600" y="115" font-family="JetBrains Mono" font-size="12" fill="#E85D5D" text-anchor="middle" font-weight="600">편도체</text>
+                <text x="600" y="130" font-family="Noto Sans KR" font-size="11" fill="#D0D0D0" text-anchor="middle">(두려움)</text>
+                <text x="600" y="170" font-family="Noto Sans KR" font-size="10" fill="#C0C0C0" text-anchor="middle">과활성화 ↑</text>
+                <text x="600" y="185" font-family="Noto Sans KR" font-size="10" fill="#C0C0C0" text-anchor="middle">(방어적 반응)</text>
+                
+                <!-- Cortisol (RIGHT) -->
+                <circle cx="720" cy="120" r="35" fill="none" stroke="#E85D5D" stroke-width="2"/>
+                <text x="720" y="115" font-family="JetBrains Mono" font-size="12" fill="#E85D5D" text-anchor="middle" font-weight="600">코르티솔</text>
+                <text x="720" y="170" font-family="Noto Sans KR" font-size="10" fill="#C0C0C0" text-anchor="middle">분비 ↑</text>
+                <text x="720" y="185" font-family="Noto Sans KR" font-size="10" fill="#C0C0C0" text-anchor="middle">(스트레스)</text>
+                
+                <!-- Defensiveness (RIGHT) -->
+                <circle cx="660" cy="250" r="35" fill="none" stroke="#E85D5D" stroke-width="2"/>
+                <text x="660" y="240" font-family="JetBrains Mono" font-size="12" fill="#E85D5D" text-anchor="middle" font-weight="600">방어 모드</text>
+                <text x="660" y="270" font-family="Noto Sans KR" font-size="10" fill="#C0C0C0" text-anchor="middle">활성화 ↑</text>
+                <text x="660" y="285" font-family="Noto Sans KR" font-size="10" fill="#C0C0C0" text-anchor="middle">(타협 불가능)</text>
+                
+                <!-- Result boxes -->
+                <rect x="60" y="330" width="330" height="50" fill="rgba(74, 191, 138, 0.15)" stroke="#4ABF8A" stroke-width="1" rx="4"/>
+                <text x="225" y="350" font-family="Noto Sans KR" font-size="13" fill="#4ABF8A" text-anchor="middle" font-weight="600">결과: 타협 가능, 문제 해결, 감정 회복</text>
+                <text x="225" y="370" font-family="Noto Sans KR" font-size="11" fill="#B0B0B0" text-anchor="middle">신경계 리셋됨</text>
+                
+                <rect x="510" y="330" width="330" height="50" fill="rgba(232, 93, 93, 0.15)" stroke="#E85D5D" stroke-width="1" rx="4"/>
+                <text x="675" y="350" font-family="Noto Sans KR" font-size="13" fill="#E85D5D" text-anchor="middle" font-weight="600">결과: 갈등 심화, 문제 미해결</text>
+                <text x="675" y="370" font-family="Noto Sans KR" font-size="11" fill="#B0B0B0" text-anchor="middle">관계 손상 누적</text>
+            </svg>
+        </section>
+
+        <section class="card">
+            <h3 class="card-title">🗣️ I-Message: 육아 분담 불만을 건설적으로 표현하기</h3>
+            <p style="margin-bottom: 1.5rem; color: #B0B0B0;">대부분의 배우자는 불만 자체보다 "비난받는다"는 느낌으로 방어합니다. I-Message는 상대의 뇌를 "편도체 모드"에서 "전전두피질 모드"로 전환합니다.</p>
+
+            <div style="margin: 1.5rem 0;">
+                <p style="color: #E85D5D; font-weight: 600; margin-bottom: 1rem;">❌ You-Message (상대의 편도체를 활성화)</p>
+                <div class="dont-box">
+                    "당신은 항상 아이 숙제를 안 봐줘. 정말 무책임하네."
+                </div>
+                <div class="dont-box">
+                    "당신은 아침에 아이를 늦게 깨워. 때문에 아이가 학교 가기 싫어해."
+                </div>
+                <div class="dont-box">
+                    "당신은 아이 교육에 관심이 없어. 나만 책임지는 느낌이야."
+                </div>
+            </div>
+
+            <div style="margin: 1.5rem 0;">
+                <p style="color: #4ABF8A; font-weight: 600; margin-bottom: 1rem;">✓ I-Message (상대의 전전두피질을 활성화)</p>
+                <div class="do-box">
+                    "내가 아이 숙제를 혼자 보면서 피곤해. 우리가 함께 책임지고 싶어."
+                </div>
+                <div class="do-box">
+                    "나는 아이가 학교에 제시간에 갔으면 좋겠어. 함께 아침 루틴을 만들어보면 어떨까?"
+                </div>
+                <div class="do-box">
+                    "나는 아이 교육에 우리가 함께 참여하는 게 중요하다고 생각해. 너도 이 부분에 함께해주면 정말 고마울 것 같아."
+                </div>
+            </div>
+
+            <details>
+                <summary>🔬 깊이 있는 학습: I-Message 구조와 신경과학</summary>
+                <div class="deep-dive-content">
+                    <p>I-Message의 기본 구조는 다음과 같습니다:</p>
+                    
+                    <h5>구조: "나는 [상황]할 때 [느낌]해. 왜냐하면 [가치관/욕구]이기 때문이야. [해결책 제안]"</h5>
+                    
+                    <ul>
+                        <li><strong>상황:</strong> 객관적 사실 (비난 없이)</li>
+                        <li><strong>느낌:</strong> "화났다" 대신 "피곤해, 불안해, 답답해" 등 구체적 감정</li>
+                        <li><strong>가치관/욕구:</strong> 나의 심리적 욕구 (존중받기, 함께하기 등)</li>
+                        <li><strong>해결책:</strong> 구체적이고 함께할 수 있는 방안</li>
+                    </ul>
+                    
+                    <h5>신경과학적 이유</h5>
+                    <p>"You" 메시지는 문자 그대로 상대를 지목합니다. 인간의 뇌는 "지목"을 위협으로 인식합니다. 편도체(threat detector)가 활성화되어 즉시 방어 모드에 진입합니다. 이것이 "암타겔"(Amygdala Hijack) 현상입니다.</p>
+                    
+                    <p>반면 "I" 메시지는 상대를 지목하지 않습니다. 대신 "나의 감정"과 "나의 욕구"를 표현합니다. 상대의 뇌는 이것을 정보로 인식하고, 전전두피질에서 처리합니다. 이 상태에서 상대는 "왜 저 사람이 이렇게 느끼나"라고 공감할 수 있게 됩니다.</p>
+                    
+                    <h5>실제 예제: 육아 분담</h5>
+                    <p><strong>상황:</strong> 아내가 혼자 아이 숙제를 도와주고 있음</p>
+                    <p><strong>나쁜 표현:</strong> "당신은 왜 아이 숙제를 안 봐줘?" → 상대: 방어적 반응, 언쟁</p>
+                    <p><strong>좋은 표현:</strong> "나는 아이 숙제를 도울 때 정말 피곤해. 우리가 함께 책임지고 싶어. 월수목은 내가, 화금은 너가 봐주면 어떨까?"</p>
+                    
+                    <p>두 번째 표현에서 상대는:</p>
+                    <ul>
+                        <li>나의 피로감을 이해함</li>
+                        <li>나의 욕구(함께하기)를 안다</li>
+                        <li>구체적 해결책이 있어서 즉시 실행 가능</li>
+                        <li>방어할 필요가 없음</li>
+                    </ul>
+                </div>
+            </details>
+        </section>
+
+        <section class="couple-dialog">
+            <h3 class="card-title">💬 실제 상황별 3턴 자연스러운 대화</h3>
+            <p style="margin-bottom: 2rem; color: #B0B0B0;">자연스러운 부부 대화는 일직선이 아닙니다. 감정이 오가고, 때로는 어색하고, 다시 시작합니다. 다음은 실제 부부들의 대화를 기반으로 한 예시입니다.</p>
+
+            <h4 style="color: #C9A84C; margin-bottom: 1.5rem; margin-top: 2rem;">【 상황 1: 아침 등교 문제로 스트레스 받음 】</h4>
+            <div class="couple-dialog">
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">남편 (퇴근 후 15분 전환 의식 후)</div>
+                    <div class="dialog-text">"오늘 아이 어땠어? 아, 너 피곤해 보이네. 무슨 일 있어?"</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">아내 (감정 표현)</div>
+                    <div class="dialog-text">"응, 오늘 아침에 또 싸웠어. 아이가 계속 늦어. 내가 몇 번을 말했는데도 자꾸 딴짓하고... (한숨) 아, 정말."</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">남편 (감정 인정, 경청)</div>
+                    <div class="dialog-text">"그렇겠네. 그런데 계속 늦으면 정말 스트레스지. 특히 너는 아이를 학교 데려다주고 일가야 하고... (짧은 침묵, 공감하는 표정) 응, 정말 힘들겠다."</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">아내 (조금 진정됨)</div>
+                    <div class="dialog-text">"그래, 맞아. 내가 목소리 크게 낼 때 아이도 위축되는 것 같고... 그럼 내가 하는 방식이 맞나 싶기도 하고."</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">남편 (문제 해결 제안)</div>
+                    <div class="dialog-text">"아, 그런 생각이 들겠네. 너는 좋은 엄마야. (짧은 포옹) 그런데 이 부분, 우리가 함께 해결해보면 어떨까? 예를 들어, 아침에 아이 깨우는 방식을 바꿔보거나, 아니면 내가 아침에 아이와 시간을 갖는 건 어때?"</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">아내 (안도감)</div>
+                    <div class="dialog-text">"그거 좋은데? 너가 주말에 아이랑 아침 루틴을 만들어보면 좋을 것 같아. 그리고 평일에는... 음, 그렇게 해보자."</div>
+                </div>
+            </div>
+
+            <h4 style="color: #C9A84C; margin-bottom: 1.5rem; margin-top: 2rem;">【 상황 2: 육아 분담이 불공평하다고 느낌 】</h4>
+            <div class="couple-dialog">
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">아내 (I-Message로 시작)</div>
+                    <div class="dialog-text">"자기, 얘기 좀 하고 싶어. 나는 요즘 아이들 케어를 혼자 하는 것 같아서 피곤해. 너도 바쁜 거 알지만, 나도 일하고 오면서 따로 육아를 또 하니까... (목소리 조금 높아짐) 아, 진짜 힘들어."</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">남편 (방어하지 않고 경청)</div>
+                    <div class="dialog-text">"응, 맞아. 너가 그럴 수밖에 없겠네. (짧은 침묵) 내가 일하고 들어오면서 좀 피하는 건 아니었나... (자책하는 표정) 구체적으로 어떤 부분이 가장 힘들어?"</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">아내 (구체화)</div>
+                    <div class="dialog-text">"글쎄, 특히 저녁이 힘들어. 내가 밥도 만들고, 아이들 씻기고, 숙제 봐주고... 너는 소파에만 앉아 있어. (약간 투덜거림) 내가 도움을 청할 때도 있는데 바쁘다고 하고."</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">남편 (듣고 성찰)</div>
+                    <div class="dialog-text">"아, 그런 느낌이 드는 거구나. (짧은 침묵) 내가 실제로 그랬을 수도 있어. 일에서 오면서 정신이 약간 흐릿한데, 그게 핑계는 안 될 것 같아. 우리가 저녁 시간을 어떻게 나눌까?"</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">아내 (해결책 제안)</div>
+                    <div class="dialog-text">"글쎄, 너는 들어와서 10분 쉬고, 그다음에 아이들 목욕을 담당해주고, 나는 밥을 만들겠어. 그리고 숙제는 우리가 함께 봐주자."</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">남편 (동의와 약속)</div>
+                    <div class="dialog-text">"응, 좋아. 내일부터 시작할까? 그리고 나중에라도 내가 미처 챌 부분이 있으면 얘기해 줄래. 나도 노력할게."</div>
+                </div>
+            </div>
+
+            <h4 style="color: #C9A84C; margin-bottom: 1.5rem; margin-top: 2rem;">【 상황 3: 육아 철학의 차이 (완고함 vs 유연함) 】</h4>
+            <div class="couple-dialog">
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">아내 (걱정과 함께)</div>
+                    <div class="dialog-text">"자기, 우리 아이 언어 발달이 조금 늦는 것 같은데, 언어 치료 한번 받아보면 안 될까?"</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">남편 (반대, 약간 방어적)</div>
+                    <div class="dialog-text">"아니야, 아직 아이가 세 살이잖아. 이 정도면 정상이야. 언어 치료까지는 필요 없을 것 같은데. (약간 자신감 있게) 내 동생도 이 정도였거든."</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">아내 (자기 감정과 욕구 표현)</div>
+                    <div class="dialog-text">"나는 아이가 또래 아이들과 잘 발달하길 원해. (목소리 약간 높아짐) 그리고 내가 이렇게 걱정하는 건 아이를 잘 키우고 싶어서야. 그런데 너는 마치 내가 과하다는 느낌을 주는 것 같아서... (목소리 가라앉음) 그게 좀 외로워."</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">남편 (상대의 감정을 경청, 자신의 두려움도 공유)</div>
+                    <div class="dialog-text">"아, 그런 마음이었구나. (침묵) 내가 너를 무시한 건 아니었고... (천천히) 사실 나도 아이가 정상적으로 잘 크길 원하는데, 나는 너무 일찍 개입하면 안 된다는 생각이 있었어. 내가 잘못 생각한 건 아닐까 봐."</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">아내 (이해와 함께)</div>
+                    <div class="dialog-text">"그렇구나. 우리 둘 다 아이를 잘 키우고 싶은 마음은 같네. (한숨) 그럼 전문가한테 한번 물어보는 것도 나쁘지 않을까? 문제가 없으면 안심하게 되고, 있으면 초기에 잡을 수 있으니까."</div>
+                </div>
+                <div class="dialog-turn">
+                    <div class="dialog-speaker">남편 (타협)</div>
+                    <div class="dialog-text">"응, 맞네. 일단 소아과 의사한테 물어보고, 그분이 필요하다고 하면 해보자. (공감) 너는 진짜 신경을 잘 쓰는 엄마야. 내도 그런 너를 더 믿고 함께하자."</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="marriage-tip">
+            <h3 class="marriage-tip-title">💡 부부 대화 15분 마스터하기</h3>
+            <div class="marriage-tip-content">
+                <div class="tip-item">
+                    <div class="tip-number">1. 의식적 목표 설정</div>
+                    <div class="tip-text">15분 전환 의식의 목표는 "문제를 푸는 것"이 아니라 "신경계를 리셋하는 것"입니다. 첫 5분은 문제 해결을 금지합니다.</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">2. 시간과 공간 정하기</div>
+                    <div class="tip-text">저녁 6시-6시 15분은 부부 대화 시간입니다. 스마트폰을 멀리 놓고, 식탁이나 침대에 앉습니다.</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">3. 경청의 기술</div>
+                    <div class="tip-text">상대가 말할 때 "응", "그렇겠네", "계속 들어봐" 정도만 합니다. 즉시 조언이나 반박은 피합니다.</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">4. 신체 접촉</div>
+                    <div class="tip-text">손을 잡거나 어깨에 손을 올리면 옥시토신이 분비됩니다. 20초 이상의 포옹은 코르티솔을 즉시 낮춥니다.</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">5. 문제는 "우리" 문제</div>
+                    <div class="tip-text">"너 때문에" 대신 "우리가 함께 해결해보자"라는 언어를 씁니다. 적과 아군이 아니라 팀입니다.</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">6. 너무 피곤하면 연기하기</div>
+                    <div class="tip-text">신경계가 극도로 흥분한 상태라면 "나중에 얘기하자"는 미룬 후, 나중에 정확히 시간을 정합니다. 약속은 지켜야 합니다.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="practice-card">
+            <h3 class="practice-title">✏️ 실천 과제 1: 퇴근 후 15분 루틴 설계</h3>
+            <p class="practice-instruction">이번 주부터 실제로 실행해볼 "당신과 배우자의 15분 전환 의식"을 설계하세요. 당신의 성향, 집의 상황, 배우자의 선호를 고려합니다.</p>
+            <div class="practice-steps">
+                <div class="practice-step">
+                    <div class="practice-step-num">STEP 1: 퇴근 후 첫 3분 (신체 격리)</div>
+                    <div class="practice-step-content">
+                        당신은 어디에서, 무엇을 할 것인가?
+                        예: 차에 앉아 심호흡, 샤워, 현관에서 짧은 명상
+                        <strong>당신의 선택:</strong> _________________
+                    </div>
+                </div>
+                <div class="practice-step">
+                    <div class="practice-step-num">STEP 2: 다음 6분 (개인 활동)</div>
+                    <div class="practice-step-content">
+                        혼자만의 활동은 무엇인가?
+                        예: 샤워, 10분 산책, 음악 감상, 스트레칭
+                        <strong>당신의 선택:</strong> _________________
+                    </div>
+                </div>
+                <div class="practice-step">
+                    <div class="practice-step-num">STEP 3: 다음 3분 (신체 접촉)</div>
+                    <div class="practice-step-content">
+                        배우자와의 첫 만남은 어떻게 할 것인가?
+                        예: 포옹 20초, 손 잡기, 뽀뽀
+                        <strong>당신의 선택:</strong> _________________
+                    </div>
+                </div>
+                <div class="practice-step">
+                    <div class="practice-step-num">STEP 4: 마지막 3분 (공동 활동)</div>
+                    <div class="practice-step-content">
+                        함께할 협력적 활동은?
+                        예: 저녁 식사 준비, 함께 차 마시기, 아이들과 인사하기
+                        <strong>당신의 선택:</strong> _________________
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="practice-card">
+            <h3 class="practice-title">✏️ 실천 과제 2: I-Message 스크립트 작성</h3>
+            <p class="practice-instruction">현재 당신이 배우자에게 느끼는 불만이나 욕구를 I-Message로 표현하세요. 최소 3가지 상황을 작성합니다.</p>
+            <div class="practice-steps">
+                <div class="practice-step">
+                    <div class="practice-step-num">상황 1</div>
+                    <div class="practice-step-content">
+                        <strong>상황:</strong> _________________________________
+                        <strong>나의 느낌:</strong> _________________________________
+                        <strong>내 욕구:</strong> _________________________________
+                        <strong>제안:</strong> _________________________________
+                    </div>
+                </div>
+                <div class="practice-step">
+                    <div class="practice-step-num">상황 2</div>
+                    <div class="practice-step-content">
+                        <strong>상황:</strong> _________________________________
+                        <strong>나의 느낌:</strong> _________________________________
+                        <strong>내 욕구:</strong> _________________________________
+                        <strong>제안:</strong> _________________________________
+                    </div>
+                </div>
+                <div class="practice-step">
+                    <div class="practice-step-num">상황 3</div>
+                    <div class="practice-step-content">
+                        <strong>상황:</strong> _________________________________
+                        <strong>나의 느낌:</strong> _________________________________
+                        <strong>내 욕구:</strong> _________________________________
+                        <strong>제안:</strong> _________________________________
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="quiz-section">
+            <h2 class="quiz-title">📝 이해도 확인 퀴즈</h2>
+            
+            <div class="quiz-item">
+                <div class="quiz-question">1. 부교감신경을 빠르게 활성화하는 방법은?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option">
+                        <input type="radio" name="quiz1" value="a" id="q1a">
+                        <label for="q1a">a) 운동하기</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" name="quiz1" value="b" id="q1b">
+                        <label for="q1b">b) 깊은 복식호흡 (복부 호흡)</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" name="quiz1" value="c" id="q1c">
+                        <label for="q1c">c) 업무 처리하기</label>
+                    </div>
+                </div>
+                <div id="quiz1-feedback" class="quiz-feedback"></div>
+                <button onclick="checkQuiz('quiz1', 'b', '깊은 호흡은 미주신경을 자극하여 즉시 코르티솔을 낮춥니다.')" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #4ABF8A; color: #0A0C10; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">확인</button>
+            </div>
+
+            <div class="quiz-item">
+                <div class="quiz-question">2. 감정 대화와 문제 해결의 올바른 순서는?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option">
+                        <input type="radio" name="quiz2" value="a" id="q2a">
+                        <label for="q2a">a) 문제 해결 → 감정 공감</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" name="quiz2" value="b" id="q2b">
+                        <label for="q2b">b) 감정 공감 → 문제 해결</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" name="quiz2" value="c" id="q2c">
+                        <label for="q2c">c) 동시에 진행해야 함</label>
+                    </div>
+                </div>
+                <div id="quiz2-feedback" class="quiz-feedback"></div>
+                <button onclick="checkQuiz('quiz2', 'b', 'Gottman 연구에 따르면 먼저 감정을 인정하고 공감해야 뇌가 문제 해결에 열려있습니다.')" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #4ABF8A; color: #0A0C10; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">확인</button>
+            </div>
+
+            <div class="quiz-item">
+                <div class="quiz-question">3. I-Message와 You-Message의 차이점은?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option">
+                        <input type="radio" name="quiz3" value="a" id="q3a">
+                        <label for="q3a">a) I-Message가 더 직설적이다</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" name="quiz3" value="b" id="q3b">
+                        <label for="q3b">b) You-Message는 상대의 편도체를 자극하고, I-Message는 전전두피질을 활성화한다</label>
+                    </div>
+                    <div class="quiz-option">
+                        <input type="radio" name="quiz3" value="c" id="q3c">
+                        <label for="q3c">c) 둘 다 같은 효과다</label>
+                    </div>
+                </div>
+                <div id="quiz3-feedback" class="quiz-feedback"></div>
+                <button onclick="checkQuiz('quiz3', 'b', 'You-Message(비난)는 방어 반응을 촉발하고, I-Message는 이성적 대화를 가능하게 합니다.')" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #4ABF8A; color: #0A0C10; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">확인</button>
+            </div>
+        </section>
+
+        <section class="tracker-section">
+            <h2 class="tracker-title">✅ 오늘 배운 것 체크리스트</h2>
+            <div class="tracker-items">
+                <div class="tracker-item">
+                    <input type="checkbox" id="tracker1">
+                    <label for="tracker1">15분 전환 의식의 신경학적 메커니즘 이해</label>
+                </div>
+                <div class="tracker-item">
+                    <input type="checkbox" id="tracker2">
+                    <label for="tracker2">Gottman의 Dreams Within Conflict 개념 학습</label>
+                </div>
+                <div class="tracker-item">
+                    <input type="checkbox" id="tracker3">
+                    <label for="tracker3">I-Message 기법으로 3가지 상황 표현 연습</label>
+                </div>
+                <div class="tracker-item">
+                    <input type="checkbox" id="tracker4">
+                    <label for="tracker4">감정 대화와 문제 해결 대화 구분 이해</label>
+                </div>
+                <div class="tracker-item">
+                    <input type="checkbox" id="tracker5">
+                    <label for="tracker5">당신의 15분 루틴 설계 완료</label>
+                </div>
+                <div class="tracker-item">
+                    <input type="checkbox" id="tracker6">
+                    <label for="tracker6">이번 주 부부와 함께 15분 전환 의식 실행</label>
+                </div>
+                <div class="tracker-item">
+                    <input type="checkbox" id="tracker7">
+                    <label for="tracker7">배우자와 이 강의 내용 공유하기</label>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Intersection Observer for fadeUp animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-up');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card, .science-card, .marriage-tip, .couple-dialog, .practice-card, .quiz-section, .learning-strategy, .diagram-section').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Timer Logic
+        let timeLeft = 25 * 60;
+        let timerRunning = false;
+        let timerInterval = null;
+
+        const timerDisplay = document.getElementById('timerDisplay');
+        const timerBtn = document.getElementById('timerBtn');
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            if (timerRunning) {
+                clearInterval(timerInterval);
+                timerBtn.textContent = '재개';
+                timerBtn.classList.remove('running');
+                timerRunning = false;
+            } else {
+                timerBtn.textContent = '일시정지';
+                timerBtn.classList.add('running');
+                timerRunning = true;
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    if (timeLeft === 0) {
+                        clearInterval(timerInterval);
+                        timerBtn.textContent = '완료!';
+                        timerBtn.style.background = '#4ABF8A';
+                        timerRunning = false;
+                    }
+                }, 1000);
+            }
+        }
+
+        timerBtn.addEventListener('click', toggleTimer);
+
+        // Quiz Logic
+        function checkQuiz(quizName, correctValue, correctMessage) {
+            const selected = document.querySelector(`input[name="${quizName}"]:checked`);
+
+            if (!selected) {
+                alert('선택지를 선택해주세요.');
+                return;
+            }
+
+            const feedbackDiv = document.getElementById(`${quizName}-feedback`);
+            feedbackDiv.classList.add('show');
+
+            if (selected.value === correctValue) {
+                feedbackDiv.classList.add('correct');
+                feedbackDiv.classList.remove('incorrect');
+                feedbackDiv.textContent = '✓ ' + correctMessage;
+            } else {
+                feedbackDiv.classList.add('incorrect');
+                feedbackDiv.classList.remove('correct');
+                feedbackDiv.textContent = '✗ 다시 생각해보세요. ' + correctMessage;
+            }
+        }
+
+        // Initialize
+        updateTimerDisplay();
+    </script>
+</body>
+</html>

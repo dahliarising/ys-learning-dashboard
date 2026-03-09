@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#12151C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="에너지 OS">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2312151C'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='%23E8C96A'>⚡</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>에너지 OS — Day 32 | HRV 활용법 — 컨디션의 숫자화</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {--bg:#0A0C10;--surface:#12151C;--surface2:#1A1E28;--border:#252A38;--gold:#C9A84C;--gold-light:#E8C96A;--blue:#4A9EBF;--green:#4ABF8A;--purple:#8A6ABF;--orange:#BF6A4A;--red:#BF4A4A;--text:#D8D3C8;--text-dim:#7A7A8A;--text-bright:#F0EBE0;--accent:#C9A84C;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-weight:400;line-height:1.75;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+.container{max-width:960px;margin:0 auto;padding:0 24px 80px;}.sticky-header{position:sticky;top:0;z-index:100;background:rgba(10,12,16,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;}
+.sticky-header .brand{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:1.1rem;color:var(--gold);}.sticky-header .part-label{font-size:0.8rem;color:var(--accent);font-family:'JetBrains Mono',monospace;background:rgba(201,168,76,0.12);padding:4px 12px;border-radius:20px;}
+.hero{text-align:center;padding:60px 0 40px;}.hero .series-note{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text-dim);margin-bottom:12px;}.hero .day-num{font-family:'Cormorant Garamond',serif;font-size:4rem;font-weight:700;color:var(--accent);line-height:1;margin-bottom:8px;}
+.hero .day-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--text-bright);margin-bottom:4px;}.hero .day-title-en{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--text-dim);margin-bottom:20px;}
+.hero .quote{font-style:italic;color:var(--gold-light);font-size:1.05rem;margin-bottom:30px;padding:0 20px;}.progress-ring-wrap{display:inline-block;position:relative;width:100px;height:100px;margin-bottom:24px;}
+.progress-ring-wrap .ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--accent);}.progress-ring-wrap .ring-text small{font-size:0.6rem;color:var(--text-dim);font-weight:400;}
+.meta-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;}.meta-badge{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:0.78rem;color:var(--text);font-family:'JetBrains Mono',monospace;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--text-bright);margin:48px 0 20px;padding-left:16px;border-left:3px solid var(--accent);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:20px;transition:border-color 0.3s;}.card:hover{border-color:var(--accent);}.card-label{font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin-bottom:8px;}
+.card h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:var(--text-bright);margin-bottom:12px;}.card p,.card li{font-size:0.92rem;line-height:1.8;}.card ul{padding-left:20px;}.card ul li{margin-bottom:6px;}
+.brain-box{background:rgba(138,106,191,0.08);border:1px solid rgba(138,106,191,0.25);border-radius:12px;padding:24px 28px;margin-bottom:24px;}.brain-box .box-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;color:var(--purple);margin-bottom:12px;}
+.time-table{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:0.85rem;font-family:'JetBrains Mono',monospace;}.time-table .tt-time{color:var(--gold);font-weight:500;}
+details{margin-top:12px;border-top:1px solid var(--border);padding-top:12px;}details summary{cursor:pointer;font-size:0.82rem;color:var(--accent);font-family:'JetBrains Mono',monospace;}details summary:hover{color:var(--gold);}details .detail-body{margin-top:10px;font-size:0.85rem;color:var(--text-dim);line-height:1.7;}
+.svg-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin:24px 0;overflow-x:auto;}.svg-section .svg-title{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;}
+.protocol-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:20px 0;}.protocol-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:20px;}
+.protocol-card .p-time{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}.protocol-card h4{font-size:1rem;font-weight:700;color:var(--text-bright);margin-bottom:8px;}
+.check-item{display:flex;align-items:flex-start;gap:8px;font-size:0.85rem;margin-bottom:6px;}.check-item input[type="checkbox"]{accent-color:var(--accent);margin-top:4px;flex-shrink:0;}
+.energy-log{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;margin:24px 0;}.energy-log h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);margin-bottom:16px;}
+.log-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;}.log-row label{font-size:0.85rem;min-width:160px;}.log-row input[type="range"]{flex:1;min-width:120px;accent-color:var(--accent);}.log-row .range-val{font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:var(--accent);min-width:30px;text-align:center;}
+.log-row input[type="number"],.log-row input[type="text"]{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text-bright);font-family:'JetBrains Mono',monospace;font-size:0.85rem;padding:6px 10px;width:80px;}
+.log-save-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;cursor:pointer;margin-top:12px;}.log-save-btn:hover{opacity:0.85;}.log-status{font-size:0.8rem;color:var(--green);margin-top:8px;min-height:20px;}
+.quiz-section{margin:32px 0;}.quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;}.quiz-card .q-num{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
+.quiz-card .q-text{font-size:0.95rem;color:var(--text-bright);margin-bottom:14px;font-weight:500;}.quiz-card .q-options{display:flex;flex-direction:column;gap:8px;}.quiz-card .q-opt{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:0.85rem;cursor:pointer;transition:all 0.25s;color:var(--text);}
+.quiz-card .q-opt:hover{border-color:var(--accent);background:rgba(201,168,76,0.1);}.quiz-card .q-opt.correct{border-color:var(--green)!important;background:rgba(74,191,138,0.12)!important;color:var(--green)!important;}.quiz-card .q-opt.wrong{border-color:var(--red)!important;background:rgba(191,74,74,0.12)!important;color:var(--red)!important;}
+.quiz-card .q-feedback{margin-top:10px;font-size:0.82rem;min-height:20px;line-height:1.6;}
+.spaced-rep{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin:24px 0;}.sr-grid{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;}.sr-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;text-align:center;}.sr-item.today{border-color:var(--accent);color:var(--accent);}.sr-item .sr-day{font-weight:700;}.sr-item .sr-label{color:var(--text-dim);font-size:0.65rem;}
+.next-preview{background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.06));border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin:24px 0;text-align:center;}.next-preview .np-label{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
+.next-preview .np-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:var(--text-bright);}.next-preview .np-desc{font-size:0.85rem;color:var(--text-dim);margin-top:6px;}
+/* ═══ FADE-UP (SAFE) ═══ */
+.fade-up {
+  opacity: 1;
+  transform: translateY(0);
+}
+.js-ready .fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.js-ready .fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.comparison-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:0.85rem;}.comparison-table th{background:var(--surface2);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);}.comparison-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}.comparison-table tr:hover td{background:rgba(201,168,76,0.04);}
+.highlight-num{font-family:'JetBrains Mono',monospace;color:var(--gold);font-weight:700;}.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:2px 8px;border-radius:4px;margin:2px;}.tag-red{background:rgba(191,74,74,0.15);color:var(--red);}.tag-orange{background:rgba(191,106,74,0.15);color:var(--orange);}.tag-blue{background:rgba(74,158,191,0.15);color:var(--blue);}.tag-green{background:rgba(74,191,138,0.15);color:var(--green);}.tag-purple{background:rgba(138,106,191,0.15);color:var(--purple);}.tag-gold{background:rgba(201,168,76,0.15);color:var(--gold);}
+.nav-links{display:flex;justify-content:space-between;margin:30px 0 10px;font-family:'JetBrains Mono',monospace;font-size:0.82rem;}.nav-links a{color:var(--accent);text-decoration:none;}.nav-links a:hover{color:var(--gold);}
+/* ── Mobile Optimization ── */
+@media (max-width:480px){
+  :root{--pad:12px;}
+  body{font-size:14px;}
+  .container{padding:0 12px 60px;}
+  .hero .day-num{font-size:2.5rem;}
+  .hero .day-title{font-size:1.15rem;line-height:1.4;}
+  .hero .day-title-en{font-size:0.7rem;}
+  .hero .quote{font-size:0.8rem;padding:8px 12px;}
+  .progress-ring-wrap svg{width:70px;height:70px;}
+  .ring-text{font-size:0.7rem;}
+  .meta-badges{gap:4px;flex-wrap:wrap;}
+  .meta-badge{font-size:0.65rem;padding:3px 8px;}
+  .card{padding:14px;margin-bottom:12px;}
+  .card h3{font-size:1rem;}
+  .card p,.card li{font-size:0.82rem;line-height:1.6;}
+  .section-title{font-size:1.15rem;}
+  .svg-section{margin:12px -12px;padding:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .svg-section svg{min-width:300px;max-width:100%;height:auto;}
+  .svg-title{font-size:0.8rem;}
+  .comparison-table{font-size:0.75rem;}
+  .comparison-table th,.comparison-table td{padding:6px 8px;}
+  .protocol-grid{grid-template-columns:1fr;gap:10px;}
+  .protocol-card{padding:14px;}
+  .protocol-card h4{font-size:0.9rem;}
+  .time-table{font-size:0.75rem;gap:4px 8px;}
+  .brain-box{padding:14px;}
+  .quiz-card{padding:14px;}
+  .q-text{font-size:0.85rem;}
+  .q-opt{padding:10px 12px;font-size:0.82rem;min-height:44px;display:flex;align-items:center;}
+  .log-row{flex-direction:column;gap:4px;}
+  .log-row label{font-size:0.8rem;}
+  .energy-log{padding:14px;}
+  .spaced-rep{padding:14px;}
+  .sr-grid{gap:6px;}
+  .sr-item{padding:6px 4px;}
+  .sr-day{font-size:0.75rem;}
+  .next-preview{padding:14px;}
+  .sticky-header{padding:6px 12px;font-size:0.72rem;}
+  .sticky-header .brand{font-size:0.72rem;}
+  .sticky-header .part-label{font-size:0.65rem;}
+  .nav-links{flex-direction:column;gap:6px;align-items:stretch;}
+  .nav-links a{text-align:center;padding:10px;font-size:0.82rem;}
+  .detail-panel{padding:12px;}
+  .detail-panel .metric{font-size:0.7rem;padding:3px 8px;}
+  .svg-tooltip{max-width:200px;font-size:0.72rem;padding:8px 10px;}
+  details summary{font-size:0.82rem;padding:8px;}
+  .highlight-num{font-size:0.9em;}
+  .check-item{font-size:0.8rem;min-height:36px;}
+  .check-item input[type="checkbox"]{width:18px;height:18px;}
+}
+@media (max-width:360px){
+  .hero .day-num{font-size:2rem;}
+  .hero .day-title{font-size:1rem;}
+  .card{padding:12px;}
+  .svg-section svg{min-width:500px;}
+}
+@media (min-width:481px) and (max-width:768px){
+  .container{padding:0 20px 60px;}
+  .protocol-grid{grid-template-columns:1fr;}
+  .svg-section svg{min-width:700px;}
+  .nav-links a{padding:10px 16px;}
+}
+/* Touch-friendly enhancements */
+@media (hover:none) and (pointer:coarse){
+  .q-opt{min-height:48px;padding:12px 14px;}
+  .check-item{min-height:40px;}
+  .nav-links a{min-height:44px;display:flex;align-items:center;justify-content:center;}
+  .log-save-btn{min-height:48px;font-size:0.9rem;}
+  .svg-hotspot{pointer-events:auto;}
+  details summary{min-height:44px;display:flex;align-items:center;}
+}
+/* Swipe navigation indicator */
+.swipe-hint{display:none;text-align:center;padding:8px;font-size:0.72rem;color:var(--text-dim);opacity:0.6;}
+@media (hover:none) and (pointer:coarse){.swipe-hint{display:block;}}
+/* Bottom navigation bar for mobile */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(18,21,28,0.97);border-top:1px solid var(--border);padding:8px 16px;z-index:200;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+.mobile-nav .mn-inner{display:flex;justify-content:space-between;align-items:center;max-width:600px;margin:0 auto;}
+.mobile-nav a{color:var(--accent);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:0.8rem;padding:8px 16px;border-radius:6px;background:rgba(var(--accent-rgb,138,106,191),0.1);min-width:80px;text-align:center;transition:background 0.2s;}
+.mobile-nav a:active{background:rgba(var(--accent-rgb,138,106,191),0.25);}
+.mobile-nav .mn-current{color:var(--gold);font-size:0.85rem;font-weight:700;}
+@media (max-width:640px){.mobile-nav{display:block;}}
+@media (max-width:640px){.nav-links{display:none;}}
+
+@keyframes hrv-wave{0%{stroke-dashoffset:500}100%{stroke-dashoffset:0}}
+@keyframes status-blink{0%,100%{opacity:0.5}50%{opacity:1}}
+@keyframes recovery-fill{0%{width:0}100%{width:100%}}
+.anim-hrv{stroke-dasharray:500;animation:hrv-wave 2s ease-out forwards;}
+.anim-status{animation:status-blink 2s ease-in-out infinite;}
+.anim-fill{animation:recovery-fill 1.5s ease-out forwards;}
+
+/* ── Interactive SVG System ── */
+.svg-interactive{position:relative;overflow:visible;}
+.svg-tooltip{position:absolute;background:rgba(18,21,28,0.96);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;color:var(--text);font-size:0.78rem;line-height:1.5;max-width:260px;pointer-events:none;opacity:0;transform:translateY(8px);transition:opacity 0.25s ease,transform 0.25s ease;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,0.4);backdrop-filter:blur(8px);}
+.svg-tooltip.visible{opacity:1;transform:translateY(0);}
+.svg-tooltip .tip-title{font-weight:700;color:var(--accent);margin-bottom:4px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.5px;text-transform:uppercase;}
+.svg-tooltip .tip-value{font-family:'JetBrains Mono',monospace;color:var(--gold);font-size:0.82rem;}
+.svg-tooltip .tip-desc{color:#B0ADAA;margin-top:3px;}
+.svg-hotspot{cursor:pointer;transition:opacity 0.2s,filter 0.2s;}
+.svg-hotspot:hover{filter:brightness(1.4) drop-shadow(0 0 6px var(--accent));opacity:1 !important;}
+.svg-hotspot.focused{filter:brightness(1.5) drop-shadow(0 0 10px var(--accent));}
+.svg-hotspot:not(.focused):not(:hover){opacity:0.65;transition:opacity 0.4s;}
+.svg-focus-active .svg-hotspot:not(.focused):not(:hover){opacity:0.3;}
+.svg-label-popup{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--accent);color:#12151C;padding:3px 8px;border-radius:4px;font-size:0.7rem;font-weight:700;white-space:nowrap;opacity:0;transition:opacity 0.2s;pointer-events:none;}
+.svg-hotspot:hover+.svg-label-popup,.svg-hotspot:hover .svg-label-popup{opacity:1;}
+.detail-panel{background:rgba(30,33,45,0.95);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:10px;display:none;animation:panelSlide 0.3s ease;}
+.detail-panel.active{display:block;}
+@keyframes panelSlide{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.detail-panel h4{color:var(--accent);font-size:0.85rem;margin:0 0 8px;}
+.detail-panel .metric{display:inline-flex;align-items:center;gap:4px;background:rgba(var(--accent-rgb,138,106,191),0.1);padding:4px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:0.75rem;margin:3px 4px 3px 0;}
+.detail-panel .metric-val{color:var(--accent);font-weight:700;}
+.detail-panel .insight{font-size:0.78rem;color:#B0ADAA;line-height:1.6;margin-top:8px;}
+.detail-panel .close-btn{position:absolute;top:8px;right:12px;cursor:pointer;color:#7A7A8A;font-size:1rem;}
+.detail-panel .close-btn:hover{color:var(--accent);}
+
+</style>
+
+<noscript><style>.fade-up{opacity:1!important;transform:none!important;}.mobile-nav{display:block!important;}</style></noscript>
+</head>
+<body>
+<script>
+// ═══ Fade-Up Failsafe ═══
+document.body.classList.add('js-ready');
+setTimeout(function(){
+  document.querySelectorAll('.fade-up:not(.visible)').forEach(function(el){
+    el.classList.add('visible');
+  });
+}, 3000);
+</script>
+
+<header class="sticky-header">
+  <div class="brand">에너지 OS / Day 32</div>
+  <div class="part-label">PART 6: 컨디션 관리</div>
+</header>
+<div class="container">
+<div class="nav-links"><a href="day31_running_review.html">&larr; Day 31</a><a href="day33_immune_energy.html">Day 33 &rarr;</a></div>
+<section class="hero fade-up">
+  <div class="series-note">이 시리즈 예상 총 Day: 50일 · PART 6/9</div>
+  <div class="day-num">32</div>
+  <div class="day-title">HRV 활용법 — 컨디션의 숫자화</div>
+  <div class="day-title-en">Heart Rate Variability — Your Body Battery</div>
+  <div class="quote">"Listen to your body — it speaks in numbers."</div>
+  <div class="progress-ring-wrap">
+    <svg width="100" height="100" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border)" stroke-width="4"/>
+      <circle cx="50" cy="50" r="42" fill="none" stroke="var(--accent)" stroke-width="4" stroke-dasharray="263.9" stroke-dashoffset="95.0" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+    </svg>
+    <div class="ring-text">32/50<small>DAYS</small></div>
+  </div>
+  <div class="meta-badges">
+    <span class="meta-badge">⏱ 25 min</span>
+    <span class="meta-badge">📊 HRV</span>
+    <span class="meta-badge">🧠 자율신경계</span>
+    <span class="meta-badge">🚦 의사결정</span>
+    <span class="meta-badge">💤 회복</span>
+  </div>
+</section>
+<section class="fade-up">
+  <div class="brain-box">
+    <div class="box-title">🧠 뇌과학 학습 전략 — 포모도로 25분 배분</div>
+    <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:14px;">데이터 기반 의사결정(data-driven)은 주관적 감각보다 37% 정확한 피로 판단을 가능하게 합니다.</p>
+    <div class="time-table">
+      <span class="tt-time">0~5분</span><span class="tt-desc">개념 이해 — 핵심 구조 파악</span>
+      <span class="tt-time">5~18분</span><span class="tt-desc">핵심 내용 + 다이어그램 정독</span>
+      <span class="tt-time">18~23분</span><span class="tt-desc">실전 프로토콜 체크</span>
+      <span class="tt-time">23~25분</span><span class="tt-desc">퀴즈 3문제</span>
+    </div>
+  </div>
+</section>
+
+<h2 class="section-title fade-up">📊 HRV — 몸의 배터리 게이지</h2>
+<div class="card fade-up">
+  <div class="card-label">Core Concept</div>
+  <h3>심박변이도(HRV)란?</h3>
+  <p>HRV는 심장 박동 사이의 시간 간격(R-R interval)의 변동성입니다. 높은 HRV = 자율신경계 유연성 = 스트레스 대응 능력이 좋은 상태입니다.</p>
+  <table class="comparison-table">
+    <tr><th>HRV 상태</th><th>의미</th><th>훈련 권장</th></tr>
+    <tr><td><span class="tag tag-green">높음 (평균 이상)</span></td><td>부교감신경 우세, 회복 양호</td><td>고강도 OK, 볼륨 증가 가능</td></tr>
+    <tr><td><span class="tag tag-gold">보통 (평균 ±5%)</span></td><td>균형 상태</td><td>계획대로 진행</td></tr>
+    <tr><td><span class="tag tag-red">낮음 (평균 이하)</span></td><td>교감신경 우세, 스트레스/피로</td><td>Zone 2 or 휴식, 강도 ↓</td></tr>
+  </table>
+</div>
+<div class="card fade-up">
+  <div class="card-label">Autonomic NS</div>
+  <h3>자율신경계의 균형 — 교감 vs 부교감</h3>
+  <ul>
+    <li><strong>교감신경 (fight-or-flight)</strong> — 심박↑, 혈압↑, 코르티솔↑. 운동·스트레스·카페인 시 활성</li>
+    <li><strong>부교감신경 (rest-and-digest)</strong> — 심박↓, 소화↑, 회복↑. 수면·이완·호흡 시 활성</li>
+    <li><strong>HRV가 높다</strong> = 두 시스템 간 전환이 유연 = 적응력·회복력 좋음</li>
+    <li><strong>HRV가 낮다</strong> = 교감신경 고착 = 과훈련·수면부족·스트레스 축적</li>
+  </ul>
+  <details><summary>🔬 RMSSD와 측정 방법</summary>
+    <div class="detail-body">RMSSD(Root Mean Square of Successive Differences)가 가장 많이 쓰이는 HRV 지표입니다. 연속 심박 간격 차이의 제곱평균제곱근으로, 부교감신경 활성도를 반영합니다. 측정: 아침 기상 직후 1~5분간 가슴벨트/워치로 측정. 7일 이동평균을 기준선(baseline)으로 사용합니다.</div>
+  </details>
+</div>
+<div class="card fade-up">
+  <div class="card-label">Daily Decision</div>
+  <h3>HRV 기반 일일 의사결정 프레임워크</h3>
+  <p>매일 아침 HRV를 확인하고, 7일 이동평균 대비 당일 수치로 훈련 강도를 조절합니다:</p>
+  <ul>
+    <li><strong>평균 대비 +10% 이상</strong> → 🟢 고강도 훈련 OK, PR 도전 가능</li>
+    <li><strong>평균 ±10% 이내</strong> → 🟡 계획대로 진행</li>
+    <li><strong>평균 대비 -10~20%</strong> → 🟠 강도 70%로 조절, Zone 2 위주</li>
+    <li><strong>평균 대비 -20% 이상</strong> → 🔴 완전 휴식 or 가벼운 산책만</li>
+    <li><strong>3일 연속 하락 추세</strong> → ⚠️ 오버트레이닝 경고, 강제 디로드</li>
+  </ul>
+</div>
+
+
+<div class="svg-section fade-up">
+  <div class="svg-title">HRV Daily Decision Framework — 7일 이동평균 기반</div>
+  <svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;">
+    <rect width="800" height="350" fill="#12151C" rx="8"/>
+    <!-- Chart area -->
+    <g transform="translate(60,30)">
+      <!-- Axes -->
+      <line x1="40" y1="10" x2="40" y2="250" stroke="#252A38"/>
+      <line x1="40" y1="250" x2="700" y2="250" stroke="#252A38"/>
+      <text class="svg-hotspot" data-tip-title="HRV (RMSSD)" data-tip-value="정상 범위 20~100ms" data-tip-desc="아침 기상 직후 측정, 7일 평균 추적" x="20" y="130" fill="#7A7A8A" font-size="10" font-family="JetBrains Mono" transform="rotate(-90,20,130)" text-anchor="middle">HRV (ms)</text>
+      <!-- Average band -->
+      <rect x="40" y="100" width="660" height="60" fill="rgba(201,168,76,0.08)" rx="2"/>
+      <line x1="40" y1="130" x2="700" y2="130" stroke="#C9A84C" stroke-width="1.5" stroke-dasharray="8,4"/>
+      <text x="710" y="134" fill="#C9A84C" font-size="9" font-family="JetBrains Mono">7일 평균</text>
+      <!-- Green zone -->
+      <rect x="40" y="40" width="660" height="60" fill="rgba(74,191,138,0.05)" rx="2"/>
+      <text x="710" y="75" fill="#4ABF8A" font-size="8" font-family="JetBrains Mono">GO HARD</text>
+      <!-- Red zone -->
+      <rect x="40" y="160" width="660" height="90" fill="rgba(191,74,74,0.05)" rx="2"/>
+      <text x="710" y="210" fill="#BF4A4A" font-size="8" font-family="JetBrains Mono">REST</text>
+      <!-- HRV data points (14 days) -->
+      <polyline points="80,110 130,95 180,120 230,85 280,130 330,145 380,170 430,150 480,120 530,100 580,90 630,105 680,115" fill="none" stroke="#4A9EBF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Data dots -->
+      <circle cx="80" cy="110" r="4" fill="#4A9EBF"/>
+      <circle cx="130" cy="95" r="4" fill="#4ABF8A"/>
+      <circle cx="180" cy="120" r="4" fill="#C9A84C"/>
+      <circle cx="230" cy="85" r="4" fill="#4ABF8A"/>
+      <circle cx="280" cy="130" r="4" fill="#C9A84C"/>
+      <circle cx="330" cy="145" r="4" fill="#BF6A4A"/>
+      <circle cx="380" cy="170" r="5" fill="#BF4A4A" stroke="#BF4A4A" stroke-width="2" opacity="0.8"/>
+      <circle cx="430" cy="150" r="4" fill="#BF6A4A"/>
+      <circle cx="480" cy="120" r="4" fill="#C9A84C"/>
+      <circle cx="530" cy="100" r="4" fill="#4ABF8A"/>
+      <circle cx="580" cy="90" r="4" fill="#4ABF8A"/>
+      <circle cx="630" cy="105" r="4" fill="#4A9EBF"/>
+      <circle cx="680" cy="115" r="4" fill="#C9A84C"/>
+      <!-- Annotation on dip -->
+      <line x1="380" y1="175" x2="380" y2="200" stroke="#BF4A4A" stroke-width="1"/>
+      <text x="380" y="215" fill="#BF4A4A" font-size="9" font-family="JetBrains Mono" text-anchor="middle">⚠ -20% → REST</text>
+      <!-- Day labels -->
+      <text x="80" y="268" fill="#7A7A8A" font-size="8" font-family="JetBrains Mono" text-anchor="middle">Mon</text>
+      <text x="180" y="268" fill="#7A7A8A" font-size="8" font-family="JetBrains Mono" text-anchor="middle">Wed</text>
+      <text x="280" y="268" fill="#7A7A8A" font-size="8" font-family="JetBrains Mono" text-anchor="middle">Fri</text>
+      <text x="380" y="268" fill="#7A7A8A" font-size="8" font-family="JetBrains Mono" text-anchor="middle">Sun</text>
+      <text x="480" y="268" fill="#7A7A8A" font-size="8" font-family="JetBrains Mono" text-anchor="middle">Tue</text>
+      <text x="580" y="268" fill="#7A7A8A" font-size="8" font-family="JetBrains Mono" text-anchor="middle">Thu</text>
+      <text x="680" y="268" fill="#7A7A8A" font-size="8" font-family="JetBrains Mono" text-anchor="middle">Sat</text>
+    </g>
+    <!-- Legend -->
+    <g transform="translate(100,310)">
+      <circle cx="0" cy="0" r="5" fill="#4ABF8A"/><text x="12" y="4" fill="#4ABF8A" font-size="9" font-family="JetBrains Mono">Go Hard</text>
+      <circle cx="120" cy="0" r="5" fill="#C9A84C"/><text x="132" y="4" fill="#C9A84C" font-size="9" font-family="JetBrains Mono">Normal</text>
+      <circle cx="240" cy="0" r="5" fill="#BF6A4A"/><text x="252" y="4" fill="#BF6A4A" font-size="9" font-family="JetBrains Mono">Easy Only</text>
+      <circle cx="360" cy="0" r="5" fill="#BF4A4A"/><text x="372" y="4" fill="#BF4A4A" font-size="9" font-family="JetBrains Mono">Rest Day</text>
+    </g>
+  </svg>
+</div>
+
+<h2 class="section-title fade-up">⚡ 실전 프로토콜 — "컨디션 셀프 모니터링"</h2>
+
+<div class="protocol-grid fade-up">
+  <div class="protocol-card">
+    <div class="p-time">매일 아침</div>
+    <h4>HRV 측정 루틴</h4>
+    <div class="check-item"><input type="checkbox"><span>기상 직후 (화장실 가기 전) 측정</span></div>
+    <div class="check-item"><input type="checkbox"><span>누운 자세에서 1~2분간 측정</span></div>
+    <div class="check-item"><input type="checkbox"><span>갤럭시 워치 / 가민 / Oura 앱 확인</span></div>
+    <div class="check-item"><input type="checkbox"><span>에너지 로그에 HRV 기록</span></div>
+  </div>
+  <div class="protocol-card">
+    <div class="p-time">의사결정</div>
+    <h4>HRV → 오늘의 강도</h4>
+    <div class="check-item"><input type="checkbox"><span>7일 이동평균 확인</span></div>
+    <div class="check-item"><input type="checkbox"><span>오늘 HRV / 평균 = 비율 계산</span></div>
+    <div class="check-item"><input type="checkbox"><span>🟢/🟡/🟠/🔴 중 오늘의 색 결정</span></div>
+    <div class="check-item"><input type="checkbox"><span>훈련 계획 조정 (필요 시)</span></div>
+  </div>
+  <div class="protocol-card">
+    <div class="p-time">HRV 향상법</div>
+    <h4>부교감신경 활성화</h4>
+    <div class="check-item"><input type="checkbox"><span>취침 전 4-7-8 호흡법 3분</span></div>
+    <div class="check-item"><input type="checkbox"><span>Zone 2 러닝 꾸준히 (최고의 HRV 부스터)</span></div>
+    <div class="check-item"><input type="checkbox"><span>알코올 최소화 (HRV 20~30% 하락 요인)</span></div>
+    <div class="check-item"><input type="checkbox"><span>수면 7.5h+ 유지</span></div>
+  </div>
+</div>
+
+<div class="energy-log fade-up">
+  <h3>📊 오늘의 에너지 로그 — Day 32</h3>
+  <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:16px;">매일 같은 시간에 기록 → 패턴 발견 → 에너지 레버 최적화</p>
+  <div class="log-row"><label>아침 에너지 (1~10):</label><input type="range" id="lm" min="1" max="10" value="5" oninput="document.getElementById('vm').textContent=this.value"><span class="range-val" id="vm">5</span></div>
+  <div class="log-row"><label>운동 퍼포먼스 (1~10):</label><input type="range" id="lw" min="1" max="10" value="5" oninput="document.getElementById('vw').textContent=this.value"><span class="range-val" id="vw">5</span></div>
+  <div class="log-row"><label>수면 시간 (h):</label><input type="number" id="ls" min="0" max="12" step="0.5" value="7" style="width:70px;"></div>
+  <div class="log-row"><label>수면 품질 (1~10):</label><input type="range" id="lq" min="1" max="10" value="5" oninput="document.getElementById('vq').textContent=this.value"><span class="range-val" id="vq">5</span></div>
+  <div class="log-row"><label>HRV (ms):</label><input type="number" id="lh" min="0" max="200" placeholder="—" style="width:70px;"></div>
+  <button class="log-save-btn" onclick="saveLog()">💾 저장</button>
+  <div class="log-status" id="logSt"></div>
+</div>
+<h2 class="section-title fade-up">🧩 복습 퀴즈</h2>
+<div class="quiz-section fade-up">
+  <div class="quiz-card" id="quiz1">
+    <div class="q-num">Question 01</div>
+    <div class="q-text">HRV가 높다는 것은 무엇을 의미하는가?</div>
+    <div class="q-options">
+      <div class="q-opt" onclick="checkQuiz(1, this, false)">A. 심장이 빠르게 뛴다</div>
+      <div class="q-opt" onclick="checkQuiz(1, this, false)">B. 교감신경이 과활성 상태</div>
+      <div class="q-opt" onclick="checkQuiz(1, this, true)">C. 자율신경계 유연성이 좋고 회복 양호</div>
+      <div class="q-opt" onclick="checkQuiz(1, this, false)">D. 운동을 너무 적게 하고 있다</div>
+    </div>
+    <div class="q-feedback" id="fb1"></div>
+  </div>
+  <div class="quiz-card" id="quiz2">
+    <div class="q-num">Question 02</div>
+    <div class="q-text">HRV가 7일 평균 대비 -20% 이상 떨어졌을 때 권장되는 행동은?</div>
+    <div class="q-options">
+      <div class="q-opt" onclick="checkQuiz(2, this, false)">A. 고강도 훈련으로 자극</div>
+      <div class="q-opt" onclick="checkQuiz(2, this, false)">B. 계획대로 진행</div>
+      <div class="q-opt" onclick="checkQuiz(2, this, true)">C. 완전 휴식 또는 가벼운 산책만</div>
+      <div class="q-opt" onclick="checkQuiz(2, this, false)">D. 카페인으로 보상</div>
+    </div>
+    <div class="q-feedback" id="fb2"></div>
+  </div>
+  <div class="quiz-card" id="quiz3">
+    <div class="q-num">Question 03</div>
+    <div class="q-text">HRV 측정의 올바른 타이밍과 자세는?</div>
+    <div class="q-options">
+      <div class="q-opt" onclick="checkQuiz(3, this, false)">A. 운동 직후 서서 측정</div>
+      <div class="q-opt" onclick="checkQuiz(3, this, true)">B. 아침 기상 직후 누운 자세에서 1~2분</div>
+      <div class="q-opt" onclick="checkQuiz(3, this, false)">C. 취침 직전 앉아서</div>
+      <div class="q-opt" onclick="checkQuiz(3, this, false)">D. 식사 후 편안한 상태에서</div>
+    </div>
+    <div class="q-feedback" id="fb3"></div>
+  </div></div>
+<div class="spaced-rep fade-up">
+  <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);">🔁 간격 반복 — Day 32</h3>
+  <div class="sr-grid">
+    <div class="sr-item today"><div class="sr-day">D+0</div><div class="sr-label">오늘</div></div>
+    <div class="sr-item"><div class="sr-day">D+1</div><div class="sr-label">내일</div></div>
+    <div class="sr-item"><div class="sr-day">D+3</div><div class="sr-label">3일후</div></div>
+    <div class="sr-item"><div class="sr-day">D+7</div><div class="sr-label">1주후</div></div>
+    <div class="sr-item"><div class="sr-day">D+14</div><div class="sr-label">2주후</div></div>
+  </div>
+</div>
+<div class="next-preview fade-up">
+  <div class="np-label">NEXT → DAY 33</div>
+  <div class="np-title">면역 시스템 & 에너지</div>
+  <div class="np-desc">운동·수면·영양이 면역 기능에 미치는 영향</div>
+</div>
+</div>
+<script>
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')})},{threshold:0.1});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+const quizFeedback = {
+  1: { correct: `정답! 높은 HRV = 교감/부교감 전환이 유연 = 스트레스 대응력·회복력이 좋은 상태입니다.`, wrong: `높은 HRV는 자율신경계가 유연하게 작동하며 회복이 잘 되고 있다는 신호입니다.` },
+  2: { correct: `맞습니다! -20% 이상은 신체가 강한 스트레스/피로 상태임을 의미합니다. 강제 휴식이 필요합니다.`, wrong: `-20% 이상 하락은 RED 신호입니다. 완전 휴식이나 가벼운 산책만 권장됩니다.` },
+  3: { correct: `정답! 기상 직후 누운 상태에서 측정해야 일관된 기준선(baseline)을 확보할 수 있습니다.`, wrong: `아침 기상 직후, 누운 자세에서 1~2분간 측정이 표준입니다. 일관된 조건이 핵심입니다.` },
+};
+function checkQuiz(n,el,ok){const c=document.getElementById('quiz'+n);if(c.dataset.a)return;c.dataset.a='1';const os=c.querySelectorAll('.q-opt'),fb=document.getElementById('fb'+n);os.forEach(o=>{o.style.pointerEvents='none';o.style.opacity='0.6';});if(ok){el.classList.add('correct');el.style.opacity='1';fb.style.color='var(--green)';fb.textContent=quizFeedback[n].correct;}else{el.classList.add('wrong');el.style.opacity='1';os.forEach(o=>{if(o.getAttribute('onclick').includes('true')){o.classList.add('correct');o.style.opacity='1';}});fb.style.color='var(--red)';fb.textContent=quizFeedback[n].wrong;}}
+function saveLog(){const d={day:32,date:new Date().toISOString().slice(0,10),m:document.getElementById('lm').value,w:document.getElementById('lw').value,s:document.getElementById('ls').value,q:document.getElementById('lq').value,h:document.getElementById('lh').value||null};let l=JSON.parse(localStorage.getItem('ys-energy-logs')||'[]');l=l.filter(x=>x.date!==d.date||x.day!==d.day);l.push(d);localStorage.setItem('ys-energy-logs',JSON.stringify(l));document.getElementById('logSt').textContent='✅ 저장! ('+d.date+')';setTimeout(()=>document.getElementById('logSt').textContent='',3e3);}
+</script>
+
+<script>
+
+// ── Interactive SVG Tooltip & Focus System ──
+(function(){
+  const diagrams = document.querySelectorAll('.diagram-box');
+  diagrams.forEach(box => {
+    let tooltip = box.querySelector('.svg-tooltip');
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.className = 'svg-tooltip';
+      box.style.position = 'relative';
+      box.appendChild(tooltip);
+    }
+    const hotspots = box.querySelectorAll('.svg-hotspot');
+    hotspots.forEach(hs => {
+      hs.addEventListener('mouseenter', e => {
+        const t = hs.dataset.tipTitle || '';
+        const v = hs.dataset.tipValue || '';
+        const d = hs.dataset.tipDesc || '';
+        tooltip.innerHTML = (t ? '<div class="tip-title">'+t+'</div>' : '') +
+          (v ? '<div class="tip-value">'+v+'</div>' : '') +
+          (d ? '<div class="tip-desc">'+d+'</div>' : '');
+        const rect = hs.getBoundingClientRect();
+        const boxRect = box.getBoundingClientRect();
+        tooltip.style.left = (rect.left - boxRect.left + rect.width/2 - 130) + 'px';
+        tooltip.style.top = (rect.top - boxRect.top - tooltip.offsetHeight - 10) + 'px';
+        tooltip.classList.add('visible');
+      });
+      hs.addEventListener('mouseleave', () => {
+        tooltip.classList.remove('visible');
+      });
+      // Touch fallback for tooltips
+      hs.addEventListener('touchstart', function(ev) {
+        ev.stopPropagation();
+        var t = hs.dataset.tipTitle || '';
+        var v = hs.dataset.tipValue || '';
+        var d = hs.dataset.tipDesc || '';
+        tooltip.innerHTML = (t ? '<div class="tip-title">'+t+'</div>' : '') +
+          (v ? '<div class="tip-value">'+v+'</div>' : '') +
+          (d ? '<div class="tip-desc">'+d+'</div>' : '');
+        var rect = hs.getBoundingClientRect();
+        var boxRect = box.getBoundingClientRect();
+        tooltip.style.left = Math.max(0, (rect.left - boxRect.left + rect.width/2 - 130)) + 'px';
+        tooltip.style.top = Math.max(0, (rect.top - boxRect.top - tooltip.offsetHeight - 10)) + 'px';
+        tooltip.classList.add('visible');
+        setTimeout(function(){ tooltip.classList.remove('visible'); }, 3000);
+      }, {passive: true});
+
+      hs.addEventListener('click', () => {
+        const wasActive = hs.classList.contains('focused');
+        box.querySelectorAll('.svg-hotspot').forEach(h => h.classList.remove('focused'));
+        const panel = box.querySelector('.detail-panel');
+        if (wasActive) {
+          box.classList.remove('svg-focus-active');
+          if(panel) panel.classList.remove('active');
+        } else {
+          hs.classList.add('focused');
+          box.classList.add('svg-focus-active');
+          if(panel && hs.dataset.detail){
+            panel.innerHTML = '<span class="close-btn" onclick="this.parentElement.classList.remove(\'active\');this.closest(\'.diagram-box\').classList.remove(\'svg-focus-active\');this.closest(\'.diagram-box\').querySelectorAll(\'.svg-hotspot\').forEach(h=>h.classList.remove(\'focused\'))">✕</span>' + hs.dataset.detail;
+            panel.classList.add('active');
+          }
+        }
+      });
+    });
+  });
+})();
+
+</script>
+<script>
+// ── Swipe Navigation ──
+(function(){
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const threshold = 80;
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, {passive: true});
+
+  document.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) < threshold) return;
+
+    const links = document.querySelectorAll('.mobile-nav a, .nav-links a');
+    if (diff > 0) {
+      // Swipe left → next day
+      const next = Array.from(links).find(a => a.textContent.includes('→') || a.textContent.includes('Day'));
+      if (next && next.href && next.textContent.includes('→')) next.click();
+    } else {
+      // Swipe right → prev day
+      const prev = Array.from(links).find(a => a.textContent.includes('←'));
+      if (prev && prev.href) prev.click();
+    }
+  }, {passive: true});
+})();
+// ── Service Worker Registration ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body></html>

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인간 탐구 | Day 20 — 정체성과 역할 통합</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #0A0C10; --bg-card: #12151C; --bg-card-hover: #181C26;
+  --purple: #8A6ABF; --purple-dim: #6B4FA0; --purple-glow: rgba(138,106,191,0.15);
+  --gold: #C9A84C; --gold-dim: #A8893A; --gold-glow: rgba(201,168,76,0.12);
+  --text: #E8E4DF; --text-dim: #9B9590; --text-muted: #6B6560;
+  --accent-green: #6BBF8A; --accent-red: #BF6B6B;
+  --border: rgba(138,106,191,0.12);
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Noto Sans KR', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-weight: 300; line-height: 1.75; font-size: 16px; overflow-x: hidden; }
+.sticky-header { position: sticky; top: 0; z-index: 100; background: rgba(10,12,16,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-logo { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 700; color: var(--gold); letter-spacing: 0.08em; }
+.header-divider { width: 1px; height: 18px; background: var(--text-muted); opacity: 0.4; }
+.header-title { font-size: 0.85rem; color: var(--text-dim); font-weight: 400; }
+.header-day { font-family: var(--font-mono); font-size: 0.78rem; color: var(--purple); background: var(--purple-glow); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(138,106,191,0.2); }
+.header-series { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
+.container { max-width: 900px; margin: 0 auto; padding: 0 24px 60px; }
+.hero { padding: 60px 0 40px; text-align: center; border-bottom: 1px solid var(--border); margin-bottom: 40px; }
+.hero-part-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 16px; }
+.hero-day { font-family: var(--font-serif); font-size: 0.95rem; color: var(--text-muted); font-weight: 300; margin-bottom: 12px; }
+.hero-question { font-family: var(--font-serif); font-size: 2.2rem; font-weight: 600; color: var(--text); margin-bottom: 24px; line-height: 1.4; }
+.hero-question em { color: var(--purple); font-style: italic; }
+.keyword-badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+.badge { font-family: var(--font-mono); font-size: 0.68rem; padding: 6px 14px; border-radius: 20px; letter-spacing: 0.05em; }
+.badge--purple { background: var(--purple-glow); color: var(--purple); border: 1px solid rgba(138,106,191,0.2); }
+.badge--gold { background: var(--gold-glow); color: var(--gold); border: 1px solid rgba(201,168,76,0.2); }
+.badge--green { background: rgba(107,191,138,0.12); color: var(--accent-green); border: 1px solid rgba(107,191,138,0.2); }
+.hero-meta { display: flex; align-items: center; justify-content: center; gap: 32px; }
+.gauge-container { text-align: center; }
+.gauge-container svg circle { fill: none; }
+.gauge-container .gauge-bg { stroke: var(--border); stroke-width: 2; }
+.gauge-container .gauge-fill { stroke: var(--purple); stroke-width: 2; stroke-dasharray: 219.8; stroke-dashoffset: 219.8; transition: stroke-dashoffset 1s ease; stroke-linecap: round; }
+.gauge-text { font-family: var(--font-mono); font-size: 0.8rem; color: var(--purple); margin-top: 8px; }
+.meta-badges { display: flex; gap: 16px; flex-direction: column; }
+.meta-badge { display: flex; align-items: center; gap: 10px; font-size: 0.82rem; color: var(--text-dim); }
+.meta-badge-icon { font-size: 1.2rem; }
+.section { margin-bottom: 48px; }
+.section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.section-icon { font-size: 1.8rem; }
+.section-title { font-family: var(--font-serif); font-size: 1.4rem; font-weight: 600; color: var(--text); }
+.section-subtitle { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.08em; margin-top: 2px; }
+.strategy-box { background: linear-gradient(135deg, rgba(138,106,191,0.04), rgba(10,12,16,0.5)); border: 1px solid var(--border); border-radius: 16px; padding: 28px; }
+.strategy-tip { font-size: 0.92rem; color: var(--text); line-height: 1.8; margin-bottom: 20px; }
+.strategy-tip strong { color: var(--gold); }
+.time-table { width: 100%; margin-top: 16px; border-collapse: collapse; font-size: 0.82rem; }
+.time-table thead { border-bottom: 2px solid var(--purple-dim); }
+.time-table th { text-align: left; padding: 12px 0; color: var(--purple); font-weight: 500; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.05em; }
+.time-table td { padding: 10px 0; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+.time-table tr:last-child td { border-bottom: none; }
+.concept-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 20px; transition: transform 0.2s, border-color 0.3s; }
+.concept-card:hover { transform: translateY(-2px); border-color: rgba(138,106,191,0.2); }
+.concept-card-num { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 10px; }
+.concept-card-title { font-family: var(--font-serif); font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.concept-card-en { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.06em; margin-bottom: 16px; }
+.concept-card-body { font-size: 0.9rem; color: var(--text-dim); line-height: 1.8; }
+.concept-card-body p { margin-bottom: 12px; }
+.concept-card-body strong { color: var(--text); font-weight: 500; }
+.concept-highlight { background: var(--purple-glow); padding: 2px 8px; border-radius: 4px; color: var(--purple); font-family: var(--font-mono); font-size: 0.82rem; }
+.concept-example { margin-top: 16px; padding: 16px 20px; background: rgba(201,168,76,0.04); border-left: 3px solid var(--gold-dim); border-radius: 0 10px 10px 0; font-size: 0.85rem; color: var(--text-dim); }
+.concept-example-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 6px; }
+.deep-dive { margin-top: 16px; }
+.deep-dive summary { font-family: var(--font-mono); font-size: 0.78rem; color: var(--purple); cursor: pointer; padding: 8px 0; list-style: none; display: flex; align-items: center; gap: 8px; user-select: none; }
+.deep-dive summary::before { content: '▸'; display: inline-block; transition: transform 0.2s; }
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive-content { padding: 16px 20px; background: rgba(138,106,191,0.04); border-radius: 10px; font-size: 0.82rem; color: var(--text-dim); line-height: 1.75; margin-top: 8px; }
+.deep-dive-content strong { color: var(--purple); font-weight: 500; }
+.diagram-wrapper { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 32px 24px; text-align: center; overflow-x: auto; }
+.diagram-wrapper svg { max-width: 100%; height: auto; }
+.diagram-caption { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin-top: 16px; letter-spacing: 0.04em; }
+.practice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+.practice-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; transition: transform 0.2s, border-color 0.3s; }
+.practice-card:hover { transform: translateY(-2px); border-color: rgba(107,191,138,0.3); }
+.practice-time { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; margin-bottom: 8px; }
+.practice-time--30s { color: var(--accent-green); }
+.practice-time--5m { color: var(--gold); }
+.practice-time--day { color: var(--purple); }
+.practice-title { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+.practice-body { font-size: 0.82rem; color: var(--text-dim); line-height: 1.7; }
+.checklist { list-style: none; margin-top: 12px; }
+.checklist li { font-size: 0.82rem; color: var(--text-dim); padding: 6px 0; display: flex; align-items: flex-start; gap: 8px; }
+.checklist li::before { content: '☐'; color: var(--purple-dim); font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+.reflection-box { background: linear-gradient(135deg, rgba(138,106,191,0.05), rgba(10,12,16,0.8)); border: 1px solid var(--border); border-radius: 16px; padding: 32px; }
+.philosopher { display: flex; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.philosopher:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.philosopher-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--purple-glow); border: 1px solid rgba(138,106,191,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+.philosopher-name { font-family: var(--font-serif); font-size: 1rem; font-weight: 600; color: var(--gold); margin-bottom: 4px; }
+.philosopher-text { font-size: 0.85rem; color: var(--text-dim); line-height: 1.7; font-style: italic; }
+.night-question { margin-top: 24px; padding: 20px 24px; background: rgba(201,168,76,0.05); border: 1px solid rgba(201,168,76,0.12); border-radius: 12px; text-align: center; }
+.night-question-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold-dim); letter-spacing: 0.12em; margin-bottom: 8px; }
+.night-question-text { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; color: var(--text); font-style: italic; line-height: 1.5; }
+.quiz-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 16px; }
+.quiz-num { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 10px; }
+.quiz-question { font-size: 0.95rem; color: var(--text); font-weight: 400; margin-bottom: 16px; line-height: 1.6; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-option { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: rgba(138,106,191,0.04); border: 1px solid rgba(138,106,191,0.08); border-radius: 10px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; color: var(--text-dim); }
+.quiz-option:hover { background: rgba(138,106,191,0.08); border-color: rgba(138,106,191,0.2); }
+.quiz-option.correct { background: rgba(107,191,138,0.1); border-color: rgba(107,191,138,0.3); color: var(--accent-green); }
+.quiz-option.wrong { background: rgba(191,107,107,0.1); border-color: rgba(191,107,107,0.3); color: var(--accent-red); }
+.quiz-option-marker { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--text-muted); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.68rem; flex-shrink: 0; transition: all 0.2s; }
+.quiz-explanation { display: none; margin-top: 14px; padding: 14px 18px; background: rgba(107,191,138,0.05); border-radius: 10px; font-size: 0.82rem; color: var(--text-dim); line-height: 1.7; }
+.quiz-explanation.show { display: block; }
+.spaced-tracker { margin-top: 24px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+.spaced-tracker-title { font-family: var(--font-mono); font-size: 0.72rem; color: var(--purple); letter-spacing: 0.1em; margin-bottom: 16px; }
+.spaced-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; font-size: 0.8rem; color: var(--text-dim); }
+.spaced-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--text-muted); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.spaced-dot.checked { background: var(--purple); border-color: var(--purple); }
+.spaced-dot.checked::after { content: '✓'; font-size: 0.6rem; color: #fff; }
+.spaced-label { font-family: var(--font-mono); font-size: 0.72rem; color: var(--gold-dim); width: 50px; }
+.footer { text-align: center; padding: 40px 0 20px; border-top: 1px solid var(--border); margin-top: 60px; }
+.footer-text { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.06em; }
+.footer-nav { margin-top: 16px; display: flex; justify-content: center; gap: 20px; }
+.footer-nav a { font-family: var(--font-mono); font-size: 0.72rem; color: var(--purple-dim); text-decoration: none; transition: color 0.2s; }
+.footer-nav a:hover { color: var(--purple); }
+@media (max-width: 600px) { .sticky-header { padding: 10px 16px; } .container { padding: 0 16px 60px; } .hero { padding: 40px 0 32px; } .concept-card, .strategy-box, .reflection-box { padding: 20px; } .practice-grid { grid-template-columns: 1fr; } .hero-meta { flex-direction: column; gap: 16px; } }
+</style>
+</head>
+<body>
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-logo">HE</span>
+    <span class="header-divider"></span>
+    <span class="header-title">인간 탐구</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span class="header-day">DAY 20 / 22</span>
+    <span class="header-series">이 시리즈 예상 총 Day: 22일</span>
+  </div>
+</header>
+<div class="container">
+<section class="hero">
+  <div class="hero-part-label">PART 4 — 나만의 삶의 철학 구축</div>
+  <div class="hero-day">— Day 20 —</div>
+  <h1 class="hero-question">당신은 엔지니어이자 아빠이자 남편이자 학습자입니다.<br><em>이들 역할이 하나의 "나"로 통합될 수 있을까?</em></h1>
+  <div class="keyword-badges">
+    <span class="badge badge--purple">다중 역할 이론</span>
+    <span class="badge badge--gold">자기참조 네트워크</span>
+    <span class="badge badge--purple">역할 풍요화</span>
+  </div>
+  <div class="hero-meta">
+    <div class="gauge-container">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <circle class="gauge-bg" cx="40" cy="40" r="35"/>
+        <circle class="gauge-fill" cx="40" cy="40" r="35" id="progressGauge" data-day="20"/>
+      </svg>
+      <div class="gauge-text"><strong>20</strong>/22</div>
+    </div>
+    <div class="meta-badges">
+      <div class="meta-badge"><div class="meta-badge-icon meta-badge-icon--time">⏱</div><span>25분 · 포모도로 1세션</span></div>
+      <div class="meta-badge"><div class="meta-badge-icon meta-badge-icon--diff">◆</div><span>난이도: 고급</span></div>
+      <div class="meta-badge"><div class="meta-badge-icon meta-badge-icon--type">🧠</div><span>유형: 사회심리학+신경과학</span></div>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="section-header"><div class="section-icon section-icon--brain">🎯</div>
+    <div><div class="section-title">학습 전략</div><div class="section-subtitle">LEARNING STRATEGY FOR DAY 20</div></div>
+  </div>
+  <div class="strategy-box">
+    <div class="strategy-tip">일상 속에서 우리는 "일 모드"와 "가정 모드"를 번갈아가며 활성화합니다. 하지만 <strong>지속 가능한 행복</strong>은 이들이 서로 분리된 자기가 아니라, <strong>하나의 일관된 정체성 안에 통합</strong>될 때 나옵니다. 오늘은 5가지 역할의 "공통 핵심"을 발견하고, 통합 정체성 선언문을 작성합니다.</div>
+    <table class="time-table"><thead><tr><th>시간</th><th>활동</th><th>목표</th></tr></thead><tbody><tr><td>0–3분</td><td>Day 19 복습 + 정체성 개념 도입</td><td>역할 vs 정체성 구분</td></tr><tr><td>3–10분</td><td>개념 1·2 정독</td><td>자기참조 네트워크 + 5역할 맵핑</td></tr><tr><td>10–16분</td><td>개념 3 + 5역할 꽃잎 다이어그램 분석</td><td>역할 간 전이 강점 발견</td></tr><tr><td>16–21분</td><td>통합 정체성 선언문 작성</td><td>"나는 ___ 한 사람이다" 완성</td></tr><tr><td>21–25분</td><td>철학 성찰 + 퀴즈</td><td>개성화의 길</td></tr></tbody></table>
+  </div>
+</section>
+<section class="section">
+  <div class="section-header"><div class="section-icon section-icon--concept">💡</div>
+    <div><div class="section-title">핵심 개념</div><div class="section-subtitle">CORE CONCEPTS</div></div>
+  </div>
+  <div class="concept-card">
+    <div class="concept-card-num">CONCEPT 1</div>
+    <div class="concept-card-title">정체성의 신경과학</div>
+    <div class="concept-card-en">Neuroscience of Identity</div>
+    <div class="concept-card-body">
+      <p>당신은 누구인가? "엔지니어", "아빠", "남편", "학습자", "INFP"—이들은 모두 역할(roles)입니다. 하지만 역할 너머에 "자기"가 있습니다.</p>
+<p><strong>자기참조 네트워크 (Self-Reference Network)</strong>: 뇌의 <span class="concept-highlight">mPFC(medial Prefrontal Cortex, 내측 전전두엽)</span>와 <span class="concept-highlight">PCC(Posterior Cingulate Cortex, 후각피질)</span>는 "나에 대해 생각할 때" 활성화됩니다. fMRI 연구에 따르면, 당신이 "엔지니어로서 나"를 생각할 때, "아버지로서 나"를 생각할 때, "배우는 자로서 나"를 생각할 때 모두 같은 영역이 활성화됩니다. 즉, 뇌는 이들을 "같은 나"로 취급합니다.</p>
+<p><strong>역할 전환의 인지 비용 (Role Switching Cost)</strong>: 다만, 각 역할을 활성화할 때마다 뇌는 그 역할에 맞는 행동 패턴, 감정 규칙, 언어 스타일을 준비합니다. 예를 들어, 직장에서 "분석적 정밀성"을 활성화한 뇌가 집에서 "감정적 온정"으로 전환하려면 신경 리소스가 필요합니다. 이것이 누적되면 <strong>역할 피로(role strain)</strong>가 됩니다.</p>
+<p><strong>역할 풍요화 이론 (Role Enrichment Theory)</strong>: 하지만 여러 역할을 가진 것이 반드시 나쁜 것은 아닙니다. "엔지니어로서의 정밀함"을 "아버지로서의 양육"에 응용하면(아이의 발달 과정을 세심히 관찰), "아이와 함께 배우는 것"이 "엔지니어로서의 지속적 학습"을 강화합니다. 각 역할이 다른 역할을 풍요롭게 만들 수 있습니다.</p>
+      <div class="concept-example">
+        <div class="concept-example-label">🧠 신경과학적 관점: 통합된 자기</div>
+        <p><strong>분리된 정체성</strong>: "직장의 나"(분석, 이성적, 침착) vs "가정의 나"(감정, 논리보다 직관)</p>
+<p>→ 매일 역할 전환 비용이 생김. PFC 포도당 고갈. 저녁에 피곤함. 아이들에게 "일 때문에 짜증난다"는 인상 남김</p>
+<p><strong>통합된 정체성</strong>: "정밀성과 배려심을 겸비한 엔지니어-아버지"</p>
+<p>→ 역할 전환 비용 감소. 직장의 성과와 가정의 질이 모두 향상. 아이들이 "아빠는 신중하고 사려 깊다"고 인식</p>
+      </div>
+      <details class="deep-dive">
+        <summary>mPFC와 PCC: 통합된 자기를 유지하는 신경 기제</summary>
+        <div class="deep-dive-content"><strong>자기참조 네트워크의 경험-의존적 구조</strong>: mPFC와 PCC는 고정적인 것이 아니라, 당신의 경험과 선택에 따라 계속 재구성됩니다. 당신이 "아버지로서 정밀함"을 반복적으로 실행하면, 그 신경 패턴이 강화됩니다. 반대로 "엔지니어와 아버지는 다르다"고 계속 생각하면, 뇌는 두 개의 분리된 네트워크를 유지하려고 노력합니다.
+
+<strong>Default Mode Network (DMN)의 역할</strong>: mPFC-PCC 네트워크는 기본 모드 네트워크(DMN)의 일부입니다. 명상, 자기 성찰, 그리고 의미 있는 대화 중에 활성화됩니다. 따라서 통합된 정체성은 의도적인 자기 반성을 통해서만 만들어집니다. "나는 어떤 사람인가"라는 질문에 자주 답할수록, 당신의 mPFC-PCC 네트워크는 더 통합된 자기상을 유지합니다.</div>
+      </details>
+    </div>
+  </div>
+<div class="concept-card">
+    <div class="concept-card-num">CONCEPT 2</div>
+    <div class="concept-card-title">5가지 역할 맵핑</div>
+    <div class="concept-card-en">Five Roles Mapping</div>
+    <div class="concept-card-body">
+      <p>당신의 삶을 5개의 역할로 나누면:</p>
+<ol style="color:var(--text-dim);margin:12px 0 12px 20px;font-size:0.9rem;">
+  <li><strong>엔지니어 (Professional)</strong> — 분석적 사고, 정밀성, 문제 해결, 끈기</li>
+  <li><strong>아빠 (Father)</strong> — 인내심, 놀이정신, 아이의 성장에 대한 기쁨과 책임</li>
+  <li><strong>남편 (Partner)</strong> — 파트너십, 공감, 아내와의 상호 지지</li>
+  <li><strong>학습자 (Learner)</strong> — 호기심, 성장 욕망, 새로운 것을 이해하려는 욕망</li>
+  <li><strong>자기 (Self)</strong> — INFP의 내면성, 가치와 의미에 대한 추구, 성찰의 필요</li>
+</ol>
+<p>각 역할은 고유한 강점을 가지고 있으며, 이들 사이에는 <strong>전이 효과(transfer effect)</strong>가 있습니다. 엔지니어로서의 체계적 사고가 학습자로서의 학습 구조를 더 효율적으로 만들고, 아버지로서의 감정적 민감성이 엔지니어로서의 의사소통을 더 설득력 있게 만듭니다.</p>
+<p><strong>역할의 강점 전이 (Strength Transfer)</strong>: 예를 들어:</p>
+<ul style="color:var(--text-dim);margin:8px 0 8px 20px;font-size:0.9rem;">
+  <li><strong>엔지니어 → 아빠</strong>: "문제를 작은 단계로 나누기"는 아이의 학습에도 적용 가능</li>
+  <li><strong>아빠 → 엔지니어</strong>: "인내심"과 "아이의 실수를 배우는 과정으로 보기"는 팀의 신입을 육성할 때 도움</li>
+  <li><strong>INFP 자기 → 모든 역할</strong>: "의미와 가치를 묻기"는 직장 결정, 양육 철학, 학습 목표를 모두 깊이 있게 함</li>
+</ul>
+      <div class="concept-example">
+        <div class="concept-example-label">🎭 역할별 강점과 전이</div>
+        <p><strong>엔지니어 (분석, 정밀)</strong></p>
+<ul style="color:var(--text-dim);font-size:0.85rem;margin:4px 0 8px 16px;">
+  <li>직업: Renault Korea 서스펜션 엔지니어 → CAD 설계, 시뮬레이션, 테스트 리포트</li>
+  <li>가정에 전이: 6세 아이의 학습 프로세스를 체계적으로 설계하기</li>
+</ul>
+<p><strong>아빠 (인내, 놀이, 기쁨)</strong></p>
+<ul style="color:var(--text-dim);font-size:0.85rem;margin:4px 0 8px 16px;">
+  <li>양육: 매일 밤 30분 놀아주기, 아이의 호기심 격려하기</li>
+  <li>직업에 전이: 팀원의 실수를 "배우는 과정"으로 보기 → 심리 안전성 높은 팀 문화</li>
+</ul>
+<p><strong>학습자 (호기심, 성장)</strong></p>
+<ul style="color:var(--text-dim);font-size:0.85rem;margin:4px 0 8px 16px;">
+  <li>개인: 신경과학, 심리학, 철학 공부 계속</li>
+  <li>남편으로서: 아내의 경력과 성장에 적극 지지. "함께 배우는" 관계 유지</li>
+  <li>아버지로서: 아이들 앞에서 "배우는 모습"을 보여주기</li>
+</ul>
+      </div>
+      <details class="deep-dive">
+        <summary>역할 간 강점 전이와 원자적 정체성</summary>
+        <div class="deep-dive-content"><strong>전이 메커니즘</strong>: Broaden-and-Build 이론(Barbara Fredrickson)에 따르면, 긍정 감정은 인지적 유연성을 높입니다. "아빠로서의 기쁨"이 높으면, 당신의 뇌는 더 창의적인 사고 양식을 취합니다. 따라서 저녁에 아이들과 놀면서 경험한 기쁨과 재미가 다음 날 직장의 문제 해결을 더 창의적으로 만들 수 있습니다.
+
+<strong>정체성 일관성의 심리적 안정성</strong>: William James는 "한 인간이 여러 개의 자기를 가질 수 있다"고 했지만, 현대 심리학은 통합된 정체성이 더 건강하다고 보입니다. 당신이 "정밀하고 배려심 있는 사람"으로 일관되게 행동하면, 뇌의 자기참조 네트워크가 안정적인 정체성을 유지합니다. 이는 스트레스 회복력을 높이고, 결정 피로를 감소시킵니다.</div>
+      </details>
+    </div>
+  </div>
+<div class="concept-card">
+    <div class="concept-card-num">CONCEPT 3</div>
+    <div class="concept-card-title">통합적 정체성 구축</div>
+    <div class="concept-card-en">Building Integrated Identity</div>
+    <div class="concept-card-body">
+      <p>5가지 역할의 "공통 핵심"을 발견해야 합니다. 엔지니어, 아빠, 남편, 학습자, INFP—이들을 관통하는 하나의 철학이 무엇인가?</p>
+<p><strong>공통 핵심 발견 프로세스</strong>:</p>
+<ol style="color:var(--text-dim);margin:8px 0 8px 20px;font-size:0.9rem;">
+  <li>각 역할의 가장 중요한 가치를 적어보세요 (Day 19 참고)</li>
+  <li>이들 사이의 <strong>공통 패턴</strong>을 찾으세요</li>
+  <li>그 패턴을 하나의 문장으로 표현하세요</li>
+</ol>
+<p>예를 들어, Renault Korea 엔지니어의 경우:</p>
+<ul style="color:var(--text-dim);margin:8px 0 8px 20px;font-size:0.9rem;">
+  <li>엔지니어: "정밀성을 추구하고, 팀과 함께 문제를 푼다"</li>
+  <li>아빠: "아이의 성장을 세심히 관찰하고, 함께 배운다"</li>
+  <li>학습자: "이해를 깊이 있게 추구한다"</li>
+  <li>→ 공통 핵심: "세밀한 관찰, 깊이 있는 이해, 함께 성장하기"</li>
+</ul>
+<p><strong>통합 정체성 선언문 (Identity Statement) 작성</strong>: "나는 <strong>___</strong> 한 사람이다"를 완성합니다. 이것은 단순한 문장이 아니라, 당신의 모든 역할을 포함하는 <strong>원칙</strong>입니다. 이 원칙이 명확하면, 역할 간 충돌이 났을 때 의사결정이 쉬워집니다.</p>
+      <div class="concept-example">
+        <div class="concept-example-label">📝 통합 정체성 선언문 작성</div>
+        <p><strong>약한 버전 (역할이 분리된 정체성)</strong>:</p>
+<p style="color:var(--text-dim);font-style:italic;margin:8px 0;">"나는 엔지니어이면서 아버지이고 배우고 싶은 사람이다."</p>
+<p>→ 역할들이 나열만 되어 있음. 충돌할 때 어느 것이 우선인지 불명확</p>
+<p><strong>강한 버전 (통합된 정체성)</strong>:</p>
+<p style="color:#C9A84C;font-weight:600;margin:8px 0;">"나는 세밀한 관찰과 깊이 있는 이해를 추구하며, 혼자가 아닌 함께 성장하는 사람이다."</p>
+<p>→ 모든 역할(엔지니어의 정밀성, 아버지의 관찰, 학습자의 깊이, 아내와 함께)이 포함됨</p>
+<p><strong>이 원칙이 명확하면:</strong></p>
+<ul style="color:var(--text-dim);font-size:0.85rem;margin:8px 0 8px 16px;">
+  <li>유럽 이사 결정 시: "이 결정이 깊이 있는 이해와 함께 성장을 지원하는가?" → 기준이 명확</li>
+  <li>일-가정 충돌 시: "지금 내가 해야 할 일은 무엇이 나를 더 깊이 있게 만드는가?"</li>
+  <li>매일의 작은 선택들: "이것이 나의 정체성에 일치하는가?" → 자동 결정 시스템</li>
+</ul>
+      </div>
+      <details class="deep-dive">
+        <summary>칼 융의 개성화와 통합된 정체성</summary>
+        <div class="deep-dive-content"><strong>Individuation(개성화)이란 무엇인가</strong>: 칼 융은 심리적 성숙의 과정을 "개성화"라고 불렀습니다. 이것은 사회적 기대(부모, 문화, 직업)에 맞춘 "페르소나(Persona, 가면)"에서 벗어나, 진정한 자기를 찾고 통합하는 과정입니다. 당신이 "엔지니어라서 감정을 숨겨야 한다"는 페르소나에서 벗어나, "정밀하면서도 배려 깊은 엔지니어"로 통합되는 것이 개성화입니다.
+
+<strong>그림자(Shadow) 통합</strong>: 융은 또한 우리 모두가 부정하고 싶은 측면(그림자)을 가진다고 했습니다. 당신이 "엔지니어는 감정적이어서는 안 된다"고 생각하면, 당신의 감정성은 그림자가 되어 무의식적으로 나타나거나(저녁에 아이에게 짜증을 냄) 억제되어 피로를 유발합니다. 통합 정체성은 이 그림자들을 인정하고 포함합니다: "나는 정밀하지만 감정도 있고, 강하지만 취약함도 있다."</div>
+      </details>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="section-header"><div class="section-icon section-icon--brain">📊</div>
+    <div><div class="section-title">정체성과 역할 통합 다이어그램</div><div class="section-subtitle">IDENTITY & ROLE INTEGRATION DIAGRAM</div></div>
+  </div>
+  <div class="diagram-wrapper">
+    <svg width="760" height="480" viewBox="0 0 760 480" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="grad20_core" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#C9A84C;stop-opacity:0.6" />
+          <stop offset="100%" style="stop-color:#8A6ABF;stop-opacity:0.2" />
+        </radialGradient>
+        <filter id="glow20">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <rect width="760" height="480" fill="#1A1E2A"/>
+      <g stroke="#9B9590" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.2">
+        <circle cx="380" cy="240" r="150"/>
+        <circle cx="380" cy="240" r="100"/>
+        <circle cx="380" cy="240" r="50"/>
+      </g>
+      
+      <!-- Central CORE -->
+      <circle cx="380" cy="240" r="45" fill="url(#grad20_core)" stroke="#C9A84C" stroke-width="2.5" filter="url(#glow20)"/>
+      <text x="380" y="235" font-size="11" font-weight="bold" fill="#1A1E2A" text-anchor="middle" font-family="monospace">CORE</text>
+      <text x="380" y="250" font-size="8" fill="#1A1E2A" text-anchor="middle" font-family="monospace">Integrated</text>
+      <text x="380" y="261" font-size="8" fill="#1A1E2A" text-anchor="middle" font-family="monospace">Self</text>
+      
+      <!-- 5 Petals (Roles) -->
+      <!-- Petal 1: Engineer (Top-Left) -->
+      <circle cx="270" cy="110" r="55" fill="none" stroke="#8A6ABF" stroke-width="2.5" opacity="0.8"/>
+      <text x="270" y="95" font-size="12" font-weight="bold" fill="#8A6ABF" text-anchor="middle" font-family="monospace">ENGINEER</text>
+      <text x="270" y="125" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">Precision</text>
+      <text x="270" y="137" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">Analysis</text>
+      
+      <!-- Petal 2: Father (Right-Top) -->
+      <circle cx="520" cy="130" r="55" fill="none" stroke="#6BBF8A" stroke-width="2.5" opacity="0.8"/>
+      <text x="520" y="115" font-size="12" font-weight="bold" fill="#6BBF8A" text-anchor="middle" font-family="monospace">FATHER</text>
+      <text x="520" y="145" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">Patience</text>
+      <text x="520" y="157" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">Joy in Growth</text>
+      
+      <!-- Petal 3: Partner (Right-Bottom) -->
+      <circle cx="520" cy="350" r="55" fill="none" stroke="#BF6B6B" stroke-width="2.5" opacity="0.8"/>
+      <text x="520" y="335" font-size="12" font-weight="bold" fill="#BF6B6B" text-anchor="middle" font-family="monospace">PARTNER</text>
+      <text x="520" y="365" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">Empathy</text>
+      <text x="520" y="377" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">Mutual Support</text>
+      
+      <!-- Petal 4: Learner (Bottom-Left) -->
+      <circle cx="270" cy="370" r="55" fill="none" stroke="#C9A84C" stroke-width="2.5" opacity="0.8"/>
+      <text x="270" y="355" font-size="12" font-weight="bold" fill="#C9A84C" text-anchor="middle" font-family="monospace">LEARNER</text>
+      <text x="270" y="385" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">Curiosity</text>
+      <text x="270" y="397" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">Growth Mindset</text>
+      
+      <!-- Petal 5: INFP Self (Bottom-Middle) -->
+      <circle cx="380" cy="390" r="55" fill="none" stroke="#8A6ABF" stroke-width="2.5" stroke-dasharray="5,3" opacity="0.8"/>
+      <text x="380" y="375" font-size="12" font-weight="bold" fill="#8A6ABF" text-anchor="middle" font-family="monospace">SELF (INFP)</text>
+      <text x="380" y="405" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">Values & Meaning</text>
+      <text x="380" y="417" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">Reflection</text>
+      
+      <!-- Connecting lines showing strength transfer -->
+      <path d="M 310 155 L 340 210" stroke="#6BBF8A" stroke-width="1.5" opacity="0.3" stroke-dasharray="3,2"/>
+      <path d="M 450 170 L 380 200" stroke="#C9A84C" stroke-width="1.5" opacity="0.3" stroke-dasharray="3,2"/>
+      <path d="M 470 290 L 420 270" stroke="#8A6ABF" stroke-width="1.5" opacity="0.3" stroke-dasharray="3,2"/>
+      <path d="M 310 340 L 340 290" stroke="#BF6B6B" stroke-width="1.5" opacity="0.3" stroke-dasharray="3,2"/>
+      <path d="M 330 360 L 350 320" stroke="#8A6ABF" stroke-width="1.5" opacity="0.3" stroke-dasharray="3,2"/>
+      
+      <!-- Title -->
+      <text x="50" y="30" font-size="14" font-weight="bold" fill="#C9A84C" font-family="monospace">INTEGRATED IDENTITY FLOWER</text>
+      
+      <!-- Legend -->
+      <text x="50" y="460" font-size="8" fill="#9B9590" font-family="monospace">Outer rings: Role-specific strengths | Overlapping areas: Strength transfer</text>
+      <text x="50" y="472" font-size="8" fill="#9B9590" font-family="monospace">Center: Unified core identity binding all roles together</text>
+    </svg>
+    <div class="diagram-caption">통합된 정체성의 꽃잎 모델 — 5가지 역할이 중심의 핵심 자기 주위에서 서로 영향을 주고받으며, 각 역할의 강점이 다른 역할을 풍요롭게 하는 구조</div>
+  </div>
+</section>
+<section class="section">
+  <div class="section-header"><div class="section-icon section-icon--practice">⚡</div>
+    <div><div class="section-title">오늘 당장 할 수 있는 것</div><div class="section-subtitle">PRACTICAL APPLICATION GUIDE</div></div>
+  </div>
+  <div class="practice-grid"><div class="practice-card">
+      <div class="practice-time practice-time--30s">30초</div>
+      <div class="practice-title">5역할 강점 열거</div>
+      <div class="practice-body">엔지니어, 아빠, 남편, 학습자, 자기—각 역할의 가장 큰 강점을 한 단어씩 적으세요.</div>
+      <ul class="checklist">        <li>엔지니어: 정밀함? 집중력? 문제해결?</li>
+        <li>아빠: 인내? 기쁨? 창의성?</li>
+        <li>통찰: 당신을 가장 잘 표현하는 강점은?</li></ul>
+    </div>
+<div class="practice-card">
+      <div class="practice-time practice-time--5m">5분</div>
+      <div class="practice-title">강점 전이 지도</div>
+      <div class="practice-body">각 역할의 강점이 다른 역할에 어떻게 도움이 되는지 연결 지어 봅시다.</div>
+      <ul class="checklist">        <li>엔지니어의 (강점) → 아버지의 (구체적 도움)</li>
+        <li>학습자의 (강점) → 남편의 (구체적 도움)</li>
+        <li>모든 역할 위에 있는 INFP 자기의 역할은?</li></ul>
+    </div>
+<div class="practice-card">
+      <div class="practice-time practice-time--day">1일</div>
+      <div class="practice-title">통합 정체성 선언문 작성</div>
+      <div class="practice-body">"나는 ___ 한 사람이다"를 완성합니다. 이 문장이 모든 역할을 포함해야 합니다.</div>
+      <ul class="checklist">        <li>Day 19의 5개 핵심 가치를 다시 보세요</li>
+        <li>그 가치들의 공통 패턴은? (예: 세밀함, 깊이, 함께)</li>
+        <li>"나는 [공통 패턴]한 사람이다" 구성</li></ul>
+    </div></div>
+</section>
+<section class="section">
+  <div class="section-header"><div class="section-icon section-icon--reflect">🔮</div>
+    <div><div class="section-title">철학적 성찰</div><div class="section-subtitle">PHILOSOPHICAL REFLECTION</div></div>
+  </div>
+  <div class="reflection-box">
+    <div class="philosopher">
+      <div class="philosopher-avatar">🎭</div>
+      <div><div class="philosopher-name">윌리엄 제임스 (1842-1910)</div>
+      <div class="philosopher-text">"한 사람은 여러 개의 자기를 가질 수 있다. 다만 그 자기들이 일관된 목적으로 통합될 때 성격이 강해진다." 당신의 엔지니어 자기, 아버지 자기, 학습자 자기는 모두 실재하지만, 이들을 하나의 원칙으로 엮을 때 정말 강한 인격이 됩니다.</div></div>
+    </div>
+<div class="philosopher">
+      <div class="philosopher-avatar">🌱</div>
+      <div><div class="philosopher-name">칼 융 (1875-1961)</div>
+      <div class="philosopher-text">"개성화(Individuation)는 사회적 기대에서 벗어나 진정한 자기를 찾는 과정이다." 당신이 "엔지니어다운" 페르소나에서 벗어나, 감정도 있고 성장도 추구하는 진정한 자기로 통합되는 것이 심리적 성숙입니다.</div></div>
+    </div>
+    <div class="night-question">
+      <div class="night-question-label">🌙 오늘 자기 전에 물을 질문</div>
+      <div class="night-question-text">당신의 모든 역할(엔지니어, 아빠, 남편, 학습자, INFP)을 관통하는 하나의 원칙이 있다면, 그것은 무엇인가?</div>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="section-header"><div class="section-icon section-icon--quiz">✏️</div>
+    <div><div class="section-title">복습 퀴즈</div><div class="section-subtitle">RETRIEVAL PRACTICE</div></div>
+  </div>
+  <div class="quiz-card" id="q20_1">
+    <div class="quiz-num">QUIZ 1 / 2</div>
+    <div class="quiz-question">자기참조 네트워크(mPFC + PCC)가 중요한 이유는?</div>
+    <div class="quiz-options">      <div class="quiz-option" onclick="checkAnswer(this,'q20_1',false)">
+        <div class="quiz-option-marker">A</div><span>감정을 억제하는 데 도움이 된다</span></div>
+      <div class="quiz-option" onclick="checkAnswer(this,'q20_1',true)">
+        <div class="quiz-option-marker">B</div><span>당신이 어떤 역할을 하든 "자신"이라는 일관된 감각을 만든다</span></div>
+      <div class="quiz-option" onclick="checkAnswer(this,'q20_1',false)">
+        <div class="quiz-option-marker">C</div><span>뇌의 가장 큰 에너지를 소비하는 영역이다</span></div>
+      <div class="quiz-option" onclick="checkAnswer(this,'q20_1',false)">
+        <div class="quiz-option-marker">D</div><span>과거의 기억을 저장한다</span></div>
+</div>
+    <div class="quiz-explanation" id="q20_1-exp"><strong>정답: B</strong> — mPFC와 PCC는 "당신"이라는 통합된 감각을 유지합니다. 엔지니어로서의 자기, 아버지로서의 자기, 학습자로서의 자기를 모두 "나"로 인식하게 하는 신경 기반입니다.</div>
+  </div>
+<div class="quiz-card" id="q20_2">
+    <div class="quiz-num">QUIZ 2 / 2</div>
+    <div class="quiz-question">역할 풍요화(Role Enrichment)의 핵심은?</div>
+    <div class="quiz-options">      <div class="quiz-option" onclick="checkAnswer(this,'q20_2',false)">
+        <div class="quiz-option-marker">A</div><span>많은 역할을 가지면 스트레스가 감소한다</span></div>
+      <div class="quiz-option" onclick="checkAnswer(this,'q20_2',true)">
+        <div class="quiz-option-marker">B</div><span>한 역할의 강점이 다른 역할을 개선할 수 있다</span></div>
+      <div class="quiz-option" onclick="checkAnswer(this,'q20_2',false)">
+        <div class="quiz-option-marker">C</div><span>역할이 많을수록 더 성공한다</span></div>
+      <div class="quiz-option" onclick="checkAnswer(this,'q20_2',false)">
+        <div class="quiz-option-marker">D</div><span>모든 역할을 동등하게 시간을 나눠야 한다</span></div>
+</div>
+    <div class="quiz-explanation" id="q20_2-exp"><strong>정답: B</strong> — 역할 풍요화는 "엔지니어의 정밀함이 양육을 더 신중하게 만드는" 식의 긍정적 전이를 의미합니다. 역할 간 갈등이 아니라 상호 강화입니다.</div>
+  </div>
+  <div class="spaced-tracker">
+    <div class="spaced-tracker-title">📅 간격 반복 트래커 — DAY 20</div>
+    <div class="spaced-row"><div class="spaced-dot" onclick="this.classList.toggle('checked')"></div><span class="spaced-label">D+0</span><span>오늘 학습 완료</span></div>
+    <div class="spaced-row"><div class="spaced-dot" onclick="this.classList.toggle('checked')"></div><span class="spaced-label">D+1</span><span>내일 — 퀴즈 다시 풀기 (30초)</span></div>
+    <div class="spaced-row"><div class="spaced-dot" onclick="this.classList.toggle('checked')"></div><span class="spaced-label">D+3</span><span>3일 후 — 핵심 개념을 백지에 적기</span></div>
+    <div class="spaced-row"><div class="spaced-dot" onclick="this.classList.toggle('checked')"></div><span class="spaced-label">D+7</span><span>7일 후 — 누군가에게 설명하기</span></div>
+    <div class="spaced-row"><div class="spaced-dot" onclick="this.classList.toggle('checked')"></div><span class="spaced-label">D+14</span><span>14일 후 — 실전 적용 패턴 점검</span></div>
+  </div>
+</section>
+</div>
+<footer class="footer"><div class="container">
+  <div class="footer-text">인간 탐구 시리즈 — 총 22일 과정 · Day 20 of 22</div>
+  <div class="footer-nav">
+    <a href="day19_가치관_명료화.html">◀ Day 19: 가치관 명료화</a>
+    <a href="day21_결정의_철학.html">Day 21: 결정의 철학 ▶</a>
+  </div>
+</div></footer>
+<script>
+function checkAnswer(el, quizId, isCorrect) {
+  var card = document.getElementById(quizId);
+  if (card.dataset.answered) return;
+  card.dataset.answered = 'true';
+  var options = card.querySelectorAll('.quiz-option');
+  options.forEach(function(opt) { opt.style.cursor = 'default'; });
+  if (isCorrect) { el.classList.add('correct'); el.querySelector('.quiz-option-marker').textContent = '✓'; }
+  else { el.classList.add('wrong'); el.querySelector('.quiz-option-marker').textContent = '✗'; }
+  document.getElementById(quizId + '-exp').classList.add('show');
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var gauge = document.getElementById('progressGauge');
+  if (gauge) {
+    var day = parseInt(gauge.dataset.day || '1');
+    var total = 22;
+    var circumference = 2 * Math.PI * 35;
+    var offset = circumference * (1 - day / total);
+    setTimeout(function() { gauge.style.strokeDashoffset = offset; }, 300);
+  }
+});
+</script>
+</body>
+</html>

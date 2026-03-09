@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 01 | 나의 재정 목표 설정 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #9A9890;
+  --text-dim: #5A584F;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 01 / 23</span>
+    <span class="header-title">나의 재정 목표 설정</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 1 · 부자 마인드셋 & 자산 기초</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 1 — 부자 마인드셋 & 자산 기초</div>
+  <h1 class="hero-day">Day 01</h1>
+  <h2 class="hero-subtitle">나의 재정 목표 설정</h2>
+  <p class="hero-quote">"자산이란 내 주머니에 돈을 넣어주는 것. 부채는 내 주머니에서 돈을 꺼내가는 것." — 로버트 기요사키</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 1: 01~07</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:4.3%"></div></div>
+    <div class="progress-label"><span>Day 01</span><span>1 / 23 완료 (4.3%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 대차대조표 사고 (Balance Sheet Mindset)</h3>
+    <p>좌뇌 분석 모드: 복잡한 자산 데이터를 체계적으로 정리할 때는 작업기억의 부하를 줄이기 위해 '자산(좌) vs 부채(우)' 시각적 구분이 중요합니다. 엔지니어 특성상 이미 설계도(사양서) 사고에 익숙하므로, 개인 재무를 '가계 재무제표'로 재해석하면 빠르게 체화됩니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">0–5분</td><td>순자산 3.28억 대차대조표 구축</td><td>테이블 분석</td></tr>
+<tr><td class="time-col">5–10분</td><td>현금흐름 분석: 월 수입 vs 지출</td><td>수식 풀이</td></tr>
+<tr><td class="time-col">10–15분</td><td>FIRE number 목표 역산 (자산 목표)</td><td>시뮬레이션</td></tr>
+<tr><td class="time-col">15–22분</td><td>FIRE 달성까지의 저축률·기간 계산</td><td>계산 및 시각화</td></tr>
+<tr><td class="time-col">22–25분</td><td>복습 퀴즈 + 행동 아이템</td><td>능동적 회상</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">나의 재정 목표 설정</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">내 재정 상태의 X-Ray: 대차대조표</div>
+      <div class="card-body"><p>개인 재무는 기업 재무와 동일한 논리로 관리됩니다. 가계 대차대조표는 의사결정의 출발점입니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>자산 (Assets)</th><th style="text-align:right;">금액</th><th>부채 (Liabilities)</th><th style="text-align:right;">금액</th></tr></thead>
+<tbody>
+<tr><td style="font-weight:500;">주택</td><td>7억</td><td style="font-weight:500;">담보대출</td><td>4억</td></tr>
+<tr><td>주식 (반도체)</td><td>2,800만</td><td>신용카드/생활비대출</td><td>0</td></tr>
+<tr><td>현금/예금</td><td>약 5,000만</td><td></td><td></td></tr>
+<tr><td>자동차</td><td>약 2,000만</td><td></td><td></td></tr>
+<tr class="highlight-row"><td style="font-weight:600;">총 자산</td><td>약 7.98억</td><td style="font-weight:600;">총 부채</td><td>4억</td></tr>
+</tbody>
+</table>
+</div>
+<div class="formula-block">
+<div class="formula-blue">순자산 (Net Worth) 계산:</div>
+<div class="formula-line">  <span class="formula-highlight">순자산 = 총 자산 − 총 부채</span></div>
+<div class="formula-line">  순자산 = 7.98억 − 4억</div>
+<div class="formula-line">  순자산 = <span class="formula-highlight">3.98억 ≈ 3.28억 (보수 추정)</span></div>
+<br>
+<div class="formula-comment">// 현재 상태: 자산 우위, 유동성 충분</div>
+<div class="formula-comment">// 부채 비율 (LTV): 4억 ÷ 7억 = 57.1% (중간 수준)</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">현금흐름: 자산 증가의 엔진</div>
+      <div class="card-body"><p>대차대조표는 정적(snapshot)이고, 현금흐름은 동적입니다. 자산은 월별 현금흐름 누적으로 증가합니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>항목</th><th>월 금액</th><th>연 금액</th></tr></thead>
+<tbody>
+<tr><td style="font-weight:500;">월 가계 수입 (맞벌이)</td><td>약 1,000만</td><td>약 1.2억</td></tr>
+<tr><td style="color:var(--red);">생활비 지출</td><td>약 400만</td><td>약 4,800만</td></tr>
+<tr><td style="color:var(--red);">담보대출 원리금</td><td>약 150만</td><td>약 1,800만</td></tr>
+<tr><td style="color:var(--red);">세금/보험</td><td>약 150만</td><td>약 1,800만</td></tr>
+<tr class="highlight-row"><td style="font-weight:600;">월 저축 가능액</td><td><span class="formula-highlight">약 300만</span></td><td><span class="formula-highlight">약 3,600만</span></td></tr>
+</tbody>
+</table>
+</div>
+<div class="formula-block">
+<div class="formula-blue">저축률 계산:</div>
+<div class="formula-line">  <span class="formula-highlight">저축률 = 저축액 ÷ 수입 × 100%</span></div>
+<div class="formula-line">  저축률 = 300만 ÷ 1,000만 × 100%</div>
+<div class="formula-line">  저축률 = <span class="formula-highlight">30%</span></div>
+<br>
+<div class="formula-comment">// 30%는 중상 수준 (일반 직장인 평균: 15-20%)</div>
+<div class="formula-comment">// 이 현금흐름으로 FIRE 달성 시간 계산 가능</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">FIRE Number 역산: 목표 자산 설정</div>
+      <div class="card-body"><p>FIRE(Financial Independence, Retire Early)의 핵심은 '자산의 몇 %를 연간 인출할 수 있는가'입니다.</p>
+<div class="formula-block">
+<div class="formula-blue">4% Rule (역사적으로 검증됨):</div>
+<div class="formula-line">  자산에서 연간 인출 가능 금액 = 총 자산 × 4%</div>
+<br>
+<div class="formula-blue">목표 연 인출액으로 필요 자산 계산:</div>
+<div class="formula-line">  <span class="formula-highlight">필요 자산 = 목표 연 인출액 ÷ 4%</span></div>
+<br>
+<div class="formula-blue">예시:</div>
+<div class="formula-line">  목표: 연 4,800만 자유로운 수입 필요</div>
+<div class="formula-line">  필요 자산 = 4,800만 ÷ 4%</div>
+<div class="formula-line">           = 4,800만 ÷ 0.04</div>
+<div class="formula-line">           = <span class="formula-highlight">12억</span></div>
+<br>
+<div class="formula-comment">// 현재: 3.28억 → 목표: 12억 (약 3.66배 증가 필요)</div>
+<div class="formula-comment">// 저축 + 복리로 몇 년 소요될까? → 다음 Day에서 계산</div>
+</div></div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  <div class="chart-container">
+    <div class="chart-title">순자산 성장 로드맵: 3.28억 → 12억</div>
+    <svg viewBox="0 0 780 350" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+      <defs>
+        <linearGradient id="fire-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#C9A84C" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <!-- Y축 레이블 -->
+      <text x="38" y="38" fill="#5A584F" font-family="JetBrains Mono" font-size="10" text-anchor="end">12억</text>
+      <line x1="50" y1="35" x2="750" y2="35" stroke="#2A2D36" stroke-width="0.5" stroke-dasharray="4"/>
+      <text x="38" y="108" fill="#5A584F" font-family="JetBrains Mono" font-size="10" text-anchor="end">9억</text>
+      <line x1="50" y1="105" x2="750" y2="105" stroke="#2A2D36" stroke-width="0.5" stroke-dasharray="4"/>
+      <text x="38" y="178" fill="#5A584F" font-family="JetBrains Mono" font-size="10" text-anchor="end">6억</text>
+      <line x1="50" y1="175" x2="750" y2="175" stroke="#2A2D36" stroke-width="0.5" stroke-dasharray="4"/>
+      <text x="38" y="248" fill="#5A584F" font-family="JetBrains Mono" font-size="10" text-anchor="end">3억</text>
+      <line x1="50" y1="245" x2="750" y2="245" stroke="#2A2D36" stroke-width="0.5" stroke-dasharray="4"/>
+      <!-- X축 레이블 -->
+      <text x="50" y="320" fill="#5A584F" font-family="JetBrains Mono" font-size="10" text-anchor="middle">현재</text>
+      <text x="167" y="320" fill="#5A584F" font-family="JetBrains Mono" font-size="10" text-anchor="middle">5년</text>
+      <text x="283" y="320" fill="#5A584F" font-family="JetBrains Mono" font-size="10" text-anchor="middle">10년</text>
+      <text x="400" y="320" fill="#5A584F" font-family="JetBrains Mono" font-size="10" text-anchor="middle">15년</text>
+      <text x="517" y="320" fill="#5A584F" font-family="JetBrains Mono" font-size="10" text-anchor="middle">20년</text>
+      <text x="633" y="320" fill="#5A584F" font-family="JetBrains Mono" font-size="10" text-anchor="middle">25년</text>
+      <text x="750" y="320" fill="#5A584F" font-family="JetBrains Mono" font-size="10" text-anchor="middle">30년</text>
+      <!-- FIRE 목표선 -->
+      <line x1="50" y1="35" x2="750" y2="35" stroke="#C9A84C" stroke-width="1.5" stroke-dasharray="8,4"/>
+      <text x="755" y="38" fill="#C9A84C" font-family="JetBrains Mono" font-size="9">목표: 12억</text>
+      <!-- 현재값 -->
+      <circle cx="50" cy="245" r="5" fill="#E8E6E1" stroke="#C9A84C" stroke-width="2"/>
+      <text x="50" y="275" fill="#E8E6E1" font-family="JetBrains Mono" font-size="10" text-anchor="middle">3.28억</text>
+      <!-- 예상 곡선 (저축 + 복리 8%) -->
+      <path d="M50,245 Q200,200 283,155 T517,60 T750,35" fill="none" stroke="#C9A84C" stroke-width="2.5"/>
+      <text x="400" y="80" fill="#C9A84C" font-family="JetBrains Mono" font-size="9">저축 + 복리</text>
+    </svg>
+  </div>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  <details class="deep-dive">
+  <summary>LTV와 DSR: 대출 안전도 판단 기준</summary>
+  <div class="deep-dive-content">
+    <p><strong>LTV (Loan-to-Value, 담보인정비율):</strong> 주택 가격 대비 대출액의 비율입니다.</p>
+    <div class="formula-block" style="margin: 0.8rem 0;">
+      <div class="formula-line"><span class="formula-highlight">LTV = 대출액 ÷ 주택가격 × 100%</span></div>
+      <div class="formula-line">LTV = 4억 ÷ 7억 × 100% = <span class="formula-highlight">57.1%</span></div>
+      <div class="formula-comment">// 57% 수준은 금융기관이 선호하는 범위 (보통 60% 이하 권장)</div>
+    </div>
+    <p><strong>DSR (Debt Service Ratio, 원리금상환비율):</strong> 월 소득 대비 월 대출 원리금의 비율입니다.</p>
+    <div class="formula-block" style="margin: 0.8rem 0;">
+      <div class="formula-line"><span class="formula-highlight">DSR = 월 원리금 ÷ 월 수입 × 100%</span></div>
+      <div class="formula-line">DSR = 150만 ÷ 1,000만 × 100% = <span class="formula-highlight">15%</span></div>
+      <div class="formula-comment">// 15% 수준은 매우 건전함 (금융당국 기준: 40% 이하 권장, 서울은 35%)</div>
+    </div>
+    <p>현재 상태는 두 지표 모두 안전 범위이며, 추가 대출이나 자산 매입 여력이 충분합니다.</p>
+  </div>
+</details>
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  <div class="sim-box">
+    <h3>📊 FIRE 계산기 — 내 목표 설정</h3>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:end;margin-top:0.5rem;">
+      <div>
+        <label style="font-size:0.72rem;color:var(--text-dim);font-family:var(--font-mono);display:block;margin-bottom:0.3rem;">현재 순자산 (만원)</label>
+        <input type="number" id="current-asset" value="32800" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--gold);font-family:var(--font-mono);font-size:1rem;padding:0.5rem 0.8rem;border-radius:4px;width:150px;outline:none;" oninput="calcFIRE()">
+      </div>
+      <div>
+        <label style="font-size:0.72rem;color:var(--text-dim);font-family:var(--font-mono);display:block;margin-bottom:0.3rem;">목표 연 인출액 (만원)</label>
+        <input type="number" id="target-income" value="4800" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--blue);font-family:var(--font-mono);font-size:1rem;padding:0.5rem 0.8rem;border-radius:4px;width:150px;outline:none;" oninput="calcFIRE()">
+      </div>
+      <div id="fireResult" style="font-family:var(--font-mono);font-size:1rem;color:var(--gold);padding:0.5rem 1rem;background:var(--gold-dim);border-radius:4px;">
+        필요 자산: 12억
+      </div>
+    </div>
+    <div style="margin-top:0.8rem;font-size:0.8rem;color:var(--text-secondary);">
+      <p style="margin-bottom:0.3rem;"><strong>4% Rule:</strong> 연 인출액 = 총 자산 × 4%</p>
+      <p style="font-family:var(--font-mono);color:var(--text-dim);">필요 자산 = 목표 연 인출액 ÷ 0.04</p>
+    </div>
+  </div>
+  <div class="sim-box">
+    <h3>📋 오늘의 실행 체크리스트</h3>
+    <ul class="checklist">
+      <li><strong>가계 대차대조표 작성:</strong> 내 자산과 부채를 정확히 파악 (부동산 평가액 확인)</li>
+      <li><strong>월 현금흐름 추적:</strong> 지난 3개월 수입/지출 통계 수집 (카드/통장 내역)</li>
+      <li><strong>저축률 계산:</strong> 내 저축률이 현재 몇 %인지 확인 (목표: 30% 이상)</li>
+      <li><strong>FIRE 목표 수립:</strong> 연 얼마의 자유로운 수입이 필요한가? (4% Rule으로 역산)</li>
+    </ul>
+  </div>
+  <script>
+  function calcFIRE(){
+    const asset=parseFloat(document.getElementById('current-asset').value)||0;
+    const target=parseFloat(document.getElementById('target-income').value)||0;
+    const needed=target/0.04;
+    const mult=(needed/asset).toFixed(2);
+    document.getElementById('fireResult').innerHTML='필요 자산: '+(needed/10000).toFixed(2)+'억 <span style="font-size:0.8rem;color:var(--text-dim);margin-left:0.5rem;">(현재 대비 '+mult+'배)</span>';
+  }
+  calcFIRE();
+  </script>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    <div class="bias-name">기저율 무시 (Base Rate Fallacy)</div>
+    <p><span class="neuro-tag">뇌과학: 전두엽 약화</span> <span class="engineer-tag">엔지니어 특성: 과분석</span></p>
+    <p>과거 자신의 투자 경험(예: "반도체 주식이 작년에 50% 올랐다")에만 집중하고, 산업 평균 수익률(기저율)을 무시합니다. 통계적으로 드물게 발생하는 사건을 자신에게는 반드시 일어날 것처럼 판단합니다.</p>
+    <p><strong style="color:var(--blue);">투자에서의 위험:</strong> 특정 기업이 특별하다고 믿고 비중을 집중시킬 위험. 반도체 주식이 "평균 8%" 정도 수익이 나는 산업인데, 과거 한 해의 50% 상승을 기준으로 미래를 계획하는 실수.</p>
+    <p><strong style="color:var(--gold);">극복 규칙:</strong></p>
+    <ul style="margin: 0.5rem 0 0 1.2rem; font-size: 0.82rem; color: var(--text-secondary);">
+      <li>투자 전에 "이 업종의 역사적 평균 수익률은 몇 %인가?" 확인</li>
+      <li>개별 기업 대신 산업 평균(예: 반도체 ETF)으로 기저율 복원</li>
+      <li>수익률 시나리오: 낙관(15%), 현실(8%), 비관(3%) 각각 확률 할당</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 현재 순자산 3.28억에서 FIRE 목표 12억을 달성하려면 현재 자산의 몇 배가 필요한가?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 약 2배</li>
+<li onclick="checkAnswer(this,'q1',true)">② 약 3.66배</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 약 4.5배</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 약 5배</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>12억 ÷ 3.28억 = 3.66배. 복합 저축과 복리로 20년 내 달성 가능한 목표입니다.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 월 수입 1,000만원, 저축액 300만원일 때 저축률은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 20%</li>
+<li onclick="checkAnswer(this,'q2',false)">② 25%</li>
+<li onclick="checkAnswer(this,'q2',true)">③ 30%</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 35%</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ③</strong><br>저축률 = 300만 ÷ 1,000만 × 100% = 30%. 직장인 평균(15-20%)보다 높은 건전한 수준입니다.</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 01</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 08일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 10일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 14일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">03월 21일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 06일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn disabled">← 이전 Day 없음</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 01 / 23</span>
+  <a class="nav-btn" href="day02_compound_interest.html">Day 02 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

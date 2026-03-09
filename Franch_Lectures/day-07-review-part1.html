@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 07 — Part 1 종합 복습 (Days 01-06)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+
+/* ═══════════════════ RESET & BASE ═══════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-alt: #181C26;
+  --terracotta: #BF6A4A;
+  --gold: #C9A84C;
+  --text: #E8E4DF;
+  --text-dim: #8A8680;
+  --text-bright: #F5F2ED;
+  --accent-glow: rgba(191,106,74,0.15);
+  --gold-glow: rgba(201,168,76,0.12);
+  --border: #2A2D35;
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Noto Sans KR', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+}
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.75;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--terracotta); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ═══════════════════ STICKY HEADER ═══════════════════ */
+.sticky-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sticky-header .logo {
+  font-family: var(--font-heading);
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--terracotta);
+  letter-spacing: 0.05em;
+}
+.sticky-header .day-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--gold);
+  background: var(--gold-glow);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid rgba(201,168,76,0.25);
+}
+.sticky-header .series-info {
+  font-size: 0.7rem; color: var(--text-dim);
+}
+
+/* ═══════════════════ HERO SECTION ═══════════════════ */
+.hero {
+  text-align: center;
+  padding: 4rem 1.5rem 3rem;
+  background: linear-gradient(180deg, rgba(191,106,74,0.08) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+}
+.hero .overline {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 0.4rem;
+  line-height: 1.2;
+}
+.hero .subtitle {
+  font-size: 1rem; color: var(--text-dim);
+  margin-bottom: 2rem;
+}
+.hero-sentence {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+.hero-sentence::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--terracotta), var(--gold));
+}
+.hero-sentence .fr {
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.3rem;
+}
+.hero-sentence .ipa {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--gold);
+  font-style: italic;
+  margin-bottom: 0.4rem;
+}
+.hero-sentence .ko {
+  font-size: 1rem; color: var(--text-dim);
+}
+
+/* ═══════════════════ SECTION LAYOUT ═══════════════════ */
+.container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+section { padding: 3rem 0; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 1.8rem; font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 1.5rem;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+.card-alt { background: var(--bg-card-alt); }
+
+/* ═══════════════════ BRAIN SCIENCE BOX ═══════════════════ */
+.brain-box {
+  background: linear-gradient(135deg, rgba(191,106,74,0.08), rgba(201,168,76,0.06));
+  border: 1px solid rgba(191,106,74,0.2);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.brain-box h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.brain-box .strategy {
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--terracotta);
+}
+.brain-box .strategy strong { color: var(--gold); font-weight: 500; }
+.brain-box .strategy p { font-size: 0.9rem; color: var(--text-dim); margin-top: 0.2rem; }
+.tip-highlight { color: var(--terracotta); font-weight: 500; }
+.time-table {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(10,12,16,0.5);
+  border-radius: 8px;
+}
+.time-table .time { font-family: var(--font-mono); color: var(--gold); font-size: 0.8rem; }
+.time-table .task { color: var(--text); }
+
+/* ═══════════════════ 5-COLUMN TABLE ═══════════════════ */
+.expr-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.expr-table th {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 0.8rem 0.6rem;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+.expr-table td {
+  padding: 0.65rem 0.6rem;
+  border-bottom: 1px solid rgba(42,45,53,0.5);
+  font-size: 0.85rem;
+  vertical-align: top;
+}
+.expr-table tr:hover { background: rgba(191,106,74,0.04); }
+.expr-table .fr-word {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--terracotta);
+  font-size: 1rem;
+}
+.pronunciation {
+  font-family: var(--font-mono);
+  font-style: italic;
+  color: var(--gold);
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+.approx-ko {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+/* ═══════════════════ GRAMMAR SVG ═══════════════════ */
+.grammar-visual { margin: 1rem 0; border-radius: 12px; overflow: hidden; }
+.grammar-visual svg { width: 100%; height: auto; display: block; }
+.grammar-note {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  background: rgba(201,168,76,0.06);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+}
+.grammar-note strong { color: var(--gold); font-weight: 500; }
+
+/* ═══════════════════ DIALOGUE ═══════════════════ */
+.dialogue { margin: 1rem 0; }
+.dialogue-line {
+  display: flex; gap: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.6rem;
+}
+.speaker-a { background: rgba(191,106,74,0.06); border: 1px solid rgba(191,106,74,0.15); }
+.speaker-b { background: rgba(201,168,76,0.04); border: 1px solid rgba(201,168,76,0.1); }
+.speaker-name {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  min-width: 90px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+.dialogue-text { flex: 1; }
+.fr-line {
+  font-family: var(--font-heading);
+  font-size: 1.05rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.2rem;
+}
+.ko-line { font-size: 0.85rem; color: var(--text-dim); }
+
+/* ═══════════════════ PRONUNCIATION DRILL ═══════════════════ */
+.pron-drill { margin: 1rem 0; }
+.pron-item {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1.2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 0.8rem;
+}
+.pron-item .number {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--terracotta);
+  font-weight: 700;
+  min-width: 24px;
+}
+.pron-word {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--terracotta);
+  font-size: 1.1rem;
+  margin-bottom: 0.2rem;
+}
+.pron-ipa {
+  font-family: var(--font-mono);
+  font-style: italic;
+  color: var(--gold);
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+}
+.pron-tip { font-size: 0.88rem; color: var(--text-dim); line-height: 1.6; }
+
+/* ═══════════════════ QUIZ ═══════════════════ */
+.quiz-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+.quiz-block h4 {
+  font-family: var(--font-heading);
+  color: var(--terracotta);
+  font-size: 1.1rem;
+  margin-bottom: 0.8rem;
+}
+.quiz-block input[type="text"] {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  width: 200px;
+}
+.quiz-block button {
+  background: var(--terracotta);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  margin-left: 0.5rem;
+}
+.quiz-block button:hover { opacity: 0.85; }
+.quiz-result { margin-top: 0.5rem; font-size: 0.85rem; }
+.correct { color: #4CAF50; }
+.incorrect { color: #F44336; }
+
+/* ═══════════════════ TRACKER ═══════════════════ */
+.tracker { margin-top: 2rem; }
+.tracker h3 {
+  font-family: var(--font-heading);
+  color: var(--text-bright); font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+.tracker-grid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 6px;
+}
+.tracker-cell {
+  aspect-ratio: 1;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tracker-cell:hover { border-color: var(--terracotta); }
+.tracker-cell.active { background: var(--terracotta); border-color: var(--terracotta); color: white; }
+.tracker-cell.today { border-color: var(--gold); box-shadow: 0 0 8px var(--gold-glow); }
+.tracker-legend {
+  display: flex; gap: 1.5rem; margin-top: 1rem;
+  font-size: 0.75rem; color: var(--text-dim);
+}
+.tracker-legend span { display: flex; align-items: center; gap: 0.3rem; }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+.legend-dot.done { background: var(--terracotta); }
+.legend-dot.today-dot { border: 1px solid var(--gold); background: transparent; }
+
+/* ═══════════════════ FOOTER ═══════════════════ */
+footer {
+  text-align: center; padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem; color: var(--text-dim);
+}
+
+/* ═══════════════════ RESPONSIVE ═══════════════════ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero { padding: 3rem 1rem 2rem; }
+  .container { padding: 0 1rem; }
+  .card { padding: 1.2rem; }
+  .expr-table { font-size: 0.75rem; display: block; overflow-x: auto; }
+  .expr-table th, .expr-table td { padding: 0.5rem 0.4rem; }
+  .dialogue-line { flex-direction: column; gap: 0.3rem; }
+  .speaker-name { min-width: auto; }
+  .pron-item { flex-direction: column; gap: 0.5rem; }
+}
+
+/* ═══════════════════ SCROLLBAR ═══════════════════ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--terracotta); }
+
+/* ═══════════════════ SHADOWING SYSTEM ═══════════════════ */
+.shadow-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  background: rgba(191,106,74,0.15);
+  border: 1px solid rgba(191,106,74,0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.shadow-btn:hover { background: rgba(191,106,74,0.3); border-color: var(--terracotta); transform: scale(1.1); }
+.shadow-btn.playing { background: var(--terracotta); border-color: var(--terracotta); animation: pulse-glow 1.2s infinite; }
+.shadow-btn svg { width: 14px; height: 14px; fill: var(--terracotta); }
+.shadow-btn.playing svg { fill: #fff; }
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(191,106,74,0.4); }
+  50% { box-shadow: 0 0 12px 4px rgba(191,106,74,0.25); }
+}
+.shadowing-section {
+  background: linear-gradient(135deg, rgba(191,106,74,0.06), rgba(201,168,76,0.04));
+  border: 1px solid rgba(191,106,74,0.2);
+  border-radius: 14px; padding: 2rem; margin: 2rem 0;
+}
+.shadowing-section h3 {
+  font-family: var(--font-heading); font-size: 1.3rem; font-weight: 600;
+  color: var(--terracotta); margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.shadowing-section .desc { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+.shadow-controls { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.shadow-ctrl-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.6rem 1.2rem;
+  color: var(--text); font-family: var(--font-body);
+  font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+}
+.shadow-ctrl-btn:hover { border-color: var(--terracotta); background: rgba(191,106,74,0.1); }
+.shadow-ctrl-btn.active { background: var(--terracotta); border-color: var(--terracotta); color: #fff; }
+.shadow-ctrl-btn svg { width: 16px; height: 16px; fill: currentColor; }
+.shadow-speed { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-dim); }
+.shadow-speed input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  width: 100px; height: 4px; background: var(--border); border-radius: 2px; outline: none;
+}
+.shadow-speed input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; border-radius: 50%; background: var(--terracotta); cursor: pointer;
+}
+.shadow-item {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.6rem; transition: all 0.3s;
+}
+.shadow-item.active-phrase { border-color: var(--terracotta); background: rgba(191,106,74,0.08); box-shadow: 0 0 20px rgba(191,106,74,0.1); }
+.shadow-item.done-phrase { border-color: rgba(201,168,76,0.3); opacity: 0.7; }
+.shadow-item .num { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); min-width: 24px; }
+.shadow-item .phrase-text { flex: 1; }
+.shadow-item .phrase-fr { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 600; color: var(--terracotta); }
+.shadow-item .phrase-ipa { font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); font-style: italic; }
+.shadow-item .phrase-ko { font-size: 0.85rem; color: var(--text-dim); margin-top: 2px; }
+.shadow-progress { margin-top: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+.shadow-progress-bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.shadow-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--terracotta), var(--gold)); border-radius: 2px; transition: width 0.3s; }
+.shadow-progress-text { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); min-width: 40px; }
+.shadow-status { text-align: center; font-size: 0.85rem; color: var(--gold); margin-top: 0.5rem; min-height: 1.2em; }
+
+
+/* ════════════════════════════════ TABLE STYLING ════════════════════════════════ */
+.expression-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+}
+
+.expression-table thead {
+    background: rgba(191, 106, 74, 0.2);
+    border-bottom: 2px solid var(--terracotta);
+}
+
+.expression-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--terracotta);
+    border-right: 1px solid var(--border);
+    font-family: var(--font-heading);
+}
+
+.expression-table th:last-child {
+    border-right: none;
+}
+
+.expression-table td {
+    padding: 1rem;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.expression-table tr:hover {
+    background: rgba(201, 168, 76, 0.1);
+}
+
+.col-french { font-weight: 600; color: var(--text-bright); }
+.col-ipa { font-family: var(--font-mono); color: var(--gold); font-size: 0.9em; }
+.col-korean-approx { color: #9B8E7E; font-weight: 500; }
+.col-korean-meaning { color: #8EC9E8; font-style: italic; }
+.col-situation { color: var(--text-dim); font-size: 0.95em; }
+
+/* ════════════════════════════════ DIALOGUE STYLING ════════════════════════════════ */
+.dialogue-container {
+    background: var(--bg-card);
+    border-left: 4px solid var(--terracotta);
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    border-radius: 4px;
+}
+
+.dialogue-exchange {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.speaker-label {
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.speaker-label.you {
+    color: var(--terracotta);
+}
+
+.speaker-label.colleague {
+    color: var(--gold);
+}
+
+.dialogue-bubble {
+    padding: 1rem;
+    border-radius: 8px;
+    line-height: 1.8;
+}
+
+.you-bubble {
+    background: rgba(191, 106, 74, 0.1);
+    border-left: 3px solid var(--terracotta);
+}
+
+.colleague-bubble {
+    background: rgba(201, 168, 76, 0.1);
+    border-left: 3px solid var(--gold);
+}
+
+.ipa-small {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    margin: 0.5rem 0;
+}
+
+.korean-translation {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: #8EC9E8;
+    font-style: italic;
+    font-size: 0.95rem;
+}
+
+.dialogue-controls,
+.shadowing-controls {
+    display: flex;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
+}
+
+.btn-play-all,
+.btn-slow,
+.btn-segment,
+.btn-shadowing,
+.btn-repeat {
+    padding: 0.7rem 1.2rem;
+    background: rgba(191, 106, 74, 0.3);
+    border: 1px solid var(--terracotta);
+    color: var(--terracotta);
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-play-all:hover,
+.btn-slow:hover,
+.btn-segment:hover,
+.btn-shadowing:hover,
+.btn-repeat:hover {
+    background: rgba(191, 106, 74, 0.6);
+    color: #0A0C10;
+}
+
+/* ════════════════════════════════ DIALOGUE REVIEW BOX ════════════════════════════════ */
+.dialogue-review-box {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.dialogue-review-box h4 {
+    color: var(--gold);
+    margin-bottom: 1rem;
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+}
+
+.dialogue-review-box h5 {
+    color: var(--text-bright);
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.dialogue-review-box ul {
+    list-style: none;
+    margin-left: 0;
+}
+
+.dialogue-review-box li {
+    padding: 0.4rem 0;
+    color: var(--text);
+    margin-left: 1.5rem;
+}
+
+.dialogue-review-box li::before {
+    content: "→ ";
+    color: var(--terracotta);
+    font-weight: 700;
+    margin-left: -1.5rem;
+    margin-right: 0.5rem;
+}
+
+/* ════════════════════════════════ QUIZ STYLING ════════════════════════════════ */
+.quiz-container {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 4px;
+    margin: 1.5rem 0;
+}
+
+.quiz-question {
+    background: var(--bg-card-alt);
+    border-left: 4px solid var(--gold);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+}
+
+.question-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.q-number {
+    display: inline-block;
+    background: var(--gold);
+    color: #0A0C10;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 2rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.q-topic {
+    background: rgba(201, 168, 76, 0.2);
+    color: var(--gold);
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.q-text {
+    color: var(--text-bright);
+    font-weight: 500;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.option:hover {
+    background: rgba(191, 106, 74, 0.1);
+}
+
+.option input[type="radio"] {
+    margin-top: 0.3rem;
+    cursor: pointer;
+    accent-color: var(--terracotta);
+}
+
+.option-text {
+    color: var(--text);
+    flex: 1;
+}
+
+.answer-explanation {
+    background: rgba(201, 168, 76, 0.1);
+    border-left: 3px solid var(--gold);
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.quiz-controls {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.btn-submit-quiz,
+.btn-reset-quiz {
+    padding: 0.8rem 1.5rem;
+    background: var(--terracotta);
+    color: #0A0C10;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.btn-submit-quiz:hover,
+.btn-reset-quiz:hover {
+    background: rgba(191, 106, 74, 0.8);
+    color: var(--text-bright);
+}
+
+.quiz-score {
+    color: var(--gold);
+    font-weight: 700;
+    margin-left: auto;
+}
+
+/* ════════════════════════════════ GRAMMAR SVG STYLING ════════════════════════════════ */
+.grammar-svg {
+    width: 100%;
+    max-width: 1000px;
+    height: auto;
+    margin: 1.5rem 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem;
+}
+
+.svg-legend {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.svg-legend h4 {
+    color: var(--gold);
+    margin-bottom: 1rem;
+}
+
+.svg-legend ul {
+    list-style: none;
+    margin: 0;
+}
+
+.svg-legend li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    color: var(--text);
+}
+
+.legend-color {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+}
+
+/* ════════════════════════════════ PROGRESS ASSESSMENT STYLING ════════════════════════════════ */
+.progress-assessment {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 4px;
+}
+
+.assessment-item {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.assessment-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.assessment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.day-label {
+    font-weight: 600;
+    color: var(--text-bright);
+}
+
+.proficiency {
+    background: rgba(191, 106, 74, 0.2);
+    color: var(--terracotta);
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-card-alt);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.8rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--terracotta), var(--gold));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.assessment-notes {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+}
+
+.assessment-notes strong {
+    color: var(--text-bright);
+}
+
+.overall-assessment {
+    background: var(--bg-card-alt);
+    border: 2px solid var(--gold);
+    border-radius: 4px;
+    padding: 2rem;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.overall-assessment h4 {
+    color: var(--gold);
+    margin-bottom: 1rem;
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+}
+
+.overall-assessment p {
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+.assessment-score {
+    background: rgba(201, 168, 76, 0.1);
+    border-left: 3px solid var(--gold);
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+.score-badge {
+    background: var(--gold);
+    color: #0A0C10;
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+.next-level {
+    color: var(--terracotta);
+    font-weight: 700;
+}
+
+/* ════════════════════════════════ TABLE WRAPPER ════════════════════════════════ */
+.table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+    </style>
+</head>
+<body>
+
+<header class="sticky-header">
+    <div class="header-content">
+        <div class="logo">Day 07 — Part 1 종합 복습</div>
+        <div class="header-subtitle">프랑스어 완벽 마스터 | Days 01-06 통합 리뷰</div>
+    </div>
+    <div class="progress-indicator">
+        <span class="day-badge">Day 07</span>
+        <span class="time-estimate">⏱ 약 45분</span>
+    </div>
+</header>
+
+<main>
+    <section class="intro-section">
+        <h1 class="main-title">Part 1 종합 복습</h1>
+        <p class="main-subtitle">르노 코리아 자동차 현가 기술자를 위한 종합 프랑스어 복습</p>
+        
+        <div class="intro-content">
+            <p>
+                이 레슨은 <strong>Days 01-06</strong>의 모든 핵심 내용을 통합하여 복습하는 종합 리뷰입니다.
+            </p>
+            <ul class="intro-topics">
+                <li><strong>Day 01:</strong> 프랑스어 발음 규칙 및 IPA 표기법</li>
+                <li><strong>Day 02:</strong> 기본 인사말 및 시간대별 인사</li>
+                <li><strong>Day 03:</strong> 자기소개 (직업, 회사, 부서)</li>
+                <li><strong>Day 04:</strong> 자동차 기술 용어 (현가, 조향, 제동, 변속, 엔진)</li>
+                <li><strong>Day 05:</strong> 숫자, 단위, 기술 사양 표현</li>
+                <li><strong>Day 06:</strong> 공식적 이메일 표현 및 업무용 인사</li>
+            </ul>
+            <p>
+                <strong>목표:</strong> 르노 프랑스 본사의 동료들과 기술적 대화를 나눌 수 있는 기초 실력 확보
+            </p>
+        </div>
+    </section>
+
+
+            <section class="section-box">
+                <h2 class="section-title">복습: 핵심 표현 종합 테이블</h2>
+                <p class="section-subtitle">Days 01-06 최고의 표현들 (5-열 형식)</p>
+                <div class="table-wrapper">
+                    <table class="expression-table">
+                        <thead>
+                            <tr>
+                                <th>프랑스어</th>
+                                <th>IPA</th>
+                                <th>한국어 근사음</th>
+                                <th>한국어 뜻</th>
+                                <th>사용 상황</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">Bonjour</span></td>
+                                <td class="col-ipa"><code>/bɔ̃ʒuʁ/</code></td>
+                                <td class="col-korean-approx">봉주흐</td>
+                                <td class="col-korean-meaning">안녕하세요</td>
+                                <td class="col-situation">인사말 (공식)</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">Au revoir</span></td>
+                                <td class="col-ipa"><code>/o ʁəvwaʁ/</code></td>
+                                <td class="col-korean-approx">오 흐브와흐</td>
+                                <td class="col-korean-meaning">안녕히 가세요</td>
+                                <td class="col-situation">헤어질 때</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">Merci beaucoup</span></td>
+                                <td class="col-ipa"><code>/mɛʁsi boku/</code></td>
+                                <td class="col-korean-approx">메르시 보꾸</td>
+                                <td class="col-korean-meaning">정말 감사합니다</td>
+                                <td class="col-situation">감사 표현</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">S&#x27;il vous plaît</span></td>
+                                <td class="col-ipa"><code>/sil vu plɛ/</code></td>
+                                <td class="col-korean-approx">실 뷔 쁠레</td>
+                                <td class="col-korean-meaning">부탁합니다</td>
+                                <td class="col-situation">정중한 요청</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">la suspension</span></td>
+                                <td class="col-ipa"><code>/la syspasjɔ̃/</code></td>
+                                <td class="col-korean-approx">라 쉬쁘앙시옹</td>
+                                <td class="col-korean-meaning">현가장치</td>
+                                <td class="col-situation">기술 용어</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">la direction</span></td>
+                                <td class="col-ipa"><code>/la diʁɛksjɔ̃/</code></td>
+                                <td class="col-korean-approx">라 디렉시옹</td>
+                                <td class="col-korean-meaning">조향계</td>
+                                <td class="col-situation">기술 용어</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">le frein</span></td>
+                                <td class="col-ipa"><code>/lə fʁɛ̃/</code></td>
+                                <td class="col-korean-approx">르 프랭</td>
+                                <td class="col-korean-meaning">제동장치</td>
+                                <td class="col-situation">기술 용어</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">la transmission</span></td>
+                                <td class="col-ipa"><code>/la tʁansmisjo̯n/</code></td>
+                                <td class="col-korean-approx">라 트랑스미시옹</td>
+                                <td class="col-korean-meaning">변속기</td>
+                                <td class="col-situation">기술 용어</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">le moteur</span></td>
+                                <td class="col-ipa"><code>/lə motœʁ/</code></td>
+                                <td class="col-korean-approx">르 모뚜으</td>
+                                <td class="col-korean-meaning">엔진</td>
+                                <td class="col-situation">기술 용어</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">les pneus</span></td>
+                                <td class="col-ipa"><code>/le pnø/</code></td>
+                                <td class="col-korean-approx">레 프느</td>
+                                <td class="col-korean-meaning">타이어</td>
+                                <td class="col-situation">기술 용어</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">trois cent quarante-cinq</span></td>
+                                <td class="col-ipa"><code>/tʁwa sɑ̃ kaʁɑ̃t sɛ̃k/</code></td>
+                                <td class="col-korean-approx">뜨와 상 까랑트 생크</td>
+                                <td class="col-korean-meaning">345</td>
+                                <td class="col-situation">숫자</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">kilomètres</span></td>
+                                <td class="col-ipa"><code>/kilɔmɛtʁ/</code></td>
+                                <td class="col-korean-approx">킬로메뜨르</td>
+                                <td class="col-korean-meaning">킬로미터</td>
+                                <td class="col-situation">단위</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">kilogrammes</span></td>
+                                <td class="col-ipa"><code>/kilɔgʁam/</code></td>
+                                <td class="col-korean-approx">킬로그람</td>
+                                <td class="col-korean-meaning">킬로그램</td>
+                                <td class="col-situation">단위</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">Cordialement</span></td>
+                                <td class="col-ipa"><code>/kɔʁdjalmɑ̃/</code></td>
+                                <td class="col-korean-approx">꼬르디알망</td>
+                                <td class="col-korean-meaning">진심을 담아서</td>
+                                <td class="col-situation">이메일 종결</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">Meilleurs vœux</span></td>
+                                <td class="col-ipa"><code>/mɛjœʁ vø/</code></td>
+                                <td class="col-korean-approx">메유으 외</td>
+                                <td class="col-korean-meaning">최고의 바람</td>
+                                <td class="col-situation">이메일 축사</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">À bientôt</span></td>
+                                <td class="col-ipa"><code>/a bjɛ̃to/</code></td>
+                                <td class="col-korean-approx">아 비앙토</td>
+                                <td class="col-korean-meaning">곧 만나요</td>
+                                <td class="col-situation">이메일 종료</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">Je suis ingénieur</span></td>
+                                <td class="col-ipa"><code>/ʒə sɥi ɛ̃ʒenjœʁ/</code></td>
+                                <td class="col-korean-approx">쥐 쉬이 앙주니외르</td>
+                                <td class="col-korean-meaning">나는 기술자입니다</td>
+                                <td class="col-situation">자기 소개</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">Je travaille chez Renault</span></td>
+                                <td class="col-ipa"><code>/ʒə tʁavaj ʃe ʁəno/</code></td>
+                                <td class="col-korean-approx">쥐 뜨라바유 셰 르노</td>
+                                <td class="col-korean-meaning">나는 르노에서 일합니다</td>
+                                <td class="col-situation">회사 소개</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">Pouvez-vous m&#x27;aider?</span></td>
+                                <td class="col-ipa"><code>/puve vu mɛde/</code></td>
+                                <td class="col-korean-approx">뿌베 뷔 메데</td>
+                                <td class="col-korean-meaning">저를 도와주실 수 있나요?</td>
+                                <td class="col-situation">요청</td>
+                            </tr>
+                            <tr>
+                                <td class="col-french"><span class="fr-word">C&#x27;est urgent</span></td>
+                                <td class="col-ipa"><code>/sɛ tyʁʒɑ̃/</code></td>
+                                <td class="col-korean-approx">세 튀르장</td>
+                                <td class="col-korean-meaning">이것은 긴급합니다</td>
+                                <td class="col-situation">긴급성 표현</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="shadowing-controls">
+                    <button class="btn-shadowing" data-lang="fr-FR">🔊 프랑스어 섀도잉</button>
+                    <button class="btn-repeat" data-lang="fr-FR">⏮️ 반복 재생</button>
+                </div>
+            </section>
+
+            <section class="section-box">
+                <h2 class="section-title">확장 대화: 복습 시나리오</h2>
+                <p class="section-subtitle">Days 01-06의 어휘를 활용한 대화 (기술 회의 상황)</p>
+                
+                <div class="dialogue-container">
+                    <div class="dialogue-exchange">
+                        <div class="speaker-label you">Vous (Korean Engineer, 당신)</div>
+                        <div class="dialogue-bubble you-bubble">
+                            Bonjour, Marc. Je suis ingénieur de suspension chez Renault Korea.
+                            <span class="ipa-small">[bɔ̃ʒuʁ mark ʒə sɥi kim min ʒyn ɛ̃ʒenjœʁ də syspasjɔ̃ ʃe ʁəno korea]</span>
+                            <div class="korean-translation">안녕하세요, 마크. 저는 르노 코리아의 현가장치 기술자입니다.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="dialogue-exchange">
+                        <div class="speaker-label colleague">Collègue (French Colleague)</div>
+                        <div class="dialogue-bubble colleague-bubble">
+                            Enchanté, Min-jun. Je suis Marc Dubois, ingénieur de la direction.
+                            <span class="ipa-small">[ɑ̃ʃɑ̃te min ʒyn ʒə sɥi mark dybwa ɛ̃ʒenjœʁ də la diʁɛksjɔ̃]</span>
+                            <div class="korean-translation">반갑습니다. 저는 마크 두부아, 조향계 기술자입니다.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="dialogue-exchange">
+                        <div class="speaker-label you">Vous</div>
+                        <div class="dialogue-bubble you-bubble">
+                            Merci beaucoup de votre accueil. Pouvez-vous m'expliquer les spécifications des freins?
+                            <span class="ipa-small">[mɛʁsi boku də votʁ akœj puve vu mɛksplique les spesifikasjɔ̃ de fʁɛ̃]</span>
+                            <div class="korean-translation">따뜻한 환영 감사합니다. 제동장치의 사양을 설명해 주실 수 있나요?</div>
+                        </div>
+                    </div>
+                    
+                    <div class="dialogue-exchange">
+                        <div class="speaker-label colleague">Collègue</div>
+                        <div class="dialogue-bubble colleague-bubble">
+                            Bien sûr. Les freins doivent supporter trois cent quarante-cinq kilogrammes. 
+                            C'est très important pour la sécurité.
+                            <span class="ipa-small">[bjɛ̃ syʁ le fʁɛ̃ duv sypɔʁte tʁwa sɑ̃ kaʁɑ̃t sɛ̃k kiloɡʁam]</span>
+                            <div class="korean-translation">물론입니다. 제동장치는 345킬로그램을 견뎌야 합니다. 안전을 위해 매우 중요합니다.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="dialogue-exchange">
+                        <div class="speaker-label you">Vous</div>
+                        <div class="dialogue-bubble you-bubble">
+                            Et les pneus? Quelle est la pression recommandée en kilomètres par seconde?
+                            <span class="ipa-small">[e le pnø kɛl ɛ la pʁɛsjɔ̃ ʁɛkɔmɑ̃de ɑ̃ kilomɛtʁ paʁ səɡɔ̃d]</span>
+                            <div class="korean-translation">타이어는요? 초당 몇 킬로미터의 권장 압력은?</div>
+                        </div>
+                    </div>
+                    
+                    <div class="dialogue-exchange">
+                        <div class="speaker-label colleague">Collègue</div>
+                        <div class="dialogue-bubble colleague-bubble">
+                            C'est urgent! La transmission et le moteur doivent être synchronisés parfaitement.
+                            <span class="ipa-small">[sɛ tyʁʒɑ̃ la tʁansmisjo̯n e lə motœʁ duv ɛtʁ sɛ̃kʁɔnize paʁfɛtmɑ̃]</span>
+                            <div class="korean-translation">이것은 긴급합니다! 변속기와 엔진이 완벽하게 동기화되어야 합니다.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="dialogue-exchange">
+                        <div class="speaker-label you">Vous</div>
+                        <div class="dialogue-bubble you-bubble">
+                            D'accord. Je vais préparer un rapport complet. À bientôt?
+                            <span class="ipa-small">[dakɔʁ ʒə ve pʁepaʁe ɛ̃ ʁapoʁ kɔ̃plɛ a bjɛ̃to]</span>
+                            <div class="korean-translation">알겠습니다. 전체 보고서를 작성하겠습니다. 곧 만나요?</div>
+                        </div>
+                    </div>
+                    
+                    <div class="dialogue-exchange">
+                        <div class="speaker-label colleague">Collègue</div>
+                        <div class="dialogue-bubble colleague-bubble">
+                            Oui. Cordialement, et meilleurs vœux pour votre projet!
+                            <span class="ipa-small">[wi kɔʁdjalmɑ̃ e mɛjœʁ vø puʁ votʁ pʁoʒɛ]</span>
+                            <div class="korean-translation">네. 진심을 담아, 귀사의 프로젝트에 최고의 바람을 드립니다!</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dialogue-controls">
+                    <h4>대화 재생 옵션</h4>
+                    <div class="control-buttons">
+                        <button class="btn-play-all" data-lang="fr-FR">▶️ 전체 재생</button>
+                        <button class="btn-slow" data-lang="fr-FR">🐢 천천히 재생</button>
+                        <button class="btn-segment" data-segment="you">당신의 대사만</button>
+                        <button class="btn-segment" data-segment="colleague">동료의 대사만</button>
+                    </div>
+                </div>
+                
+                <div class="dialogue-review-box">
+                    <h4>대화 검토 박스</h4>
+                    <div class="review-content">
+                        <h5>핵심 문법 포인트:</h5>
+                        <ul>
+                            <li><strong>Être + 직업:</strong> "Je suis ingénieur" (나는 기술자다)</li>
+                            <li><strong>정관사 + 명사:</strong> "la suspension" (f), "le moteur" (m), "les pneus" (pl)</li>
+                            <li><strong>숫자 + 단위:</strong> "345 kilogrammes", "100 kilomètres"</li>
+                            <li><strong>공식적 표현:</strong> "Pouvez-vous..." (공식 당신), "Cordialement" (이메일 종료)</li>
+                            <li><strong>기술 용어:</strong> suspension, direction, frein, transmission, moteur, pneus</li>
+                        </ul>
+                        <h5>발음 팁:</h5>
+                        <ul>
+                            <li>/ʁ/ (R음) → 흐 (한국어 '흐' 음)</li>
+                            <li>/ɔ̃/ (코의 O) → 옹</li>
+                            <li>/ʒ/ (부드러운 J) → 쥐</li>
+                            <li>연음: "les pneus" = "레 프느" (s는 발음 안 함)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-box">
+                <h2 class="section-title">종합 복습 퀴즈</h2>
+                <p class="section-subtitle">Days 01-06 전체 내용을 복습하는 5개 이상의 문제</p>
+                
+                <div class="quiz-container">
+                    <!-- Question 1: Pronunciation -->
+                    <div class="quiz-question">
+                        <div class="question-header">
+                            <span class="q-number">Q1</span>
+                            <span class="q-topic">[Day 01: 발음]</span>
+                        </div>
+                        <div class="q-text">
+                            다음 프랑스어 단어의 올바른 IPA 표기는?<br>
+                            <strong>"Renault"</strong>
+                        </div>
+                        <div class="quiz-options">
+                            <label class="option">
+                                <input type="radio" name="q1" value="a">
+                                <span class="option-text">A) /ʁəno/</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q1" value="b">
+                                <span class="option-text">B) /ʁənault/</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q1" value="c">
+                                <span class="option-text">C) /ʁɛnault/</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q1" value="d">
+                                <span class="option-text">D) /renault/</span>
+                            </label>
+                        </div>
+                        <div class="answer-explanation" id="exp-q1" style="display:none;">
+                            정답: A) /ʁəno/<br>
+                            "Renault"는 "르노"로 발음되며, /ʁ/는 프랑스식 R음(흐), /ə/는 [ə] 음입니다.
+                        </div>
+                    </div>
+                    
+                    <!-- Question 2: Greetings -->
+                    <div class="quiz-question">
+                        <div class="question-header">
+                            <span class="q-number">Q2</span>
+                            <span class="q-topic">[Day 02: 인사말]</span>
+                        </div>
+                        <div class="q-text">
+                            직장 동료와 아침에 만났을 때 가장 적절한 인사는?
+                        </div>
+                        <div class="quiz-options">
+                            <label class="option">
+                                <input type="radio" name="q2" value="a">
+                                <span class="option-text">A) Bonsoir!</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q2" value="b">
+                                <span class="option-text">B) Bonjour!</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q2" value="c">
+                                <span class="option-text">C) Bonne nuit!</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q2" value="d">
+                                <span class="option-text">D) Au revoir!</span>
+                            </label>
+                        </div>
+                        <div class="answer-explanation" id="exp-q2" style="display:none;">
+                            정답: B) Bonjour!<br>
+                            "Bonjour"는 아침부터 저녁 초반까지 사용하는 일반적인 인사입니다.
+                        </div>
+                    </div>
+                    
+                    <!-- Question 3: Technical vocabulary (Jobs) -->
+                    <div class="quiz-question">
+                        <div class="question-header">
+                            <span class="q-number">Q3</span>
+                            <span class="q-topic">[Day 03: 자기소개 + 기술]</span>
+                        </div>
+                        <div class="q-text">
+                            다음 중 기술자를 나타내는 프랑스어 단어는?
+                        </div>
+                        <div class="quiz-options">
+                            <label class="option">
+                                <input type="radio" name="q3" value="a">
+                                <span class="option-text">A) professeur</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q3" value="b">
+                                <span class="option-text">B) ingénieur</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q3" value="c">
+                                <span class="option-text">C) docteur</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q3" value="d">
+                                <span class="option-text">D) musicien</span>
+                            </label>
+                        </div>
+                        <div class="answer-explanation" id="exp-q3" style="display:none;">
+                            정답: B) ingénieur<br>
+                            "ingénieur"는 기술자/엔지니어를 의미하며, 자동차 산업에서 자주 사용됩니다.
+                        </div>
+                    </div>
+                    
+                    <!-- Question 4: Suspension vocabulary -->
+                    <div class="quiz-question">
+                        <div class="question-header">
+                            <span class="q-number">Q4</span>
+                            <span class="q-topic">[Day 04: 기술 용어]</span>
+                        </div>
+                        <div class="q-text">
+                            다음 중 "타이어"를 의미하는 프랑스어는?
+                        </div>
+                        <div class="quiz-options">
+                            <label class="option">
+                                <input type="radio" name="q4" value="a">
+                                <span class="option-text">A) la suspension</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q4" value="b">
+                                <span class="option-text">B) les pneus</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q4" value="c">
+                                <span class="option-text">C) le moteur</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q4" value="d">
+                                <span class="option-text">D) la transmission</span>
+                            </label>
+                        </div>
+                        <div class="answer-explanation" id="exp-q4" style="display:none;">
+                            정답: B) les pneus<br>
+                            "pneus"는 타이어를 의미하며, 복수형입니다. 정관사는 "les"입니다.
+                        </div>
+                    </div>
+                    
+                    <!-- Question 5: Numbers and units -->
+                    <div class="quiz-question">
+                        <div class="question-header">
+                            <span class="q-number">Q5</span>
+                            <span class="q-topic">[Day 05: 숫자 및 단위]</span>
+                        </div>
+                        <div class="q-text">
+                            "345 kilogrammes"를 프랑스어로 올바르게 읽으면?
+                        </div>
+                        <div class="quiz-options">
+                            <label class="option">
+                                <input type="radio" name="q5" value="a">
+                                <span class="option-text">A) trois cent quarante-cinq kilogrammes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q5" value="b">
+                                <span class="option-text">B) trois cents quarante-cinq kilogrammes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q5" value="c">
+                                <span class="option-text">C) treize cents quarante-cinq kilogrammes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q5" value="d">
+                                <span class="option-text">D) trois cent quatre-vingt-cinq kilogrammes</span>
+                            </label>
+                        </div>
+                        <div class="answer-explanation" id="exp-q5" style="display:none;">
+                            정답: A) trois cent quarante-cinq kilogrammes<br>
+                            "cent"은 다음에 다른 숫자가 오면 복수형 "cents"가 아닌 "cent"입니다.
+                        </div>
+                    </div>
+                    
+                    <!-- Question 6: Email expressions -->
+                    <div class="quiz-question">
+                        <div class="question-header">
+                            <span class="q-number">Q6</span>
+                            <span class="q-topic">[Day 06: 이메일 표현]</span>
+                        </div>
+                        <div class="q-text">
+                            이메일을 마칠 때 가장 적절한 공식적 인사는?
+                        </div>
+                        <div class="quiz-options">
+                            <label class="option">
+                                <input type="radio" name="q6" value="a">
+                                <span class="option-text">A) À bientôt!</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q6" value="b">
+                                <span class="option-text">B) Cordialement</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q6" value="c">
+                                <span class="option-text">C) Coucou!</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q6" value="d">
+                                <span class="option-text">D) Bisous!</span>
+                            </label>
+                        </div>
+                        <div class="answer-explanation" id="exp-q6" style="display:none;">
+                            정답: B) Cordialement<br>
+                            "Cordialement"는 프로페셔널한 이메일 마무리 인사로 가장 널리 사용됩니다.
+                        </div>
+                    </div>
+                    
+                    <!-- Question 7: Grammar review -->
+                    <div class="quiz-question">
+                        <div class="question-header">
+                            <span class="q-number">Q7</span>
+                            <span class="q-topic">[Days 01-06: 문법 복습]</span>
+                        </div>
+                        <div class="q-text">
+                            빈칸을 채우세요:<br>
+                            "Je suis _______ suspension chez Renault Korea."
+                        </div>
+                        <div class="quiz-options">
+                            <label class="option">
+                                <input type="radio" name="q7" value="a">
+                                <span class="option-text">A) ingénieur de la</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q7" value="b">
+                                <span class="option-text">B) ingénieur de</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q7" value="c">
+                                <span class="option-text">C) un ingénieur de la</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q7" value="d">
+                                <span class="option-text">D) l'ingénieur de la</span>
+                            </label>
+                        </div>
+                        <div class="answer-explanation" id="exp-q7" style="display:none;">
+                            정답: A) ingénieur de la<br>
+                            직업 앞에는 관사가 없으므로 "Je suis ingénieur..." + "de la suspension" (정관사 + 여성명사)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quiz-controls">
+                    <button class="btn-submit-quiz">✓ 정답 확인</button>
+                    <button class="btn-reset-quiz">↻ 초기화</button>
+                    <div class="quiz-score" id="quiz-score" style="display:none;">
+                        당신의 점수: <span class="score-value">0</span>/7
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-box">
+                <h2 class="section-title">문법 시각화: 핵심 개념도</h2>
+                <p class="section-subtitle">Days 01-06 핵심 문법 구조</p>
+                
+                <svg class="grammar-svg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Title -->
+                    <text x="500" y="30" text-anchor="middle" font-size="24" font-weight="bold" fill="#BF6A4A">
+                        프랑스어 기본 문법 구조
+                    </text>
+                    
+                    <!-- Center circle: Subject -->
+                    <circle cx="500" cy="250" r="40" fill="#BF6A4A" opacity="0.8"/>
+                    <text x="500" y="255" text-anchor="middle" font-size="14" font-weight="bold" fill="white">
+                        Je
+                    </text>
+                    
+                    <!-- Left branch: Être + Job -->
+                    <line x1="460" y1="250" x2="250" y2="150" stroke="#C9A84C" stroke-width="2"/>
+                    <rect x="150" y="130" width="150" height="40" fill="#C9A84C" opacity="0.2" rx="5"/>
+                    <text x="227" y="155" text-anchor="middle" font-size="12" fill="#C9A84C" font-weight="bold">
+                        suis ingénieur
+                    </text>
+                    <text x="227" y="175" text-anchor="middle" font-size="10" fill="#8A8680">
+                        (be + job, no article)
+                    </text>
+                    
+                    <!-- Right branch: Work location -->
+                    <line x1="540" y1="250" x2="750" y2="150" stroke="#BF6A4A" stroke-width="2"/>
+                    <rect x="680" y="130" width="140" height="40" fill="#BF6A4A" opacity="0.2" rx="5"/>
+                    <text x="750" y="155" text-anchor="middle" font-size="12" fill="#BF6A4A" font-weight="bold">
+                        travaille chez
+                    </text>
+                    <text x="750" y="175" text-anchor="middle" font-size="10" fill="#8A8680">
+                        Renault Korea
+                    </text>
+                    
+                    <!-- Bottom left: Article + Noun -->
+                    <line x1="480" y1="290" x2="350" y2="380" stroke="#6B8E99" stroke-width="2"/>
+                    <rect x="250" y="360" width="200" height="40" fill="#6B8E99" opacity="0.2" rx="5"/>
+                    <text x="350" y="385" text-anchor="middle" font-size="12" fill="#6B8E99" font-weight="bold">
+                        la suspension / le moteur
+                    </text>
+                    <text x="350" y="405" text-anchor="middle" font-size="10" fill="#8A8680">
+                        (definite articles: gender agreement)
+                    </text>
+                    
+                    <!-- Bottom center: Numbers + Units -->
+                    <line x1="500" y1="290" x2="500" y2="360" stroke="#9B7E4A" stroke-width="2"/>
+                    <rect x="420" y="360" width="160" height="40" fill="#9B7E4A" opacity="0.2" rx="5"/>
+                    <text x="500" y="385" text-anchor="middle" font-size="12" fill="#9B7E4A" font-weight="bold">
+                        345 kilogrammes
+                    </text>
+                    <text x="500" y="405" text-anchor="middle" font-size="10" fill="#8A8680">
+                        (number + unit agreement)
+                    </text>
+                    
+                    <!-- Bottom right: Formal expressions -->
+                    <line x1="520" y1="290" x2="650" y2="380" stroke="#7B6F9E" stroke-width="2"/>
+                    <rect x="580" y="360" width="140" height="40" fill="#7B6F9E" opacity="0.2" rx="5"/>
+                    <text x="650" y="385" text-anchor="middle" font-size="12" fill="#7B6F9E" font-weight="bold">
+                        Cordialement,
+                    </text>
+                    <text x="650" y="405" text-anchor="middle" font-size="10" fill="#8A8680">
+                        (email formality)
+                    </text>
+                </svg>
+                
+                <div class="svg-legend">
+                    <h4>범례 (Legend)</h4>
+                    <ul>
+                        <li><span class="legend-color" style="background:#BF6A4A;"></span> 주제어 및 동사 (Subject + Verb)</li>
+                        <li><span class="legend-color" style="background:#C9A84C;"></span> 직업 표현 (Job Expressions)</li>
+                        <li><span class="legend-color" style="background:#6B8E99;"></span> 정관사 + 명사 (Article + Noun)</li>
+                        <li><span class="legend-color" style="background:#9B7E4A;"></span> 숫자 + 단위 (Numbers + Units)</li>
+                        <li><span class="legend-color" style="background:#7B6F9E;"></span> 공식 표현 (Formal Expressions)</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <section class="section-box">
+                <h2 class="section-title">학습 진도 평가</h2>
+                <p class="section-subtitle">Day 01-06 종합 복습 완료도</p>
+                
+                <div class="progress-assessment">
+                    <div class="assessment-item">
+                        <div class="assessment-header">
+                            <span class="day-label">Day 01: 발음 규칙</span>
+                            <span class="proficiency">초급 → 중급</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%;"></div>
+                        </div>
+                        <div class="assessment-notes">
+                            <strong>습득 내용:</strong> 프랑스어 발음 규칙, IPA 표기, 한국어 근사음 (흐, 쥐, 우아 등)
+                        </div>
+                    </div>
+                    
+                    <div class="assessment-item">
+                        <div class="assessment-header">
+                            <span class="day-label">Day 02: 인사말</span>
+                            <span class="proficiency">초급 → 중급</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%;"></div>
+                        </div>
+                        <div class="assessment-notes">
+                            <strong>습득 내용:</strong> 공식/비공식 인사, 시간대별 인사 (Bonjour, Bonsoir, Au revoir)
+                        </div>
+                    </div>
+                    
+                    <div class="assessment-item">
+                        <div class="assessment-header">
+                            <span class="day-label">Day 03: 자기소개 및 직업</span>
+                            <span class="proficiency">초급 → 중급</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%;"></div>
+                        </div>
+                        <div class="assessment-notes">
+                            <strong>습득 내용:</strong> "Je suis..." 구문, 직업 표현, 회사명 소개
+                        </div>
+                    </div>
+                    
+                    <div class="assessment-item">
+                        <div class="assessment-header">
+                            <span class="day-label">Day 04: 기술 용어 (현가/조향/제동/변속/엔진)</span>
+                            <span class="proficiency">초급 → 중급</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 70%;"></div>
+                        </div>
+                        <div class="assessment-notes">
+                            <strong>습득 내용:</strong> 기술 부품명, 정관사 (le/la/les), 복수형 일치
+                        </div>
+                    </div>
+                    
+                    <div class="assessment-item">
+                        <div class="assessment-header">
+                            <span class="day-label">Day 05: 숫자 및 단위</span>
+                            <span class="proficiency">초급 → 중급</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%;"></div>
+                        </div>
+                        <div class="assessment-notes">
+                            <strong>습득 내용:</strong> 숫자 읽기, 단위 표현 (km, kg, etc.), 기술 사양 표현
+                        </div>
+                    </div>
+                    
+                    <div class="assessment-item">
+                        <div class="assessment-header">
+                            <span class="day-label">Day 06: 이메일 표현</span>
+                            <span class="proficiency">초급 → 중급</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%;"></div>
+                        </div>
+                        <div class="assessment-notes">
+                            <strong>습득 내용:</strong> 공식적 이메일 인사, 종료 표현, 업무용 이메일 작성법
+                        </div>
+                    </div>
+                    
+                    <div class="overall-assessment">
+                        <h4>종합 평가</h4>
+                        <p>당신은 <strong>Days 01-06의 핵심 내용</strong>을 성공적으로 습득했습니다!</p>
+                        <p class="assessment-score">
+                            현재 수준: <span class="score-badge">초급-중급 경계</span><br>
+                            권장 다음 단계: <span class="next-level">Day 08 — 회의 표현 및 기술 설명</span>
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+    <section class="section-box footer-section">
+        <h2>다음 단계</h2>
+        <p>
+            이 종합 복습을 완료하셨다면, <strong>Day 08 (회의 표현 및 기술 설명)</strong으로 진행하실 준비가 완료되었습니다!
+        </p>
+        <p style="margin-top: 1rem; color: var(--text-dim);">
+            <em>프랑스어는 꾸준한 연습과 반복을 통해 완성됩니다. 매일 섀도잉과 발음 연습을 계속하세요!</em>
+        </p>
+    </section>
+
+</main>
+
+<script>
+
+// ═══════════════════ QUIZ LOGIC ═══════════════════
+function checkQuiz(n) {
+  const input = document.getElementById('q' + n).value.trim().toLowerCase();
+  const result = document.getElementById('r' + n);
+  if (n === 1) {
+    if (input === 'careful' || input.includes('careful')) {
+      result.innerHTML = '<span class="correct">&#10004; 정답! C, R, F, L &mdash; CaReFuL 법칙입니다.</span>';
+    } else {
+      result.innerHTML = '<span class="incorrect">&#10008; 다시 생각해보세요. C, R, F, L의 첫 글자를 모으면?</span>';
+    }
+  } else if (n === 2) {
+    if ((input.includes('2') || input.includes('두')) && (input.includes('ɑ̃') || input.includes('ɔ̃') || input.includes('앙') || input.includes('옹'))) {
+      result.innerHTML = '<span class="correct">&#10004; 정답! 2개 &mdash; /ɑ̃/(an 부분)과 /ɔ̃/(on 부분)입니다.</span>';
+    } else {
+      result.innerHTML = '<span class="incorrect">&#10008; sus-p<strong>an</strong>-si-<strong>on</strong> &mdash; /ɑ̃/과 /ɔ̃/ 2개의 비모음이 포함되어 있습니다.</span>';
+    }
+  }
+}
+
+// ═══════════════════ TRACKER LOGIC ═══════════════════
+(function() {
+  const grid = document.getElementById('trackerGrid');
+  const storageKey = 'fr-eng-tracker';
+  let data = {};
+  try { data = JSON.parse(localStorage.getItem(storageKey)) || {}; } catch(e) {}
+  for (let i = 1; i <= 26; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'tracker-cell';
+    if (i === 1) cell.classList.add('today');
+    if (data['day' + i]) cell.classList.add('active');
+    cell.textContent = i < 10 ? '0' + i : i;
+    cell.addEventListener('click', function() {
+      this.classList.toggle('active');
+      data['day' + i] = this.classList.contains('active');
+      localStorage.setItem(storageKey, JSON.stringify(data));
+    });
+    grid.appendChild(cell);
+  }
+})();
+
+// ═══════════════════ SHADOWING ENGINE ═══════════════════
+(function(){
+  const PLAY_SVG = '<svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>';
+  const PAUSE_SVG = '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>';
+  const STOP_SVG = '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>';
+  const SPEAKER_SVG = '<svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>';
+
+  let currentUtterance = null;
+  let currentBtn = null;
+
+  // ─── French Voice Engine ───
+  let selectedFrVoice = null;
+  const PREFERRED_VOICES = [
+    'Thomas', 'Amelie', 'Amélie', 'Audrey', 'Aurélie', 'Marie',
+    'Google français', 'Google French',
+    'Microsoft Paul', 'Microsoft Hortense', 'Microsoft Julie',
+    'Virginie', 'Siri', 'Chloe', 'Chloé', 'Léa', 'Nicolas'
+  ];
+
+  function getAllFrenchVoices() {
+    return window.speechSynthesis.getVoices().filter(function(v) {
+      return v.lang === 'fr-FR' || v.lang === 'fr_FR' || v.lang === 'fr';
+    });
+  }
+
+  function initFrenchVoice() {
+    var frVoices = getAllFrenchVoices();
+    if (frVoices.length === 0) {
+      var anyFr = window.speechSynthesis.getVoices().filter(function(v) { return v.lang.startsWith('fr'); });
+      if (anyFr.length > 0) selectedFrVoice = anyFr[0];
+      return;
+    }
+    for (var i = 0; i < PREFERRED_VOICES.length; i++) {
+      var pref = PREFERRED_VOICES[i];
+      var match = frVoices.find(function(v) { return v.name.includes(pref); });
+      if (match) { selectedFrVoice = match; break; }
+    }
+    if (!selectedFrVoice) selectedFrVoice = frVoices[0];
+    console.log('[Shadowing] Using French voice:', selectedFrVoice?.name, selectedFrVoice?.lang);
+  }
+
+  function getFrenchVoice() {
+    if (!selectedFrVoice) initFrenchVoice();
+    return selectedFrVoice;
+  }
+
+  function speakFr(text, btn, rate) {
+    window.speechSynthesis.cancel();
+    if (currentBtn) currentBtn.classList.remove('playing');
+    var cleanText = text.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    if (!cleanText) return;
+    var utter = new SpeechSynthesisUtterance(cleanText);
+    utter.lang = 'fr-FR';
+    utter.rate = rate || parseFloat(document.getElementById('shadowSpeed')?.value || '0.8');
+    utter.pitch = 1.0;
+    var voice = getFrenchVoice();
+    if (voice) utter.voice = voice;
+    if (btn) { btn.classList.add('playing'); currentBtn = btn; }
+    utter.onend = function() { if (btn) btn.classList.remove('playing'); currentBtn = null; };
+    utter.onerror = function() { if (btn) btn.classList.remove('playing'); currentBtn = null; };
+    currentUtterance = utter;
+    window.speechSynthesis.speak(utter);
+  }
+  window.speakFr = speakFr;
+
+  function addInlinePlayButtons() {
+    document.querySelectorAll('.fr-word, .hero-sentence .fr, .fr-line').forEach(function(el) {
+      if (el.querySelector('.shadow-btn')) return;
+      var text = el.textContent.trim();
+      if (!text || text.length < 2) return;
+      if (!/[a-zA-Zéèêëàâäùûüôöîïçœæ]/.test(text)) return;
+      var btn = document.createElement('span');
+      btn.className = 'shadow-btn';
+      btn.innerHTML = SPEAKER_SVG;
+      btn.title = '클릭하여 발음 듣기';
+      btn.addEventListener('click', function(e) { e.stopPropagation(); speakFr(text, this); });
+      el.appendChild(btn);
+    });
+  }
+
+  var shadowPhrases = [];
+  var shadowIndex = 0;
+  var shadowPlaying = false;
+
+  function collectPhrases() {
+    var phrases = [];
+    var heroFr = document.querySelector('.hero-sentence .fr')?.textContent?.trim();
+    var heroIpa = document.querySelector('.hero-sentence .ipa')?.textContent?.trim() || '';
+    var heroKo = document.querySelector('.hero-sentence .ko')?.textContent?.trim() || '';
+    if (heroFr) phrases.push({ fr: heroFr, ipa: heroIpa, ko: heroKo });
+    document.querySelectorAll('.expr-table tbody tr').forEach(function(row) {
+      var cells = row.querySelectorAll('td');
+      if (cells.length >= 4) {
+        var frText = cells[0]?.textContent?.trim().replace(/\s+/g, ' ');
+        var ipaText = cells[1]?.textContent?.trim() || '';
+        var koText = cells[3]?.textContent?.trim() || '';
+        if (frText && /[a-zA-Zéèêëàâäùûüôöîïçœæ]/.test(frText)) {
+          phrases.push({ fr: frText, ipa: ipaText, ko: koText });
+        }
+      }
+    });
+    return phrases;
+  }
+
+  function buildShadowingSection() {
+    shadowPhrases = collectPhrases();
+    if (shadowPhrases.length === 0) return;
+    var tracker = document.querySelector('.tracker');
+    var container = document.querySelector('.container');
+    if (!container) return;
+    var section = document.createElement('div');
+    section.className = 'shadowing-section';
+    section.id = 'shadowingPractice';
+    var itemsHTML = shadowPhrases.map(function(p, i) {
+      return '<div class="shadow-item" data-idx="' + i + '">' +
+        '<div class="num">' + String(i+1).padStart(2,'0') + '</div>' +
+        '<div class="phrase-text">' +
+        '<div class="phrase-fr">' + p.fr + '</div>' +
+        (p.ipa ? '<div class="phrase-ipa">' + p.ipa + '</div>' : '') +
+        (p.ko ? '<div class="phrase-ko">' + p.ko + '</div>' : '') +
+        '</div>' +
+        '<span class="shadow-btn" onclick="speakFr(\'' + p.fr.replace(/'/g, "\\'") + '\', this)">' + SPEAKER_SVG + '</span>' +
+        '</div>';
+    }).join('');
+    section.innerHTML = '<h3>&#127911; 쉐도잉 연습 &mdash; Shadowing Practice</h3>' +
+      '<p class="desc">프랑스어 음성을 듣고 &rarr; 3초 대기 &rarr; 따라 말하기를 반복합니다.</p>' +
+      '<div class="shadow-controls">' +
+      '<button class="shadow-ctrl-btn" id="shadowPlayAll" onclick="shadowStartAll()">' + PLAY_SVG + ' 전체 쉐도잉 시작</button>' +
+      '<button class="shadow-ctrl-btn" id="shadowStop" onclick="shadowStopAll()">' + STOP_SVG + ' 정지</button>' +
+      '<div class="shadow-speed"><span>속도:</span><input type="range" id="shadowSpeed" min="0.4" max="1.2" step="0.1" value="0.8"><span id="shadowSpeedLabel">0.8x</span></div>' +
+      '</div><div id="voiceSelectorContainer"></div>' +
+      '<div id="shadowItems">' + itemsHTML + '</div>' +
+      '<div class="shadow-progress"><div class="shadow-progress-bar"><div class="shadow-progress-fill" id="shadowProgressFill"></div></div><div class="shadow-progress-text" id="shadowProgressText">0/' + shadowPhrases.length + '</div></div>' +
+      '<div class="shadow-status" id="shadowStatus"></div>';
+    if (tracker) tracker.parentNode.insertBefore(section, tracker);
+    else container.appendChild(section);
+    var speedSlider = document.getElementById('shadowSpeed');
+    var speedLabel = document.getElementById('shadowSpeedLabel');
+    if (speedSlider) speedSlider.addEventListener('input', function() { speedLabel.textContent = this.value + 'x'; });
+    buildVoiceSelector(document.getElementById('voiceSelectorContainer'));
+  }
+
+  function buildVoiceSelector(container) {
+    if (!container) return;
+    var frVoices = getAllFrenchVoices();
+    if (frVoices.length <= 1) return;
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:var(--text-dim);margin-bottom:0.75rem;';
+    wrapper.innerHTML = '<span>&#127467;&#127479; 음성:</span>';
+    var sel = document.createElement('select');
+    sel.style.cssText = 'background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:0.3rem 0.5rem;font-size:0.8rem;cursor:pointer;';
+    frVoices.forEach(function(v, i) {
+      var opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = v.name + (v.localService ? ' (로컬)' : ' (온라인)');
+      if (v === selectedFrVoice) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', function() { selectedFrVoice = frVoices[parseInt(this.value)]; speakFr('Bonjour', null, 0.9); });
+    wrapper.appendChild(sel);
+    container.appendChild(wrapper);
+  }
+
+  window.shadowStartAll = function() {
+    shadowPlaying = true; shadowIndex = 0;
+    document.querySelectorAll('.shadow-item').forEach(function(el) { el.classList.remove('active-phrase', 'done-phrase'); });
+    document.getElementById('shadowPlayAll')?.classList.add('active');
+    document.getElementById('shadowStatus').textContent = '&#127911; 쉐도잉 시작...';
+    playShadowPhrase(0);
+  };
+  window.shadowStopAll = function() {
+    shadowPlaying = false; window.speechSynthesis.cancel();
+    document.getElementById('shadowPlayAll')?.classList.remove('active');
+    document.getElementById('shadowStatus').textContent = '&#9209; 정지됨';
+    document.querySelectorAll('.shadow-item').forEach(function(el) { el.classList.remove('active-phrase'); });
+  };
+
+  function playShadowPhrase(idx) {
+    if (!shadowPlaying || idx >= shadowPhrases.length) {
+      if (idx >= shadowPhrases.length) {
+        document.getElementById('shadowStatus').textContent = '&#10004; 쉐도잉 연습 완료!';
+        document.getElementById('shadowPlayAll')?.classList.remove('active');
+      }
+      shadowPlaying = false; return;
+    }
+    var phrase = shadowPhrases[idx];
+    var items = document.querySelectorAll('.shadow-item');
+    items.forEach(function(el) { el.classList.remove('active-phrase'); });
+    if (items[idx]) { items[idx].classList.add('active-phrase'); items[idx].scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    var fill = document.getElementById('shadowProgressFill');
+    var text = document.getElementById('shadowProgressText');
+    if (fill) fill.style.width = ((idx + 1) / shadowPhrases.length * 100) + '%';
+    if (text) text.textContent = (idx + 1) + '/' + shadowPhrases.length;
+    document.getElementById('shadowStatus').textContent = '&#128264; 듣기: ' + phrase.fr;
+    var utter = new SpeechSynthesisUtterance(phrase.fr);
+    utter.lang = 'fr-FR';
+    utter.rate = parseFloat(document.getElementById('shadowSpeed')?.value || '0.8');
+    var voice = getFrenchVoice();
+    if (voice) utter.voice = voice;
+    utter.onend = function() {
+      if (!shadowPlaying) return;
+      document.getElementById('shadowStatus').textContent = '&#127908; 따라 말해보세요: ' + phrase.fr;
+      setTimeout(function() {
+        if (!shadowPlaying) return;
+        if (items[idx]) { items[idx].classList.remove('active-phrase'); items[idx].classList.add('done-phrase'); }
+        playShadowPhrase(idx + 1);
+      }, 3000);
+    };
+    window.speechSynthesis.speak(utter);
+  }
+
+  function init() {
+    function waitForVoices(cb) {
+      var voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) { cb(); return; }
+      var tries = 0;
+      var interval = setInterval(function() {
+        voices = window.speechSynthesis.getVoices(); tries++;
+        if (voices.length > 0 || tries > 20) { clearInterval(interval); cb(); }
+      }, 100);
+      window.speechSynthesis.addEventListener('voiceschanged', function() { clearInterval(interval); cb(); }, { once: true });
+    }
+    waitForVoices(function() { initFrenchVoice(); addInlinePlayButtons(); buildShadowingSection(); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+
+// ════════════════════════════════ DAY 07 ENHANCED FEATURES ════════════════════════════════
+
+// Quiz functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const submitBtn = document.querySelector('.btn-submit-quiz');
+    const resetBtn = document.querySelector('.btn-reset-quiz');
+    
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function() {
+            checkQuizAnswers();
+        });
+    }
+    
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            resetQuiz();
+        });
+    }
+});
+
+function checkQuizAnswers() {
+    const correctAnswers = {
+        q1: 'a',
+        q2: 'b',
+        q3: 'b',
+        q4: 'b',
+        q5: 'a',
+        q6: 'b',
+        q7: 'a'
+    };
+    
+    let score = 0;
+    let totalQuestions = 0;
+    
+    for (let qNum = 1; qNum <= 7; qNum++) {
+        const qKey = 'q' + qNum;
+        const selected = document.querySelector('input[name="' + qKey + '"]:checked');
+        const explanation = document.getElementById('exp-' + qKey);
+        
+        if (selected) {
+            totalQuestions++;
+            if (selected.value === correctAnswers[qKey]) {
+                score++;
+                if (explanation) {
+                    explanation.style.display = 'block';
+                    explanation.style.borderLeft = '3px solid #4CAF50';
+                    explanation.style.color = '#4CAF50';
+                }
+            } else {
+                if (explanation) {
+                    explanation.style.display = 'block';
+                    explanation.style.borderLeft = '3px solid #FF6B6B';
+                    explanation.style.color = '#FF6B6B';
+                }
+            }
+        }
+    }
+    
+    const scoreDiv = document.getElementById('quiz-score');
+    if (scoreDiv) {
+        scoreDiv.style.display = 'block';
+        scoreDiv.querySelector('.score-value').textContent = score + '/' + totalQuestions;
+    }
+}
+
+function resetQuiz() {
+    document.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.checked = false;
+    });
+    document.querySelectorAll('.answer-explanation').forEach(exp => {
+        exp.style.display = 'none';
+    });
+    const scoreDiv = document.getElementById('quiz-score');
+    if (scoreDiv) {
+        scoreDiv.style.display = 'none';
+    }
+}
+
+// Shadowing and playback controls
+document.querySelectorAll('.btn-shadowing, .btn-repeat').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const lang = this.getAttribute('data-lang');
+        playWithShadowing(lang);
+    });
+});
+
+document.querySelectorAll('.btn-play-all').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const lang = this.getAttribute('data-lang');
+        playDialogue(lang);
+    });
+});
+
+document.querySelectorAll('.btn-slow').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const lang = this.getAttribute('data-lang');
+        playDialogueSlow(lang);
+    });
+});
+
+function playWithShadowing(lang) {
+    const utterances = document.querySelectorAll('.ipa-small');
+    utterances.forEach((utter, index) => {
+        setTimeout(() => {
+            if ('speechSynthesis' in window) {
+                const synthesis = new SpeechSynthesisUtterance(utter.textContent);
+                synthesis.lang = lang;
+                synthesis.rate = 1.0;
+                window.speechSynthesis.speak(synthesis);
+            }
+        }, index * 3000);
+    });
+}
+
+function playDialogue(lang) {
+    const exchanges = document.querySelectorAll('.dialogue-exchange');
+    exchanges.forEach((exchange, index) => {
+        setTimeout(() => {
+            const text = exchange.querySelector('.dialogue-bubble').textContent;
+            if ('speechSynthesis' in window) {
+                const synthesis = new SpeechSynthesisUtterance(text);
+                synthesis.lang = lang;
+                synthesis.rate = 1.0;
+                window.speechSynthesis.speak(synthesis);
+            }
+        }, index * 5000);
+    });
+}
+
+function playDialogueSlow(lang) {
+    const exchanges = document.querySelectorAll('.dialogue-exchange');
+    exchanges.forEach((exchange, index) => {
+        setTimeout(() => {
+            const text = exchange.querySelector('.dialogue-bubble').textContent;
+            if ('speechSynthesis' in window) {
+                const synthesis = new SpeechSynthesisUtterance(text);
+                synthesis.lang = lang;
+                synthesis.rate = 0.7;
+                window.speechSynthesis.speak(synthesis);
+            }
+        }, index * 8000);
+    });
+}
+
+// Expression table shadowing
+document.querySelectorAll('.btn-shadowing, .btn-repeat').forEach(btn => {
+    if (btn.closest('.shadowing-controls')) {
+        btn.addEventListener('click', function() {
+            const lang = this.getAttribute('data-lang');
+            const table = btn.closest('.section-box').querySelector('.expression-table');
+            if (table) {
+                playTableRows(table, lang, this.classList.contains('btn-repeat'));
+            }
+        });
+    }
+});
+
+function playTableRows(table, lang, isRepeat) {
+    const rows = table.querySelectorAll('tbody tr');
+    rows.forEach((row, index) => {
+        const french = row.querySelector('.col-french').textContent;
+        const delayMultiplier = isRepeat ? 2 : 1;
+        setTimeout(() => {
+            if ('speechSynthesis' in window) {
+                const synthesis = new SpeechSynthesisUtterance(french);
+                synthesis.lang = lang;
+                synthesis.rate = 0.9;
+                window.speechSynthesis.speak(synthesis);
+            }
+        }, index * 2000 * delayMultiplier);
+    });
+}
+
+// Smooth scroll for internal links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+});
+
+    </script>
+</body>
+</html>

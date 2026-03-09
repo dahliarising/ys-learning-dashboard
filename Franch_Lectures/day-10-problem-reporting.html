@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 10 — 문제 보고 & 해결 제안 | French for Korean Engineers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+/* ═══════════════════ RESET & BASE ═══════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-alt: #181C26;
+  --terracotta: #BF6A4A;
+  --gold: #C9A84C;
+  --text: #E8E4DF;
+  --text-dim: #8A8680;
+  --text-bright: #F5F2ED;
+  --accent-glow: rgba(191,106,74,0.15);
+  --gold-glow: rgba(201,168,76,0.12);
+  --border: #2A2D35;
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Noto Sans KR', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+}
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.75;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--terracotta); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ═══════════════════ STICKY HEADER ═══════════════════ */
+.sticky-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sticky-header .logo {
+  font-family: var(--font-heading);
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--terracotta);
+  letter-spacing: 0.05em;
+}
+.sticky-header .day-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--gold);
+  background: var(--gold-glow);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid rgba(201,168,76,0.25);
+}
+.sticky-header .series-info {
+  font-size: 0.7rem; color: var(--text-dim);
+}
+
+/* ═══════════════════ HERO SECTION ═══════════════════ */
+.hero {
+  text-align: center;
+  padding: 4rem 1.5rem 3rem;
+  background: linear-gradient(180deg, rgba(191,106,74,0.08) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+}
+.hero .overline {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 0.4rem;
+  line-height: 1.2;
+}
+.hero .subtitle {
+  font-size: 1rem; color: var(--text-dim);
+  margin-bottom: 2rem;
+}
+.hero-sentence {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+.hero-sentence::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--terracotta), var(--gold));
+}
+.hero-sentence .fr {
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.3rem;
+}
+.hero-sentence .ipa {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--gold);
+  font-style: italic;
+  margin-bottom: 0.4rem;
+}
+.hero-sentence .ko {
+  font-size: 1rem; color: var(--text-dim);
+}
+
+/* ═══════════════════ SECTION LAYOUT ═══════════════════ */
+.container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+section { padding: 3rem 0; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 1.8rem; font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 1.5rem;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+.card-alt { background: var(--bg-card-alt); }
+
+/* ═══════════════════ BRAIN SCIENCE BOX ═══════════════════ */
+.brain-box {
+  background: linear-gradient(135deg, rgba(191,106,74,0.08), rgba(201,168,76,0.06));
+  border: 1px solid rgba(191,106,74,0.2);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.brain-box h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.brain-box .strategy {
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--terracotta);
+}
+.brain-box .strategy strong { color: var(--gold); font-weight: 500; }
+.brain-box .strategy p { font-size: 0.9rem; color: var(--text-dim); margin-top: 0.2rem; }
+.tip-highlight { color: var(--terracotta); font-weight: 500; }
+.time-table {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(10,12,16,0.5);
+  border-radius: 8px;
+}
+.time-table .time { font-family: var(--font-mono); color: var(--gold); font-size: 0.8rem; }
+.time-table .task { color: var(--text); }
+
+/* ═══════════════════ 5-COLUMN TABLE ═══════════════════ */
+.expr-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+.expr-table th {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 0.8rem 0.6rem;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+  background: rgba(201,168,76,0.04);
+}
+.expr-table td {
+  padding: 0.75rem 0.6rem;
+  border-bottom: 1px solid rgba(42,45,53,0.5);
+  font-size: 0.85rem;
+  vertical-align: top;
+}
+.expr-table tr:hover { background: rgba(191,106,74,0.04); }
+.expr-table .fr-word {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--terracotta);
+  font-size: 1rem;
+}
+.pronunciation {
+  font-family: var(--font-mono);
+  font-style: italic;
+  color: var(--gold);
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+.approx-ko {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+/* ═══════════════════ GRAMMAR SVG ═══════════════════ */
+.grammar-visual { margin: 1.5rem 0; border-radius: 12px; overflow: hidden; }
+.grammar-visual svg { width: 100%; height: auto; display: block; }
+.grammar-note {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  background: rgba(201,168,76,0.06);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+}
+.grammar-note strong { color: var(--gold); font-weight: 500; }
+
+/* ═══════════════════ DIALOGUE ═══════════════════ */
+.dialogue { margin: 1.5rem 0; }
+.dialogue-line {
+  display: flex; gap: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.6rem;
+}
+.speaker-a { background: rgba(191,106,74,0.06); border: 1px solid rgba(191,106,74,0.15); }
+.speaker-b { background: rgba(201,168,76,0.04); border: 1px solid rgba(201,168,76,0.1); }
+.speaker-name {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  min-width: 90px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+.dialogue-text { flex: 1; }
+.fr-line {
+  font-family: var(--font-heading);
+  font-size: 1.05rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.2rem;
+}
+.ko-line { font-size: 0.85rem; color: var(--text-dim); }
+
+/* ═══════════════════ PRONUNCIATION DRILL ═══════════════════ */
+.pron-drill { margin: 1.5rem 0; }
+.pron-item {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1.2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 0.8rem;
+}
+.pron-item .number {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--terracotta);
+  font-weight: 700;
+  min-width: 24px;
+}
+.pron-word {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--terracotta);
+  font-size: 1.1rem;
+  margin-bottom: 0.2rem;
+}
+.pron-ipa {
+  font-family: var(--font-mono);
+  font-style: italic;
+  color: var(--gold);
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+}
+.pron-ko { font-size: 0.88rem; color: var(--text-dim); line-height: 1.6; }
+.pron-tip { font-size: 0.88rem; color: var(--text-dim); line-height: 1.6; margin-top: 0.3rem; }
+
+/* ═══════════════════ DIALOGUE REVIEW BOX ═══════════════════ */
+.dialogue-review {
+  background: linear-gradient(135deg, rgba(191,106,74,0.08), rgba(201,168,76,0.04));
+  border: 1px solid rgba(191,106,74,0.2);
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+.dialogue-review h4 {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 1rem;
+}
+.dialogue-review .review-item {
+  margin-bottom: 0.8rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--gold);
+}
+.dialogue-review .review-item strong { color: var(--gold); }
+.dialogue-review .review-item p { font-size: 0.88rem; color: var(--text-dim); margin-top: 0.2rem; }
+
+/* ═══════════════════ QUIZ ═══════════════════ */
+.quiz-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+.quiz-block h4 {
+  font-family: var(--font-heading);
+  color: var(--terracotta);
+  font-size: 1.1rem;
+  margin-bottom: 0.8rem;
+}
+.quiz-block input[type="text"] {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  width: 200px;
+}
+.quiz-block button {
+  background: var(--terracotta);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  margin-left: 0.5rem;
+}
+.quiz-block button:hover { opacity: 0.85; }
+.quiz-result { margin-top: 0.5rem; font-size: 0.85rem; }
+.correct { color: #4CAF50; }
+.incorrect { color: #F44336; }
+
+/* ═══════════════════ TRACKER ═══════════════════ */
+.tracker { margin-top: 3rem; }
+.tracker h3 {
+  font-family: var(--font-heading);
+  color: var(--text-bright); font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+.tracker-grid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 6px;
+}
+.tracker-cell {
+  aspect-ratio: 1;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tracker-cell:hover { border-color: var(--terracotta); }
+.tracker-cell.active { background: var(--terracotta); border-color: var(--terracotta); color: white; }
+.tracker-cell.today { border-color: var(--gold); box-shadow: 0 0 8px var(--gold-glow); }
+.tracker-legend {
+  display: flex; gap: 1.5rem; margin-top: 1rem;
+  font-size: 0.75rem; color: var(--text-dim);
+}
+.tracker-legend span { display: flex; align-items: center; gap: 0.3rem; }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+.legend-dot.done { background: var(--terracotta); }
+.legend-dot.today-dot { border: 1px solid var(--gold); background: transparent; }
+
+/* ═══════════════════ FOOTER ═══════════════════ */
+footer {
+  text-align: center; padding: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem; color: var(--text-dim);
+}
+
+/* ═══════════════════ SHADOWING SYSTEM ═══════════════════ */
+.shadow-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  background: rgba(191,106,74,0.15);
+  border: 1px solid rgba(191,106,74,0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.shadow-btn:hover { background: rgba(191,106,74,0.3); border-color: var(--terracotta); transform: scale(1.1); }
+.shadow-btn.playing { background: var(--terracotta); border-color: var(--terracotta); animation: pulse-glow 1.2s infinite; }
+.shadow-btn svg { width: 14px; height: 14px; fill: var(--terracotta); }
+.shadow-btn.playing svg { fill: #fff; }
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(191,106,74,0.4); }
+  50% { box-shadow: 0 0 12px 4px rgba(191,106,74,0.25); }
+}
+.shadowing-section {
+  background: linear-gradient(135deg, rgba(191,106,74,0.06), rgba(201,168,76,0.04));
+  border: 1px solid rgba(191,106,74,0.2);
+  border-radius: 14px; padding: 2rem; margin: 2rem 0;
+}
+.shadowing-section h3 {
+  font-family: var(--font-heading); font-size: 1.3rem; font-weight: 600;
+  color: var(--terracotta); margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.shadowing-section .desc { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+.shadow-controls { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.shadow-ctrl-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.6rem 1.2rem;
+  color: var(--text); font-family: var(--font-body);
+  font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+}
+.shadow-ctrl-btn:hover { border-color: var(--terracotta); background: rgba(191,106,74,0.1); }
+.shadow-ctrl-btn.active { background: var(--terracotta); border-color: var(--terracotta); color: #fff; }
+.shadow-ctrl-btn svg { width: 16px; height: 16px; fill: currentColor; }
+.shadow-speed { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-dim); }
+.shadow-speed input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  width: 100px; height: 4px; background: var(--border); border-radius: 2px; outline: none;
+}
+.shadow-speed input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; border-radius: 50%; background: var(--terracotta); cursor: pointer;
+}
+.shadow-item {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.6rem; transition: all 0.3s;
+}
+.shadow-item.active-phrase { border-color: var(--terracotta); background: rgba(191,106,74,0.08); box-shadow: 0 0 20px rgba(191,106,74,0.1); }
+.shadow-item.done-phrase { border-color: rgba(201,168,76,0.3); opacity: 0.7; }
+.shadow-item .num { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); min-width: 24px; }
+.shadow-item .phrase-text { flex: 1; }
+.shadow-item .phrase-fr { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 600; color: var(--terracotta); }
+.shadow-item .phrase-ipa { font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); font-style: italic; }
+.shadow-item .phrase-ko { font-size: 0.85rem; color: var(--text-dim); margin-top: 2px; }
+.shadow-progress { margin-top: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+.shadow-progress-bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.shadow-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--terracotta), var(--gold)); border-radius: 2px; transition: width 0.3s; }
+.shadow-progress-text { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); min-width: 40px; }
+.shadow-status { text-align: center; font-size: 0.85rem; color: var(--gold); margin-top: 0.5rem; min-height: 1.2em; }
+
+/* ═══════════════════ RESPONSIVE ═══════════════════ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero { padding: 3rem 1rem 2rem; }
+  .container { padding: 0 1rem; }
+  .card { padding: 1.2rem; }
+  .expr-table { font-size: 0.75rem; display: block; overflow-x: auto; }
+  .expr-table th, .expr-table td { padding: 0.5rem 0.4rem; }
+  .dialogue-line { flex-direction: column; gap: 0.3rem; }
+  .speaker-name { min-width: auto; }
+  .pron-item { flex-direction: column; gap: 0.5rem; }
+}
+
+/* ═══════════════════ SCROLLBAR ═══════════════════ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--terracotta); }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════ STICKY HEADER ═══════════════════ -->
+<header class="sticky-header">
+  <div class="logo">Français pour l'Ingénieur</div>
+  <div class="series-info">26일 완성 커리큘럼</div>
+  <div class="day-tag">DAY 10 / 26</div>
+  <a href="#shadowingPractice" style="font-size:0.75rem;color:var(--gold);text-decoration:none;display:flex;align-items:center;gap:4px;" title="쉐도잉 연습">🎧</a>
+</header>
+
+<!-- ═══════════════════ HERO SECTION ═══════════════════ -->
+<section class="hero">
+  <p class="overline">Part 10 &mdash; 문제 보고 & 해결 방안 제시</p>
+  <h1>문제 보고 & 이슈 설명</h1>
+  <p class="subtitle">Rapporter un problème &middot; Décrire une situation &middot; Proposer une solution</p>
+  <div class="hero-sentence">
+    <div class="fr">Il y a un bruit anormal dans la suspension arrière.</div>
+    <div class="ipa">/il ja ʏn bʁui a nɔʁ mal dɑ̃ la sɥs pɑ̃ sjɔ̃ a ʁjɛʁ/</div>
+    <div class="ko">후면 서스펜션에서 이상한 소음이 있습니다.</div>
+  </div>
+</section>
+
+<div class="container">
+
+<!-- ═══════════════════ 뇌과학 학습 전략 ═══════════════════ -->
+<section>
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략 &mdash; Day 10</h3>
+    <div class="strategy">
+      <strong>1. 문제 표현 + 음성 메모 (5분)</strong>
+      <p>문제 상황을 프랑스어로 설명하며 즉시 음성 재생. 엔지니어들은 빠른 커뮤니케이션 능력을 필요로 합니다.</p>
+    </div>
+    <div class="strategy">
+      <strong>2. Passé Composé 재작동화 (3분)</strong>
+      <p>"On a constaté" "Il s'est produit"처럼 과거 이벤트를 정확히 보고하는 것이 핵심. 스포팅 역할로 강화.</p>
+    </div>
+    <div class="strategy">
+      <strong>3. 스트레스 언어 숨겨진 의미 (4분)</strong>
+      <p>"Urgent" vs "Critique" vs "Mineur"의 뉘앙스를 문맥과 함께 배우면 감정 해석이 명확해집니다.</p>
+    </div>
+    <div class="strategy">
+      <strong>4. 대화 배치 및 자동 응답 구성 (3분)</strong>
+      <p>Renault 관리자와 엔지니어 간의 실제 대화를 반복 청취하면 자동 반응 체계가 확립됩니다.</p>
+    </div>
+    <div class="time-table">
+      <div class="time">05:00</div><div class="task">표현식 5개 학습 및 IPA 발음</div>
+      <div class="time">03:00</div><div class="task">Passé Composé 연습</div>
+      <div class="time">04:00</div><div class="task">심각도 표현 비교</div>
+      <div class="time">05:00</div><div class="task">실제 대화 섀도잉</div>
+      <div class="time">03:00</div><div class="task">정리 및 퀴즈</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 1. 문제 보고 기초 표현식 ═══════════════════ -->
+<section>
+  <div class="section-label">섹션 1</div>
+  <h2 class="section-title">📋 문제 보고 기초 표현식</h2>
+  
+  <div class="card">
+    <p style="margin-bottom: 1rem; color: var(--text-dim);">Renault에서 가장 자주 사용되는 문제 보고 표현식들입니다. 각 표현의 심각도와 상황을 이해하세요.</p>
+    
+    <table class="expr-table">
+      <thead>
+        <tr>
+          <th>프랑스어</th>
+          <th>IPA</th>
+          <th>한국어 근사음</th>
+          <th>한국어 뜻</th>
+          <th>사용 상황</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fr-word">Il y a un problème</td>
+          <td class="pronunciation">/il ja ɛ̃ pʁɔ blɛm/</td>
+          <td class="approx-ko">일 야 앙 프로블렘</td>
+          <td>문제가 있습니다</td>
+          <td>일반적, 중립적 보고</td>
+        </tr>
+        <tr>
+          <td class="fr-word">On a constaté que</td>
+          <td class="pronunciation">/ɔ̃ na kɔ̃ state kə/</td>
+          <td class="approx-ko">옹 나 꼍따떼 크</td>
+          <td>~임을 확인했습니다</td>
+          <td>객관적 발견 보고</td>
+        </tr>
+        <tr>
+          <td class="fr-word">C'est urgent</td>
+          <td class="pronunciation">/sɛ tyr ʒɑ̃/</td>
+          <td class="approx-ko">쎄 뤼르장</td>
+          <td>긴급합니다</td>
+          <td>즉시 해결 필요</td>
+        </tr>
+        <tr>
+          <td class="fr-word">C'est critique</td>
+          <td class="pronunciation">/sɛ kʁi tik/</td>
+          <td class="approx-ko">쎄 크리티크</td>
+          <td>치명적입니다</td>
+          <td>안전 관련, 최고 우선순위</td>
+        </tr>
+        <tr>
+          <td class="fr-word">C'est mineur</td>
+          <td class="pronunciation">/sɛ mi nœʁ/</td>
+          <td class="approx-ko">쎄 미느르</td>
+          <td>사소합니다</td>
+          <td>낮은 우선순위, 검사용</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════ 2. Passé Composé for Problem Reporting ═══════════════════ -->
+<section>
+  <div class="section-label">섹션 2</div>
+  <h2 class="section-title">⏮️ Passé Composé — 과거 보고식</h2>
+  
+  <div class="card">
+    <p style="margin-bottom: 1.5rem; color: var(--text-dim);">문제가 발생했을 때를 설명할 때 Passé Composé를 사용합니다. "avoir + 과거분사" 형태에 주목하세요.</p>
+    
+    <div class="grammar-visual">
+      <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background -->
+        <rect width="800" height="300" fill="#0A0C10" stroke="none"/>
+        
+        <!-- Title -->
+        <text x="400" y="30" font-family="Cormorant Garamond, serif" font-size="24" font-weight="600" text-anchor="middle" fill="#BF6A4A">
+          Passé Composé Structure
+        </text>
+        
+        <!-- Verb avoir examples -->
+        <g id="group1">
+          <rect x="30" y="60" width="350" height="220" fill="rgba(191,106,74,0.06)" stroke="rgba(191,106,74,0.2)" stroke-width="1" rx="8"/>
+          <text x="215" y="85" font-family="Cormorant Garamond, serif" font-size="18" font-weight="600" text-anchor="middle" fill="#C9A84C">
+            적극적: Avoir를 사용
+          </text>
+          
+          <!-- Example 1 -->
+          <text x="50" y="120" font-family="JetBrains Mono, monospace" font-size="14" fill="#BF6A4A" font-weight="600">
+            On a détecté
+          </text>
+          <text x="50" y="145" font-family="Noto Sans KR" font-size="13" fill="#8A8680">
+            (우리가 발견했습니다)
+          </text>
+          
+          <!-- Example 2 -->
+          <text x="50" y="175" font-family="JetBrains Mono, monospace" font-size="14" fill="#BF6A4A" font-weight="600">
+            Nous avons constaté
+          </text>
+          <text x="50" y="200" font-family="Noto Sans KR" font-size="13" fill="#8A8680">
+            (우리는 확인했습니다)
+          </text>
+          
+          <!-- Example 3 -->
+          <text x="50" y="230" font-family="JetBrains Mono, monospace" font-size="14" fill="#BF6A4A" font-weight="600">
+            J'ai trouvé le problème
+          </text>
+          <text x="50" y="255" font-family="Noto Sans KR" font-size="13" fill="#8A8680">
+            (나는 문제를 찾았습니다)
+          </text>
+        </g>
+        
+        <!-- Verb être examples -->
+        <g id="group2">
+          <rect x="420" y="60" width="350" height="220" fill="rgba(201,168,76,0.04)" stroke="rgba(201,168,76,0.1)" stroke-width="1" rx="8"/>
+          <text x="595" y="85" font-family="Cormorant Garamond, serif" font-size="18" font-weight="600" text-anchor="middle" fill="#C9A84C">
+            수동적: Être를 사용
+          </text>
+          
+          <!-- Example 1 -->
+          <text x="440" y="120" font-family="JetBrains Mono, monospace" font-size="14" fill="#BF6A4A" font-weight="600">
+            C'est produit
+          </text>
+          <text x="440" y="145" font-family="Noto Sans KR" font-size="13" fill="#8A8680">
+            (발생했습니다)
+          </text>
+          
+          <!-- Example 2 -->
+          <text x="440" y="175" font-family="JetBrains Mono, monospace" font-size="14" fill="#BF6A4A" font-weight="600">
+            Une fuite s'est produite
+          </text>
+          <text x="440" y="200" font-family="Noto Sans KR" font-size="13" fill="#8A8680">
+            (누수가 발생했습니다)
+          </text>
+          
+          <!-- Example 3 -->
+          <text x="440" y="230" font-family="JetBrains Mono, monospace" font-size="14" fill="#BF6A4A" font-weight="600">
+            Il s'est cassé
+          </text>
+          <text x="440" y="255" font-family="Noto Sans KR" font-size="13" fill="#8A8680">
+            (그것이 부러졌습니다)
+          </text>
+        </g>
+      </svg>
+    </div>
+    
+    <div class="grammar-note">
+      <strong>핵심:</strong> Avoir + 과거분사가 대부분의 경우. 신체 움직임, 상태 변화는 Être를 씁니다. 
+      "Je suis entré = 나는 들어갔다" vs "J'ai entré = 나는 들여놓았다" (타동사)
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 3. 심각도 표현식 비교 ═══════════════════ -->
+<section>
+  <div class="section-label">섹션 3</div>
+  <h2 class="section-title">🚨 심각도 표현식 비교</h2>
+  
+  <div class="card">
+    <p style="margin-bottom: 1.5rem; color: var(--text-dim);">Renault에서는 문제의 심각도를 정확히 구분합니다. 각 수준에 따라 대응 시간과 자원이 달라집니다.</p>
+    
+    <table class="expr-table">
+      <thead>
+        <tr>
+          <th>표현식</th>
+          <th>IPA</th>
+          <th>의미</th>
+          <th>심각도</th>
+          <th>예시</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fr-word">Critique</td>
+          <td class="pronunciation">/kʁi tik/</td>
+          <td>치명적, 중대</td>
+          <td style="color: #F44336; font-weight: 600;">극심</td>
+          <td>안전, 작동 정지</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Urgent</td>
+          <td class="pronunciation">/yr ʒɑ̃/</td>
+          <td>긴급</td>
+          <td style="color: #FF9800; font-weight: 600;">높음</td>
+          <td>24시간 내 해결</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Modéré</td>
+          <td class="pronunciation">/mɔ de re/</td>
+          <td>중간 수준</td>
+          <td style="color: #FFC107; font-weight: 600;">중간</td>
+          <td>일주일 내 처리</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Mineur</td>
+          <td class="pronunciation">/mi nœʁ/</td>
+          <td>사소한</td>
+          <td style="color: #4CAF50; font-weight: 600;">낮음</td>
+          <td>미학, 검사 항목</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════ 4. 해결방안 제시 표현식 ═══════════════════ -->
+<section>
+  <div class="section-label">섹션 4</div>
+  <h2 class="section-title">💡 해결방안 제시 표현식</h2>
+  
+  <div class="card">
+    <p style="margin-bottom: 1rem; color: var(--text-dim);">문제를 보고한 후, 해결책을 제안하는 것이 전문가다운 태도입니다.</p>
+    
+    <table class="expr-table">
+      <thead>
+        <tr>
+          <th>프랑스어</th>
+          <th>IPA</th>
+          <th>한국어 근사음</th>
+          <th>한국어 뜻</th>
+          <th>사용 상황</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fr-word">Je propose de</td>
+          <td class="pronunciation">/ʒə pʁɔ poz də/</td>
+          <td class="approx-ko">쥐 프로포즈 드</td>
+          <td>~을 제안합니다</td>
+          <td>능동적 제안</td>
+        </tr>
+        <tr>
+          <td class="fr-word">La solution serait</td>
+          <td class="pronunciation">/la sɔ ly sjɔ̃ sə ʁɛ/</td>
+          <td class="approx-ko">라 솔루시옹 스르왓</td>
+          <td>해결책은 ~일 것입니다</td>
+          <td>신중한 제안</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Il faut</td>
+          <td class="pronunciation">/il fo/</td>
+          <td class="approx-ko">일 포</td>
+          <td>~해야 합니다</td>
+          <td>필수 조치</td>
+        </tr>
+        <tr>
+          <td class="fr-word">On devrait</td>
+          <td class="pronunciation">/ɔ̃ də vʁɛ/</td>
+          <td class="approx-ko">옹 드브르왓</td>
+          <td>우리는 ~해야 할 것 같습니다</td>
+          <td>협의적 제안</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Je recommande</td>
+          <td class="pronunciation">/ʒə rə kɔ mɑ̃d/</td>
+          <td class="approx-ko">쥐 르꼼망드</td>
+          <td>~을 추천합니다</td>
+          <td>전문가 의견</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════ 5. 실제 대화 — Reporting Suspension Noise ═══════════════════ -->
+<section>
+  <div class="section-label">섹션 5</div>
+  <h2 class="section-title">🎬 실제 대화 — 서스펜션 소음 보고</h2>
+  
+  <div class="card" style="margin-bottom: 0;">
+    <p style="margin-bottom: 1.5rem; color: var(--text-dim); font-style: italic;">
+      당신(한국 엔지니어)이 관리자(Collègue français)에게 후면 서스펜션에서 발견된 비정상 소음을 보고합니다.
+    </p>
+    
+    <div class="dialogue">
+      <!-- Exchange 1 -->
+      <div class="dialogue-line speaker-a">
+        <div class="speaker-name">Vous (엔지)</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Bonjour Thierry. J'ai détecté un bruit anormal dans la suspension arrière.</div>
+          <div class="ko-line">안녕하세요 티에리. 후면 서스펜션에서 비정상 소음을 감지했습니다.</div>
+        </div>
+      </div>
+      
+      <div class="dialogue-line speaker-b">
+        <div class="speaker-name">Thierry (관리자)</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Ah bon? Depuis quand l'avez-vous remarqué?</div>
+          <div class="ko-line">그래요? 언제부터 발견하셨습니까?</div>
+        </div>
+      </div>
+      
+      <!-- Exchange 2 -->
+      <div class="dialogue-line speaker-a">
+        <div class="speaker-name">Vous (엔지)</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Depuis ce matin, lors des tests de route. C'est un cliquetis métallique, assez régulier.</div>
+          <div class="ko-line">오늘 아침부터, 도로 테스트 중에요. 금속성 딱딱거리는 소리인데, 꽤 일정합니다.</div>
+        </div>
+      </div>
+      
+      <div class="dialogue-line speaker-b">
+        <div class="speaker-name">Thierry (관리자)</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Vous pouvez décrire plus précisément? Cela vient de quelle position?</div>
+          <div class="ko-line">더 정확히 설명할 수 있을까요? 어느 위치에서 나오나요?</div>
+        </div>
+      </div>
+      
+      <!-- Exchange 3 -->
+      <div class="dialogue-line speaker-a">
+        <div class="speaker-name">Vous (엔지)</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Du côté droit, au niveau de la barre stabilisatrice. C'est urgent, car cela affecte la sécurité.</div>
+          <div class="ko-line">오른쪽, 안티롤 바 부근입니다. 안전에 영향을 주므로 긴급합니다.</div>
+        </div>
+      </div>
+      
+      <div class="dialogue-line speaker-b">
+        <div class="speaker-name">Thierry (관리자)</div>
+        <div class="dialogue-text">
+          <div class="fr-line">D'accord. Je propose de faire un diagnostic complet avant la prochaine phase.</div>
+          <div class="ko-line">알겠습니다. 다음 단계 전에 완전한 진단을 할 것을 제안합니다.</div>
+        </div>
+      </div>
+      
+      <!-- Exchange 4 -->
+      <div class="dialogue-line speaker-a">
+        <div class="speaker-name">Vous (엔지)</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Oui, c'est une bonne idée. Je recommande de vérifier les attaches et les roulements.</div>
+          <div class="ko-line">예, 좋은 생각입니다. 나사와 베어링을 확인할 것을 권장합니다.</div>
+        </div>
+      </div>
+      
+      <div class="dialogue-line speaker-b">
+        <div class="speaker-name">Thierry (관리자)</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Merci pour votre rapport détaillé. Nous allons agir rapidement.</div>
+          <div class="ko-line">상세한 보고서 감사합니다. 우리가 빠르게 조치하겠습니다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Dialogue Review Box -->
+  <div class="dialogue-review">
+    <h4>💬 대화 분석 — Dialogue Review</h4>
+    <div class="review-item">
+      <strong>Opening:</strong>
+      <p>"J'ai détecté"는 Passé Composé로 현재 상황에서 이루어진 발견을 전합니다. "remarqué"(noticed)도 같은 역할을 합니다.</p>
+    </div>
+    <div class="review-item">
+      <strong>Escalation:</strong>
+      <p>"C'est urgent" + "affecte la sécurité"로 심각도를 강조. 안전 관련 표현은 상대방의 즉시 반응을 유도합니다.</p>
+    </div>
+    <div class="review-item">
+      <strong>Proposal:</strong>
+      <p>"Je propose" vs "Je recommande"의 차이: 제안은 함께 고민하는 느낌, 권장은 전문가로서의 의견입니다.</p>
+    </div>
+    <div class="review-item">
+      <strong>Closing:</strong>
+      <p>"Nous allons agir rapidement"로 상대방의 책임을 상기시키며 대화를 마무리합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 6. 발음 연습 ═══════════════════ -->
+<section>
+  <div class="section-label">섹션 6</div>
+  <h2 class="section-title">🔊 발음 연습 — 5가지 문제 보고 문구</h2>
+  
+  <div class="pron-drill">
+    <div class="pron-item">
+      <div class="number">1</div>
+      <div>
+        <div class="pron-word">Il y a un bruit anormal</div>
+        <div class="pron-ipa">/il ja ɛ̃ bʁui a nɔʁ mal/</div>
+        <div class="pron-ko">일 야 앙 브뤼이 아 노르말</div>
+        <div class="pron-tip">주의: "anormal" 발음 시 "a"는 /a/ (아), "nor"는 /nɔʁ/ (놀). 코를 통과하는 비음 /ɔ̃/을 느끼세요.</div>
+      </div>
+    </div>
+    
+    <div class="pron-item">
+      <div class="number">2</div>
+      <div>
+        <div class="pron-word">On a constaté une fuite</div>
+        <div class="pron-ipa">/ɔ̃ na kɔ̃ state yn fɥit/</div>
+        <div class="pron-ko">옹 나 꼍따떼 유느 퓌이트</div>
+        <div class="pron-tip">"constaté"는 /kɔ̃state/로 '-ate' 부분이 하강음. "fuite"에서 /ɥ/는 /y/와 /i/의 중간 음.</div>
+      </div>
+    </div>
+    
+    <div class="pron-item">
+      <div class="number">3</div>
+      <div>
+        <div class="pron-word">C'est critique et urgent</div>
+        <div class="pron-ipa">/sɛ kʁitik e yr ʒɑ̃/</div>
+        <div class="pron-ko">쎄 크리티크 에 뤼르장</div>
+        <div class="pron-tip">연음: "et urgent"는 "et-urgent"로 음절화. "ʒɑ̃"는 혀가 뒤로 물러나며 비강으로 나가는 /ʒ/.</div>
+      </div>
+    </div>
+    
+    <div class="pron-item">
+      <div class="number">4</div>
+      <div>
+        <div class="pron-word">Je propose de remplacer</div>
+        <div class="pron-ipa">/ʒə pʁɔ poz də rɑ̃ plase/</div>
+        <div class="pron-ko">쥐 프로포즈 드 랑플라세</div>
+        <div class="pron-tip">"propose"에서 두 개의 /o/는 /ɔ/ (오)로 발음. "remplacer"의 /ɑ̃/ 비음은 입을 크게 벌려 발음.</div>
+      </div>
+    </div>
+    
+    <div class="pron-item">
+      <div class="number">5</div>
+      <div>
+        <div class="pron-word">La solution serait de vérifier</div>
+        <div class="pron-ipa">/la sɔ ly sjɔ̃ sə ʁɛ də ve ri fje/</div>
+        <div class="pron-ko">라 솔루시옹 스르왓 드 베리피에</div>
+        <div class="pron-tip">"solution"의 /ɔ/ 비음은 /ɔ̃/으로, "serait"는 조건법 /sə ʁɛ/. 마지막 "vérifier"에서 "fier"는 /fje/ 한 음절.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 7. 퀴즈 ═══════════════════ -->
+<section>
+  <div class="section-label">섹션 7</div>
+  <h2 class="section-title">📝 퀴즈 — 이해도 확인</h2>
+  
+  <div class="card">
+    <div class="quiz-block">
+      <h4>Q1. Passé Composé: "Je ___ (découvrir) un problème"</h4>
+      <p style="margin-bottom: 0.8rem; color: var(--text-dim); font-size: 0.9rem;">과거분사 형태로 채우세요.</p>
+      <input type="text" id="q1" placeholder="ai découvert">
+      <button onclick="checkQuiz('q1', 'ai découvert', 'Q1')">확인</button>
+      <div id="result-q1" class="quiz-result"></div>
+    </div>
+    
+    <div class="quiz-block">
+      <h4>Q2. 심각도 선택: 안전 관련 문제는 어떤 수준?</h4>
+      <p style="margin-bottom: 0.8rem; color: var(--text-dim); font-size: 0.9rem;">선택지: critique, urgent, modéré, mineur</p>
+      <input type="text" id="q2" placeholder="critique">
+      <button onclick="checkQuiz('q2', 'critique', 'Q2')">확인</button>
+      <div id="result-q2" class="quiz-result"></div>
+    </div>
+    
+    <div class="quiz-block">
+      <h4>Q3. 번역: "Je propose de" 의 의미는?</h4>
+      <p style="margin-bottom: 0.8rem; color: var(--text-dim); font-size: 0.9rem;">한국어로 입력하세요.</p>
+      <input type="text" id="q3" placeholder="~을 제안합니다">
+      <button onclick="checkQuiz('q3', '을 제안합니다', 'Q3')">확인</button>
+      <div id="result-q3" class="quiz-result"></div>
+    </div>
+    
+    <div class="quiz-block">
+      <h4>Q4. 문법: "On a ___ (constater) une fuite."</h4>
+      <p style="margin-bottom: 0.8rem; color: var(--text-dim); font-size: 0.9rem;">과거분사를 적어주세요.</p>
+      <input type="text" id="q4" placeholder="constaté">
+      <button onclick="checkQuiz('q4', 'constaté', 'Q4')">확인</button>
+      <div id="result-q4" class="quiz-result"></div>
+    </div>
+    
+    <div class="quiz-block">
+      <h4>Q5. 상황 선택: "Du côté droit, la barre stabilisatrice" — 어느 부분을 설명?</h4>
+      <p style="margin-bottom: 0.8rem; color: var(--text-dim); font-size: 0.9rem;">한국어로: 문제의 위치와 부품을 적으세요.</p>
+      <input type="text" id="q5" placeholder="오른쪽, 안티롤 바">
+      <button onclick="checkQuiz('q5', '오른', 'Q5')">확인</button>
+      <div id="result-q5" class="quiz-result"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 학습 진행 추적 ═══════════════════ -->
+<section class="tracker">
+  <h3>📊 학습 진행 현황 (26일 커리큘럼)</h3>
+  <div class="tracker-grid">
+    <div class="tracker-cell" onclick="toggleTracker(this)">1</div>
+    <div class="tracker-cell active" onclick="toggleTracker(this)">2</div>
+    <div class="tracker-cell active" onclick="toggleTracker(this)">3</div>
+    <div class="tracker-cell active" onclick="toggleTracker(this)">4</div>
+    <div class="tracker-cell active" onclick="toggleTracker(this)">5</div>
+    <div class="tracker-cell active" onclick="toggleTracker(this)">6</div>
+    <div class="tracker-cell active" onclick="toggleTracker(this)">7</div>
+    <div class="tracker-cell active" onclick="toggleTracker(this)">8</div>
+    <div class="tracker-cell active" onclick="toggleTracker(this)">9</div>
+    <div class="tracker-cell today active" onclick="toggleTracker(this)">10</div>
+    <div class="tracker-cell" onclick="toggleTracker(this)">11</div>
+    <div class="tracker-cell" onclick="toggleTracker(this)">12</div>
+    <div class="tracker-cell" onclick="toggleTracker(this)">13</div>
+  </div>
+  <div class="tracker-legend">
+    <span><span class="legend-dot done"></span> 완료</span>
+    <span><span class="legend-dot today-dot"></span> 오늘</span>
+  </div>
+</section>
+
+</div>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer>
+  <p>Français pour l'Ingénieur — Day 10: 문제 보고 & 해결 제안</p>
+  <p style="margin-top: 0.5rem; font-size: 0.7rem;">Renault Korea 자동차 서스펜션 엔지니어를 위한 맞춤형 프랑스어 과정</p>
+  <p style="margin-top: 1rem; font-size: 0.65rem;">© 2026 French Learning Course &mdash; All rights reserved</p>
+</footer>
+
+<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
+<script>
+(function() {
+  'use strict';
+
+  // ═══════════════════ SVG 아이콘 상수 ═══════════════════
+  const SPEAKER_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a7 7 0 0 1 0 9.9M19.07 4.93a11 11 0 0 1 0 15.66"></path></svg>';
+  const PLAY_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+  const STOP_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16"></rect></svg>';
+
+  // ═══════════════════ 음성 합성 설정 ═══════════════════
+  let shadowPhrases = [];
+  let shadowPlaying = false;
+  let shadowIndex = 0;
+  let shadowPauseTime = 3500; // 3.5초 대기
+  let selectedFrenchVoice = null;
+
+  function getFrenchVoice() {
+    if (selectedFrenchVoice) return selectedFrenchVoice;
+    const voices = window.speechSynthesis.getVoices();
+    for (let voice of voices) {
+      if (voice.lang.startsWith('fr')) return voice;
+    }
+    return voices.length > 0 ? voices[0] : null;
+  }
+
+  function initFrenchVoice() {
+    const voices = window.speechSynthesis.getVoices();
+    const frVoices = voices.filter(v => v.lang.startsWith('fr'));
+    if (frVoices.length > 0) {
+      selectedFrenchVoice = frVoices[0];
+    }
+  }
+
+  function buildVoiceSelector(container) {
+    const voices = window.speechSynthesis.getVoices();
+    const frVoices = voices.filter(v => v.lang.startsWith('fr'));
+    if (frVoices.length < 2) return;
+
+    const voiceHTML = frVoices.map((v, i) => `
+      <button class="shadow-ctrl-btn ${i === 0 ? 'active' : ''}" onclick="changeVoice('${v.name}')">
+        🎤 ${v.name.substring(0, 20)}
+      </button>
+    `).join('');
+
+    container.innerHTML = voiceHTML;
+  }
+
+  window.changeVoice = function(voiceName) {
+    const voices = window.speechSynthesis.getVoices();
+    selectedFrenchVoice = voices.find(v => v.name === voiceName) || getFrenchVoice();
+    document.querySelectorAll('.shadow-ctrl-btn').forEach(b => b.classList.remove('active'));
+    event.target.closest('.shadow-ctrl-btn')?.classList.add('active');
+  };
+
+  // ═══════════════════ 음성 재생 함수 ═══════════════════
+  window.speakFr = function(text, btn) {
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'fr-FR';
+    utter.rate = 0.9;
+    const voice = getFrenchVoice();
+    if (voice) utter.voice = voice;
+
+    if (btn) {
+      btn.classList.add('playing');
+      utter.onend = function() {
+        btn.classList.remove('playing');
+      };
+    }
+    window.speechSynthesis.speak(utter);
+  };
+
+  // ═══════════════════ 인라인 재생 버튼 추가 ═══════════════════
+  function addInlinePlayButtons() {
+    const elements = document.querySelectorAll('.fr-word, .fr-line, .pron-word, .hero-sentence .fr');
+    elements.forEach(el => {
+      const text = el.textContent.trim();
+      if (text && !el.querySelector('.shadow-btn')) {
+        const btn = document.createElement('span');
+        btn.className = 'shadow-btn';
+        btn.innerHTML = SPEAKER_SVG;
+        btn.style.display = 'inline-flex';
+        btn.onclick = function(e) {
+          e.stopPropagation();
+          speakFr(text, this);
+        };
+        el.appendChild(btn);
+      }
+    });
+  }
+
+  // ═══════════════════ 쉐도잉 구문 수집 ═══════════════════
+  function collectPhrases() {
+    const phrases = [];
+    const items = document.querySelectorAll('.pron-item, .hero-sentence, .dialogue-line, .expr-table tbody tr');
+    items.forEach(item => {
+      const fr = item.querySelector('.pron-word, .fr-word, .fr, .fr-line')?.textContent?.trim();
+      const ipa = item.querySelector('.pron-ipa, .ipa')?.textContent?.trim() || '';
+      const ko = item.querySelector('.pron-ko, .ko, .ko-line')?.textContent?.trim() || '';
+      if (fr) phrases.push({ fr, ipa, ko });
+    });
+    const heroFr = document.querySelector('.hero-sentence .fr')?.textContent?.trim();
+    const heroIpa = document.querySelector('.hero-sentence .ipa')?.textContent?.trim() || '';
+    const heroKo = document.querySelector('.hero-sentence .ko')?.textContent?.trim() || '';
+    if (heroFr && !phrases.find(p => p.fr === heroFr)) {
+      phrases.unshift({ fr: heroFr, ipa: heroIpa, ko: heroKo });
+    }
+    return phrases;
+  }
+
+  // ═══════════════════ 쉐도잉 섹션 생성 ═══════════════════
+  function buildShadowingSection() {
+    shadowPhrases = collectPhrases();
+    if (shadowPhrases.length === 0) return;
+
+    const tracker = document.querySelector('.tracker');
+    const container = document.querySelector('.container');
+    if (!container) return;
+
+    const section = document.createElement('div');
+    section.className = 'shadowing-section';
+    section.id = 'shadowingPractice';
+
+    const itemsHTML = shadowPhrases.map((p, i) => `
+      <div class="shadow-item" data-idx="${i}" data-fr="${p.fr.replace(/"/g, '&quot;')}">
+        <div class="num">${String(i+1).padStart(2,'0')}</div>
+        <div class="phrase-text">
+          <div class="phrase-fr">${p.fr}</div>
+          ${p.ipa ? '<div class="phrase-ipa">' + p.ipa + '</div>' : ''}
+          ${p.ko ? '<div class="phrase-ko">' + p.ko + '</div>' : ''}
+        </div>
+        <span class="shadow-btn" onclick="speakFr('${p.fr.replace(/'/g, "\'")}', this)">
+          ${SPEAKER_SVG}
+        </span>
+      </div>
+    `).join('');
+
+    section.innerHTML = `
+      <h3>🎧 쉐도잉 연습 — Shadowing Practice</h3>
+      <p class="desc">프랑스어 음성을 듣고 → 3초 대기 → 따라 말하기를 반복합니다. 속도를 조절하여 자신에게 맞는 페이스로 연습하세요.</p>
+      <div class="shadow-controls">
+        <button class="shadow-ctrl-btn" id="shadowPlayAll" onclick="shadowStartAll()">
+          ${PLAY_SVG} 전체 쉐도잉 시작
+        </button>
+        <button class="shadow-ctrl-btn" id="shadowStop" onclick="shadowStopAll()">
+          ${STOP_SVG} 정지
+        </button>
+        <div class="shadow-speed">
+          <span>속도:</span>
+          <input type="range" id="shadowSpeed" min="0.4" max="1.2" step="0.1" value="0.8">
+          <span id="shadowSpeedLabel">0.8x</span>
+        </div>
+      </div>
+      <div id="voiceSelectorContainer"></div>
+      <div id="shadowItems">${itemsHTML}</div>
+      <div class="shadow-progress">
+        <div class="shadow-progress-bar"><div class="shadow-progress-fill" id="shadowProgressFill"></div></div>
+        <div class="shadow-progress-text" id="shadowProgressText">0/${shadowPhrases.length}</div>
+      </div>
+      <div class="shadow-status" id="shadowStatus"></div>
+    `;
+
+    if (tracker) {
+      tracker.parentNode.insertBefore(section, tracker);
+    } else {
+      container.appendChild(section);
+    }
+
+    const speedSlider = document.getElementById('shadowSpeed');
+    if (speedSlider) {
+      speedSlider.addEventListener('input', function() {
+        document.getElementById('shadowSpeedLabel').textContent = this.value + 'x';
+      });
+    }
+    const voiceContainer = document.getElementById('voiceSelectorContainer');
+    if (voiceContainer) buildVoiceSelector(voiceContainer);
+  }
+
+  // ═══════════════════ 글로벌 쉐도잉 제어 함수 ═══════════════════
+  window.shadowStartAll = function() {
+    shadowPlaying = true;
+    shadowIndex = 0;
+    document.querySelectorAll('.shadow-item').forEach(el => {
+      el.classList.remove('active-phrase', 'done-phrase');
+    });
+    document.getElementById('shadowPlayAll')?.classList.add('active');
+    document.getElementById('shadowStatus').textContent = '🎧 쉐도잉 시작...';
+    playShadowPhrase(0);
+  };
+
+  window.shadowStopAll = function() {
+    shadowPlaying = false;
+    window.speechSynthesis.cancel();
+    document.getElementById('shadowPlayAll')?.classList.remove('active');
+    document.getElementById('shadowStatus').textContent = '⏹ 정지됨';
+    document.querySelectorAll('.shadow-item').forEach(el => {
+      el.classList.remove('active-phrase');
+    });
+  };
+
+  function playShadowPhrase(idx) {
+    if (!shadowPlaying || idx >= shadowPhrases.length) {
+      if (idx >= shadowPhrases.length) {
+        document.getElementById('shadowStatus').textContent = '✅ 쉐도잉 연습 완료! 수고하셨습니다!';
+        document.getElementById('shadowPlayAll')?.classList.remove('active');
+      }
+      shadowPlaying = false;
+      return;
+    }
+
+    const phrase = shadowPhrases[idx];
+    const items = document.querySelectorAll('.shadow-item');
+
+    items.forEach(el => el.classList.remove('active-phrase'));
+    if (items[idx]) {
+      items[idx].classList.add('active-phrase');
+      items[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    const fill = document.getElementById('shadowProgressFill');
+    const text = document.getElementById('shadowProgressText');
+    if (fill) fill.style.width = ((idx + 1) / shadowPhrases.length * 100) + '%';
+    if (text) text.textContent = (idx + 1) + '/' + shadowPhrases.length;
+
+    document.getElementById('shadowStatus').textContent = '🔊 듣기: ' + phrase.fr;
+
+    const utter = new SpeechSynthesisUtterance(phrase.fr);
+    utter.lang = 'fr-FR';
+    utter.rate = parseFloat(document.getElementById('shadowSpeed')?.value || '0.8');
+    const voice = getFrenchVoice();
+    if (voice) utter.voice = voice;
+
+    utter.onend = function() {
+      if (!shadowPlaying) return;
+      document.getElementById('shadowStatus').textContent = '🎤 따라 말해보세요: ' + phrase.fr;
+      setTimeout(function() {
+        if (!shadowPlaying) return;
+        if (items[idx]) {
+          items[idx].classList.remove('active-phrase');
+          items[idx].classList.add('done-phrase');
+        }
+        playShadowPhrase(idx + 1);
+      }, shadowPauseTime);
+    };
+
+    window.speechSynthesis.speak(utter);
+  }
+
+  // ═══════════════════ 퀴즈 검증 함수 ═══════════════════
+  window.checkQuiz = function(inputId, expectedValue, qLabel) {
+    const inputEl = document.getElementById(inputId);
+    const userAnswer = inputEl.value.trim();
+    const resultDiv = document.getElementById('result-' + inputId);
+    const isCorrect = userAnswer.toLowerCase().includes(expectedValue.toLowerCase());
+
+    if (isCorrect) {
+      resultDiv.innerHTML = '<span class="correct">✅ 정답! 잘했어요!</span>';
+      resultDiv.style.color = '#4CAF50';
+    } else {
+      resultDiv.innerHTML = `<span class="incorrect">❌ 다시 시도하세요. 힌트: "${expectedValue}"</span>`;
+      resultDiv.style.color = '#F44336';
+    }
+  };
+
+  // ═══════════════════ 추적 토글 함수 ═══════════════════
+  window.toggleTracker = function(cell) {
+    cell.classList.toggle('active');
+  };
+
+  // ═══════════════════ 초기화 함수 ═══════════════════
+  function init() {
+    function waitForVoices(cb) {
+      let voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) { cb(); return; }
+      let tries = 0;
+      const interval = setInterval(function() {
+        voices = window.speechSynthesis.getVoices();
+        tries++;
+        if (voices.length > 0 || tries > 20) {
+          clearInterval(interval);
+          cb();
+        }
+      }, 100);
+      window.speechSynthesis.addEventListener('voiceschanged', function() {
+        clearInterval(interval);
+        cb();
+      }, { once: true });
+    }
+    waitForVoices(function() {
+      initFrenchVoice();
+      addInlinePlayButtons();
+      buildShadowingSection();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 13 | KOSPI 구조적 저평가 논쟁 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #9A9890;
+  --text-dim: #5A584F;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 13 / 23</span>
+    <span class="header-title">KOSPI 구조적 저평가 논쟁</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 2 · 주식 투자 심화</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 2 — 주식 투자 심화</div>
+  <h1 class="hero-day">Day 13</h1>
+  <h2 class="hero-subtitle">KOSPI 구조적 저평가 논쟁</h2>
+  <p class="hero-quote">코리아 디스카운트는 가격 차별이 아니라, 시장의 비효율성을 기회로 본다. — 신용창 교수</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 2: 08~14</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:56.5%"></div></div>
+    <div class="progress-label"><span>Day 13</span><span>13 / 23 완료 (56.5%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 글로벌 관점으로 한국 시장 재평가</h3>
+    <p>한국의 반도체·배터리 기업들이 세계 최고 기술을 갖고도 왜 저평가될까?
+    PER 비교·지정학적 리스크·지배구조를 분석하여 기회를 발견하세요.
+    엔지니어 마인드셋: 기술력은 뛰어나나 '시장이 인지하지 못한' 가치 = 기회.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">00:00~05:00</td><td>코리아 디스카운트 정의</td><td>역사적 배경 & 통계</td></tr>
+<tr><td class="time-col">05:00~10:00</td><td>저평가 원인 5가지</td><td>지정학적 vs 기업가치 분리</td></tr>
+<tr><td class="time-col">10:00~15:00</td><td>글로벌 PER 비교</td><td>한국 vs 미국 vs 대만 실시간 비교</td></tr>
+<tr><td class="time-col">15:00~20:00</td><td>밸류업 프로그램 분석</td><td>정책 변화의 신호 읽기</td></tr>
+<tr><td class="time-col">20:00~25:00</td><td>향후 시나리오 & 투자 액션</td><td>PER 16배 상향 가능성 계산</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">KOSPI 구조적 저평가 논쟁</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">코리아 디스카운트의 수식화</div>
+      <div class="card-body">
+            <div class="formula-block">
+<span class="formula-highlight">코리아 디스카운트 = 글로벌 평균 PER - 한국 기업 PER</span>
+<span class="formula-comment">예: 삼성전자</span>
+<span class="formula-line">  글로벌 반도체 평균 PER = 18.5배</span>
+<span class="formula-line">  삼성전자 PER = 14.6배</span>
+<span class="formula-highlight">  코리아 디스카운트 = 18.5 - 14.6 = 3.9배 (약 -21%)</span>
+</div>
+
+<p style="margin-top:1rem;"><strong>원인 5가지:</strong></p>
+<ul style="margin-left:1.5rem;color:var(--text-secondary);font-size:0.85rem;line-height:1.8;">
+  <li><strong>① 지정학적 리스크:</strong> 북한 리스크 프리미엄 (외국인 회피)</li>
+  <li><strong>② 거버넌스 의심:</strong> 재벌 구조, 후계 상속세 이슈</li>
+  <li><strong>③ 인구 고령화:</strong> 국내 소비 성장 한계 인식</li>
+  <li><strong>④ 기관투자자 편중:</strong> 미국·유럽 투자 선호</li>
+  <li><strong>⑤ 공시 미흡:</strong> 영어 공시 부족 (외국인 접근성 낮음)</li>
+</ul>
+            </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">글로벌 PER 비교표 (2024년 기준)</div>
+      <div class="card-body">
+            <div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>회사명</th><th>국가</th><th>사업</th><th>PER(배)</th><th>평가</th><th>할인/할증</th></tr></thead>
+<tbody>
+<tr><td>삼성전자</td><td>한국</td><td>반도체</td><td>14.6</td><td>저평가</td><td>-21%</td></tr>
+<tr><td>SK하이닉스</td><td>한국</td><td>메모리칩</td><td>17.7</td><td>약 저평가</td><td>-4%</td></tr>
+<tr><td>TSMC</td><td>대만</td><td>파운드리</td><td>21.5</td><td>정상</td><td>+16%</td></tr>
+<tr><td>인텔</td><td>미국</td><td>반도체</td><td>18.2</td><td>정상</td><td>-2%</td></tr>
+<tr class="highlight-row"><td>글로벌 반도체 평균</td><td>-</td><td>-</td><td>18.5</td><td>기준</td><td>0%</td></tr>
+<tr><td>NVIDIA</td><td>미국</td><td>GPU/AI</td><td>42.0</td><td>고평가</td><td>+127%</td></tr>
+</tbody>
+</table>
+</div>
+            <p style="margin-top:1rem;color:var(--gold);"><strong>해석:</strong> 같은 기술력·수익성을 가진 기업이라면, 삼성(14.6배)은 인텔(18.2배)보다 23% 더 싼 셈입니다.</p>
+            </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">밸류업 프로그램의 효과 메커니즘</div>
+      <div class="card-body">
+            <p style="margin-bottom:1rem;"><strong>2024년 정부 발표 '주가 부양 종합대책'</strong></p>
+            <div class="formula-block">
+<span class="formula-highlight">자사주 매입 메커니즘:</span>
+<span class="formula-line">  주당순이익(EPS) = 순이익 / 발행주식 수</span>
+<span class="formula-line">  자사주 소각 → 발행주식 수 ↓ → EPS ↑</span>
+<span class="formula-line">  같은 순이익에도 EPS 증가 → PER 자동 상향</span>
+
+<span class="formula-highlight" style="margin-top:1rem;">배당세 인하의 외국인 유인 효과:</span>
+<span class="formula-line">  기존: 배당금에 대한 종합과세 (최대 42% 세금)</span>
+<span class="formula-line">  개선: 배당세 인하 (예정세율 20%로 인하)</span>
+<span class="formula-line">  외국인 순배당률 = 배당수익률 × (1 - 세율)</span>
+<span class="formula-highlight">  세율 ↓ → 외국인 매수 유인 ↑ → 수요 ↑ → PER ↑</span>
+</div>
+
+<p style="margin-top:1rem;"><strong>예상 효과 타임라인:</strong></p>
+<ul style="margin-left:1.5rem;color:var(--text-secondary);font-size:0.85rem;">
+  <li>2024~2025: 정책 신호 + 자사주 매입 시작</li>
+  <li>2025~2026: 외국인 자금 유입 본격화</li>
+  <li>목표 PER: 현재 14.6배 → 16~17배 상향</li>
+  <li>예상 주가 상승률: 10~16% (2년)</li>
+</ul>
+            </div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  <div class="chart-container">
+    <div class="chart-title">글로벌 반도체 기업 PER 비교</div>
+    <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+      <defs>
+        <linearGradient id="barGradent1" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#BF4A4A;stop-opacity:0.9"/>
+          <stop offset="100%" style="stop-color:#BF4A4A;stop-opacity:0.5"/>
+        </linearGradient>
+        <linearGradient id="barGradent2" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#C9A84C;stop-opacity:0.9"/>
+          <stop offset="100%" style="stop-color:#C9A84C;stop-opacity:0.5"/>
+        </linearGradient>
+        <linearGradient id="barGradent3" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#4A9EBF;stop-opacity:0.9"/>
+          <stop offset="100%" style="stop-color:#4A9EBF;stop-opacity:0.5"/>
+        </linearGradient>
+        <linearGradient id="barGradent4" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#4ABF7A;stop-opacity:0.9"/>
+          <stop offset="100%" style="stop-color:#4ABF7A;stop-opacity:0.5"/>
+        </linearGradient>
+      </defs>
+
+      <rect width="900" height="420" fill="#0A0C10"/>
+
+      <text x="450" y="35" font-size="16" fill="#E8E6E1" text-anchor="middle" font-weight="600">
+        글로벌 반도체 기업 PER 비교 (2024년)
+      </text>
+
+      <!-- Y축 -->
+      <line x1="90" y1="60" x2="90" y2="340" stroke="#2A2D36" stroke-width="2"/>
+      <line x1="90" y1="340" x2="880" y2="340" stroke="#2A2D36" stroke-width="2"/>
+
+      <!-- Grid lines & labels -->
+      <line x1="85" y1="340" x2="880" y2="340" stroke="#2A2D36" stroke-width="1"/>
+      <text x="80" y="346" font-size="11" fill="#9A9890" text-anchor="end">0</text>
+
+      <line x1="85" y1="285" x2="880" y2="285" stroke="#2A2D36" stroke-width="1" opacity="0.4"/>
+      <text x="80" y="291" font-size="11" fill="#9A9890" text-anchor="end">10</text>
+
+      <line x1="85" y1="230" x2="880" y2="230" stroke="#2A2D36" stroke-width="1" opacity="0.4"/>
+      <text x="80" y="236" font-size="11" fill="#9A9890" text-anchor="end">20</text>
+
+      <line x1="85" y1="175" x2="880" y2="175" stroke="#2A2D36" stroke-width="1" opacity="0.4"/>
+      <text x="80" y="181" font-size="11" fill="#9A9890" text-anchor="end">30</text>
+
+      <line x1="85" y1="120" x2="880" y2="120" stroke="#2A2D36" stroke-width="1" opacity="0.4"/>
+      <text x="80" y="126" font-size="11" fill="#9A9890" text-anchor="end">40</text>
+
+      <!-- Average line -->
+      <line x1="90" y1="265" x2="880" y2="265" stroke="#C9A84C" stroke-width="2" stroke-dasharray="5,5" opacity="0.7"/>
+      <text x="885" y="270" font-size="10" fill="#C9A84C" font-weight="500">평균 18.5배</text>
+
+      <!-- Bars with gradients -->
+      <!-- Samsung (14.6) -->
+      <rect x="110" y="265" width="55" height="75" fill="url(#barGradent1)"/>
+      <text x="137" y="365" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="500">삼성전자</text>
+      <text x="137" y="382" font-size="11" fill="#BF4A4A" text-anchor="middle" font-weight="500">14.6배</text>
+      <text x="137" y="398" font-size="10" fill="#9A9890" text-anchor="middle">-21%</text>
+
+      <!-- SK Hynix (17.7) -->
+      <rect x="185" y="278" width="55" height="62" fill="url(#barGradent2)"/>
+      <text x="212" y="365" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="500">SK하이닉스</text>
+      <text x="212" y="382" font-size="11" fill="#C9A84C" text-anchor="middle" font-weight="500">17.7배</text>
+      <text x="212" y="398" font-size="10" fill="#9A9890" text-anchor="middle">-4%</text>
+
+      <!-- TSMC (21.5) -->
+      <rect x="260" y="242" width="55" height="98" fill="url(#barGradent3)"/>
+      <text x="287" y="365" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="500">TSMC</text>
+      <text x="287" y="382" font-size="11" fill="#4A9EBF" text-anchor="middle" font-weight="500">21.5배</text>
+      <text x="287" y="398" font-size="10" fill="#9A9890" text-anchor="middle">+16%</text>
+
+      <!-- Intel (18.2) -->
+      <rect x="335" y="263" width="55" height="77" fill="url(#barGradent3)"/>
+      <text x="362" y="365" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="500">인텔</text>
+      <text x="362" y="382" font-size="11" fill="#4A9EBF" text-anchor="middle" font-weight="500">18.2배</text>
+      <text x="362" y="398" font-size="10" fill="#9A9890" text-anchor="middle">-2%</text>
+
+      <!-- NVIDIA (42.0) -->
+      <rect x="410" y="50" width="55" height="290" fill="url(#barGradent4)"/>
+      <text x="437" y="365" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="500">NVIDIA</text>
+      <text x="437" y="382" font-size="11" fill="#4ABF7A" text-anchor="middle" font-weight="500">42.0배</text>
+      <text x="437" y="398" font-size="10" fill="#9A9890" text-anchor="middle">+127%</text>
+
+      <!-- Info box -->
+      <rect x="500" y="90" width="370" height="200" fill="#C9A84C" opacity="0.08" stroke="#C9A84C" stroke-width="1.5" stroke-dasharray="3,3" rx="6"/>
+
+      <text x="685" y="115" font-size="13" fill="#C9A84C" text-anchor="middle" font-weight="600">
+        코리아 디스카운트의 기회
+      </text>
+
+      <text x="515" y="145" font-size="11" fill="#E8E6E1" font-weight="400">
+        삼성전자: PER 14.6배 (글로벌 18.5배 대비 -21%)
+      </text>
+      <text x="515" y="165" font-size="11" fill="#E8E6E1">
+        기술력: 세계 최고 수준의 파운드리 기술
+      </text>
+      <text x="515" y="185" font-size="11" fill="#E8E6E1">
+        성장성: HBM4 수요 폭발 (AI 혁명)
+      </text>
+      <text x="515" y="205" font-size="11" fill="#E8E6E1">
+        정책: 밸류업 프로그램 지원 (2025~2026)
+      </text>
+      <text x="515" y="225" font-size="11" fill="#E8E6E1">
+        시장: 외국인 매수 본격화 가능성
+      </text>
+      <text x="515" y="250" font-size="11" fill="#C9A84C" font-weight="600">
+        → PER 16~17배 상향 가능성 높음
+      </text>
+
+      <!-- Legend -->
+      <rect x="110" y="360" width="14" height="14" fill="#BF4A4A" opacity="0.8"/>
+      <text x="130" y="370" font-size="10" fill="#E8E6E1">저평가 (&lt;-10%)</text>
+
+      <rect x="310" y="360" width="14" height="14" fill="#C9A84C" opacity="0.8"/>
+      <text x="330" y="370" font-size="10" fill="#E8E6E1">중간값</text>
+
+      <rect x="510" y="360" width="14" height="14" fill="#4A9EBF" opacity="0.8"/>
+      <text x="530" y="370" font-size="10" fill="#E8E6E1">정상 (±10%)</text>
+
+      <rect x="710" y="360" width="14" height="14" fill="#4ABF7A" opacity="0.8"/>
+      <text x="730" y="370" font-size="10" fill="#E8E6E1">고평가 (&gt;+10%)</text>
+    </svg>
+  </div>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  
+    <details class="deep-dive">
+      <summary>코리아 디스카운트가 언제 해소될까? (신경과학적 관점)</summary>
+      <div class="deep-dive-content">
+        <p><span class="neuro-tag">신경과학</span> <strong>기울어진 운동장 심리 — Anchoring Bias의 반대:</strong></p>
+        <p>외국인 투자자들의 뇌는 "한국 = 위험 → 저평가"라는 과거의 앵커링에 갇혀 있습니다.
+        하지만 실제 기술력·수익성은 변했습니다. 새로운 정보(밸류업 프로그램, HBM4 성장)가 충분히 반복되면
+        신경회로가 업데이트되고, 외국인의 매매 행동도 바뀝니다.</p>
+        <p><span class="engineer-tag">엔지니어 관점</span> 시스템 리셋: 한국 반도체가 세계 최고 기술을 갖고도 저평가되는 것은
+        '정보 비대칭'—외국인이 모르는 것입니다. 공시·홍보·정책 신호가 반복되면 마켓 효율성이 점진적으로 개선됩니다.</p>
+        <p style="margin-top:1rem;"><strong>구체적 시나리오:</strong></p>
+        <ul style="margin-left:1.5rem;font-size:0.85rem;color:var(--text-secondary);">
+          <li>Q1 2025: 자사주 매입 공식화 → 외국인 기관투자자 주목</li>
+          <li>Q2 2025: 배당세 인하 법안 통과 → 외국인 수익률 개선</li>
+          <li>Q3~Q4 2025: HBM4 대량 수주 발표 → EPS 상향</li>
+          <li>2026년: PER 16~17배로 상향, 코리아 디스카운트 부분 해소</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="deep-dive">
+      <summary>내 주식 포트폴리오 최적화: 삼성전자 vs SK하이닉스 선택</summary>
+      <div class="deep-dive-content">
+        <p><span class="neuro-tag">신경과학</span> <strong>최적화 마비 극복:</strong> 두 회사 모두 저평가인데,
+        "어느 게 더 좋을까?" 고민하다가 아무 것도 안 하는 경우가 많습니다. 뇌의 의사결정 마비입니다.
+        객관적 기준(수익/성장률/배당)을 세우면 결정 속도가 올라갑니다.</p>
+
+        <div class="data-table-wrap" style="margin-top:1rem;">
+          <table class="data-table">
+            <thead><tr><th>항목</th><th>삼성전자</th><th>SK하이닉스</th><th>추천</th></tr></thead>
+            <tbody>
+              <tr><td>현재 PER</td><td>14.6배</td><td>17.7배</td><td>삼성 (더 저평가)</td></tr>
+              <tr><td>기술 리더십</td><td>파운드리 (GAE)</td><td>메모리칩 (HBM)</td><td>동등</td></tr>
+              <tr><td>배당 수익률</td><td>3.2%</td><td>2.8%</td><td>삼성</td></tr>
+              <tr><td>성장성</td><td>높음 (AI 파운드리)</td><td>높음 (HBM4)</td><td>동등</td></tr>
+              <tr><td>변동성</td><td>낮음</td><td>중간</td><td>삼성 (안정)</td></tr>
+              <tr class="highlight-row"><td><strong>종합 추천비</strong></td><td><strong>60%</strong></td><td><strong>40%</strong></td><td><strong>삼성 우선</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:1rem;"><span class="engineer-tag">엔지니어 체크리스트:</span></p>
+        <ul style="margin-left:1.5rem;font-size:0.85rem;color:var(--text-secondary);">
+          <li>✓ 수익성: 둘 다 영구적 이익 기업 (삼성이 더 안정)</li>
+          <li>✓ 기술 경쟁력: 둘 다 세계 탑3 (단, 파운드리 vs 메모리 다른 시장)</li>
+          <li>✓ 정책 지원: 둘 다 반도체 육성 정책 대상</li>
+          <li>✓ 외국인 매수: 삼성이 배당세 인하로 더 유리</li>
+        </ul>
+      </div>
+    </details>
+    
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  <div class="sim-box">
+    <h3>학생 자산에 적용: 코리아 디스카운트 기회 평가</h3>
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">
+      현재 주식 보유: 삼성전자·SK하이닉스 2,800만원 | 현 순자산 3억 2,800만원
+    </p>
+
+    <div class="formula-block" style="margin-bottom:1.5rem;">
+      <span class="formula-highlight">시나리오: 2년 후 PER 상향 효과</span>
+      <span class="formula-line">현재 삼성전자 주가: 70,000원 (PER 14.6배)</span>
+      <span class="formula-line">현재 EPS: 4,800원</span>
+      <span class="formula-line">미래 가정: PER 16배로 상향 (밸류업 효과)</span>
+      <span class="formula-highlight">미래 주가 = 4,800원 × 16배 = 76,800원</span>
+      <span class="formula-line" style="margin-top:0.5rem;">예상 수익률 = (76,800 - 70,000) / 70,000 = <span class="formula-highlight">+9.7%</span> (2년)</span>
+      <span class="formula-line">배당 누적 (3.2% × 2년) = +6.4%</span>
+      <span class="formula-highlight">총 기대수익률 ≈ 16% (2년) = 연 7.8%</span>
+    </div>
+
+    <p style="color:var(--gold);font-weight:500;">추가 고려사항:</p>
+    <ul class="checklist">
+      <li>현재 보유 비중 확인: 주식 2,800만 / 순자산 3억 2,800만 = 약 8.5%</li>
+      <li>추가 매수 검토: 한국 반도체 기업에 15~20% 배분 추천</li>
+      <li>HBM4 성장 시 +15~20% 추가 상승 가능</li>
+      <li>배당 재투자 설정: 분기별 배당금 자동 재매수</li>
+      <li>리스크: 지정학적 긴장 급등 시 일시적 조정 가능성</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    
+    <div class="bias-name">국가 편향 + 정보 비대칭 (Country Bias + Information Asymmetry)</div>
+    <p><span class="neuro-tag">신경과학</span> <strong>과거의 앵커링:</strong>
+    외국인 투자자의 뇌는 "한국 = 1997년 외환위기 / 2008년 금융위기"라는 오래된 기억에 고착되어 있습니다.
+    현재의 기술력·수익성·정책 변화를 충분히 인지하지 못합니다. 이것이 코리아 디스카운트의 근본 원인입니다.</p>
+
+    <p style="margin-top:0.8rem;"><span class="engineer-tag">엔지니어 관점</span> <strong>정보 재구성:</strong>
+    한국 반도체 회사의 기술·수익성·성장성은 미국과 동등 이상입니다.
+    하지만 공시 방식·IR 활동·영어 콘텐츠가 미흡해서 외국인이 모릅니다.
+    이는 시스템의 문제(공시 부족), 심리의 문제(앵커링)가 맞물린 결과입니다.</p>
+
+    <p style="margin-top:1rem;padding:1rem;background:rgba(201,168,76,0.1);border-radius:6px;color:var(--gold);border-left:3px solid var(--gold);">
+      <strong>금 조언:</strong> 동일한 기술력이면 저평가 기업을 사세요.
+      시장의 비효율성은 임시적입니다. 밸류업 프로그램 + HBM4 성장 = 2025~2026년 PER 상향의 촉매입니다.
+    </p>
+
+    <p style="margin-top:0.8rem;padding:1rem;background:rgba(74,158,191,0.1);border-radius:6px;color:var(--blue);border-left:3px solid var(--blue);">
+      <strong>파 조언:</strong> 반도체 산업을 깊이 이해하는 엔지니어라면,
+      글로벌 PER 비교만으로도 기회를 찾을 수 있습니다.
+      자신의 기술 직관 + 재무 분석 = 강력한 투자 근거입니다.
+      자신의 주식 비중을 20~30% 수준으로 높이는 것도 합리적입니다.
+    </p>
+    
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 삼성전자의 코리아 디스카운트 규모는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 약 -5% (거의 없음)</li>
+<li onclick="checkAnswer(this,'q1',true)">② 약 -21% (글로벌 평균 대비)</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 약 -50% (매우 심각)</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 국가와 무관하게 결정됨</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>삼성 PER 14.6배 vs 글로벌 평균 18.5배 = 3.9배 차이 = -21% 할인. 같은 기술력·수익성을 가진 미국·대만 기업보다 훨씬 쌉니다.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 밸류업 프로그램이 2025~2026년 기여할 주요 메커니즘은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 정부 보조금 직접 지원</li>
+<li onclick="checkAnswer(this,'q2',true)">② 자사주 매입 + 배당세 인하 → EPS ↑ + 외국인 유인 → PER ↑</li>
+<li onclick="checkAnswer(this,'q2',false)">③ 주가 강제 상승</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 배당 폐지</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ②</strong><br>자사주 매입은 발행주식 수를 줄여 EPS를 올리고, 배당세 인하는 외국인 순배당률을 개선해 매수를 유인합니다. 결과: PER 16~17배 상향 가능.</div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. 한국 기업이 저평가되는 근본 원인으로 가장 정확한 것은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 한국 기업의 기술력이 실제로 낮음</li>
+<li onclick="checkAnswer(this,'q3',true)">② 외국인의 과거 경험(앵커링) + 정보 비대칭 + 공시 미흡</li>
+<li onclick="checkAnswer(this,'q3',false)">③ 한국 경제가 필연적으로 침체함</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 미국 회사만 좋은 회사다</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ②</strong><br>실제로 한국 반도체·배터리 기업의 기술·수익성은 세계 최고 수준입니다. 문제는 외국인의 구(구) 인식 + 공시 부족으로 인한 정보 차이입니다.</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 13</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 20일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 22일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 26일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">04월 02일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 18일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day12_timing_principles.html">← Day 12</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 13 / 23</span>
+  <a class="nav-btn" href="day14_part2_review.html">Day 14 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인간 탐구 Day 05 — 메타인지 훈련</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--purple:#8A6ABF;--gold:#C9A84C;--green:#6BBF8A;--red:#BF6B6B;--cyan:#6BB5BF;
+--bg:#0A0C10;--card:#12151C;--card2:#161A24;--text1:#E8E9F3;--text2:#9EA0B8;
+--border:rgba(138,106,191,0.15);--glow:rgba(138,106,191,0.08);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text1);line-height:1.85;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--purple);border-radius:3px}
+
+/* ── Header ── */
+header{position:sticky;top:0;z-index:1000;background:rgba(10,12,16,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:.85rem 2rem}
+.hdr{max-width:860px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+.hdr-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:700;background:linear-gradient(135deg,var(--purple),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr-sub{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--text2)}
+.hdr-progress{height:2px;background:linear-gradient(90deg,var(--purple),var(--gold));position:absolute;bottom:0;left:0;width:22.7%}
+
+/* ── Series Banner ── */
+.series-banner{max-width:860px;margin:1.5rem auto 0;padding:.6rem 1.2rem;background:rgba(138,106,191,0.06);border:1px solid var(--border);border-radius:8px;display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--text2)}
+.series-banner strong{color:var(--gold);font-family:'JetBrains Mono',monospace}
+
+/* ── Main ── */
+main{max-width:860px;margin:0 auto;padding:2rem 1.5rem 4rem}
+
+/* ── Hero ── */
+.hero{text-align:center;padding:3.5rem 2rem;margin-bottom:3rem;background:linear-gradient(160deg,rgba(138,106,191,0.07),rgba(201,168,76,0.05));border:1px solid var(--border);border-radius:16px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 40%,rgba(138,106,191,0.04),transparent 50%);pointer-events:none}
+.gauge-wrap{display:flex;justify-content:center;align-items:center;gap:1.2rem;margin-bottom:2rem;flex-wrap:wrap}
+.gauge{width:100px;height:100px;border-radius:50%;position:relative}
+.gauge svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gauge-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge-val{font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:600;color:var(--gold)}
+.gauge-txt{font-size:.65rem;color:var(--text2);margin-top:2px}
+.meta-badges{display:flex;flex-direction:column;gap:.4rem;align-items:flex-start}
+.meta-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .65rem;background:rgba(138,106,191,0.12);border:1px solid rgba(138,106,191,0.25);border-radius:12px;font-size:.72rem;color:var(--purple);font-family:'JetBrains Mono',monospace}
+.meta-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--purple)}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-weight:600;line-height:1.35;margin-bottom:1rem}
+.hero-q{font-size:1.15rem;color:var(--text2);line-height:1.6;font-style:italic;margin-bottom:2rem}
+.kw-badges{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+.kw{padding:.45rem 1rem;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:20px;font-size:.82rem;color:var(--gold)}
+
+/* ── Section Titles ── */
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:600;margin-bottom:1.8rem;padding-bottom:.8rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.8rem}
+.sec-title .icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+
+/* ── Learning Strategy ── */
+.strategy{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:3rem}
+.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+@media(max-width:700px){.time-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:450px){.time-grid{grid-template-columns:1fr}}
+.tslot{padding:1rem;background:rgba(138,106,191,0.06);border-left:3px solid var(--purple);border-radius:0 8px 8px 0;transition:transform .2s}
+.tslot:hover{transform:translateX(4px)}
+.tslot-time{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--gold);margin-bottom:.4rem}
+.tslot-desc{font-size:.88rem;color:var(--text2);line-height:1.6}
+.strat-note{padding:1.2rem;background:rgba(107,191,138,0.06);border-left:3px solid var(--green);border-radius:0 8px 8px 0;font-size:.9rem;color:var(--text2);line-height:1.7}
+.strat-note strong{color:var(--green)}
+
+/* ── Concept Cards ── */
+.concepts{display:grid;gap:1.5rem;margin-bottom:3rem}
+.ccard{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .3s}
+.ccard:hover{border-color:rgba(138,106,191,0.35)}
+.ccard-head{padding:1.5rem 2rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.ccard-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600;color:var(--gold)}
+.ccard-num{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text2);background:rgba(201,168,76,0.1);padding:.2rem .6rem;border-radius:10px}
+.ccard-toggle{font-size:1.2rem;color:var(--text2);transition:transform .3s}
+.ccard.open .ccard-toggle{transform:rotate(180deg)}
+.ccard-body{padding:0 2rem;max-height:0;overflow:hidden;transition:max-height .5s ease,padding .3s}
+.ccard.open .ccard-body{max-height:3000px;padding:0 2rem 2rem}
+.ccard-summary{padding:0 2rem 1.5rem;font-size:.95rem;color:var(--text2)}
+.ccard-body h4{font-size:.95rem;color:var(--purple);margin:1.2rem 0 .6rem;font-weight:600}
+.ccard-body p,.ccard-body li{font-size:.92rem;color:var(--text2);line-height:1.75}
+.ccard-body ul{margin-left:1.2rem;margin-bottom:.8rem}
+.ccard-body li{margin-bottom:.3rem}
+.deep-dive{margin-top:1.5rem;padding:1.2rem;background:rgba(138,106,191,0.05);border:1px dashed rgba(138,106,191,0.2);border-radius:8px}
+.deep-dive summary{cursor:pointer;font-size:.88rem;color:var(--purple);font-weight:500;margin-bottom:.8rem}
+.deep-dive p{font-size:.85rem;color:var(--text2);line-height:1.7}
+
+/* ── SVG Diagram ── */
+.diagram-section{margin-bottom:3rem}
+.diagram-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;overflow-x:auto}
+.diagram-wrap svg{width:100%;max-width:780px;margin:0 auto;display:block}
+.diagram-caption{margin-top:1.2rem;font-size:.88rem;color:var(--text2);line-height:1.7;padding:0 .5rem}
+
+/* ── Practice ── */
+.practice{margin-bottom:3rem}
+.proutine{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:1.2rem;overflow:hidden}
+.proutine-head{padding:1.2rem 1.8rem;display:flex;align-items:center;gap:1rem;border-bottom:1px solid var(--border)}
+.proutine-time{font-family:'JetBrains Mono',monospace;font-size:.85rem;padding:.35rem .8rem;border-radius:8px;font-weight:600;min-width:60px;text-align:center}
+.proutine-time.t30{background:rgba(191,107,107,0.15);color:var(--red)}
+.proutine-time.t5{background:rgba(201,168,76,0.15);color:var(--gold)}
+.proutine-time.tday{background:rgba(107,191,138,0.15);color:var(--green)}
+.proutine-name{font-size:1rem;font-weight:500}
+.proutine-body{padding:1.8rem}
+.proutine-body ol{margin-left:1.3rem;font-size:.92rem;color:var(--text2);line-height:1.8}
+.proutine-body ol li{margin-bottom:.6rem}
+.proutine-body ol li strong{color:var(--text1)}
+.do-dont{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem}
+@media(max-width:500px){.do-dont{grid-template-columns:1fr}}
+.do-box,.dont-box{padding:1rem;border-radius:8px;font-size:.88rem;line-height:1.6}
+.do-box{background:rgba(107,191,138,0.08);border:1px solid rgba(107,191,138,0.2);color:var(--text2)}
+.do-box strong{color:var(--green);display:block;margin-bottom:.4rem}
+.dont-box{background:rgba(191,107,107,0.08);border:1px solid rgba(191,107,107,0.2);color:var(--text2)}
+.dont-box strong{color:var(--red);display:block;margin-bottom:.4rem}
+
+/* ── Philosophy ── */
+.philo{margin-bottom:3rem}
+.philosopher{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:1.2rem}
+.philosopher h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);margin-bottom:1rem}
+.philosopher blockquote{padding:1rem 1.5rem;border-left:3px solid var(--gold);background:rgba(201,168,76,0.05);border-radius:0 8px 8px 0;font-style:italic;font-size:.95rem;color:var(--text2);margin-bottom:1rem;line-height:1.7}
+.philosopher .analysis{font-size:.9rem;color:var(--text2);line-height:1.75}
+.night-q{background:linear-gradient(135deg,rgba(138,106,191,0.08),rgba(201,168,76,0.06));border:1px solid var(--border);border-radius:14px;padding:2rem;text-align:center;margin-top:1.5rem}
+.night-q h4{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gold);margin-bottom:.8rem}
+.night-q p{font-size:1rem;font-style:italic;color:var(--text2);line-height:1.6}
+
+/* ── Quiz ── */
+.quiz{margin-bottom:3rem}
+.quiz-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:1.2rem}
+.quiz-card h4{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--purple);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.5px}
+.quiz-card .q-text{font-size:1rem;margin-bottom:1.5rem;line-height:1.7}
+.q-options{display:flex;flex-direction:column;gap:.6rem}
+.q-opt{padding:.8rem 1.2rem;background:rgba(138,106,191,0.06);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:.9rem;color:var(--text2);transition:all .3s}
+.q-opt:hover{border-color:var(--purple);background:rgba(138,106,191,0.12);color:var(--text1)}
+.q-opt.correct{border-color:var(--green);background:rgba(107,191,138,0.12);color:var(--green)}
+.q-opt.wrong{border-color:var(--red);background:rgba(191,107,107,0.12);color:var(--red)}
+.q-explain{margin-top:1rem;padding:1rem;background:rgba(107,191,138,0.06);border-radius:8px;font-size:.88rem;color:var(--text2);line-height:1.7;display:none}
+.q-explain.show{display:block}
+
+/* ── Spaced Repetition ── */
+.sr-tracker{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:3rem}
+.sr-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;margin-top:1rem}
+@media(max-width:500px){.sr-grid{grid-template-columns:repeat(3,1fr)}}
+.sr-day{padding:.7rem;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;transition:all .3s;font-size:.8rem}
+.sr-day:hover{border-color:var(--purple)}
+.sr-day.done{background:rgba(107,191,138,0.15);border-color:var(--green);color:var(--green)}
+.sr-day small{display:block;font-size:.65rem;color:var(--text2);margin-bottom:.2rem}
+
+/* ── Footer Nav ── */
+footer{border-top:1px solid var(--border);padding:2rem 1.5rem;max-width:860px;margin:0 auto}
+.foot-nav{display:flex;justify-content:space-between;gap:1rem}
+@media(max-width:500px){.foot-nav{flex-direction:column}}
+.foot-nav a{flex:1;padding:1rem;color:var(--text2);text-decoration:none;border:1px solid var(--border);border-radius:8px;text-align:center;transition:all .3s;font-size:.9rem}
+.foot-nav a:hover{border-color:var(--purple);color:var(--text1);background:rgba(138,106,191,0.08)}
+
+/* ── Animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.ani{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.ani.vis{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<header>
+<div class="hdr">
+<div class="hdr-title">인간 탐구 | DAY 05</div>
+<div class="hdr-sub">PART 2 — 메타인지와 마음 읽기</div>
+</div>
+<div class="hdr-progress"></div>
+</header>
+
+<div class="series-banner">
+<span>이 시리즈 예상 총 Day: <strong>22일</strong></span>
+<span>Day 05 of 22 · 진행률 <strong>22.7%</strong></span>
+</div>
+
+<main>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero ani">
+<div class="gauge-wrap">
+<div class="gauge">
+<svg viewBox="0 0 100 100">
+<circle cx="50" cy="50" r="42" fill="none" stroke="rgba(138,106,191,0.15)" stroke-width="6"/>
+<circle cx="50" cy="50" r="42" fill="none" stroke="url(#gaugeGrad)" stroke-width="6" stroke-dasharray="264" stroke-dashoffset="40" stroke-linecap="round"/>
+<defs><linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+<stop offset="0%" stop-color="#6BB5BF"/><stop offset="50%" stop-color="#8A6ABF"/><stop offset="100%" stop-color="#C9A84C"/>
+</linearGradient></defs>
+</svg>
+<div class="gauge-label"><span class="gauge-val">05</span><span class="gauge-txt">DAY</span></div>
+</div>
+<div class="meta-badges">
+<span class="meta-badge"><span class="dot"></span>난이도: 중급</span>
+<span class="meta-badge"><span class="dot" style="background:var(--purple)"></span>자기인식 심화</span>
+<span class="meta-badge"><span class="dot" style="background:var(--cyan)"></span>28분 완결</span>
+</div>
+</div>
+<h1>"생각을 관찰하는 나"<br>기본값 모드 네트워크의 정체</h1>
+<p class="hero-q">"당신의 뇌는 휴식 중에도 가장 활발하게 작동한다.<br>그리고 그것이 반추(Rumination)로 변할 때, 당신은 자기 자신의 포로가 된다."</p>
+<div class="kw-badges">
+<span class="kw">Default Mode Network (DMN)</span>
+<span class="kw">메타인지 Metacognition</span>
+<span class="kw">반추 Rumination</span>
+<span class="kw">자기거리두기 Self-Distancing</span>
+</div>
+</section>
+
+<!-- ═══ LEARNING STRATEGY ═══ -->
+<section class="strategy ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(138,106,191,0.15)">🧠</span>학습 전략 — Day 05의 세 층</h2>
+<div class="time-grid">
+<div class="tslot">
+<div class="tslot-time">0~7분</div>
+<div class="tslot-desc">기본값 모드 네트워크(DMN) 이해 — 휴식 중의 뇌 활동</div>
+</div>
+<div class="tslot">
+<div class="tslot-time">7~14분</div>
+<div class="tslot-desc">메타인지와 DMN의 악순환 — 반추의 신경생물학</div>
+</div>
+<div class="tslot">
+<div class="tslot-time">14~22분</div>
+<div class="tslot-desc">SVG 다이어그램 + 자기거리두기 기술</div>
+</div>
+<div class="tslot">
+<div class="tslot-time">22~28분</div>
+<div class="tslot-desc">10분 메타인지 일지 작성법 + 실전 루틴</div>
+</div>
+</div>
+<div class="strat-note">
+<strong>💡 학습 기법 — 메타메모리(Metamemory):</strong> 오늘은 "당신이 어떻게 생각하는지"를 관찰하면서 학습하세요. 본인의 마음이 언제 DMN 모드(자기 관련 생각)로 빠지는지 주의 깊게 봅시다. 이것이 메타인지 능력을 강화하는 가장 직접적인 방법입니다.
+</div>
+</section>
+
+<!-- ═══ CONCEPT CARDS ═══ -->
+<section class="concepts ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(201,168,76,0.15)">📋</span>핵심 개념 카드</h2>
+
+<!-- Card 1 -->
+<div class="ccard open" id="c1">
+<div class="ccard-head" onclick="toggleCard('c1')">
+<div><span class="ccard-num">01/03</span> <span class="ccard-title">기본값 모드 네트워크 (DMN)</span></div>
+<span class="ccard-toggle">▾</span>
+</div>
+<p class="ccard-summary">당신이 아무것도 하지 않을 때 가장 활발해지는 뇌의 기본 상태 — 자기 관련 생각의 중추</p>
+<div class="ccard-body">
+<h4>🔬 뇌과학 메커니즘</h4>
+<p>기본값 모드 네트워크(Default Mode Network, DMN)는 Marcus Raichle(2001, Washington University)의 발견으로, 휴식 중에 특히 활발하게 작동하는 뇌 영역들의 집합입니다. 핵심 구성 요소:</p>
+<ul>
+<li><strong>내측 전전두엽(mPFC):</strong> "나"에 대한 자동적 평가 — "나는 충분한가? 내가 했던 말이 이상하지 않았나?"</li>
+<li><strong>후부 대상피질(PCC):</strong> 자서전적 기억과 미래 시뮬레이션 — "저때 있었던 일을 다시 생각해본다"</li>
+<li><strong>측두엽 내측(MTL):</strong> 에피소드 기억 저장소</li>
+<li><strong>전측두엽(ATL):</strong> 의미 처리와 사회적 이해</li>
+</ul>
+<p>DMN의 활동이 높을 때, 뇌의 외부 자극 감지 네트워크(Task-Positive Network, TPN)는 억제됩니다. 즉, <strong>당신이 자기 생각에 몰두할수록 주변 세상으로부터 멀어진다</strong>는 의미입니다.</p>
+
+<h4>🔄 르노와 가정에서의 DMN</h4>
+<p><strong>직장 시나리오:</strong> 미팅이 끝나고 점심시간. 당신의 DMN이 활성화되면서, 방금 전 당신이 한 제안이 동료들에게 어떻게 보였을지 자동으로 되짚게 됩니다. 이것은 생존에 도움이 되는 메커니즘입니다. 하지만 그 생각이 반복되면 반추가 됩니다.</p>
+<p><strong>가정 시나리오:</strong> 퇴근 후 피로한 상태에서 아이들 목욕을 시킵니다. DMN 활동이 높은 상태에서 아이의 말을 제대로 듣지 못하고, 자신의 피로와 불안감에만 몰두합니다. "내가 좋은 부모인가?" 라는 생각이 반복됩니다.</p>
+
+<h4>⚠️ DMN의 진화 역사</h4>
+<p>DMN의 크기가 클수록 마음 이론(Theory of Mind) — 다른 사람의 의도를 추론하는 능력이 뛰어납니다. 인간은 다른 영장류보다 DMN이 발달했기 때문에, 복잡한 사회를 이룰 수 있었습니다. 하지만 그 대가로 자기 비판과 불안에도 취약해졌습니다.</p>
+
+<details class="deep-dive">
+<summary>🔍 Deep Dive: DMN과 뇌 에너지 소비</summary>
+<p>뇌는 전체 신체 에너지의 20%를 소비하는데, DMN은 특히 에너지 집약적입니다. 휴식 중일 때 DMN이 뇌 에너지의 약 5-10%를 차지합니다. 반추 상태에서 이 수치가 더 증가하면, 당신의 뇌는 실제 외부 위협이나 기회에 대응할 에너지를 상실합니다. 이것이 INFP가 반추에 빠지면 피로하지만 잠을 자지 못하는 이유입니다 — 뇌가 "쉬고" 있지 않기 때문입니다.</p>
+</details>
+</div>
+</div>
+
+<!-- Card 2 -->
+<div class="ccard" id="c2">
+<div class="ccard-head" onclick="toggleCard('c2')">
+<div><span class="ccard-num">02/03</span> <span class="ccard-title">메타인지 약화와 반추의 악순환</span></div>
+<span class="ccard-toggle">▾</span>
+</div>
+<p class="ccard-summary">자동적 생각이 지배하는 상태 — 메타인지가 실패하면 반추는 불가피하다</p>
+<div class="ccard-body">
+<h4>🔬 심리학적 메커니즘</h4>
+<p>반추(Rumination)는 단순한 "생각이 많은 것"이 아닙니다. Susan Nolen-Hoeksema(스탠포드)의 정의:</p>
+<ul>
+<li><strong>자동성:</strong> 의식적으로 시작한 것이 아닌데 자동으로 반복되는 생각</li>
+<li><strong>부정성:</strong> 주로 문제와 원인에 초점 ("왜 나는 계속 이럴까?")</li>
+<li><strong>통제 불가능성:</strong> 멈추려고 해도 멈춰지지 않는 생각의 반복</li>
+</ul>
+<p>메타인지가 강하면, 당신은 이 자동적 생각을 "관찰"할 수 있습니다. 마치 구름이 하늘을 지나가는 것처럼. 하지만 메타인지가 약하면, 당신은 그 구름과 동일시되어 빨려 들어갑니다.</p>
+
+<h4>📊 반추의 4단계 악순환</h4>
+<ul>
+<li><strong>1단계 (자동 발동):</strong> 부정적 자극 (미팅에서의 피드백) → DMN 활성화</li>
+<li><strong>2단계 (메타인지 실패):</strong> "이건 그냥 생각일 뿐"이라고 인식 불가 → 생각을 사실로 간주</li>
+<li><strong>3단계 (반추 시작):</strong> "나는 왜 항상 실수할까?" → "내가 무능한 거 아닐까?" → "저 사람들은 나를 어떻게 생각할까?"</li>
+<li><strong>4단계 (신경생물학적 심화):</strong> 반복적 반추 → 코르티솔 상승 → 수면 악화 → PFC 기능 저하 → 메타인지 추가 약화</li>
+</ul>
+
+<h4>🧬 INFP의 취약성</h4>
+<p>INFP는 내향적 감정(Fi)이 주기능이므로, 자신의 내적 상태에 매우 민감합니다. 이는 미묘한 감정을 감지할 수 있다는 장점이 있지만, 동시에 내적 불일치에 대한 불안감이 커집니다. "나의 행동이 나의 가치관과 맞는가?"라는 물음이 반복되면, 이것이 반추로 변질됩니다.</p>
+
+<h4>🏢 당신의 실제 시나리오</h4>
+<p>르노에서 당신의 설계를 다른 엔지니어가 "더 간단한 방법이 있지 않을까?"라고 질문할 때. 당신은:</p>
+<ol style="margin-left:1.5rem">
+<li>즉시 이것을 "나의 능력 부족"의 신호로 해석</li>
+<li>메타인지가 약한 상태에서, "내가 진짜 엔지니어가 맞나?"라는 생각에 빠짐</li>
+<li>그 생각이 2시간 반복 → 점심을 먹으면서도 반복 → 퇴근 후에도 반복</li>
+<li>결과: 밤에 가족들과 함께 있어도 "나"에게만 집중</li>
+</ol>
+
+<details class="deep-dive">
+<summary>🔍 Deep Dive: fMRI 연구로 본 반추의 신경적 기전</summary>
+<p>Oxford 대학의 Jud Brewer의 연구(2018)에 따르면, 반추 상태에서는 DMN과 salience network(중요도 판단 네트워크)가 과도하게 연결(hyperconnectivity)됩니다. 정상인이 외부 자극에 주의를 돌릴 때, 반추 장애가 있는 사람은 그 자동적 생각에 계속 "중요도" 신호를 보냅니다. 메타인지 훈련(이 강의의 핵심)은 이 hyperconnectivity를 약화시키는 것이 목표입니다.</p>
+</details>
+</div>
+</div>
+
+<!-- Card 3 -->
+<div class="ccard" id="c3">
+<div class="ccard-head" onclick="toggleCard('c3')">
+<div><span class="ccard-num">03/03</span> <span class="ccard-title">메타인지와 자기거리두기</span></div>
+<span class="ccard-toggle">▾</span>
+</div>
+<p class="ccard-summary">"생각을 관찰하는 능력" — 당신이 당신의 생각에 동일시되지 않는 방법</p>
+<div class="ccard-body">
+<h4>🔬 메타인지의 정의</h4>
+<p>메타인지(Metacognition)는 "인지에 대한 인지" — 쉽게 말해 "생각을 생각하는 것"입니다. Flavell(1979)의 세 가지 핵심:</p>
+<ul>
+<li><strong>메타인지 지식:</strong> "나는 반추하는 경향이 있다" — 자신의 인지 패턴을 아는 것</li>
+<li><strong>메타인지 모니터링:</strong> "지금 내가 반추하고 있다" — 현재 순간에 자동적 생각을 감지하는 것</li>
+<li><strong>메타인지 통제:</strong> "이 생각에서 벗어나자" — 실제로 주의를 전환하는 것</li>
+</ul>
+
+<h4>🎯 자기거리두기(Self-Distancing)</h4>
+<p>Ethan Kross(Michigan University)의 획기적 연구(2012):</p>
+<ul>
+<li><strong>실험:</strong> 참가자들이 가까운 미래에 발표해야 하는 불안감에 대해 생각하게 함</li>
+<li><strong>첫번째 그룹:</strong> "나는 불안하다"고 생각 (일인칭)</li>
+<li><strong>두번째 그룹:</strong> "John은 불안하다"고 생각 (삼인칭, 자신의 이름을 사용)</li>
+<li><strong>결과:</strong> 삼인칭으로 사고한 그룹의 코르티솔 수치가 훨씬 낮았고, 발표 성과도 더 좋았음</li>
+</ul>
+<p>이것이 바로 자기거리두기의 힘입니다. 물리적으로 이동할 필요는 없습니다. <strong>시간적 거리두기</strong> ("10년 후에 이 문제가 중요할까?"), <strong>공간적 거리두기</strong> ("우주 관점에서 보면 이것은..."), <strong>관점적 거리두기</strong> ("친구 입장에서 이 상황을 보면...")도 동일한 신경생물학적 효과를 냅니다.</p>
+
+<h4>🧠 메타인지가 강화되는 과정</h4>
+<ul>
+<li><strong>1주차:</strong> 간헐적으로 자동적 생각에 주의 → "아, 지금 내가 반추하고 있네"</li>
+<li><strong>2~3주차:</strong> 더 빠르게 인식 → 생각과 자아를 분리하는 데 성공</li>
+<li><strong>4주차+:</strong> 예방적 메타인지 → 반추를 감지하기 전에 관점을 전환</li>
+</ul>
+
+<h4>🏠 + 🏢 당신의 예시</h4>
+<p><strong>직장:</strong> 동료의 질문에 마음이 상할 때, "지금 내 편도체가 발화했다"고 관찰하는 것이 아니라, "한 엔지니어는 이 질문을 어떻게 해석할까?"라고 거리를 두면, 정서적 반응과 논리적 분석을 분리할 수 있습니다.</p>
+<p><strong>가정:</strong> "나는 좋은 부모가 아니야"라는 반복적 생각이 떠오를 때, "아, 나의 INFP 성향이 또 내 행동을 지나치게 평가하고 있네"라고 관찰하면, 그 생각에 휩쓸리지 않습니다.</p>
+
+<details class="deep-dive">
+<summary>🔍 Deep Dive: 불교 명상과 메타인지의 신경학적 동일성</summary>
+<p>Tomas Boldrini(로마 사피엔차 대학)의 메타분석(2009)에 따르면, 장기 명상 수행자의 뇌는:</p>
+<ul style="margin-left:1.5rem">
+<li>DMN의 크기가 더 작음 (자기 관련 반추에 덜 취약)</li>
+<li>DMN과 TPN 사이의 연결이 더 유연함 (필요에 따라 전환 용이)</li>
+<li>전전두엽 피질의 회백질 밀도가 높음 (메타인지 능력이 뛰어남)</li>
+</ul>
+<p>불교의 "관자재(觀自在)" — "자신을 자유롭게 관찰하는 것"이 바로 이 신경학적 기전을 설명하고 있었습니다.</p>
+</details>
+</div>
+</div>
+</section>
+
+<!-- ═══ SVG DIAGRAM ═══ -->
+<section class="diagram-section ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(138,106,191,0.15)">🔄</span>기본값 모드 네트워크(DMN) 다이어그램</h2>
+<div class="diagram-wrap">
+<svg viewBox="0 0 780 580" xmlns="http://www.w3.org/2000/svg">
+<!-- Background -->
+<defs>
+<pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+<path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(138,106,191,0.04)" stroke-width="0.5"/>
+</pattern>
+<marker id="arrP" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#8A6ABF"/></marker>
+<marker id="arrR" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#BF6B6B"/></marker>
+<marker id="arrG" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#6BBF8A"/></marker>
+<filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="780" height="580" fill="var(--card)" rx="12"/>
+<rect width="780" height="580" fill="url(#grid)"/>
+
+<!-- Title -->
+<text x="390" y="35" font-family="Cormorant Garamond,serif" font-size="16" fill="#C9A84C" text-anchor="middle" font-weight="600">DMN: 자기 관련 생각의 뇌 회로</text>
+
+<!-- Left side: Normal DMN state -->
+<text x="195" y="65" font-family="Noto Sans KR" font-size="12" fill="#6BBF8A" text-anchor="middle" font-weight="600">건강한 상태: DMN과 TPN 균형</text>
+
+<!-- mPFC -->
+<circle cx="130" cy="150" r="35" fill="rgba(138,106,191,0.15)" stroke="#8A6ABF" stroke-width="2"/>
+<text x="130" y="155" font-family="Noto Sans KR" font-size="10" fill="#8A6ABF" text-anchor="middle" font-weight="600">mPFC</text>
+<text x="130" y="170" font-family="JetBrains Mono" font-size="7" fill="#9EA0B8" text-anchor="middle">내측 전전두엽</text>
+
+<!-- PCC -->
+<circle cx="130" cy="270" r="35" fill="rgba(138,106,191,0.15)" stroke="#8A6ABF" stroke-width="2"/>
+<text x="130" y="275" font-family="Noto Sans KR" font-size="10" fill="#8A6ABF" text-anchor="middle" font-weight="600">PCC</text>
+<text x="130" y="290" font-family="JetBrains Mono" font-size="7" fill="#9EA0B8" text-anchor="middle">후부 대상피질</text>
+
+<!-- MTL -->
+<circle cx="260" cy="210" r="35" fill="rgba(138,106,191,0.15)" stroke="#8A6ABF" stroke-width="2"/>
+<text x="260" y="215" font-family="Noto Sans KR" font-size="10" fill="#8A6ABF" text-anchor="middle" font-weight="600">MTL</text>
+<text x="260" y="230" font-family="JetBrains Mono" font-size="7" fill="#9EA0B8" text-anchor="middle">측두엽내측</text>
+
+<!-- DMN connections -->
+<line x1="160" y1="160" x2="230" y2="200" stroke="#8A6ABF" stroke-width="2" marker-end="url(#arrP)"/>
+<line x1="230" y1="220" x2="160" y2="260" stroke="#8A6ABF" stroke-width="2" marker-end="url(#arrP)"/>
+<line x1="160" y1="170" x2="160" y2="250" stroke="#8A6ABF" stroke-width="2" stroke-dasharray="4,2" marker-end="url(#arrP)"/>
+
+<!-- TPN (Task-Positive Network) -->
+<text x="195" y="350" font-family="Noto Sans KR" font-size="11" fill="#6BBF8A" text-anchor="middle" font-weight="600">TPN이 활성화 중</text>
+<circle cx="100" cy="420" r="25" fill="rgba(107,191,138,0.15)" stroke="#6BBF8A" stroke-width="1.5"/>
+<text x="100" y="425" font-family="JetBrains Mono" font-size="8" fill="#6BBF8A" text-anchor="middle">외부</text>
+<text x="100" y="435" font-family="JetBrains Mono" font-size="8" fill="#6BBF8A" text-anchor="middle">주의</text>
+
+<!-- Inhibition -->
+<path d="M190,310 L190,370" stroke="#6BBF8A" stroke-width="2.5" marker-end="url(#arrG)" stroke-dasharray="6,3"/>
+<text x="210" y="340" font-family="Noto Sans KR" font-size="9" fill="#6BBF8A" font-weight="600">억제</text>
+
+<text x="330" y="65" font-family="Noto Sans KR" font-size="12" fill="#BF6B6B" text-anchor="middle" font-weight="600">반추 상태: DMN 과활성화</text>
+
+<!-- Rumination cycle -->
+<circle cx="480" cy="120" r="30" fill="rgba(191,107,107,0.15)" stroke="#BF6B6B" stroke-width="2"/>
+<text x="480" y="125" font-family="Noto Sans KR" font-size="9" fill="#BF6B6B" text-anchor="middle" font-weight="600">자동적</text>
+<text x="480" y="135" font-family="Noto Sans KR" font-size="9" fill="#BF6B6B" text-anchor="middle">부정 생각</text>
+
+<!-- Rumination loop -->
+<circle cx="580" cy="210" r="30" fill="rgba(191,107,107,0.15)" stroke="#BF6B6B" stroke-width="2"/>
+<text x="580" y="215" font-family="Noto Sans KR" font-size="9" fill="#BF6B6B" text-anchor="middle" font-weight="600">"왜 나는</text>
+<text x="580" y="225" font-family="Noto Sans KR" font-size="9" fill="#BF6B6B" text-anchor="middle">계속..."</text>
+
+<!-- Loop arrows -->
+<path d="M505,145 Q540,160 560,190" stroke="#BF6B6B" stroke-width="2.5" fill="none" marker-end="url(#arrR)"/>
+<path d="M560,240 Q520,230 505,190" stroke="#BF6B6B" stroke-width="2.5" fill="none" marker-end="url(#arrR)"/>
+
+<!-- Consequences -->
+<rect x="420" y="280" width="160" height="100" rx="8" fill="rgba(191,107,107,0.08)" stroke="#BF6B6B" stroke-width="1.5" stroke-dasharray="4,2"/>
+<text x="500" y="300" font-family="Noto Sans KR" font-size="10" fill="#BF6B6B" text-anchor="middle" font-weight="600">반추의 결과</text>
+<text x="500" y="318" font-family="Noto Sans KR" font-size="8" fill="#9EA0B8" text-anchor="middle">코르티솔 상승</text>
+<text x="500" y="331" font-family="Noto Sans KR" font-size="8" fill="#9EA0B8" text-anchor="middle">PFC 기능 저하</text>
+<text x="500" y="344" font-family="Noto Sans KR" font-size="8" fill="#9EA0B8" text-anchor="middle">수면 악화</text>
+<text x="500" y="357" font-family="Noto Sans KR" font-size="8" fill="#9EA0B8" text-anchor="middle">메타인지 더욱 약화</text>
+
+<!-- Metocognition breakthrough -->
+<rect x="420" y="420" width="160" height="80" rx="8" fill="rgba(107,191,138,0.1)" stroke="#6BBF8A" stroke-width="2" filter="url(#glow)"/>
+<text x="500" y="445" font-family="Noto Sans KR" font-size="11" fill="#6BBF8A" text-anchor="middle" font-weight="600">메타인지 개입</text>
+<text x="500" y="460" font-family="Noto Sans KR" font-size="9" fill="#9EA0B8" text-anchor="middle">"아, 지금 내가</text>
+<text x="500" y="473" font-family="Noto Sans KR" font-size="9" fill="#9EA0B8" text-anchor="middle">반복하고 있네"</text>
+<text x="500" y="486" font-family="Noto Sans KR" font-size="8" fill="#6BBF8A" text-anchor="middle">↓ 악순환 차단</text>
+
+<!-- Break arrow -->
+<path d="M500,380 L500,415" stroke="#6BBF8A" stroke-width="2.5" marker-end="url(#arrG)" stroke-dasharray="6,3"/>
+<text x="530" y="397" font-family="Noto Sans KR" font-size="9" fill="#6BBF8A" font-weight="600">관찰</text>
+
+<!-- Bottom explanation -->
+<rect x="30" y="530" width="720" height="35" rx="6" fill="rgba(0,0,0,0.3)"/>
+<text x="60" y="555" font-family="Noto Sans KR" font-size="9" fill="#E8E9F3">당신이 반추에 "빠져 있는" 상태와 반추를 "관찰하는" 상태는 신경생물학적으로 다릅니다. 메타인지가 바로 그 전환을 일으킵니다.</text>
+</svg>
+</div>
+<p class="diagram-caption">
+왼쪽의 건강한 상태에서는 DMN(자기 관련 생각)과 TPN(외부 주의)이 역동적으로 상호작용합니다. 하지만 반추 상태(오른쪽)에서는 DMN이 과활성화되어 자동적 부정 생각의 루프에 빠집니다. 메타인지는 이 루프를 "관찰하는 능력"으로, 악순환을 차단하는 열쇠입니다.
+</p>
+</section>
+
+<!-- ═══ PRACTICE GUIDE ═══ -->
+<section class="practice ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(191,107,107,0.15)">⚡</span>실전 루틴 — 메타인지 훈련 3단계</h2>
+
+<div class="proutine">
+<div class="proutine-head">
+<span class="proutine-time t30">30초</span>
+<span class="proutine-name">즉시 반추 탈출 — "일지 기록 신호"</span>
+</div>
+<div class="proutine-body">
+<ol>
+<li><strong>인식 (5초):</strong> "지금 나의 DMN이 활성화되어 있다"고 속으로 명명. 예: "부정적 반복 사고 감지"</li>
+<li><strong>거리두기 (15초):</strong> 다음 중 하나를 선택:<br>
+   - 시간적: "3개월 후에 이게 중요할까?" <br>
+   - 공간적: "국제우주정거장에서 이 상황을 보면?" <br>
+   - 관점적: "내 아이가 내 입장이었다면 나는 뭐라고 조언할까?"</li>
+<li><strong>기록 신호 (10초):</strong> 손가락으로 배에 한 번 탭. 이것은 저녁에 일지 작성할 때의 리마인더입니다.</li>
+</ol>
+<div class="do-dont">
+<div class="do-box"><strong>✓ 요령</strong>거리두기는 "현실을 무시하는 것"이 아닙니다. 문제를 더 정확하게 보는 것입니다. 엔지니어링의 "시스템 레벨 분석"과 같습니다.</div>
+<div class="dont-box"><strong>✗ 주의</strong>"긍정 생각"으로 부정 생각을 억제하려 하지 마세요. 그것은 메타인지가 아니라 억압입니다. 관찰하세요, 억제하지 마세요.</div>
+</div>
+</div>
+</div>
+
+<div class="proutine">
+<div class="proutine-head">
+<span class="proutine-time t5">5분</span>
+<span class="proutine-name">정오 마음챙김 — DMN 리셋 루틴</span>
+</div>
+<div class="proutine-body">
+<ol>
+<li><strong>현재성 고정 (2분):</strong> 5감을 차례로 사용. "지금 보이는 것 5개, 들리는 것 4개, 느껴지는 것 3개, 냄새 2개, 맛 1개" (Grounding technique)</li>
+<li><strong>DMN을 TPN으로 전환 (2분):</strong> 주변의 작은 물건 하나를 정말 자세히 관찰합니다. 표면의 질감, 빛의 반사, 형태. 이것이 TPN을 활성화합니다.</li>
+<li><strong>마무리 (1분):</strong> "지금 이 순간이 실제 현실이다. 내가 반복하는 생각들은 뇌의 자동 프로그램일 뿐이다" 다짐.</li>
+</ol>
+<div class="do-dont">
+<div class="do-box"><strong>✓ 시간과 장소</strong>점심시간, 커피 시간, 화장실. 기간이 아니라 빈도가 중요합니다. 매일 짧게 하는 것이 주말에 한 번 길게 하는 것보다 효과적입니다.</div>
+<div class="dont-box"><strong>✗ 실패 신호</strong>"완벽하게 명상하지 못했다"는 생각도 DMN입니다. INFP의 함정: 완벽주의가 메타인지 훈련을 방해합니다.</div>
+</div>
+</div>
+</div>
+
+<div class="proutine">
+<div class="proutine-head">
+<span class="proutine-time tday">10분</span>
+<span class="proutine-name">저녁 메타인지 일지 — 당신의 뇌 사용 설명서</span>
+</div>
+<div class="proutine-body">
+<p style="margin-bottom:1rem;font-size:.9rem;color:var(--text2)"><strong>목표:</strong> 오늘의 DMN 활동 패턴을 "데이터로 수집"합니다. 이것이 메타인지를 강화합니다.</p>
+<ol>
+<li><strong>당신의 반추 트리거 (3분):</strong> 오늘 DMN이 가장 활성화된 시점은? 그때 어떤 외부 자극이 있었나?<br>
+예: "3시 45분, 팀장의 메시지를 보고 →즉시 '혹시 내 설계가...'라는 생각 시작"</li>
+
+<li><strong>패턴 인식 (3분):</strong> 지난 며칠 동안의 반추 시간을 기록해두었다면, 패턴이 보입니까?<br>
+- 특정 시간대에 더 자주 반추하는가? (피로 시 → PFC 약화)<br>
+- 특정 대면 후인가? (사회적 평가 위협)<br>
+- 수면 부족 다음날인가?</li>
+
+<li><strong>메타인지 성공 기록 (2분):</strong> 오늘 당신이 반추에서 벗어난 순간을 하나 적으세요. 아무리 작아도 됩니다.<br>
+예: "오후 2시, 되풀이 생각에 빠져 있었는데, 옆 책상의 동료 웃음소리가 들렸을 때, 순간 현재로 돌아왔다"<br>
+이것도 메타인지입니다. 당신의 뇌가 DMN에서 TPN으로 전환된 것.</li>
+
+<li><strong>내일의 약속 (2분):</strong> 내일 반추 시간을 30% 줄이기 위해, 무엇을 할 것인가?<br>
+예: "내일은 점심 후 화장실에서 그라운딩 기법 1회 꼭 실행하기"</li>
+</ol>
+<div class="do-dont">
+<div class="do-box"><strong>✓ 추천</strong>펜과 종이를 사용하세요. 손글씨가 뇌의 후각 회로를 활성화하여 기억에 더 잘 정착합니다.</div>
+<div class="dont-box"><strong>✗ 금지</strong>자책 금지. "왜 이렇게 자주 반추할까?"라는 생각도 반추입니다. 당신은 데이터를 수집하는 엔지니어일 뿐입니다.</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══ PHILOSOPHY ═══ -->
+<section class="philo ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(201,168,76,0.15)">📖</span>철학적 성찰</h2>
+
+<div class="philosopher">
+<h3>불교의 "아(我)" 개념과 메타인지</h3>
+<blockquote>"모든 것은 지속적으로 변한다. 당신은 지금 당신이 5분 전 당신과 다르다.<br>따라서 어떤 생각도 '당신의 진정한 자아'가 될 수 없다."<br><span style="font-size:.8rem;color:var(--text2)">— 불교의 무아(無我) 개념</span></blockquote>
+<div class="analysis">
+<p><strong>신경학적 해석:</strong> 당신이 "나는 무능하다"고 생각할 때, 이 생각은 mPFC와 PCC의 기계적 활동일 뿐입니다. 그 생각 자체가 "당신"이 아닙니다. 당신은 그 생각을 "관찰하는 각각이 있습니다. 이것이 바로 메타인지입니다.</p>
+<p style="margin-top:.8rem"><strong>INFP로서의 당신:</strong> INFP는 자신의 내적 상태에 매우 민감하고, 그 상태를 "나의 정체성"으로 여기는 경향이 있습니다. "오늘 내가 우울하다" → "나는 우울한 사람이다" 이 도약이 문제입니다. 불교의 무아 개념은 이를 "그것은 당신이 아닌 당신의 신경계의 일시적 상태"라고 분명히 말합니다.</p>
+</div>
+</div>
+
+<div class="philosopher">
+<h3>데카르트 이후 현대 신경철학 — Antonio Damasio</h3>
+<blockquote>"생각한다는 것은 무엇인가? 그것은 생각하는 과정을 관찰하는 것이다."<br><span style="font-size:.8rem;color:var(--text2)">— 현대 신경철학의 재정의</span></blockquote>
+<div class="analysis">
+<p><strong>재정의의 핵심:</strong> 데카르트의 "나는 생각한다, 따라서 나는 존재한다(Cogito, ergo sum)"는 오래되었습니다. 현대 해석은 "나는 생각하는 것을 관찰한다, 따라서 나는 (초월적 자아로서) 존재한다"입니다. 이것이 메타인지의 철학적 기초입니다.</p>
+<p style="margin-top:.8rem"><strong>실제 의미:</strong> 당신이 반추 중일 때, 그 반추 자체를 관찰할 수 있다면, 당신은 그 반추보다 높은 차원에 존재합니다. 이것이 바로 메타인지가 자유를 가져다주는 이유입니다.</p>
+</div>
+</div>
+
+<div class="night-q">
+<h4>🌙 오늘 자기 전 물을 질문</h4>
+<p>"오늘 나의 생각이 '나'였던 순간은 언제이고,<br>나의 생각을 '관찰했던' 순간은 언제였는가?"</p>
+</div>
+</section>
+
+<!-- ═══ QUIZ ═══ -->
+<section class="quiz ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(138,106,191,0.15)">✏️</span>복습 퀴즈</h2>
+
+<div class="quiz-card" id="q1">
+<h4>Quiz 01</h4>
+<p class="q-text">기본값 모드 네트워크(DMN)가 활성화될 때, 뇌의 다른 네트워크는 어떻게 변하는가?</p>
+<div class="q-options">
+<div class="q-opt" onclick="checkAns(this,'q1',false)">A. TPN도 함께 활성화되어 최대 성능을 발휘한다</div>
+<div class="q-opt" onclick="checkAns(this,'q1',true)">B. TPN(작업 관련 네트워크)이 억제되어 외부 주의가 낮아진다</div>
+<div class="q-opt" onclick="checkAns(this,'q1',false)">C. 뇌 활동이 전반적으로 감소한다</div>
+<div class="q-opt" onclick="checkAns(this,'q1',false)">D. DMN과 TPN은 뇌의 다른 부위이므로 상호 영향이 없다</div>
+</div>
+<div class="q-explain" id="q1-exp">
+<strong>정답: B.</strong> DMN과 TPN은 "역상관" 관계입니다. 당신이 자신의 생각에 몰두할수록(DMN↑), 외부 세상에 주의를 기울이지 않습니다(TPN↓). 이것이 반추가 문제가 되는 이유 — 당신은 현재의 기회나 신호를 놓칩니다. 메타인지의 목표는 이 두 네트워크를 유연하게 전환하는 것입니다.
+</div>
+</div>
+
+<div class="quiz-card" id="q2">
+<h4>Quiz 02</h4>
+<p class="q-text">Ethan Kross의 자기거리두기 연구에서, 삼인칭으로 자신을 언급했을 때의 효과는?</p>
+<div class="q-options">
+<div class="q-opt" onclick="checkAns(this,'q2',false)">A. 불안감이 증가했다</div>
+<div class="q-opt" onclick="checkAns(this,'q2',true)">B. 코르티솔 수치가 낮아지고 성과가 향상되었다</div>
+<div class="q-opt" onclick="checkAns(this,'q2',false)">C. 효과가 없었다</div>
+<div class="q-opt" onclick="checkAns(this,'q2',false)">D. 일인칭과 동일한 효과를 보였다</div>
+</div>
+<div class="q-explain" id="q2-exp">
+<strong>정답: B.</strong> "나는 불안하다" 대신 "John은 불안하다"고 생각하는 것만으로도, 신체의 스트레스 호르몬(코르티솔)이 감소했습니다. 이것은 메타인지의 강력함을 보여줍니다. 당신은 당신의 생각과 감정에서 조금의 거리를 유지하는 것만으로도, 신경생물학적 상태를 변화시킬 수 있습니다.
+</div>
+</div>
+</section>
+
+<!-- ═══ SPACED REPETITION ═══ -->
+<section class="sr-tracker ani">
+<h2 class="sec-title"><span class="icon" style="background:rgba(107,191,138,0.15)">📅</span>간격 반복 트래커</h2>
+<p style="font-size:.88rem;color:var(--text2);margin-bottom:1rem">Day 05 메타인지 훈련을 기억에 정착시키기 위한 복습 일정입니다. 클릭하여 완료 표시하세요.</p>
+<div class="sr-grid">
+<div class="sr-day" onclick="this.classList.toggle('done')"><small>1일 후</small>Day 06</div>
+<div class="sr-day" onclick="this.classList.toggle('done')"><small>3일 후</small>Day 08</div>
+<div class="sr-day" onclick="this.classList.toggle('done')"><small>7일 후</small>Day 12</div>
+<div class="sr-day" onclick="this.classList.toggle('done')"><small>14일 후</small>Day 19</div>
+<div class="sr-day" onclick="this.classList.toggle('done')"><small>30일 후</small>완료 ✓</div>
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="foot-nav">
+<a href="day04_인지적_재평가.html">← Day 04: 인지적 재평가</a>
+<a href="day06_감정조절_실전_직장.html">Day 06: 감정조절 실전(직장) →</a>
+</div>
+</footer>
+
+<script>
+function toggleCard(id){
+const c=document.getElementById(id);
+c.classList.toggle('open');
+}
+
+function checkAns(el,qid,correct){
+const card=document.getElementById(qid);
+if(card.dataset.answered) return;
+card.dataset.answered='true';
+const opts=card.querySelectorAll('.q-opt');
+opts.forEach(o=>{
+o.style.pointerEvents='none';
+if(o===el) o.classList.add(correct?'correct':'wrong');
+if(correct===false && o!==el){
+}
+});
+if(!correct){
+opts.forEach(o=>{
+if(o.onclick && o.onclick.toString().includes('true')) o.classList.add('correct');
+});
+}
+document.getElementById(qid+'-exp').classList.add('show');
+}
+
+const obs=new IntersectionObserver((entries)=>{
+entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');obs.unobserve(e.target)}});
+},{threshold:0.1});
+document.querySelectorAll('.ani').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

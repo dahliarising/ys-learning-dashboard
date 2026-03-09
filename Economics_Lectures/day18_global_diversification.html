@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 18 | 글로벌 분산 투자 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #9A9890;
+  --text-dim: #5A584F;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 18 / 23</span>
+    <span class="header-title">글로벌 분산 투자</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 3 · 부동산 & 자산 배분</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 3 — 부동산 & 자산 배분</div>
+  <h1 class="hero-day">Day 18</h1>
+  <h2 class="hero-subtitle">글로벌 분산 투자</h2>
+  <p class="hero-quote">"한국 주식 100%는 도박이다. 글로벌 포트폴리오는 분산이다."</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 3: 15~19</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:78.3%"></div></div>
+    <div class="progress-label"><span>Day 18</span><span>18 / 23 완료 (78.3%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 글로벌 자산배분의 신경생리학</h3>
+    <p>한국 시장만 보면 '강한 감정 자극'(특정 기업 뉴스에 과민반응)이 발생합니다. 글로벌 자산군을 추가하면 뇌의 감정 중추(편도체)가 차분해지고, 전전두엽의 논리적 사고가 우위를 차지합니다. 시각적으로 '세계 지도'를 보는 것도 신경 다양성 효과를 불러옵니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">0-5분</td><td>한국 시장 편중의 위험성</td><td>KOSPI 구조적 저평가 vs 기술주 쏠림</td></tr>
+<tr><td class="time-col">5-10분</td><td>글로벌 자산 구성: S&P500·나스닥·MSCI World</td><td>미국 vs 선진국 vs 신흥국</td></tr>
+<tr><td class="time-col">10-15분</td><td>환율 위험 관리</td><td>환노출 vs 환헤지: 학생 상황 분석</td></tr>
+<tr><td class="time-col">15-20분</td><td>한국 해외주식 세제: 250만원 비과세 활용</td><td>ISA vs 일반 계좌 선택</td></tr>
+<tr><td class="time-col">20-25분</td><td>글로벌 배분 목표 설정 & 매월 저축 계획</td><td>자동화된 선진국 투자</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">글로벌 분산 투자</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">한국 vs 글로벌: 시장 구성 비교</div>
+      <div class="card-body"><div class="data-table-wrap">
+<table class="data-table">
+  <thead>
+    <tr>
+      <th style="text-align:left">지표</th>
+      <th>한국 KOSPI</th>
+      <th>미국 S&P500</th>
+      <th>전 세계 MSCI World</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>시가총액</td>
+      <td>약 1.5조 달러</td>
+      <td>약 35조 달러</td>
+      <td>약 45조 달러</td>
+    </tr>
+    <tr>
+      <td>상장사 수</td>
+      <td>약 700개</td>
+      <td>약 500개</td>
+      <td>약 3,000개</td>
+    </tr>
+    <tr>
+      <td>산업 다각성</td>
+      <td>반도체·금융·자동차 편중 (상위 10개가 60%)</td>
+      <td>IT·금융·헬스·에너지 균형</td>
+      <td>글로벌 모든 산업 대표</td>
+    </tr>
+    <tr>
+      <td>평가 배수 (P/E)</td>
+      <td>약 10배 (저평가)</td>
+      <td>약 20배 (고평가)</td>
+      <td>약 18배 (중도)</td>
+    </tr>
+    <tr>
+      <td>배당 수익률</td>
+      <td>2.5%</td>
+      <td>1.5-2.0%</td>
+      <td>약 2.0%</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p style="font-size:0.82rem;color:#9A9890;margin-top:0.8rem;"><strong>해석:</strong> KOSPI는 저평가(저배수)이지만 산업 편중이 심합니다. 반도체 약세 시 전체 시장이 흔들립니다. 반면 S&P500은 고평가이지만 산업 다각성이 높아 변동성이 낮습니다.</p></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">환율 위험과 환헤지 전략</div>
+      <div class="card-body"><div class="formula-block">
+<div class="formula-line"><span class="formula-highlight">학생의 상황 분석:</span></div>
+<div class="formula-line">• 소득: KRW (한국 급여) → 달러 환율 위험에 노출</div>
+<div class="formula-line">• 지출: KRW (한국에서 생활) → 달러 강세 시 자산가치 ↑ (심리적 이득)</div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line"><span class="formula-highlight">환헤지 전략 선택:</span></div>
+<div class="formula-line">1. <span class="formula-highlight">환노출(Non-Hedged)</span>: KRW/USD 환율 변동을 그대로 포트폴리오에 반영</div>
+<div class="formula-line">   예: S&P500 투자 시 USD 강세 → 한화 기준 추가 수익</div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line">2. <span class="formula-highlight">환헤지(Hedged)</span>: 선물/옵션으로 환율 변동 중립화</div>
+<div class="formula-line">   예: S&P500 + 환헤지 ETF = USD 강약영향 최소화</div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line"><span class="formula-highlight">학생 권고:</span> 20년 투자 시간 → 환노출 선택 (장기적으로 환헤지 비용 > 이득)</div>
+<div class="formula-comment">* 2023-2026 USD/KRW = 1,000~1,300 → 약한 KRW의 이점 활용</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">해외주식 세제: 250만원 비과세 vs 일반 과세</div>
+      <div class="card-body"><div class="formula-block">
+<div class="formula-line"><span class="formula-highlight">한국 해외주식 세제 (2026년 기준):</span></div>
+<div class="formula-line">• 국내 주식: 배당세 15.4%, 양도세 기본 20%</div>
+<div class="formula-line">• 해외 주식: <span class="formula-highlight">배당세 15.4% (동일)</span>, 양도세 25% (신고)</div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line"><span class="formula-highlight">ISA(개인종합자산관리계좌) 비과세 한도:</span></div>
+<div class="formula-line">• 연간 납입한도: 2,000만원 (한도 초과분은 일반 계좌로 자동 이체)</div>
+<div class="formula-line">• 비과세 대상: 배당금, 양도차익 모두 (해외주식 포함!)</div>
+<div class="formula-line">• 중요: ISA 내 해외주식 배당/양도차익은 <span class="formula-highlight">연 250만원까지만 비과세</span></div>
+<div class="formula-line"><!-- --></div>
+<div class="formula-line"><span class="formula-highlight">전략:</span></div>
+<div class="formula-line">1. ISA 2,000만원 중 1,500만원 → 국내 배당주 (배당세 회피)</div>
+<div class="formula-line">2. ISA 2,000만원 중 500만원 → 해외주식 (연 250만원 비과세)</div>
+<div class="formula-line">3. 추가 해외주식 → 일반 계좌 (양도세 25%, 배당세 15.4% 감수)</div>
+<div class="formula-comment">* 학생은 연소득 5,000만~6,000만 대상 → ISA 소득 한도 제약 없음 (중산층 400만원 한도와 다름)</div>
+</div></div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+      <div class="chart-container">
+      <div class="chart-title">ALLOCATION: 한국 100% vs 글로벌 분산</div>
+      <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;margin:0 auto;display:block;">
+        <!-- 좌측: 한국 100% 포트폴리오 -->
+        <text x="200" y="30" font-size="14" font-weight="600" fill="#BF4A4A" text-anchor="middle">HIGH RISK: Korea 100%</text>
+        <g>
+          <rect x="100" y="60" width="200" height="250" fill="#4A9EBF" opacity="0.2" stroke="#4A9EBF" stroke-width="1"/>
+          <text x="200" y="150" font-size="13" fill="#4A9EBF" font-weight="600" text-anchor="middle">KOSPI</text>
+          <text x="200" y="170" font-size="11" fill="#9A9890" text-anchor="middle">100%</text>
+          <text x="200" y="250" font-size="10" fill="#9A9890" text-anchor="middle">반도체 40%</text>
+          <text x="200" y="263" font-size="10" fill="#9A9890" text-anchor="middle">금융 25%</text>
+          <text x="200" y="276" font-size="10" fill="#9A9890" text-anchor="middle">자동차 15%</text>
+        </g>
+
+        <!-- 우측: 글로벌 분산 포트폴리오 -->
+        <text x="700" y="30" font-size="14" font-weight="600" fill="#4ABF7A" text-anchor="middle">BALANCED: Global Diversified</text>
+        <g>
+          <rect x="550" y="60" width="90" height="100" fill="#4A9EBF" opacity="0.3" stroke="#4A9EBF" stroke-width="1"/>
+          <text x="595" y="90" font-size="11" fill="#4A9EBF" font-weight="600" text-anchor="middle">KOSPI</text>
+          <text x="595" y="105" font-size="10" fill="#9A9890" text-anchor="middle">30%</text>
+          <text x="595" y="145" font-size="9" fill="#9A9890" text-anchor="middle">산업 다각</text>
+        </g>
+
+        <g>
+          <rect x="660" y="60" width="110" height="150" fill="#C9A84C" opacity="0.3" stroke="#C9A84C" stroke-width="1"/>
+          <text x="715" y="100" font-size="11" fill="#C9A84C" font-weight="600" text-anchor="middle">S&P500</text>
+          <text x="715" y="115" font-size="10" fill="#9A9890" text-anchor="middle">45%</text>
+          <text x="715" y="155" font-size="9" fill="#9A9890" text-anchor="middle">IT, Finance</text>
+          <text x="715" y="168" font-size="9" fill="#9A9890" text-anchor="middle">Healthcare</text>
+        </g>
+
+        <g>
+          <rect x="790" y="60" width="70" height="80" fill="#4ABF7A" opacity="0.3" stroke="#4ABF7A" stroke-width="1"/>
+          <text x="825" y="85" font-size="11" fill="#4ABF7A" font-weight="600" text-anchor="middle">Emerging</text>
+          <text x="825" y="100" font-size="10" fill="#9A9890" text-anchor="middle">15%</text>
+          <text x="825" y="130" font-size="9" fill="#9A9890" text-anchor="middle">Growth</text>
+        </g>
+
+        <!-- 비교 표시 -->
+        <text x="200" y="350" font-size="11" fill="#BF4A4A" font-weight="600" text-anchor="middle">변동성 높음 (Volatility ↑)</text>
+        <text x="200" y="367" font-size="10" fill="#9A9890" text-anchor="middle">1주 낙폭 3-5%</text>
+
+        <text x="700" y="350" font-size="11" fill="#4ABF7A" font-weight="600" text-anchor="middle">변동성 낮음 (Volatility ↓)</text>
+        <text x="700" y="367" font-size="10" fill="#9A9890" text-anchor="middle">1주 낙폭 1-2%</text>
+
+        <!-- 수익률 기대 -->
+        <text x="450" y="390" font-size="10" fill="#9A9890" text-anchor="middle">기대 연수익률: 한국 8% vs 글로벌 6.5% (변동성 조정 후 글로벌 우위)</text>
+      </svg>
+    </div>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  <details class="deep-dive">
+    <summary>환헤지 vs 환노출: 엔지니어 입장에서 의사결정 트리</summary>
+    <div class="deep-dive-content">
+    <p><strong>의사결정 트리:</strong></p>
+    <p style="color:#C9A84C;">Q1: 투자 기간이 20년 이상인가? → YES → 환노출 선택</p>
+    <p style="color:#C9A84C;">Q2: 소득과 지출이 모두 KRW인가? → YES → 환노출 추가 가점</p>
+    <p style="color:#C9A84C;">Q3: 변동성 회피 성향이 강한가? → YES → 환헤지 고려</p>
+    <p><strong>학생의 점수:</strong> 20년+ 투자(YES) + KRW 소득/지출(YES) + 중간 위험회피(MAYBE) = <span class="formula-highlight">환노출 권고 (80% 확도)</span></p>
+    <p><strong>수치 기반 논거:</strong></p>
+    <p>환헤지 비용 = 연 0.5~1.0% (헤징 파생상품 비용)</p>
+    <p>20년 누적 헤징 비용 = 초기자본의 10~20%</p>
+    <p>반면 USD/KRW 환율 장기 변동성은 ±20~30% 범위 → 헤징 비용이 헤징 효과를 상쇄</p>
+    </div>
+    </details>
+    <details class="deep-dive">
+    <summary>ISA 비과세 한도 정확히 이해하기: 250만원의 함정</summary>
+    <div class="deep-dive-content">
+    <p><strong>일반적 오해:</strong> "ISA면 비과세다" → 틀림! 해외주식은 연 250만원 한도만 비과세</p>
+    <p><strong>정확한 규칙 (2026년):</strong></p>
+    <p>ISA 내 해외주식 배당금 + 양도차익의 합 ≤ 250만원 → 비과세</p>
+    <p>ISA 내 해외주식 배당금 + 양도차익의 합 > 250만원 → 초과분은 15.4% 배당세 + 25% 양도세 납부</p>
+    <p><strong>사례:</strong></p>
+    <p>S&P500 해외주식 500만원 투자 → 연 배당 5만원 + 양도차익 245만원 = 250만원 정확히 비과세</p>
+    <p>그러나 S&P500 해외주식 1,000만원 투자 → 연 배당 10만원 + 양도차익 500만원 = 510만원 → 초과분 260만원에 세금 납부</p>
+    <p><strong>최적 전략:</strong> ISA 내 해외주식은 "보수적 배당주" 중심으로 구성 (배당 수익률 2~3%, 양도차익은 장기 보유로 제한)</p>
+    </div>
+    </details>
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+      <div class="sim-box">
+      <h3>내 글로벌 포트폴리오 구성: 순자산 3.28억 기준</h3>
+      <p style="font-size:0.85rem;color:#9A9890;margin-bottom:1rem;">
+      현재 주식 비중을 1.3억원으로 증대할 때, 글로벌 분산 비율:
+      </p>
+      <ul class="checklist">
+        <li><strong>한국 KOSPI (30% = 3,900만원):</strong> 삼성전자 1,800만 + SK하이닉스 1,000만 + 기타 신규 매수 1,100만</li>
+        <li style="margin-top:0.5rem;"><strong>미국 S&P500 ETF (45% = 5,850만원):</strong> VOO 또는 IVV (저비용 지수펀드) / 월 500만원 자동이체</li>
+        <li style="margin-top:0.5rem;"><strong>신흥국 ETF (15% = 1,950만원):</strong> VWO 또는 이머징마켓 지수펀드</li>
+        <li style="margin-top:0.5rem;"><strong>현금성 자산 (10% = 1,300만원):</strong> 긴급자금 + 리밸런싱 용도</li>
+        <li style="margin-top:0.5rem;"><strong>ISA 계좌 활용:</strong> 연 2,000만원 한도 → 국내 배당주 1,500만 + 해외 배당주 500만</li>
+      </ul>
+      <p style="font-size:0.82rem;color:#C9A84C;margin-top:1.2rem;"><strong>월 저축 계획:</strong> 월 500만 추가 → S&P500 자동매수로 20년 후 글로벌 분산 자산 7억 목표</p>
+    </div>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    <div class="bias-name">홈 바이어스 (Home Bias)</div>
+    <p><span class="neuro-tag">뇌과학 | 편도체 안정</span> <span class="engineer-tag">엔지니어 사고 | 데이터 검증</span></p>
+    <p>뇌는 친숙한 것(한국 주식)에 더 강한 신뢰를 느낍니다. 이것이 '홈 바이어스' 편향입니다. 대부분의 한국 개인투자자가 KOSPI에 60~80% 집중투자하는 이유입니다.</p>
+    <p><strong>데이터로 극복:</strong></p>
+    <p style="color:#4ABF7A;"><strong>규칙 1.</strong> "KOSPI 역사적 수익률 vs S&P500 비교" → 과거 20년 기준 S&P500이 2~3% 초과 수익</p>
+    <p style="color:#4ABF7A;"><strong>규칙 2.</strong> "변동성 지수 비교" → KOSPI 변동성(연 18%) > S&P500 변동성(연 13%)</p>
+    <p style="color:#4ABF7A;"><strong>규칙 3.</strong> "산업 다각성 점수화" → KOSPI(점수 3/10) vs S&P500(점수 8/10)</p>
+    <p style="color:#C9A84C;"><strong>엔지니어의 결론:</strong> 감정이 아닌 데이터 → 글로벌 분산이 리스크-조정 수익률에서 우월합니다.</p>
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 한국 해외주식의 배당세 및 양도세율은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 배당세 15.4%, 양도세 20%</li>
+<li onclick="checkAnswer(this,'q1',true)">② 배당세 15.4%, 양도세 25%</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 배당세 20%, 양도세 20%</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 배당세 10%, 양도세 15%</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>2026년 한국 기준, 해외주식은 국내주식보다 양도세가 5% 높습니다(20% → 25%). 배당세는 동일 15.4%입니다.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 순자산 3.28억 기준, 글로벌 분산 포트폴리오(한국 30% / 미국 45% / 신흥국 15% / 현금 10%) 구성 시 S&P500 ETF 필요 금액은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 약 2,900만원</li>
+<li onclick="checkAnswer(this,'q2',true)">② 약 5,850만원</li>
+<li onclick="checkAnswer(this,'q2',false)">③ 약 9,750만원</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 약 1.5억원</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ②</strong><br>S&P500 비중 45% × 1.3억원(총 주식 배분) = 5,850만원. 이 중 월 500만원씩 자동 매수 권고.</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 18</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 25일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 27일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 31일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">04월 07일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 23일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day17_rebalancing.html">← Day 17</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 18 / 23</span>
+  <a class="nav-btn" href="day19_part3_review.html">Day 19 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 20 — 감정 코치 대화법 (Gottman 감정 코칭)</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #0A0C10;
+  --bg-card: #12151B;
+  --bg-card-alt: #181C24;
+  --green: #4ABF8A;
+  --green-dim: #2A7A56;
+  --gold: #C9A84C;
+  --gold-dim: #8A7333;
+  --text: #E8E6E1;
+  --text-dim: #9A9890;
+  --text-bright: #FFFFFF;
+  --danger: #E85D5D;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+html { font-size: 16px; scroll-behavior: smooth; }
+
+/* ═══════════════════════════════════════
+   CUSTOM SCROLLBAR
+   ═══════════════════════════════════════ */
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--green), var(--gold));
+  border-radius: 6px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--green), var(--green-dim));
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--green); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ═══════════════════════════════════════
+   FADE UP ANIMATION
+   ═══════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { opacity: 0; animation: fadeUp 0.8s ease-out forwards; }
+
+/* ═══════════════════════════════════════
+   ① STICKY HEADER
+   ═══════════════════════════════════════ */
+.sticky-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(74,191,138,0.15);
+  padding: 12px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+.sticky-header .series-tag { color: var(--green); letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+.sticky-header .day-tag { background: linear-gradient(135deg, var(--green), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
+.sticky-header .timer-display { display: flex; align-items: center; gap: 8px; }
+.sticky-header .timer-btn { background: var(--green); color: var(--bg); padding: 6px 14px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 0.75rem; }
+.sticky-header .timer-btn:hover { background: var(--green-dim); }
+
+/* ═══════════════════════════════════════
+   ② HERO SECTION
+   ═══════════════════════════════════════ */
+.hero {
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-alt) 100%);
+  border-bottom: 2px solid var(--green);
+  padding: 3.5rem 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+.hero .part-badge { display: inline-block; background: var(--green); color: var(--bg); padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; margin-bottom: 1rem; letter-spacing: 1px; }
+.hero h1 { font-family: var(--serif); font-size: 3.2rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--green), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero .subtitle { font-size: 1.3rem; color: var(--text-dim); margin-bottom: 1rem; }
+.hero .oneliner { font-size: 1.1rem; color: var(--gold); font-style: italic; font-weight: 500; margin-bottom: 1.5rem; }
+.hero-badges { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+.badge { background: var(--bg-card-alt); border: 1px solid rgba(74,191,138,0.2); padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; color: var(--text-dim); }
+
+/* LAYOUT */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+.section { margin-bottom: 3.5rem; }
+.section-label { font-family: var(--mono); font-size: 0.75rem; color: var(--green); letter-spacing: 2px; text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--serif); font-size: 2.2rem; font-weight: 700; color: var(--text-bright); margin-bottom: 1.5rem; border-left: 4px solid var(--green); padding-left: 1rem; }
+
+/* ③ LEARNING STRATEGY */
+.learning-strategy { background: var(--bg-card); border: 1px solid rgba(74,191,138,0.15); border-left: 4px solid var(--green); border-radius: var(--radius); padding: 2rem; margin-bottom: 2rem; }
+.learning-strategy h3 { color: var(--green); font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; }
+.learning-strategy p { color: var(--text-dim); margin-bottom: 1rem; line-height: 1.8; }
+.time-table { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+.time-block { background: var(--bg-card-alt); border: 1px solid rgba(201,168,76,0.2); border-radius: var(--radius-sm); padding: 1rem; text-align: center; }
+.time-block .time { font-family: var(--mono); color: var(--gold); font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; }
+.time-block .label { font-size: 0.85rem; color: var(--text-dim); }
+
+/* ④ SCIENCE CARDS */
+.science-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+.science-card { background: var(--bg-card); border: 1px solid rgba(74,191,138,0.15); border-top: 3px solid var(--green); border-radius: var(--radius); padding: 2rem; transition: all 0.3s ease; }
+.science-card:hover { border-color: var(--green); box-shadow: 0 8px 24px rgba(74,191,138,0.1); }
+.card-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem; }
+.card-icon { font-size: 2.2rem; flex-shrink: 0; }
+.card-header h4 { font-size: 1.1rem; font-weight: 600; color: var(--green); line-height: 1.4; }
+.card-body p { color: var(--text); margin-bottom: 1rem; line-height: 1.8; }
+.age-badge-inline { display: inline-block; background: rgba(74,191,138,0.15); color: var(--green); padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin: 0 6px; }
+.behavior-box { background: rgba(74,191,138,0.08); border-left: 3px solid var(--green); padding: 1rem; border-radius: var(--radius-sm); margin: 1rem 0; }
+.behavior-box .label { font-weight: 600; color: var(--green); margin-bottom: 0.5rem; font-size: 0.9rem; }
+.behavior-box p { color: var(--text-dim); font-size: 0.95rem; }
+.deep-dive-toggle { cursor: pointer; display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(74,191,138,0.1); color: var(--green); font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; }
+.deep-dive-toggle .chevron { display: inline-block; transition: transform 0.3s ease; }
+.deep-dive-toggle:hover { color: var(--gold); }
+.deep-dive-toggle.open .chevron { transform: rotate(180deg); }
+.deep-dive-content { display: none; background: rgba(201,168,76,0.08); border-left: 3px solid var(--gold); padding: 1rem; border-radius: var(--radius-sm); margin-top: 1rem; color: var(--text-dim); font-size: 0.95rem; }
+.deep-dive-content.open { display: block; }
+.deep-dive-content p { margin-bottom: 0.8rem; line-height: 1.7; }
+.neuro-tag { display: inline-block; background: rgba(74,191,138,0.15); color: var(--green); padding: 3px 8px; border-radius: 3px; font-size: 0.8rem; margin-right: 0.5rem; margin-bottom: 0.5rem; }
+
+/* ⑤ DIAGRAM */
+.diagram-section { background: var(--bg-card); border: 1px solid rgba(74,191,138,0.15); border-radius: var(--radius); padding: 2rem; margin-bottom: 2rem; overflow-x: auto; }
+.diagram-title { font-size: 1.1rem; color: var(--green); margin-bottom: 1.5rem; font-weight: 600; }
+svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+/* ⑥ SCRIPTS & TABS */
+.age-tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid rgba(74,191,138,0.1); }
+.age-tab { padding: 12px 20px; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--text-dim); font-family: var(--sans); font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem; }
+.age-tab:hover { color: var(--green); }
+.age-tab.active { color: var(--green); border-bottom-color: var(--green); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.script-card { background: var(--bg-card-alt); border: 1px solid rgba(74,191,138,0.1); border-radius: var(--radius-sm); padding: 1.5rem; margin-bottom: 1.5rem; }
+.script-card .scenario { font-weight: 700; color: var(--gold); margin-bottom: 1rem; font-size: 0.95rem; }
+.dialog-line { display: flex; gap: 1rem; margin-bottom: 1rem; padding: 1rem; background: rgba(10,12,16,0.4); border-radius: var(--radius-sm); border-left: 3px solid transparent; }
+.dialog-line:nth-child(odd) { border-left-color: var(--green); }
+.dialog-line:nth-child(even) { border-left-color: var(--gold); }
+.dialog-label { font-weight: 700; font-family: var(--mono); font-size: 0.85rem; min-width: 50px; flex-shrink: 0; }
+.dialog-label.dad { color: var(--gold); }
+.dialog-label.child { color: var(--green); }
+.dialog-text { color: var(--text); flex: 1; line-height: 1.7; }
+.dialog-text em { color: var(--text-dim); font-style: italic; font-size: 0.9rem; }
+.do-dont { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+.do-box, .dont-box { border-radius: var(--radius); padding: 1.5rem; }
+.do-box { background: rgba(74,191,138,0.08); border: 1px solid rgba(74,191,138,0.2); border-left: 4px solid var(--green); }
+.do-box h5 { color: var(--green); margin-bottom: 1rem; font-size: 1rem; }
+.dont-box { background: rgba(232,93,93,0.08); border: 1px solid rgba(232,93,93,0.2); border-left: 4px solid var(--danger); }
+.dont-box h5 { color: var(--danger); margin-bottom: 1rem; font-size: 1rem; }
+.do-box ul, .dont-box ul { list-style: none; padding: 0; }
+.do-box li, .dont-box li { padding-left: 1.5rem; position: relative; margin-bottom: 0.8rem; color: var(--text-dim); font-size: 0.95rem; line-height: 1.6; }
+.do-box li::before { content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+.dont-box li::before { content: "✕"; position: absolute; left: 0; color: var(--danger); font-weight: 700; }
+
+/* ⑦ TIP SECTIONS */
+.tip-section { background: var(--bg-card); border: 1px solid rgba(74,191,138,0.15); border-left: 4px solid var(--gold); border-radius: var(--radius); padding: 2rem; margin-bottom: 2rem; }
+.tip-section h3 { font-size: 1.3rem; color: var(--gold); margin-bottom: 1rem; font-weight: 600; }
+.tip-section p { color: var(--text); margin-bottom: 1rem; line-height: 1.8; }
+.tip-highlight { background: rgba(201,168,76,0.1); border-left: 3px solid var(--gold); padding: 1.2rem; border-radius: var(--radius-sm); margin-top: 1rem; color: var(--text-dim); }
+.tip-highlight strong { color: var(--gold); }
+.couple-tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+.couple-tip-box { background: var(--bg-card-alt); border: 1px solid rgba(201,168,76,0.1); padding: 1.5rem; border-radius: var(--radius-sm); border-left: 3px solid var(--gold); }
+.couple-tip-box strong { color: var(--gold); display: block; margin-bottom: 0.8rem; font-size: 0.95rem; }
+.couple-tip-box p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.7; }
+
+/* ⑧ QUIZ & TRACKER */
+.quiz-section { background: var(--bg-card); border: 1px solid rgba(74,191,138,0.15); border-radius: var(--radius); padding: 2rem; margin-bottom: 2rem; }
+.quiz-section h3 { font-size: 1.3rem; color: var(--green); margin-bottom: 1.5rem; font-weight: 600; }
+.quiz-card { background: var(--bg-card-alt); border: 1px solid rgba(74,191,138,0.1); padding: 1.5rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; }
+.quiz-question { font-weight: 600; color: var(--text-bright); margin-bottom: 1rem; font-size: 1rem; }
+.quiz-options { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1rem; }
+.quiz-option { display: flex; align-items: center; gap: 0.8rem; cursor: pointer; padding: 0.8rem; border-radius: var(--radius-sm); transition: all 0.3s ease; }
+.quiz-option:hover { background: rgba(74,191,138,0.05); }
+.quiz-option input[type="radio"] { cursor: pointer; accent-color: var(--green); width: 18px; height: 18px; }
+.quiz-option label { flex: 1; cursor: pointer; color: var(--text); margin: 0; }
+.quiz-explanation { background: rgba(201,168,76,0.08); border-left: 3px solid var(--gold); padding: 1rem; border-radius: var(--radius-sm); color: var(--text-dim); font-size: 0.95rem; line-height: 1.7; max-height: 0; overflow: hidden; opacity: 0; transition: all 0.3s ease; }
+.quiz-explanation.show { max-height: 500px; opacity: 1; }
+.tracker-section { background: var(--bg-card); border: 1px solid rgba(74,191,138,0.15); border-radius: var(--radius); padding: 2rem; }
+.tracker-title { font-size: 1.2rem; color: var(--green); margin-bottom: 1.5rem; font-weight: 600; }
+.tracker-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); gap: 0.8rem; }
+.tracker-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-card-alt); border: 1px solid rgba(74,191,138,0.1); border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; color: var(--text-dim); transition: all 0.3s ease; font-size: 0.9rem; }
+.tracker-day:hover { border-color: var(--green); }
+.tracker-day.completed { background: var(--green); color: var(--bg); border-color: var(--green); }
+
+/* FOOTER */
+.footer { text-align: center; padding: 2.5rem 2rem; color: var(--text-dim); font-size: 0.9rem; border-top: 1px solid rgba(74,191,138,0.1); margin-top: 3rem; }
+.footer p { margin-bottom: 0.5rem; }
+
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2.2rem; }
+  .section-title { font-size: 1.6rem; }
+  .science-cards { grid-template-columns: 1fr; }
+  .age-tabs { flex-wrap: wrap; }
+  .do-dont { grid-template-columns: 1fr; }
+  .sticky-header { flex-wrap: wrap; gap: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ① STICKY HEADER -->
+<div class="sticky-header">
+  <div>
+    <span class="series-tag">PART 4: 대화법 & 관계</span>
+    <span class="day-tag"> · DAY 20</span>
+  </div>
+  <div class="timer-display">
+    <span id="timerDisplay" style="font-family: var(--mono); color: var(--green); font-weight: 700;">25:00</span>
+    <button class="timer-btn" onclick="openTimer()">타이머</button>
+  </div>
+</div>
+
+<!-- ② HERO -->
+<div class="hero">
+  <span class="part-badge">PART 4: 대화법 & 관계</span>
+  <h1>감정 코치 대화법</h1>
+  <p class="subtitle">Gottman의 5단계 감정 코칭으로 아이의 정서지능 키우기</p>
+  <p class="oneliner">"아이의 감정은 틀린 게 아니야. 다만 어떻게 표현하는지 배워야 할 뿐이야."</p>
+  <div class="hero-badges">
+    <span class="badge">👶 신경발달과학</span>
+    <span class="badge">🧠 정서지능 개발</span>
+    <span class="badge">💬 대화 스크립트</span>
+    <span class="badge">👧 자매 관계</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ③ LEARNING STRATEGY -->
+<section class="fade-up">
+  <div class="learning-strategy">
+    <h3>📚 오늘의 학습 전략</h3>
+    <p>Gottman의 감정 코칭 방법론은 단순한 '달래기'가 아닙니다. 아이의 뇌가 감정을 언어로 표현하고, 이를 조절하는 신경 회로를 발달시키는 과정입니다. 특히 5-7세는 감정 어휘를 습득하는 황금기이고, 2-4세는 감정을 '느끼지만 표현할 수 없는' 상태입니다. 오늘은 이 차이를 이해하고, 실제 상황에서 어떻게 대응할지 배웁니다.</p>
+    <div class="time-table">
+      <div class="time-block">
+        <div class="time">0-5분</div>
+        <div class="label">Gottman 방법론</div>
+      </div>
+      <div class="time-block">
+        <div class="time">5-10분</div>
+        <div class="label">5단계 감정 코칭</div>
+      </div>
+      <div class="time-block">
+        <div class="time">10-18분</div>
+        <div class="label">대화 스크립트</div>
+      </div>
+      <div class="time-block">
+        <div class="time">18-23분</div>
+        <div class="label">실전 가이드</div>
+      </div>
+      <div class="time-block">
+        <div class="time">23-25분</div>
+        <div class="label">퀴즈 & 복습</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ④ SCIENCE CARDS -->
+<section class="fade-up">
+  <div class="section-label">NEUROSCIENCE</div>
+  <div class="section-title">감정 코칭의 신경과학</div>
+  <div class="science-cards">
+
+    <div class="science-card">
+      <div class="card-header">
+        <div class="card-icon">🧩</div>
+        <h4>감정 처리: 편도체 vs 전두엽</h4>
+      </div>
+      <div class="card-body">
+        <p>감정 자극이 들어오면 신경신호가 두 경로로 나뉩니다: 빠른 경로(편도체-즉각적 반응)와 느린 경로(전두엽-분석). Gottman의 감정 코칭은 아이를 느린 경로로 안내하는 과정입니다.</p>
+        <div style="margin-bottom:12px;">
+          <span class="neuro-tag">⚡ 신호 처리</span>
+          <span class="neuro-tag">🧠 뇌 성숙</span>
+        </div>
+        <p><strong>5-7세</strong> <span class="age-badge-inline">FIRST CHILD</span>: 전두엽이 감정 신호에 개입할 여유가 생깁니다(약 60-100ms). "화났구나. 어디가?"라는 질문이 가능해집니다.</p>
+        <p><strong>2-4세</strong> <span class="age-badge-inline">SECOND CHILD</span>: 편도체가 절대적으로 지배합니다. "왜 화났어?"가 아니라 감정을 진정시키고 나중에 표현 방법을 배우는 것이 순서입니다.</p>
+        <div class="behavior-box">
+          <div class="label">이래서 중요해요</div>
+          <p>아이가 울 때, "왜 화났니?"를 묻습니다. 하지만 그 순간 아이의 뇌는 전두엽이 차단되어 있습니다. 질문이 아니라 '감정 라벨링'이 필요한 시점입니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="science-card">
+      <div class="card-header">
+        <div class="card-icon">💬</div>
+        <h4>감정 어휘와 자가조절</h4>
+      </div>
+      <div class="card-body">
+        <p>아이가 감정을 명확히 이름 붙일 수 있을 때, 그 감정의 강도가 20-30% 감소합니다(affect labeling effect). 이를 신경과학으로 설명하면: 감정을 언어화하면 편도체 활성화가 진정된다는 것입니다.</p>
+        <div style="margin-bottom:12px;">
+          <span class="neuro-tag">📊 어휘 폭</span>
+          <span class="neuro-tag">🎯 자가조절</span>
+        </div>
+        <p><strong>5-7세</strong> <span class="age-badge-inline">FIRST CHILD</span>: 기본 감정뿐 아니라 frustrated, disappointed, nervous 같은 세분화된 감정도 학습 가능합니다. 이 시기 감정 어휘가 청소년기 정서 조절력을 결정합니다.</p>
+        <p><strong>2-4세</strong> <span class="age-badge-inline">SECOND CHILD</span>: 좋아, 싫어, 화났어 2-3가지만 사용합니다. 우리는 아이 표현에 더 섬세한 어휘를 제시합니다. "화났다는 게 맞아. 아, 실망한 거구나!"</p>
+      </div>
+    </div>
+
+    <div class="science-card">
+      <div class="card-header">
+        <div class="card-icon">🎯</div>
+        <h4>Gottman의 5단계</h4>
+      </div>
+      <div class="card-body">
+        <p>Gottman이 제시한 5단계: ① 감정 자각 → ② 감정 공감 → ③ 감정 라벨링 → ④ 정서 검증 → ⑤ 문제 해결. 각 단계마다 신경과학적 근거가 있습니다.</p>
+        <div style="margin-bottom:12px;">
+          <span class="neuro-tag">1️⃣ 자각</span>
+          <span class="neuro-tag">2️⃣ 공감</span>
+          <span class="neuro-tag">3️⃣ 라벨링</span>
+          <span class="neuro-tag">4️⃣ 검증</span>
+          <span class="neuro-tag">5️⃣ 해결</span>
+        </div>
+        <p><strong>핵심</strong>: 감정 폭발 중에는 3단계까지만, 아이가 진정된 후(약 20분) 4-5단계를 진행합니다.</p>
+        <div class="behavior-box">
+          <div class="label">Gottman의 핵심</div>
+          <p>"아이의 감정은 옳거나 그른 것이 아니다. 하지만 행동은 선택이다." 이 원칙이 5단계 모두에 깔려 있습니다.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ⑤ DIAGRAM -->
+<section class="fade-up">
+  <div class="diagram-section">
+    <div class="diagram-title">Gottman 5단계 감정 코칭 프로세스</div>
+    <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1000" height="500" fill="#0A0C10"/>
+      <text x="500" y="35" font-size="24" font-weight="bold" fill="#4ABF8A" text-anchor="middle">Gottman 감정 코칭 5단계 프로세스</text>
+      
+      <!-- Step boxes -->
+      <g>
+        <rect x="30" y="80" width="140" height="110" fill="#12151B" stroke="#4ABF8A" stroke-width="2" rx="6"/>
+        <circle cx="100" cy="105" r="18" fill="#4ABF8A"/>
+        <text x="100" y="112" font-size="16" fill="#0A0C10" text-anchor="middle" font-weight="bold">1</text>
+        <text x="100" y="135" font-size="12" font-weight="bold" fill="#4ABF8A" text-anchor="middle">감정 자각</text>
+        <text x="100" y="155" font-size="11" fill="#9A9890" text-anchor="middle">아이가 화났거나</text>
+        <text x="100" y="170" font-size="11" fill="#9A9890" text-anchor="middle">슬픈 신호를 감지</text>
+      </g>
+      
+      <path d="M 170 135 L 200 135" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrowgold)"/>
+      
+      <g>
+        <rect x="200" y="80" width="140" height="110" fill="#12151B" stroke="#4ABF8A" stroke-width="2" rx="6"/>
+        <circle cx="270" cy="105" r="18" fill="#4ABF8A"/>
+        <text x="270" y="112" font-size="16" fill="#0A0C10" text-anchor="middle" font-weight="bold">2</text>
+        <text x="270" y="135" font-size="12" font-weight="bold" fill="#4ABF8A" text-anchor="middle">감정 공감</text>
+        <text x="270" y="155" font-size="11" fill="#9A9890" text-anchor="middle">아이 감정에</text>
+        <text x="270" y="170" font-size="11" fill="#9A9890" text-anchor="middle">공감하고 경청</text>
+      </g>
+      
+      <path d="M 340 135 L 370 135" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrowgold)"/>
+      
+      <g>
+        <rect x="370" y="80" width="140" height="110" fill="#12151B" stroke="#4ABF8A" stroke-width="2" rx="6"/>
+        <circle cx="440" cy="105" r="18" fill="#4ABF8A"/>
+        <text x="440" y="112" font-size="16" fill="#0A0C10" text-anchor="middle" font-weight="bold">3</text>
+        <text x="440" y="135" font-size="12" font-weight="bold" fill="#4ABF8A" text-anchor="middle">감정 라벨링</text>
+        <text x="440" y="155" font-size="11" fill="#9A9890" text-anchor="middle">감정의 이름을</text>
+        <text x="440" y="170" font-size="11" fill="#9A9890" text-anchor="middle">함께 붙이기</text>
+      </g>
+      
+      <path d="M 510 135 L 540 135" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrowgold)"/>
+      
+      <g>
+        <rect x="540" y="80" width="140" height="110" fill="#12151B" stroke="#4ABF8A" stroke-width="2" rx="6"/>
+        <circle cx="610" cy="105" r="18" fill="#4ABF8A"/>
+        <text x="610" y="112" font-size="16" fill="#0A0C10" text-anchor="middle" font-weight="bold">4</text>
+        <text x="610" y="135" font-size="12" font-weight="bold" fill="#4ABF8A" text-anchor="middle">정서 검증</text>
+        <text x="610" y="155" font-size="11" fill="#9A9890" text-anchor="middle">감정은 정당</text>
+        <text x="610" y="170" font-size="11" fill="#9A9890" text-anchor="middle">하다는 메시지</text>
+      </g>
+      
+      <path d="M 680 135 L 710 135" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrowgold)"/>
+      
+      <g>
+        <rect x="710" y="80" width="140" height="110" fill="#12151B" stroke="#C9A84C" stroke-width="2" rx="6"/>
+        <circle cx="780" cy="105" r="18" fill="#C9A84C"/>
+        <text x="780" y="112" font-size="16" fill="#0A0C10" text-anchor="middle" font-weight="bold">5</text>
+        <text x="780" y="135" font-size="12" font-weight="bold" fill="#C9A84C" text-anchor="middle">문제 해결</text>
+        <text x="780" y="155" font-size="11" fill="#9A9890" text-anchor="middle">행동 지도 및</text>
+        <text x="780" y="170" font-size="11" fill="#9A9890" text-anchor="middle">대안 제시</text>
+      </g>
+
+      <!-- Note -->
+      <text x="500" y="230" font-size="13" fill="#C9A84C" text-anchor="middle" font-weight="bold">⚡ 핵심: 감정 폭발 중(1-3단계) vs 진정 후(4-5단계)</text>
+      
+      <!-- Age comparison -->
+      <rect x="30" y="260" width="320" height="200" fill="#181C24" stroke="#4ABF8A" stroke-width="2" rx="6"/>
+      <text x="190" y="285" font-size="13" font-weight="bold" fill="#4ABF8A" text-anchor="middle">2-4세: 감정 폭발 중심</text>
+      <text x="40" y="310" font-size="11" fill="#E8E6E1">✓ 1단계: 감정 자각</text>
+      <text x="40" y="330" font-size="11" fill="#E8E6E1">✓ 2단계: 신체적 공감</text>
+      <text x="40" y="350" font-size="11" fill="#E8E6E1">✓ 3단계: 간단한 라벨링</text>
+      <text x="40" y="370" font-size="11" fill="#E8E6E1">✗ 4-5단계: 진정 후 진행</text>
+      <text x="40" y="395" font-size="10" fill="#9A9890" font-style="italic">감정 폭발 중엔 신체적 진정이</text>
+      <text x="40" y="410" font-size="10" fill="#9A9890" font-style="italic">말보다 효과적입니다</text>
+      <text x="40" y="440" font-size="10" fill="#4ABF8A" font-weight="bold">20-30분 후 진정 후 4-5단계</text>
+      
+      <rect x="380" y="260" width="340" height="200" fill="#181C24" stroke="#C9A84C" stroke-width="2" rx="6"/>
+      <text x="550" y="285" font-size="13" font-weight="bold" fill="#C9A84C" text-anchor="middle">5-7세: 5단계 전체 적용 가능</text>
+      <text x="390" y="310" font-size="11" fill="#E8E6E1">✓ 1단계: 감정 자각 가능</text>
+      <text x="390" y="330" font-size="11" fill="#E8E6E1">✓ 2단계: 공감과 경청</text>
+      <text x="390" y="350" font-size="11" fill="#E8E6E1">✓ 3단계: 정교한 라벨링</text>
+      <text x="390" y="370" font-size="11" fill="#E8E6E1">✓ 4-5단계: 폭발 중에도 가능</text>
+      <text x="390" y="395" font-size="10" fill="#9A9890" font-style="italic">감정 폭발 중에도 대화가</text>
+      <text x="390" y="410" font-size="10" fill="#9A9890" font-style="italic">어느 정도 가능합니다</text>
+      <text x="390" y="440" font-size="10" fill="#C9A84C" font-weight="bold">더 섬세한 감정 어휘 제시</text>
+      
+      <defs>
+        <marker id="arrowgold" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L0,6 L9,3 z" fill="#C9A84C"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+</section>
+
+<!-- ⑥ SCRIPTS -->
+<section class="fade-up">
+  <div class="section-label">DAD'S PLAYBOOK</div>
+  <div class="section-title">상황별 감정 코칭 대화</div>
+  
+  <div class="age-tabs">
+    <button class="age-tab active" onclick="switchTab(this, 'age6')">👧 5-7세 대화</button>
+    <button class="age-tab" onclick="switchTab(this, 'age3')">👶 2-4세 대화</button>
+  </div>
+
+  <!-- 5-7세 -->
+  <div id="age6" class="tab-content active">
+    <div class="script-card">
+      <div class="scenario">상황 1 — 새 장난감을 못 가졌을 때</div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"싫어! 왜 나한테만 안 사줘!"</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"(눈높이에서) 그 장난감을 갖고 싶었구나. 정말 답답하고 실망했어?"<br><em>→ 자각 + 공감 + 라벨링</em></span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"응... 모든 친구들이 다 갖는데 나만 없어."</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"맞아, 혼자만 없으니까 더 슬프겠다. 그런 마음이 정말 이해가 돼. 우리 함께 다른 방법을 생각해볼까?"<br><em>→ 검증 + 문제해결</em></span>
+      </div>
+    </div>
+
+    <div class="script-card">
+      <div class="scenario">상황 2 — 동생과 싸웠을 때</div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"(화난 목소리) 동생 때문에 짜증 나! 내 것 자꾸 가져가!"</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"동생이 자꾸 너의 것을 빼앗으니까 짜증이 났구나. 그게 진짜 싫었겠다."<br><em>→ 공감 + 라벨링</em></span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"응!! 그리고 제일 화나는 건 아빠는 내 말을 안 들어줘!"</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"(안으며) 아, 그래서 더 화났구나. 아빠가 지금 듣고 있어. 계속 말해줄래?"<br><em>→ 더 깊은 감정 발견 + 안정감</em></span>
+      </div>
+    </div>
+
+    <div class="script-card">
+      <div class="scenario">상황 3 — 실수를 했을 때</div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"(자책하는 목소리) 아, 망쳤어! 나 정말 바보야!"</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"뭔가 잘못된 것 같고, 자신에게 화났구나. 어떤 부분이 제일 싫었어?"<br><em>→ 자책 감정 라벨링 + 원인 탐색</em></span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"내가 최선을 다하지 않았어."</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"그렇구나. 자신에게 큰 기대가 있었는데 못 충족시켜서 슬프고 답답한 거네. 완벽한 사람은 없어. 다음엔 뭘 다르게 해보고 싶어?"<br><em>→ 검증 + 자존감 강화 + 성장</em></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2-4세 -->
+  <div id="age3" class="tab-content" style="display:none;">
+    <div class="script-card">
+      <div class="scenario">상황 1 — 장난감을 빼앗겼을 때</div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"싫어!!! 내 거야!!! (바닥에서 울음)"</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"(다른 아이와 분리시키고, 곁에 앉아서) 화났구나. 되찾고 싶었어."<br><em>→ 상황 제어 + 간단한 라벨링</em></span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"(계속 울며) 싫어... 싫어..."</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"(말 없이 등을 쓸어주며) 후~ 후~ (깊게 숨 쉬기 시범)"<br><em>→ 신체적 진정 (호흡, 터치)</em></span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"(30분 후 진정되고) 응..."</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"아까 화났던 거 맞지? 나중에 친구에게 '내 거야'라고 말하고, 아빠가 도와줄 수 있어. 약속할래?"<br><em>→ 진정 후 4-5단계</em></span>
+      </div>
+    </div>
+
+    <div class="script-card">
+      <div class="scenario">상황 2 — 형/누나와 싸웠을 때</div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"(형/누나를 때리려 함) 싫어!!"</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"(손을 잡으며) 안 돼. 친구는 때리면 아파. (안아서 이동)<br><em>→ 경계선 + 신체적 개입</em></span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"(계속 울고) 아!! 화났어!!!"</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"화났구나. (안으며) 우리 함께 바람 불자. 후~~ (부드럽게 숨 쉬기)"<br><em>→ 감각 입력으로 진정</em></span>
+      </div>
+    </div>
+
+    <div class="script-card">
+      <div class="scenario">상황 3 — 외출 거부</div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"싫어!! 안 해!! 더 놀아!!!!"</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"더 놀고 싶었구나."<br><em>→ 공감</em></span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"응!! 싫어!! (울음)"</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"아, 아빠가 이해해. (간단한 대안) 집에 가서 블록으로 놀자. 어떤 걸 만들어볼까?"<br><em>→ 감각 전환 (놀이화)</em></span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label child">아이</span>
+        <span class="dialog-text">"(울음이 조금 그치고) 집에서... 성 만들어?"</span>
+      </div>
+      <div class="dialog-line">
+        <span class="dialog-label dad">아빠</span>
+        <span class="dialog-text">"그래! 우리 가자!" (손을 잡고 가기)<br><em>→ 긍정 회로 강화</em></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DO/DON'T -->
+  <div class="do-dont">
+    <div class="do-box">
+      <h5>✅ DO — 감정 코칭의 핵심</h5>
+      <ul>
+        <li>아이 눈높이에서 눈을 맞추기</li>
+        <li>5-7세: 정교한 감정 어휘 제시</li>
+        <li>2-4세: 감각 전환 (놀이, 호흡)</li>
+        <li>폭발 중에는 1-3단계만 진행</li>
+        <li>감정은 받아주되, 행동은 경계선</li>
+        <li>일관된 감정 어휘 사용하기</li>
+        <li>진정 후에 "왜?"라는 질문하기</li>
+      </ul>
+    </div>
+    <div class="dont-box">
+      <h5>❌ DON'T — 피해야 할 실수</h5>
+      <ul>
+        <li>폭발 중에 논리적 설명하기</li>
+        <li>"왜 화났어?" 연속으로 묻기</li>
+        <li>"울지 마", "진정해" 감정 부정</li>
+        <li>즉시 문제 해결만 시도하기</li>
+        <li>한 아이 방식을 다른 아이에게 적용</li>
+        <li>감정 코칭 중에 윽박지르기</li>
+        <li>5-7세와 2-4세 대화 수준 미구분</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ⑦ TIP SECTIONS -->
+<section class="tip-section fade-up">
+  <h3>👧👶 자매 갈등 해결에 감정 코칭 활용하기</h3>
+  <p>5-7세와 2-4세가 싸울 때, 보통 "누가 먼저 잘못했어?"라고 판단합니다. 하지만 감정 코칭 관점에서는 "두 아이 모두 자신의 감정을 표현하는 방식을 배우는 중"입니다.</p>
+  <p>5-7세는 2-4세의 행동이 짜증 나지만, 2-4세는 자신의 감정을 어떻게 표현해야 하는지 모릅니다. 이 차이를 안다면, 두 아이 모두에게 공감을 먼저 제공할 수 있습니다.</p>
+  <div class="tip-highlight">
+    <strong>🎯 오늘의 한 마디:</strong> "00이(첫째)가 짜증낸 것도 이해해. 그리고 동생이 울은 것도 이해해. 우리 모두 기분이 안 좋을 때가 있어. 그럼 어떻게 말해야 좋을까?"
+  </div>
+</section>
+
+<section class="tip-section fade-up">
+  <h3>💑 부부가 함께 배우면 좋은 것</h3>
+  <p>감정 코칭은 아이뿐 아니라 부부 관계도 개선합니다. 배우자가 아이에게 다른 방식으로 대처할 때, "감정 코칭 5단계"를 공유하면 같은 언어로 대화할 수 있습니다.</p>
+  
+  <div class="couple-tips-grid">
+    <div class="couple-tip-box">
+      <strong>공유할 한 가지: 5단계 프로세스</strong>
+      배우자와 오늘 배운 5단계를 함께 복습하세요. 같은 언어로 이해할 수 있습니다.
+    </div>
+    <div class="couple-tip-box">
+      <strong>충돌을 줄이는 대화법</strong>
+      아내/남편이 아이를 "버릇없이" 키운다고 느껴질 때, "너는 몇 단계에 있다고 생각해?"라고 물으세요.
+    </div>
+    <div class="couple-tip-box">
+      <strong>일관성 있는 메시지</strong>
+      부부가 감정 어휘를 통일하세요. 한 쪽은 "화났네", 다른 쪽은 "짜증났어" 하면 아이가 혼란합니다.
+    </div>
+    <div class="couple-tip-box">
+      <strong>역할 분담하기</strong>
+      한 아이가 감정 폭발할 때 한 사람이 감정 코칭하고, 다른 사람이 환경 안정화합니다.
+    </div>
+  </div>
+</section>
+
+<!-- ⑧ QUIZ -->
+<section class="quiz-section fade-up">
+  <h3>🎯 오늘의 핵심 복습</h3>
+  
+  <div class="quiz-card">
+    <div class="quiz-question">Q1. 2-4세 아이가 감정 폭발 중일 때, 아빠가 가장 먼저 해야 할 것은?</div>
+    <div class="quiz-options">
+      <label class="quiz-option">
+        <input type="radio" name="quiz1" value="a" onchange="updateQuiz(this, 'q1')">
+        <label>"왜 화났어?" 계속 물어보기</label>
+      </label>
+      <label class="quiz-option">
+        <input type="radio" name="quiz1" value="b" onchange="updateQuiz(this, 'q1')">
+        <label>"화났네" 한 마디만 하고 신체적으로 진정 도와주기</label>
+      </label>
+      <label class="quiz-option">
+        <input type="radio" name="quiz1" value="c" onchange="updateQuiz(this, 'q1')">
+        <label>"울지 마", "진정해" 감정 부정하기</label>
+      </label>
+    </div>
+    <div id="q1-exp" class="quiz-explanation">
+      <strong>정답: B</strong><br>
+      2-4세는 폭발 중일 때 전두엽이 차단되므로 말(A)은 작동하지 않습니다. 감정 부정(C)은 역효과입니다. 신체적 진정(호흡, 터치)으로 편도체를 진정시킨 후, 20-30분 후에 대화합니다.
+    </div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-question">Q2. Gottman의 5단계 중, 감정 폭발 중에는 어디까지만 진행하나요?</div>
+    <div class="quiz-options">
+      <label class="quiz-option">
+        <input type="radio" name="quiz2" value="a" onchange="updateQuiz(this, 'q2')">
+        <label>5단계 모두</label>
+      </label>
+      <label class="quiz-option">
+        <input type="radio" name="quiz2" value="b" onchange="updateQuiz(this, 'q2')">
+        <label>1-3단계 (4-5단계는 나중에)</label>
+      </label>
+      <label class="quiz-option">
+        <input type="radio" name="quiz2" value="c" onchange="updateQuiz(this, 'q2')">
+        <label>3단계만</label>
+      </label>
+    </div>
+    <div id="q2-exp" class="quiz-explanation">
+      <strong>정답: B</strong><br>
+      감정 폭발 중에는 아이의 뇌가 감정 처리 상태입니다. 1-3단계로 아이를 진정시키고, 20-30분 후 4-5단계(검증과 해결책)를 진행합니다.
+    </div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-question">Q3. 5-7세 아이가 감정 폭발할 때, 더 세밀한 감정 어휘를 제시하는 이유는?</div>
+    <div class="quiz-options">
+      <label class="quiz-option">
+        <input type="radio" name="quiz3" value="a" onchange="updateQuiz(this, 'q3')">
+        <label>아이가 엄청 똑똑해서</label>
+      </label>
+      <label class="quiz-option">
+        <input type="radio" name="quiz3" value="b" onchange="updateQuiz(this, 'q3')">
+        <label>감정을 언어화하면 편도체 활성화가 진정되기 때문 (신경과학)</label>
+      </label>
+      <label class="quiz-option">
+        <input type="radio" name="quiz3" value="c" onchange="updateQuiz(this, 'q3')">
+        <label>아이를 압박하기 위해</label>
+      </label>
+    </div>
+    <div id="q3-exp" class="quiz-explanation">
+      <strong>정답: B</strong><br>
+      감정을 명확히 이름 붙이면 그 감정의 강도가 20-30% 감소합니다(affect labeling effect). 5-7세는 이 시기에 감정 어휘를 많이 배울수록 청소년기 정서 조절력이 높아집니다.
+    </div>
+  </div>
+
+</section>
+
+<!-- TRACKER -->
+<section class="tracker-section fade-up">
+  <div class="tracker-title">📊 21일 학습 진도 추적기</div>
+  <div class="tracker-grid" id="trackerGrid"></div>
+</section>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>과학적 아빠 육아 스터디 · Day 20 of 21 · PART 4: 대화법 & 관계</p>
+  <p style="margin-top:6px;">내일 Day 21: 아빠 루틴 시스템 완성 — 21일 과정의 최종 마무리 &지속 가능한 일상 루틴 →</p>
+</footer>
+
+<!-- TIMER MODAL -->
+<div id="timerModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:200; flex-direction:column; align-items:center; justify-content:center;">
+  <div style="background:var(--bg-card); padding:3rem; border-radius:16px; border:2px solid var(--green); text-align:center;">
+    <h2 style="font-family:var(--serif); color:var(--green); margin-bottom:1.5rem;">포모도로 타이머</h2>
+    <div style="font-family:var(--mono); font-size:3rem; color:var(--green); font-weight:700; margin:2rem 0;" id="timerDisplay">25:00</div>
+    <div style="display:flex; gap:1rem; justify-content:center;">
+      <button onclick="startTimer()" style="padding:12px 24px; background:var(--green); color:var(--bg); border:none; border-radius:8px; font-weight:700; cursor:pointer;">시작</button>
+      <button onclick="pauseTimer()" style="padding:12px 24px; background:var(--gold); color:var(--bg); border:none; border-radius:8px; font-weight:700; cursor:pointer;">일시정지</button>
+      <button onclick="resetTimer()" style="padding:12px 24px; background:var(--text-dim); color:var(--bg); border:none; border-radius:8px; font-weight:700; cursor:pointer;">초기화</button>
+    </div>
+    <button onclick="closeTimer()" style="margin-top:1.5rem; padding:10px 20px; background:var(--bg-card-alt); color:var(--text); border:1px solid var(--text-dim); border-radius:6px; cursor:pointer;">닫기</button>
+  </div>
+</div>
+
+<script>
+// Intersection Observer
+const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.style.animationDelay = '0s';
+      observer.unobserve(entry.target);
+    }
+  });
+}, observerOptions);
+document.querySelectorAll('.fade-up').forEach((el) => { observer.observe(el); });
+
+// Timer
+let timerInterval = null;
+let timeLeft = 25 * 60;
+function openTimer() { document.getElementById('timerModal').style.display = 'flex'; }
+function closeTimer() { document.getElementById('timerModal').style.display = 'none'; }
+function updateDisplay() {
+  const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+  const s = (timeLeft % 60).toString().padStart(2, '0');
+  document.getElementById('timerDisplay').textContent = m + ':' + s;
+}
+function startTimer() {
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      document.getElementById('timerDisplay').textContent = "✅ 완료!";
+      return;
+    }
+    timeLeft--;
+    updateDisplay();
+  }, 1000);
+}
+function pauseTimer() { clearInterval(timerInterval); timerInterval = null; }
+function resetTimer() { clearInterval(timerInterval); timerInterval = null; timeLeft = 25 * 60; updateDisplay(); }
+
+// Tabs
+function switchTab(el, tabId) {
+  document.querySelectorAll('.age-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+  document.getElementById(tabId).style.display = 'block';
+}
+
+// Quiz
+function updateQuiz(el, quizId) {
+  const explanationId = quizId + '-exp';
+  document.querySelectorAll('.quiz-explanation').forEach(exp => exp.classList.remove('show'));
+  document.getElementById(explanationId).classList.add('show');
+}
+
+// Tracker
+window.addEventListener('DOMContentLoaded', () => {
+  const trackerGrid = document.getElementById('trackerGrid');
+  for (let i = 1; i <= 21; i++) {
+    const dayDiv = document.createElement('div');
+    dayDiv.className = 'tracker-day';
+    dayDiv.textContent = i;
+    dayDiv.addEventListener('click', () => { dayDiv.classList.toggle('completed'); });
+    trackerGrid.appendChild(dayDiv);
+  }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 11 — 피드백의 신경과학 | 인간 탐구</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --purple: #8A6ABF;
+            --gold: #C9A84C;
+            --green: #6BBF8A;
+            --red: #BF6B6B;
+            --cyan: #6BB5BF;
+            --bg: #0A0C10;
+            --card: #12151C;
+            --card2: #161A24;
+            --text1: #E8E9F3;
+            --text2: #9EA0B8;
+            --border: rgba(138, 106, 191, 0.15);
+            --glow: rgba(138, 106, 191, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text1);
+            font-family: 'Noto Sans KR', sans-serif;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.05), rgba(201, 168, 76, 0.02));
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--purple), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background-color: var(--card2);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 50%;
+            background: linear-gradient(90deg, var(--purple), var(--gold));
+            box-shadow: 0 0 10px rgba(138, 106, 191, 0.5);
+        }
+
+        .day-badge {
+            background-color: var(--card2);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--gold);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @media (max-width: 700px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-title {
+                font-size: 1.4rem;
+            }
+
+            .progress-bar {
+                width: 100%;
+            }
+        }
+
+        /* Series Banner */
+        .series-banner {
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.1), rgba(201, 168, 76, 0.05));
+            border-bottom: 2px solid var(--border);
+            padding: 1.5rem 2rem;
+            text-align: center;
+        }
+
+        .series-banner-text {
+            max-width: 1200px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            color: var(--text2);
+        }
+
+        .series-banner-text strong {
+            color: var(--purple);
+            font-weight: 600;
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--card2), var(--card));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .gauge-container {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+        }
+
+        .hero-right {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .meta-badges {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text2);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .badge.purple { border-color: rgba(138, 106, 191, 0.4); color: #B8A5D8; }
+        .badge.gold { border-color: rgba(201, 168, 76, 0.4); color: #E8D6A0; }
+        .badge.green { border-color: rgba(107, 191, 138, 0.4); color: #A3D8B8; }
+
+        .question {
+            font-size: 1.3rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            color: var(--gold);
+            line-height: 1.6;
+            margin: 1rem 0;
+        }
+
+        .keyword-badges {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .keyword {
+            background-color: rgba(138, 106, 191, 0.1);
+            border: 1px solid rgba(138, 106, 191, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--purple);
+        }
+
+        @media (max-width: 700px) {
+            .hero {
+                grid-template-columns: 1fr;
+                padding: 1.5rem;
+                gap: 1.5rem;
+            }
+
+            .question {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Learning Strategy */
+        .strategy-box {
+            background: linear-gradient(135deg, var(--card2), var(--card));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .strategy-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--purple);
+            margin-bottom: 1.5rem;
+        }
+
+        .timeslots {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .timeslot {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            padding: 1.2rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .timeslot-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeslot-activity {
+            font-size: 0.9rem;
+            color: var(--text2);
+            line-height: 1.4;
+        }
+
+        .infp-tip {
+            background-color: rgba(107, 191, 138, 0.1);
+            border-left: 3px solid var(--green);
+            padding: 1.2rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--text1);
+        }
+
+        .infp-tip strong {
+            color: var(--green);
+        }
+
+        @media (max-width: 700px) {
+            .timeslots {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .timeslots {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Concept Cards */
+        .concepts {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .concept-card {
+            background: linear-gradient(135deg, var(--card2), var(--card));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .concept-card:hover {
+            border-color: rgba(138, 106, 191, 0.4);
+            box-shadow: 0 0 20px rgba(138, 106, 191, 0.15);
+        }
+
+        .concept-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--purple);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toggle-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .concept-card.expanded .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .concept-summary {
+            font-size: 0.95rem;
+            color: var(--text2);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .evidence-label {
+            display: inline-block;
+            background-color: rgba(201, 168, 76, 0.1);
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--gold);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 1rem;
+        }
+
+        .dive-content {
+            display: none;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .concept-card.expanded .dive-content {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dive-section {
+            margin-bottom: 1.2rem;
+        }
+
+        .dive-section-title {
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .dive-text {
+            font-size: 0.9rem;
+            color: var(--text2);
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.8rem;
+            margin-top: 0.8rem;
+        }
+
+        .model-item {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            padding: 0.8rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .model-item-label {
+            color: var(--purple);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .model-item-desc {
+            color: var(--text2);
+            font-size: 0.75rem;
+        }
+
+        .example-box {
+            background-color: rgba(107, 191, 138, 0.05);
+            border-left: 3px solid var(--green);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .example-label {
+            color: var(--green);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .example-text {
+            color: var(--text2);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 700px) {
+            .concepts {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Diagram Section */
+        .diagram-section {
+            background: linear-gradient(135deg, var(--card2), var(--card));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .diagram-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--purple);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .scarf-diagram {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .threat-flow {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .flow-card {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .flow-title {
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
+
+        .flow-content {
+            font-size: 0.85rem;
+            color: var(--text2);
+            line-height: 1.5;
+        }
+
+        .threat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 700px) {
+            .threat-flow {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Practice Guide */
+        .practice-section {
+            background: linear-gradient(135deg, var(--card2), var(--card));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .practice-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--purple);
+            margin-bottom: 1.5rem;
+        }
+
+        .practice-tiers {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .tier {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .tier-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .tier-content {
+            font-size: 0.9rem;
+            color: var(--text2);
+            line-height: 1.6;
+        }
+
+        .tier-content strong {
+            color: var(--text1);
+        }
+
+        .tier-content ul {
+            margin: 0.8rem 0 0 1.2rem;
+        }
+
+        .tier-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 700px) {
+            .practice-tiers {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Philosophy Section */
+        .philosophy-section {
+            background: linear-gradient(135deg, var(--card2), var(--card));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .philosophy-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--purple);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .philosophers {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .philosopher-card {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .philosopher-portrait {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.2rem;
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.2), rgba(201, 168, 76, 0.1));
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .philosopher-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--purple);
+            margin-bottom: 0.5rem;
+        }
+
+        .philosopher-era {
+            font-size: 0.8rem;
+            color: var(--text2);
+            margin-bottom: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .quote {
+            font-style: italic;
+            color: var(--gold);
+            margin: 1rem 0;
+            padding: 1rem;
+            border-left: 3px solid var(--gold);
+            background-color: rgba(201, 168, 76, 0.05);
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        .neuroscience-connection {
+            font-size: 0.9rem;
+            color: var(--text2);
+            line-height: 1.6;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 700px) {
+            .philosophers {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Quiz Section */
+        .quiz-section {
+            background: linear-gradient(135deg, var(--card2), var(--card));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .quiz-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--purple);
+            margin-bottom: 2rem;
+        }
+
+        .question-block {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-text {
+            font-weight: 600;
+            color: var(--text1);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .answer-btn {
+            background-color: rgba(138, 106, 191, 0.1);
+            border: 1px solid rgba(138, 106, 191, 0.3);
+            color: var(--text1);
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(138, 106, 191, 0.2);
+            border-color: rgba(138, 106, 191, 0.5);
+        }
+
+        .answer-btn.correct {
+            background-color: rgba(107, 191, 138, 0.3);
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .answer-btn.incorrect {
+            background-color: rgba(191, 107, 107, 0.3);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .feedback-msg {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .feedback-msg.show {
+            display: block;
+        }
+
+        .feedback-msg.correct {
+            background-color: rgba(107, 191, 138, 0.15);
+            border-left: 3px solid var(--green);
+            color: var(--green);
+        }
+
+        .feedback-msg.incorrect {
+            background-color: rgba(191, 107, 107, 0.15);
+            border-left: 3px solid var(--red);
+            color: var(--red);
+        }
+
+        /* Spaced Repetition */
+        .repetition-section {
+            background: linear-gradient(135deg, var(--card2), var(--card));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .repetition-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--purple);
+            margin-bottom: 1.5rem;
+        }
+
+        .spaced-days {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .day-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--card);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text2);
+            font-weight: 600;
+        }
+
+        .day-circle:hover {
+            border-color: rgba(138, 106, 191, 0.5);
+        }
+
+        .day-circle.completed {
+            background-color: rgba(107, 191, 138, 0.3);
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        /* Animations */
+        .ani {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .ani.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            main {
+                padding: 1rem;
+            }
+
+            .strategy-box,
+            .diagram-section,
+            .practice-section,
+            .philosophy-section,
+            .quiz-section,
+            .repetition-section {
+                padding: 1.5rem;
+            }
+
+            header {
+                padding: 1rem;
+            }
+
+            .header-title {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <h1 class="header-title">인간 탐구</h1>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="day-badge">Day 11/22</div>
+        </div>
+    </header>
+
+    <!-- Series Banner -->
+    <div class="series-banner">
+        <div class="series-banner-text">
+            <strong>Part 2: 인간관계 심리학</strong> | 피드백의 신경과학 | Day 11 of 22
+        </div>
+    </div>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero ani">
+            <div class="hero-left">
+                <div class="gauge-container">
+                    <svg viewBox="0 0 200 200" style="width:100%;height:100%;">
+                        <defs>
+                            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#8A6ABF;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#C9A84C;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Background arc -->
+                        <circle cx="100" cy="100" r="85" fill="none" stroke="rgba(138,106,191,0.15)" stroke-width="8" stroke-dasharray="265 530" stroke-dashoffset="0" stroke-linecap="round"/>
+                        <!-- Filled arc (50%) -->
+                        <circle cx="100" cy="100" r="85" fill="none" stroke="url(#gaugeGradient)" stroke-width="8" stroke-dasharray="265 530" stroke-dashoffset="-265" stroke-linecap="round"/>
+                        <!-- Center text -->
+                        <text x="100" y="95" text-anchor="middle" font-family="Cormorant Garamond" font-size="32" font-weight="600" fill="#C9A84C">50%</text>
+                        <text x="100" y="120" text-anchor="middle" font-family="Noto Sans KR" font-size="12" fill="#9EA0B8">Course Progress</text>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="hero-right">
+                <div class="meta-badges">
+                    <div class="badge purple">Part 2 | 인간관계</div>
+                    <div class="badge gold">⏱ 25분</div>
+                    <div class="badge green">난이도: 중상</div>
+                </div>
+
+                <div class="question">
+                    피드백을 받을 때, 왜 우리의 뇌는 위협에 반응할까? 그리고 어떻게 성장의 신호로 변환할 수 있을까?
+                </div>
+
+                <div class="keyword-badges">
+                    <span class="keyword">SCARF 모델</span>
+                    <span class="keyword">피드백 처리</span>
+                    <span class="keyword">전전두피질 활성화</span>
+                    <span class="keyword">심리안전</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Learning Strategy -->
+        <section class="strategy-box ani">
+            <h2 class="strategy-title">오늘의 학습 전략</h2>
+            <div class="timeslots">
+                <div class="timeslot">
+                    <div class="timeslot-time">0-5분</div>
+                    <div class="timeslot-activity">SCARF 모델 이해 및 위협 반응 인식</div>
+                </div>
+                <div class="timeslot">
+                    <div class="timeslot-time">5-12분</div>
+                    <div class="timeslot-activity">SBI 모델 + 직장 사례 분석 (회사)</div>
+                </div>
+                <div class="timeslot">
+                    <div class="timeslot-time">12-20분</div>
+                    <div class="timeslot-activity">신경학적 대처법 + 실습 가이드</div>
+                </div>
+                <div class="timeslot">
+                    <div class="timeslot-time">20-25분</div>
+                    <div class="timeslot-activity">철학적 관점 + 복습 및 자기 점검</div>
+                </div>
+            </div>
+
+            <div class="infp-tip">
+                <strong>💡 INFP를 위한 팁:</strong> 당신은 상대방의 의도를 읽는 데 뛰어납니다. 피드백을 받을 때, 상대방이 당신의 성장을 진심으로 원하는지 확인하는 시간을 먼저 가지세요. 그 후 깊이 있는 대화를 통해 진정한 배움으로 전환하는 것이 당신의 강점입니다.
+            </div>
+        </section>
+
+        <!-- Concept Cards -->
+        <section class="concepts ani">
+            <!-- SCARF Model Card -->
+            <div class="concept-card" onclick="toggleCard(this)">
+                <div class="concept-title">
+                    SCARF 모델: 위협 인지의 신경생물학
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="concept-summary">
+                    피드백 상황에서 우리의 뇌가 5가지 영역(Status, Certainty, Autonomy, Relatedness, Fairness)에서 위협을 감지하면, 편도체가 활성화되고 전전두피질(PFC)이 억제됩니다.
+                </div>
+                <div class="evidence-label">✓ 신경과학 증거 기반</div>
+
+                <div class="dive-content">
+                    <div class="dive-section">
+                        <div class="dive-section-title">SCARF의 5가지 영역과 신경 반응</div>
+                        <div class="model-grid">
+                            <div class="model-item">
+                                <div class="model-item-label">Status</div>
+                                <div class="model-item-desc">사회적 지위 위협 → 미상핵 활성화</div>
+                            </div>
+                            <div class="model-item">
+                                <div class="model-item-label">Certainty</div>
+                                <div class="model-item-desc">불확실성 → 편도체 과활성</div>
+                            </div>
+                            <div class="model-item">
+                                <div class="model-item-label">Autonomy</div>
+                                <div class="model-item-desc">자율성 제한 → 전전두피질 억제</div>
+                            </div>
+                            <div class="model-item">
+                                <div class="model-item-label">Relatedness</div>
+                                <div class="model-item-desc">소속감 위협 → 분리 신호</div>
+                            </div>
+                            <div class="model-item">
+                                <div class="model-item-label">Fairness</div>
+                                <div class="model-item-desc">불공정성 → 섬엽(insula) 활성</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dive-section">
+                        <div class="dive-section-title">회사의 현장 사례</div>
+                        <div class="example-box">
+                            <div class="example-label">상황 분석</div>
+                            <div class="example-text">
+                                당신(한국 엔지니어)이 프랑스 매니저로부터 서스펜션 설계에 대한 피드백을 받습니다.
+                            </div>
+                            <div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(138,106,191,0.2);">
+                                <div style="color:#6BB5BF;font-weight:600;margin-bottom:0.5rem;font-size:0.85rem;">위협 신호 분석</div>
+                                <div class="example-text">
+                                    • <strong>Status:</strong> "당신의 접근법은 틀렸다" → 능력 평가 의심<br>
+                                    • <strong>Certainty:</strong> 피드백 기준이 모호함 → 불안감<br>
+                                    • <strong>Autonomy:</strong> "이렇게 해야 한다" 강압적 지시<br>
+                                    • <strong>Relatedness:</strong> 문화적 커뮤니케이션 차이 → 거리감<br>
+                                    • <strong>Fairness:</strong> 다른 팀원들과의 대우 차이 인식
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dive-section">
+                        <div class="dive-section-title">신경 메커니즘</div>
+                        <div class="dive-text">
+                            위협 감지 → 편도체(amygdala) 활성화 → 스트레스 호르몬(cortisol) 분비 → 전전두피질 혈류 감소 → 인지 자원 제한 → 방어적 반응(고집, 회피, 논쟁)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SBI Model Card -->
+            <div class="concept-card" onclick="toggleCard(this)">
+                <div class="concept-title">
+                    SBI 피드백 모델: 뇌 친화적 구조
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="concept-summary">
+                    Situation-Behavior-Impact 구조는 편도체의 위협 반응을 줄이고 전전두피질의 고차 인지를 활성화하는 가장 효과적인 피드백 방식입니다.
+                </div>
+                <div class="evidence-label">✓ 神経과학적 최적화</div>
+
+                <div class="dive-content">
+                    <div class="dive-section">
+                        <div class="dive-section-title">SBI 구조의 신경학적 효과</div>
+                        <div class="model-grid">
+                            <div class="model-item">
+                                <div class="model-item-label">Situation</div>
+                                <div class="model-item-desc">객관적 맥락 제공 → 확실성 증가</div>
+                            </div>
+                            <div class="model-item">
+                                <div class="model-item-label">Behavior</div>
+                                <div class="model-item-desc">행동만 평가 → 자아 위협 감소</div>
+                            </div>
+                            <div class="model-item">
+                                <div class="model-item-label">Impact</div>
+                                <div class="model-item-desc">결과 설명 → 의도 이해 증가</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dive-section">
+                        <div class="dive-section-title">회사 적용 사례: 효과적인 피드백</div>
+                        <div class="example-box">
+                            <div class="example-label">상황(Situation)</div>
+                            <div class="example-text">
+                                "지난 수요일 공급업체 회의에서..."
+                            </div>
+                            <div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(138,106,191,0.2);">
+                                <div class="example-label">행동(Behavior)</div>
+                                <div class="example-text">
+                                    "당신은 프랑스 동료의 의견을 끝까지 듣지 않았고, 당신의 입장을 설명했습니다."
+                                </div>
+                            </div>
+                            <div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(138,106,191,0.2);">
+                                <div class="example-label">영향(Impact)</div>
+                                <div class="example-text">
+                                    "결과적으로 그는 소외감을 느꼈고, 이후 협력이 어려워졌습니다. 하지만 당신의 기술력은 훌륭합니다. 더 효과적이 되기 위해 경청 시간을 먼저 가져보세요."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dive-section">
+                        <div class="dive-section-title">PFC 활성화 메커니즘</div>
+                        <div class="dive-text">
+                            객관적 정보 제공 → 불확실성 감소(Certainty 위협 해소) → 행동 분리(Status 위협 해소) → 긍정적 의도 전달(Relatedness 회복) → 전전두피질의 분석 능력 활성화 → 건설적 대화 가능
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCARF Threat Model Diagram -->
+        <section class="diagram-section ani">
+            <h2 class="diagram-title">신경학적 위협-성장 모델</h2>
+
+            <div class="scarf-diagram">
+                <svg viewBox="0 0 500 300" style="width:100%;max-width:600px;height:auto;">
+                    <defs>
+                        <marker id="arrowThreat" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <path d="M0,0 L0,6 L9,3 z" fill="#BF6B6B"/>
+                        </marker>
+                        <marker id="arrowGrowth" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <path d="M0,0 L0,6 L9,3 z" fill="#6BBF8A"/>
+                        </marker>
+                    </defs>
+
+                    <!-- SCARF Domains (top) -->
+                    <g id="scarf-domains">
+                        <circle cx="50" cy="50" r="25" fill="rgba(138,106,191,0.2)" stroke="#8A6ABF" stroke-width="2"/>
+                        <text x="50" y="55" text-anchor="middle" font-family="JetBrains Mono" font-size="12" fill="#8A6ABF" font-weight="600">Status</text>
+
+                        <circle cx="130" cy="50" r="25" fill="rgba(138,106,191,0.2)" stroke="#8A6ABF" stroke-width="2"/>
+                        <text x="130" y="55" text-anchor="middle" font-family="JetBrains Mono" font-size="12" fill="#8A6ABF" font-weight="600">Cert.</text>
+
+                        <circle cx="210" cy="50" r="25" fill="rgba(138,106,191,0.2)" stroke="#8A6ABF" stroke-width="2"/>
+                        <text x="210" y="55" text-anchor="middle" font-family="JetBrains Mono" font-size="12" fill="#8A6ABF" font-weight="600">Auto.</text>
+
+                        <circle cx="290" cy="50" r="25" fill="rgba(138,106,191,0.2)" stroke="#8A6ABF" stroke-width="2"/>
+                        <text x="290" y="55" text-anchor="middle" font-family="JetBrains Mono" font-size="12" fill="#8A6ABF" font-weight="600">Rel.</text>
+
+                        <circle cx="370" cy="50" r="25" fill="rgba(138,106,191,0.2)" stroke="#8A6ABF" stroke-width="2"/>
+                        <text x="370" y="55" text-anchor="middle" font-family="JetBrains Mono" font-size="12" fill="#8A6ABF" font-weight="600">Fair.</text>
+                    </g>
+
+                    <!-- Threat pathway -->
+                    <path d="M 50 75 Q 130 120 200 130" stroke="#BF6B6B" stroke-width="2" fill="none" marker-end="url(#arrowThreat)" stroke-dasharray="5,5"/>
+                    <circle cx="200" cy="160" r="20" fill="rgba(191,107,107,0.2)" stroke="#BF6B6B" stroke-width="2"/>
+                    <text x="200" y="165" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#BF6B6B" font-weight="600">Amygdala</text>
+
+                    <path d="M 200 180 Q 200 220 150 250" stroke="#BF6B6B" stroke-width="2" fill="none" marker-end="url(#arrowThreat)"/>
+                    <rect x="90" y="245" width="120" height="40" fill="rgba(191,107,107,0.15)" stroke="#BF6B6B" stroke-width="1" rx="5"/>
+                    <text x="150" y="261" text-anchor="middle" font-family="Noto Sans KR" font-size="11" fill="#BF6B6B" font-weight="600">Defensive Response</text>
+                    <text x="150" y="277" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#BF6B6B">(고집, 회피, 논쟁)</text>
+
+                    <!-- Growth pathway -->
+                    <path d="M 370 75 Q 300 120 300 130" stroke="#6BBF8A" stroke-width="2" fill="none" marker-end="url(#arrowGrowth)" stroke-dasharray="5,5"/>
+                    <circle cx="300" cy="160" r="20" fill="rgba(107,191,138,0.2)" stroke="#6BBF8A" stroke-width="2"/>
+                    <text x="300" y="165" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#6BBF8A" font-weight="600">PFC</text>
+
+                    <path d="M 300 180 Q 300 220 350 250" stroke="#6BBF8A" stroke-width="2" fill="none" marker-end="url(#arrowGrowth)"/>
+                    <rect x="290" y="245" width="120" height="40" fill="rgba(107,191,138,0.15)" stroke="#6BBF8A" stroke-width="1" rx="5"/>
+                    <text x="350" y="261" text-anchor="middle" font-family="Noto Sans KR" font-size="11" fill="#6BBF8A" font-weight="600">Growth Response</text>
+                    <text x="350" y="277" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#6BBF8A">(학습, 성찰, 협력)</text>
+                </svg>
+            </div>
+
+            <div class="threat-flow">
+                <div class="flow-card">
+                    <div class="threat-icon">⚠️</div>
+                    <div class="flow-title">위협 반응 (Threat Mode)</div>
+                    <div class="flow-content">
+                        • 편도체 과활성<br>
+                        • 코르티솔 급증<br>
+                        • 인지 리소스 제한<br>
+                        • 고착된 사고<br>
+                        • 학습 불가능
+                    </div>
+                </div>
+
+                <div class="flow-card">
+                    <div class="threat-icon">✨</div>
+                    <div class="flow-title">성장 반응 (Approach Mode)</div>
+                    <div class="flow-content">
+                        • PFC 활성화<br>
+                        • 도파민 분비<br>
+                        • 인지 유연성<br>
+                        • 열린 사고<br>
+                        • 깊은 학습 가능
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Practice Guide -->
+        <section class="practice-section ani">
+            <h2 class="practice-title">실습 가이드: 신경학적 대처법</h2>
+
+            <div class="practice-tiers">
+                <!-- 30초 루틴 -->
+                <div class="tier">
+                    <div class="tier-name">🎯 30초 루틴</div>
+                    <div class="tier-content">
+                        <strong>상황:</strong> 피드백 받는 순간
+                        <ul>
+                            <li><strong>1단계:</strong> 깊은 호흡 3회 (4초 들이, 8초 내쉬기)</li>
+                            <li><strong>2단계:</strong> "이것은 내 인격이 아니라 행동에 대한 것"이라고 자신에게 말하기</li>
+                            <li><strong>3단계:</strong> "상대방은 내 성장을 원한다"고 반복</li>
+                        </ul>
+                        <p style="margin-top:0.8rem;font-size:0.8rem;color:#6BBF8A;">효과: 편도체 진정, PFC 재활성화</p>
+                    </div>
+                </div>
+
+                <!-- 5분 루틴 -->
+                <div class="tier">
+                    <div class="tier-name">⚡ 5분 루틴</div>
+                    <div class="tier-content">
+                        <strong>상황:</strong> 피드백 직후 반성
+                        <ul>
+                            <li><strong>1단계:</strong> SBI로 피드백 재분석
+                                <ul style="margin-top:0.3rem;">
+                                    <li>상황(S): 객관적 배경</li>
+                                    <li>행동(B): 내 구체적 행동</li>
+                                    <li>영향(I): 그 영향</li>
+                                </ul>
+                            </li>
+                            <li><strong>2단계:</strong> SCARF 중 어느 영역이 위협받았는지 파악</li>
+                            <li><strong>3단계:</strong> "내가 할 수 있는 개선"을 구체적으로 3가지 작성</li>
+                        </ul>
+                        <p style="margin-top:0.8rem;font-size:0.8rem;color:#6BBF8A;">효과: 객관적 거리 확보, 행동 전환</p>
+                    </div>
+                </div>
+
+                <!-- 하루 루틴 -->
+                <div class="tier">
+                    <div class="tier-name">🌱 하루 루틴</div>
+                    <div class="tier-content">
+                        <strong>상황:</strong> 피드백 통합
+                        <ul>
+                            <li><strong>1단계:</strong> 하루 중 받은 모든 피드백 기록 (일기, 메모앱)</li>
+                            <li><strong>2단계:</strong> 각 피드백에서 배운 점 1개씩 작성</li>
+                            <li><strong>3단계:</strong> 내일 적용할 구체적 행동 결정</li>
+                            <li><strong>4단계:</strong> 저녁에 스스로에게 "잘했다"고 격려 (자기 연민)</li>
+                        </ul>
+                        <p style="margin-top:0.8rem;font-size:0.8rem;color:#6BBF8A;">효과: 신경적 가소성, 점진적 성장</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:2rem;padding:1.5rem;background-color:var(--card);border:1px solid var(--border);border-radius:12px;">
+                <div style="font-weight:600;color:var(--gold);margin-bottom:0.8rem;font-size:0.95rem;">💡 피드백 주기 위한 뇌 활용</div>
+                <div style="font-size:0.9rem;color:var(--text2);line-height:1.6;margin-bottom:1rem;">
+                    다른 사람에게 피드백을 줄 때도 같은 원리가 적용됩니다. SBI 구조를 사용하면 상대의 PFC를 활성화시켜 건설적인 대화가 됩니다.
+                </div>
+                <div style="background-color:rgba(138,106,191,0.1);padding:1rem;border-radius:8px;border-left:3px solid var(--purple);">
+                    <strong style="color:var(--purple);">회사 팀 상황:</strong>
+                    <div style="font-size:0.85rem;color:var(--text2);margin-top:0.5rem;">
+                        동료의 설계 아이디어를 검토할 때: "어제 그 서스펜션 설계 제안서를 봤는데, 혁신적인 접근이었다. 한 가지 고려할 점은 프랑스 기준의 내구성 테스트인데, 그것을 추가하면 유럽 시장 진출이 훨씬 쉬워질 것 같다."
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Philosophy Section -->
+        <section class="philosophy-section ani">
+            <h2 class="philosophy-title">철학적 관점: 대화의 본질</h2>
+
+            <div class="philosophers">
+                <!-- Socrates -->
+                <div class="philosopher-card">
+                    <div class="philosopher-portrait">🏛️</div>
+                    <div class="philosopher-name">소크라테스</div>
+                    <div class="philosopher-era">기원전 470-399</div>
+
+                    <div class="quote">
+                        "나는 아무것도 아는 것이 없다. 다만 아는 것도 모르는 것도 안다는 점에서 조금 낫다."
+                    </div>
+
+                    <div class="neuroscience-connection">
+                        <strong>신경과학적 연결:</strong> 소크라테스의 대화법(Socratic Method)은 상대방의 지식을 드러내도록 질문하는 방식입니다. 이는 자신의 관점에서 다른 관점으로 전환하는 과정에서 전전두피질의 메타인지 능력을 활성화합니다. 이 과정에서 편도체의 위협은 최소화되고, 상대방은 자신의 성장을 "발견"하게 됩니다. 당신의 INFP 특성상, 상대방의 깊은 의도를 이해하면서 이런 질문형 피드백을 주는 것이 자연스럽습니다.
+                    </div>
+                </div>
+
+                <!-- Confucius -->
+                <div class="philosopher-card">
+                    <div class="philosopher-portrait">🏮</div>
+                    <div class="philosopher-name">공자</div>
+                    <div class="philosopher-era">기원전 551-479</div>
+
+                    <div class="quote">
+                        "진심 어린 충고는 귀에 거슬릴지 몰라도 행동에 이롭다. (忠言逆耳利於行)"
+                    </div>
+
+                    <div class="neuroscience-connection">
+                        <strong>신경과학적 연결:</strong> 공자의 "충고(忠告)"는 진심 어린 관심(loyalty)에서 비롯된 조언입니다. 피드백이 불편해도(편도체 활성화), 받는 사람이 상대방의 진심을 느끼면 그 불편함은 성장의 신호로 변환됩니다. 이것이 바로 "Relatedness" SCARF 영역입니다. 회사에서 한국과 프랑스 문화 간 차이를 느낄 때, 상대방의 깊은 관심이 있는지를 먼저 느껴보세요. 당신의 INFP 감정성이 정확하게 이를 포착할 수 있습니다.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section class="quiz-section ani">
+            <h2 class="quiz-title">자기 점검: 이해도 확인</h2>
+
+            <!-- Question 1 -->
+            <div class="question-block">
+                <div class="question-text">
+                    Q1. SCARF 모델에서 "불확실성에 대한 위협"은 뇌의 어느 영역을 주로 과활성화시킵니까?
+                </div>
+                <div class="answer-options">
+                    <button class="answer-btn" onclick="checkAns(this, false)">① 전전두피질(PFC)</button>
+                    <button class="answer-btn" onclick="checkAns(this, true)">② 편도체(Amygdala)</button>
+                    <button class="answer-btn" onclick="checkAns(this, false)">③ 해마(Hippocampus)</button>
+                    <button class="answer-btn" onclick="checkAns(this, false)">④ 시상(Thalamus)</button>
+                </div>
+                <div class="feedback-msg"></div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-block">
+                <div class="question-text">
+                    Q2. SBI 피드백 모델에서 행동(Behavior)만 평가하는 이유는 무엇입니까?
+                </div>
+                <div class="answer-options">
+                    <button class="answer-btn" onclick="checkAns(this, false)">① 행동이 가장 중요하기 때문</button>
+                    <button class="answer-btn" onclick="checkAns(this, true)">② 자아(self)에 대한 위협을 줄이고 PFC를 활성화하기 위함</button>
+                    <button class="answer-btn" onclick="checkAns(this, false)">③ 의도를 평가하는 것이 어렵기 때문</button>
+                    <button class="answer-btn" onclick="checkAns(this, false)">④ 행동만 변할 수 있기 때문</button>
+                </div>
+                <div class="feedback-msg"></div>
+            </div>
+        </section>
+
+        <!-- Spaced Repetition -->
+        <section class="repetition-section ani">
+            <h2 class="repetition-title">스페이스드 반복: 신경적 강화</h2>
+
+            <p style="margin-bottom:1.5rem;font-size:0.95rem;color:var(--text2);line-height:1.6;">
+                뇌는 같은 정보를 반복적으로 접할 때 신경 경로를 강화합니다. 다음 날짜에 다시 돌아와 이 내용을 복습하세요. 클릭하면 진행 상황이 저장됩니다.
+            </p>
+
+            <div class="spaced-days">
+                <span style="color:var(--text2);font-size:0.9rem;">복습 일정:</span>
+                <div class="day-circle" onclick="toggleDay(this)">Day 1</div>
+                <div class="day-circle" onclick="toggleDay(this)">Day 3</div>
+                <div class="day-circle" onclick="toggleDay(this)">Day 7</div>
+                <div class="day-circle" onclick="toggleDay(this)">Day 14</div>
+                <div class="day-circle" onclick="toggleDay(this)">Day 30</div>
+            </div>
+
+            <div style="margin-top:2rem;padding:1.5rem;background-color:var(--card);border:1px solid var(--border);border-radius:12px;">
+                <div style="font-weight:600;color:var(--gold);margin-bottom:0.8rem;">이 복습의 신경과학적 의미</div>
+                <div style="font-size:0.9rem;color:var(--text2);line-height:1.6;">
+                    각 복습 간격이 증가할수록(1→3→7→14→30일), 당신의 뇌는 이 정보를 더 중요하다고 인식하고 장기 기억(해마)으로 통합합니다. 이는 "피드백을 통한 성장"이라는 스키마를 뇌에 깊게 새기는 과정입니다. 당신의 전전두피질이 이를 기본값으로 삼게 됩니다.
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Takeaways -->
+        <section style="background:linear-gradient(135deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:16px;padding:2rem;margin-bottom:3rem;" class="ani">
+            <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:var(--purple);margin-bottom:1.5rem;">핵심 정리</h2>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;">
+                <div style="background-color:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:12px;border-left:3px solid var(--purple);">
+                    <div style="font-weight:600;color:var(--purple);margin-bottom:0.8rem;font-size:0.95rem;">신경학적 진실</div>
+                    <div style="font-size:0.9rem;color:var(--text2);line-height:1.6;">
+                        피드백은 초기에 위협으로 감지됩니다. 이는 당신의 약점이 아니라 모든 인간의 기본 설정입니다.
+                    </div>
+                </div>
+
+                <div style="background-color:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:12px;border-left:3px solid var(--green);">
+                    <div style="font-weight:600;color:var(--green);margin-bottom:0.8rem;font-size:0.95rem;">행동 변화</div>
+                    <div style="font-size:0.9rem;color:var(--text2);line-height:1.6;">
+                        SCARF와 SBI를 의식하면, 당신과 상대방 모두의 전전두피질을 활성화시킬 수 있습니다.
+                    </div>
+                </div>
+
+                <div style="background-color:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:12px;border-left:3px solid var(--cyan);">
+                    <div style="font-weight:600;color:var(--cyan);margin-bottom:0.8rem;font-size:0.95rem;">문화적 현명함</div>
+                    <div style="font-size:0.9rem;color:var(--text2);line-height:1.6;">
+                        프랑스와 한국의 피드백 스타일 차이를 이해하는 것은 신경학적으로도, 관계적으로도 강점입니다.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Toggle Card Deep Dive
+        function toggleCard(element) {
+            element.classList.toggle('expanded');
+        }
+
+        // Check Answer
+        function checkAns(btn, isCorrect) {
+            const block = btn.closest('.question-block');
+            const allBtns = block.querySelectorAll('.answer-btn');
+            const feedbackMsg = block.querySelector('.feedback-msg');
+
+            // Disable all buttons
+            allBtns.forEach(b => b.disabled = true);
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedbackMsg.textContent = '✓ 정확합니다! 뇌의 신경 경로를 정확하게 이해했습니다.';
+                feedbackMsg.classList.add('correct', 'show');
+            } else {
+                btn.classList.add('incorrect');
+                feedbackMsg.textContent = '✗ 다시 생각해보세요. 위의 내용을 다시 읽어보면 답을 찾을 수 있습니다.';
+                feedbackMsg.classList.add('incorrect', 'show');
+            }
+        }
+
+        // Toggle Spaced Repetition Day
+        function toggleDay(element) {
+            element.classList.toggle('completed');
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.ani').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

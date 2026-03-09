@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="YS학습">
+<meta name="apple-mobile-web-app-title" content="학습멘토">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <meta name="theme-color" content="#c9a84c">
-<title>YS 학습 멘토 — 뇌과학 기반 학습 시스템</title>
+<title>학습 멘토 — 뇌과학 기반 학습 시스템</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -296,7 +296,7 @@ button{font-family:inherit;cursor:pointer}
 
 <!-- PWA Install Banner -->
 <div class="pwa-banner" id="pwaBanner">
-  <div class="pwa-icon"><img src="icons/icon-192.png" alt="YS"></div>
+  <div class="pwa-icon"><img src="icons/icon-192.png" alt="학습"></div>
   <div class="pwa-info">
     <div class="pwa-title">홈 화면에 추가</div>
     <div class="pwa-desc">앱처럼 빠르게 열고, 오프라인에서도 사용</div>
@@ -331,7 +331,7 @@ button{font-family:inherit;cursor:pointer}
 </div>
 
 <div class="hero">
-  <h1>YS 학습 멘토 시스템</h1>
+  <h1>학습 멘토 시스템</h1>
   <div class="sub">뇌과학 기반 · 간격반복 · 인터리빙 · 능동회상 · 울트라디안 리듬</div>
   <div class="date-display" id="dateDisplay"></div>
 </div>
@@ -585,17 +585,6 @@ window.onerror=function(msg,url,line,col,err){
   errEl.innerHTML+='L'+line+': '+msg+'<br>';
 };
 
-// ═══ REMOTE MODE DETECTION ═══
-const IS_REMOTE=location.hostname.includes('github.io')||location.hostname.includes('netlify.app')||location.hostname.includes('vercel.app');
-function lessonLink(href,text){
-  if(IS_REMOTE)return`<span style="color:var(--text-dim);cursor:default" title="로컬에서만 열 수 있습니다">${text}</span>`;
-  return`<a class="link" href="${href}" target="_blank">${text}</a>`;
-}
-function lessonBookmark(href){
-  if(IS_REMOTE)return`<span style="color:var(--text-dim);cursor:default;font-size:0.78rem" title="로컬에서만 열 수 있습니다">📖</span>`;
-  return`<a href="${href}" target="_blank" style="color:var(--gold);font-size:0.78rem">📖</a>`;
-}
-
 // ═══ file:// protocol warning for iOS ═══
 (function(){
   if(window.location.protocol==='file:'){
@@ -641,8 +630,8 @@ const NEURO_TIPS=[
 ];
 
 // ═══ STATE ═══
-function getState(){try{return JSON.parse(localStorage.getItem('ys_learn_v3'))||{}}catch(e){return{}}}
-function saveState(s){localStorage.setItem('ys_learn_v3',JSON.stringify(s))}
+function getState(){try{return JSON.parse(localStorage.getItem('learn_data_v3'))||{}}catch(e){return{}}}
+function saveState(s){localStorage.setItem('learn_data_v3',JSON.stringify(s))}
 function getLK(cid,day){return`${cid}_d${day}`}
 function today(){return new Date().toISOString().slice(0,10)}
 function addDays(ds,n){const d=new Date(ds);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
@@ -954,7 +943,7 @@ function renderPlan(plan){
     const href=`${it.course.folder}/${it.lesson.file}`;
     return`<div class="plan-item">
       <span class="type ${it.type}">${it.type==='new'?'신규':'복습'}</span>
-      ${lessonLink(href,'Day'+it.lesson.day+': '+it.lesson.title)}
+      <a href="${href}" target="_blank">Day${it.lesson.day}: ${it.lesson.title}</a>
       <span class="course-tag" style="border-left:2px solid ${it.course.color};padding-left:5px">${it.course.icon}</span>
       <button class="btn-sm" style="border-color:${it.type==='new'?'var(--green)':'var(--purple)'};color:${it.type==='new'?'var(--green)':'var(--purple)'}" onclick="event.stopPropagation();${it.type==='new'?`markComplete('${it.course.id}',${it.lesson.day})`:`markReviewed('${it.course.id}',${it.lesson.day})`}">✓</button>
     </div>`;
@@ -977,7 +966,7 @@ function renderCourses(){
           else if(!comp&&c.lessons.indexOf(l)===c.lessons.findIndex(ll=>!isCompleted(c.id,ll.day)))bdg='<span class="badge next">다음</span>';
           return`<div class="lesson-item" onclick="event.stopPropagation()">
             <div class="chk ${comp?'done':''}" onclick="event.stopPropagation();${comp?`unmarkComplete('${c.id}',${l.day})`:`markComplete('${c.id}',${l.day})`}">${comp?'✓':''}</div>
-            ${lessonLink(c.folder+'/'+l.file,'Day'+l.day+': '+l.title+(l.isReview?' 📝':''))}${bdg}
+            <a class="link" href="${c.folder}/${l.file}" target="_blank">Day${l.day}: ${l.title}${l.isReview?' 📝':''}</a>${bdg}
           </div>`;
         }).join('')}
       </div>
@@ -1004,7 +993,7 @@ function renderReviewQueue(){
     return`<div class="rq-item">
       <div class="urgency-bar ${it.urgency}"></div>
       <div class="rq-info"><div class="rq-title">${it.course.icon} Day${it.lesson.day}: ${it.lesson.title}</div><div class="rq-meta">${lbl} · 복습${it.rec.reviews.length}회 · 간격${SR_INTERVALS[it.rec.srIndex]||'—'}일</div></div>
-      ${lessonBookmark(it.course.folder+'/'+it.lesson.file)}
+      <a href="${it.course.folder}/${it.lesson.file}" target="_blank" style="color:var(--gold);font-size:0.78rem">📖</a>
       <button class="btn-sm" style="border-color:var(--purple);color:var(--purple)" onclick="markReviewed('${it.course.id}',${it.lesson.day})">✓</button>
     </div>`;
   }).join('');
@@ -1367,7 +1356,7 @@ function exportReport(){
   const data=getWeekData(week);
   const grade=calcGrade(data);
   const totalMin=Math.round(data.totalSec/60);
-  let text=`═══ YS 주간 학습 리포트 ═══\n기간: ${week.start} ~ ${week.end}\n등급: ${grade.grade} (${grade.label})\n\n`;
+  let text=`═══ 주간 학습 리포트 ═══\n기간: ${week.start} ~ ${week.end}\n등급: ${grade.grade} (${grade.label})\n\n`;
   text+=`총 학습: ${totalMin}분 | 학습일: ${data.activeDays}/7 | 세션: ${data.sessionCount}회 | 신규완료: ${data.completedThisWeek}개\n\n`;
   text+=`[과목별 시간]\n`;
   COURSES.forEach(c=>{
@@ -1381,7 +1370,7 @@ function exportReport(){
 
   const blob=new Blob([text],{type:'text/plain'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download=`YS_WeeklyReport_${week.start}.txt`;a.click();
+  a.download=`WeeklyReport_${week.start}.txt`;a.click();
 }
 
 // ═══ TABS ═══
@@ -1396,13 +1385,13 @@ function switchTab(tab){
 }
 
 // ═══ UTILS ═══
-function exportData(){const d=JSON.stringify(getState(),null,2);const b=new Blob([d],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ys_learn_'+today()+'.json';a.click()}
-function resetAll(){if(confirm('모든 학습 데이터를 초기화하시겠습니까?')){localStorage.removeItem('ys_learn_v3');location.reload()}}
+function exportData(){const d=JSON.stringify(getState(),null,2);const b=new Blob([d],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='learn_data_'+today()+'.json';a.click()}
+function resetAll(){if(confirm('모든 학습 데이터를 초기화하시겠습니까?')){localStorage.removeItem('learn_data_v3');location.reload()}}
 
 // ═══ MIGRATE from v2 ═══
 (function(){
-  const v2=localStorage.getItem('ys_learn_v2');
-  if(v2&&!localStorage.getItem('ys_learn_v3')){localStorage.setItem('ys_learn_v3',v2)}
+  const v2=localStorage.getItem('learn_data_v2');
+  if(v2&&!localStorage.getItem('learn_data_v3')){localStorage.setItem('learn_data_v3',v2)}
 })();
 
 // ═══ INIT ═══

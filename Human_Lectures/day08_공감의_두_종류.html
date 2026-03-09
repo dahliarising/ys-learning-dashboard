@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인간 탐구 Day 08 — 공감의 두 종류</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--purple:#8A6ABF;--gold:#C9A84C;--green:#6BBF8A;--red:#BF6B6B;--cyan:#6BB5BF;
+--bg:#0A0C10;--card:#12151C;--card2:#161A24;--text1:#E8E9F3;--text2:#9EA0B8;
+--border:rgba(138,106,191,0.15);--glow:rgba(138,106,191,0.08);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text1);line-height:1.85;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--purple);border-radius:3px}
+
+/* ── Header ── */
+header{position:sticky;top:0;z-index:1000;background:rgba(10,12,16,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:.85rem 2rem}
+.hdr{max-width:860px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+.hdr-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:700;background:linear-gradient(135deg,var(--purple),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr-sub{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--text2)}
+.hdr-progress{height:2px;background:linear-gradient(90deg,var(--cyan),var(--purple));position:absolute;bottom:0;left:0;width:36.4%}
+
+/* ── Series Banner ── */
+.series-banner{max-width:860px;margin:1.5rem auto 0;padding:.6rem 1.2rem;background:rgba(138,106,191,0.06);border:1px solid var(--border);border-radius:8px;display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--text2)}
+.series-banner strong{color:var(--gold);font-family:'JetBrains Mono',monospace}
+
+/* ── Main ── */
+main{max-width:860px;margin:0 auto;padding:2rem 1.5rem 4rem}
+
+/* ── Hero ── */
+.hero{text-align:center;padding:3.5rem 2rem;margin-bottom:3rem;background:linear-gradient(160deg,rgba(107,191,191,0.07),rgba(138,106,191,0.05));border:1px solid var(--border);border-radius:16px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 40%,rgba(107,191,191,0.04),transparent 50%);pointer-events:none}
+.gauge-wrap{display:flex;justify-content:center;align-items:center;gap:1.2rem;margin-bottom:2rem;flex-wrap:wrap}
+.gauge{width:100px;height:100px;border-radius:50%;position:relative}
+.gauge svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gauge-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge-val{font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:600;color:var(--cyan)}
+.gauge-txt{font-size:.65rem;color:var(--text2);margin-top:2px}
+.meta-badges{display:flex;flex-direction:column;gap:.4rem;align-items:flex-start}
+.meta-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .65rem;background:rgba(107,191,191,0.12);border:1px solid rgba(107,191,191,0.25);border-radius:12px;font-size:.72rem;color:var(--cyan);font-family:'JetBrains Mono',monospace}
+.meta-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan)}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-weight:600;line-height:1.35;margin-bottom:1rem}
+.hero-q{font-size:1.15rem;color:var(--text2);line-height:1.6;font-style:italic;margin-bottom:2rem}
+.kw-badges{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+.kw{padding:.45rem 1rem;background:rgba(107,191,191,0.1);border:1px solid rgba(107,191,191,0.3);border-radius:20px;font-size:.82rem;color:var(--cyan)}
+
+/* ── Section Titles ── */
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:600;margin-bottom:1.8rem;padding-bottom:.8rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.8rem}
+.sec-title .icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+
+/* ── Learning Strategy ── */
+.strategy{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:3rem}
+.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+@media(max-width:700px){.time-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:450px){.time-grid{grid-template-columns:1fr}}
+.tslot{padding:1rem;background:rgba(107,191,191,0.06);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;transition:transform .2s}
+.tslot:hover{transform:translateX(4px)}
+.tslot-time{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--cyan);margin-bottom:.4rem}
+.tslot-desc{font-size:.88rem;color:var(--text2);line-height:1.6}
+.strat-note{padding:1.2rem;background:rgba(107,191,138,0.06);border-left:3px solid var(--green);border-radius:0 8px 8px 0;font-size:.9rem;color:var(--text2);line-height:1.7}
+.strat-note strong{color:var(--green)}
+
+/* ── Concept Cards ── */
+.concepts{display:grid;gap:1.5rem;margin-bottom:3rem}
+.ccard{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .3s}
+.ccard:hover{border-color:rgba(107,191,191,0.35)}
+.ccard-head{padding:1.5rem 2rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.ccard-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600;color:var(--cyan)}
+.ccard-num{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text2);background:rgba(107,191,191,0.1);padding:.2rem .6rem;border-radius:10px}
+.ccard-toggle{font-size:1.2rem;color:var(--text2);transition:transform .3s}
+.ccard.open .ccard-toggle{transform:rotate(180deg)}
+.ccard-body{padding:0 2rem;max-height:0;overflow:hidden;transition:max-height .5s ease,padding .3s}
+.ccard.open .ccard-body{max-height:3000px;padding:0 2rem 2rem}
+.ccard-summary{padding:0 2rem 1.5rem;font-size:.95rem;color:var(--text2)}
+.ccard-body h4{font-size:.95rem;color:var(--cyan);margin:1.2rem 0 .6rem;font-weight:600}
+.ccard-body p,.ccard-body li{font-size:.92rem;color:var(--text2);line-height:1.75}
+.ccard-body ul{margin-left:1.2rem;margin-bottom:.8rem}
+.ccard-body li{margin-bottom:.3rem}
+.deep-dive{margin-top:1.5rem;padding:1.2rem;background:rgba(107,191,191,0.05);border:1px dashed rgba(107,191,191,0.2);border-radius:8px}
+.deep-dive summary{cursor:pointer;font-size:.88rem;color:var(--cyan);font-weight:500;margin-bottom:.8rem}
+.deep-dive p{font-size:.85rem;color:var(--text2);line-height:1.7}
+
+/* ── SVG Diagram ── */
+.diagram-section{margin-bottom:3rem}
+.diagram-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;overflow-x:auto}
+.diagram-wrap svg{width:100%;max-width:780px;margin:0 auto;display:block}
+.diagram-caption{margin-top:1.2rem;font-size:.88rem;color:var(--text2);line-height:1.7;padding:0 .5rem}
+
+/* ── Practice ── */
+.practice{margin-bottom:3rem}
+.proutine{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:1.2rem;overflow:hidden}
+.proutine-head{padding:1.2rem 1.8rem;display:flex;align-items:center;gap:1rem;border-bottom:1px solid var(--border)}
+.proutine-time{font-family:'JetBrains Mono',monospace;font-size:.85rem;padding:.35rem .8rem;border-radius:8px;font-weight:600;min-width:60px;text-align:center}
+.proutine-time.t30{background:rgba(191,107,107,0.15);color:var(--red)}
+.proutine-time.t5{background:rgba(201,168,76,0.15);color:var(--gold)}
+.proutine-time.tday{background:rgba(107,191,138,0.15);color:var(--green)}
+.proutine-name{font-size:1rem;font-weight:500}
+.proutine-body{padding:1.8rem}
+.proutine-body ol{margin-left:1.3rem;font-size:.92rem;color:var(--text2);line-height:1.8}
+.proutine-body ol li{margin-bottom:.6rem}
+.proutine-body ol li strong{color:var(--text1)}
+.do-dont{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem}
+@media(max-width:500px){.do-dont{grid-template-columns:1fr}}
+.do-box,.dont-box{padding:1rem;border-radius:8px;font-size:.88rem;line-height:1.6}
+.do-box{background:rgba(107,191,138,0.08);border:1px solid rgba(107,191,138,0.2);color:var(--text2)}
+.do-box strong{color:var(--green);display:block;margin-bottom:.4rem}
+.dont-box{background:rgba(191,107,107,0.08);border:1px solid rgba(191,107,107,0.2);color:var(--text2)}
+.dont-box strong{color:var(--red);display:block;margin-bottom:.4rem}
+
+/* ── Philosophy ── */
+.philo{margin-bottom:3rem}
+.philosopher{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:1.2rem}
+.philosopher h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--cyan);margin-bottom:1rem}
+.philosopher blockquote{padding:1rem 1.5rem;border-left:3px solid var(--cyan);background:rgba(107,191,191,0.05);border-radius:0 8px 8px 0;font-style:italic;font-size:.95rem;color:var(--text2);margin-bottom:1rem;line-height:1.7}
+.philosopher .analysis{font-size:.9rem;color:var(--text2);line-height:1.75}
+.night-q{background:linear-gradient(135deg,rgba(107,191,191,0.08),rgba(138,106,191,0.06));border:1px solid var(--border);border-radius:14px;padding:2rem;text-align:center;margin-top:1.5rem}
+.night-q h4{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--cyan);margin-bottom:.8rem}
+.night-q p{font-size:1rem;font-style:italic;color:var(--text2);line-height:1.6}
+
+/* ── Quiz ── */
+.quiz{margin-bottom:3rem}
+.quiz-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:1.2rem}
+.quiz-card h4{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.5px}
+.quiz-card .q-text{font-size:1rem;margin-bottom:1.5rem;line-height:1.7}
+.q-options{display:flex;flex-direction:column;gap:.6rem}
+.q-opt{padding:.8rem 1.2rem;background:rgba(107,191,191,0.06);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:.9rem;color:var(--text2);transition:all .3s}
+.q-opt:hover{border-color:var(--cyan);background:rgba(107,191,191,0.12);color:var(--text1)}
+.q-opt.correct{border-color:var(--green);background:rgba(107,191,138,0.12);color:var(--green)}
+.q-opt.wrong{border-color:var(--red);background:rgba(191,107,107,0.12);color:var(--red)}
+.q-explain{margin-top:1rem;padding:1rem;background:rgba(107,191,138,0.06);border-radius:8px;font-size:.88rem;color:var(--text2);line-height:1.7;display:none}
+.q-explain.show{display:block}
+
+/* ── Spaced Repetition ── */
+.sr-tracker{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:3rem}
+.sr-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;margin-top:1rem}
+@media(max-width:500px){.sr-grid{grid-template-columns:repeat(3,1fr)}}
+.sr-day{padding:.7rem;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;transition:all .3s;font-size:.8rem}
+.sr-day:hover{border-color:var(--cyan)}
+.sr-day.done{background:rgba(107,191,138,0.15);border-color:var(--green);color:var(--green)}
+.sr-day small{display:block;font-size:.65rem;color:var(--text2);margin-bottom:.2rem}
+
+/* ── Footer Nav ── */
+footer{border-top:1px solid var(--border);padding:2rem 1.5rem;max-width:860px;margin:0 auto}
+.foot-nav{display:flex;justify-content:space-between;gap:1rem}
+@media(max-width:500px){.foot-nav{flex-direction:column}}
+.foot-nav a{flex:1;padding:1rem;color:var(--text2);text-decoration:none;border:1px solid var(--border);border-radius:8px;text-align:center;transition:all .3s;font-size:.9rem}
+.foot-nav a:hover{border-color:var(--cyan);color:var(--text1);background:rgba(107,191,191,0.08)}
+
+/* ── Animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.ani{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.ani.vis{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<header>
+<div class="hdr">
+<div class="hdr-title">인간 탐구 | DAY 08</div>
+<div class="hdr-sub">PART 2 — 공감의 신경과학</div>
+</div>
+<div class="hdr-progress"></div>
+</header>
+
+<div class="series-banner">
+<span>이 시리즈 예상 총 Day: <strong>22일</strong></span>
+<span>Day 08 of 22 · 진행률 <strong>36.4%</strong></span>
+</div>
+
+<main>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero ani">
+<div class="gauge-wrap">
+<div class="gauge">
+<svg viewBox="0 0 100 100">
+<circle cx="50" cy="50" r="42" fill="none" stroke="rgba(107,191,191,0.15)" stroke-width="6"/>
+<circle cx="50" cy="50" r="42" fill="none" stroke="url(#gaugeGrad)" stroke-width="6" stroke-dasharray="264" stroke-dashoffset="100" stroke-linecap="round"/>
+<defs><linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+<stop offset="0%" stop-color="#6BB5BF"/><stop offset="100%" stop-color="#8A6ABF"/>
+</linearGradient></defs>
+</svg>
+<div class="gauge-label"><span class="gauge-val">08</span><span class="gauge-txt">DAY</span></div>
+</div>
+<div class="meta-badges">
+<span class="meta-badge"><span class="dot"></span>난이도: 중급</span>
+<span class="meta-badge"><span class="dot" style="background:var(--cyan)"></span>신경과학 심화</span>
+<span class="meta-badge"><span class="dot" style="background:var(--green)"></span>32분 완결</span>
+</div>
+</div>
+<h1>당신은 '느껴서' 공감하는가,<br>아니면 '이해해서' 공감하는가?</h1>
+<p class="hero-q">"미러 뉴런이 울렸을 때 비로소 시작되는 진정한 연결,<br>그리고 그것이 당신을 소진시키기 전에 알아야 할 것들"</p>
+<div class="kw-badges">
+<span class="kw">정서적 공감</span>
+<span class="kw">인지적 공감</span>
+<span class="kw">미러 뉴런</span>
+<span class="kw">공감 피로</span>
+</div>
+</section>
+
+<!-- ═══ LEARNING STRATEGY ═══ -->
+<section class="strategy">
+<h2 class="sec-title">
+<span class="icon">📚</span> 학습 전략
+</h2>
+<div class="time-grid">
+<div class="tslot">
+<div class="tslot-time">1단계: 5분</div>
+<div class="tslot-desc">두 종류의 공감 구분하기</div>
+</div>
+<div class="tslot">
+<div class="tslot-time">2단계: 8분</div>
+<div class="tslot-desc">Mirror Neuron 이해하기</div>
+</div>
+<div class="tslot">
+<div class="tslot-time">3단계: 10분</div>
+<div class="tslot-desc">공감 피로의 메커니즘</div>
+</div>
+<div class="tslot">
+<div class="tslot-time">4단계: 9분</div>
+<div class="tslot-desc">실생활 적용 연습</div>
+</div>
+</div>
+<div class="strat-note">
+<strong>회사 엔지니어를 위한 팁:</strong> 엔지니어링적 사고방식이 강하다면, 공감을 '시스템'으로 이해하세요. 정서적 공감은 실시간 피드백 루프, 인지적 공감은 분석적 처리 모듈입니다. 자녀와의 상호작용에서 두 시스템을 번갈아가며 활성화하는 것이 비결입니다.
+</div>
+</section>
+
+<!-- ═══ THREE CORE CONCEPTS ═══ -->
+<section class="concepts">
+
+<div class="ccard">
+<div class="ccard-head">
+<div>
+<h3 class="ccard-title">Concept 01. 정서적 공감 (Emotional Empathy)</h3>
+<p class="ccard-summary">다른 사람의 감정을 '함께 느끼기' — 아래 눌린 것을 본능적으로 아프게 느끼는 능력</p>
+</div>
+<div class="ccard-num">1 / 3</div>
+<span class="ccard-toggle">▼</span>
+</div>
+<div class="ccard-body">
+<h4>📖 핵심 정의</h4>
+<p>정서적 공감은 <strong>미러 뉴런 시스템(Mirror Neuron System)</strong>에 의해 자동으로 활성화됩니다. 다른 사람이 아파하는 것을 보면, 당신의 뇌에서도 마치 당신이 아파하는 것처럼 같은 신경회로가 발화됩니다. 이는 의식적 노력 없이, 반사적으로 일어나는 현상입니다.</p>
+
+<h4>⚙️ 신경과학적 기제</h4>
+<ul>
+<li><strong>전대상피질 (Anterior Cingulate Cortex, ACC):</strong> 신체적 고통과 정서적 고통을 동일하게 처리</li>
+<li><strong>뇌섬엽 (Insula):</strong> '이것은 나쁜 느낌이다'라는 직관적 평가</li>
+<li><strong>편도체 (Amygdala):</strong> 감정의 강도 증폭</li>
+</ul>
+
+<h4>💡 일상의 예</h4>
+<p>당신의 6살 아이가 장난감을 잃어버렸다며 울 때, 당신도 자동으로 그 슬픔을 느낍니다. 당신이 '좋은 아버지'이려고 노력한 결과가 아니라, 당신의 뇌가 자동으로 그 감정을 시뮬레이션하고 있는 것입니다. 이것이 정서적 공감입니다.</p>
+
+<h4>✅ 장점</h4>
+<ul>
+<li>빠르고 즉각적인 연결감 형성</li>
+<li>상대방의 필요를 직관적으로 파악</li>
+<li>따뜻하고 인간적인 관계 기초</li>
+</ul>
+
+<h4>⚠️ 위험성</h4>
+<ul>
+<li>상대방의 감정에 과도하게 휘말릴 수 있음</li>
+<li>공감 피로(empathy fatigue)의 주요 원인</li>
+<li>객관적 판단을 흐릴 수 있음</li>
+</ul>
+
+<details class="deep-dive">
+<summary>🔬 Deep Dive: Affective Empathy와 Mirror Neuron의 정확한 관계</summary>
+<p>2006년 이탈리아 신경과학자 리자로티(Vittorio Gallese)의 연구에 따르면, 미러 뉴런은 단순히 '흉내내기'를 넘어, 실제로 타인의 상태를 우리 자신의 신경계 내에서 <strong>재구성(re-enact)</strong>합니다. 당신이 다른 사람이 손가락을 가시에 찔렸을 때의 얼굴을 보면, 당신의 전대상피질에서 실제로 당신이 찔린 것과 거의 동일한 신호 패턴이 발생합니다. 이는 감정 이입이 아니라, 신경학적 <strong>시뮬레이션</strong>입니다.</p>
+</details>
+</div>
+</div>
+
+<div class="ccard">
+<div class="ccard-head">
+<div>
+<h3 class="ccard-title">Concept 02. 인지적 공감 (Cognitive Empathy)</h3>
+<p class="ccard-summary">다른 사람의 관점을 '이해하기' — 감정을 느끼지 않고도 상황을 분석하고 예측하기</p>
+</div>
+<div class="ccard-num">2 / 3</div>
+<span class="ccard-toggle">▼</span>
+</div>
+<div class="ccard-body">
+<h4>📖 핵심 정의</h4>
+<p>인지적 공감은 <strong>이론적 마음(Theory of Mind)</strong>이라 불리는 능력입니다. 상대방이 어떤 신념을 가지고 있고, 어떻게 생각하고, 무엇을 원하는지를 논리적으로 추론하는 것입니다. 감정적 참여 없이 '만약 나라면 어떻게 느낄까?'를 계산하는 것입니다.</p>
+
+<h4>⚙️ 신경과학적 기제</h4>
+<ul>
+<li><strong>측두엽 (Temporoparietal Junction, TPJ):</strong> 타인의 신념 상태를 추적</li>
+<li><strong>전전두피질 (Prefrontal Cortex):</strong> 논리적 추론과 관점 전환</li>
+<li><strong>후상측 뇌 (Posterior Superior Temporal Sulcus):</strong> 타인의 의도 해석</li>
+</ul>
+
+<h4>💡 일상의 예</h4>
+<p>당신의 13살 아이가 학교에서 친구에게 따돌림을 받았다고 했을 때, 정서적으로는 덜 격한 반응을 보이면서도 '그 친구 입장에서는 왜 그렇게 했을까? 혹시 자신도 누군가에게 상처받아서 그럴 수도 있겠네'라고 분석하는 것이 인지적 공감입니다.</p>
+
+<h4>✅ 장점</h4>
+<ul>
+<li>객관적이고 균형잡힌 이해</li>
+<li>감정에 휘둘리지 않은 조언 제공</li>
+<li>복잡한 인간관계 네트워크 이해 가능</li>
+<li>공감 피로 없음</li>
+</ul>
+
+<h4>⚠️ 위험성</h4>
+<ul>
+<li>'차갑게 느껴질' 수 있음</li>
+<li>상대방이 감정적 지지를 덜 받은 것으로 느낄 수 있음</li>
+<li>과도하면 냉소주의로 변할 수 있음</li>
+</ul>
+
+<details class="deep-dive">
+<summary>🔬 Deep Dive: Cognitive Empathy가 없으면 무엇이 되는가? — 사이코패시의 스펙트럼</summary>
+<p>흥미롭게도, 인지적 공감이 정상이면서 정서적 공감이 손상된 사람들이 있습니다. 이들을 '차가운 심리병질자(cold psychopaths)'라 부릅니다. 반대로 정서적 공감은 강하지만 인지적 공감이 약한 사람도 있으며, 이 경우 감정에 압도되어 판단을 못 내리게 됩니다. 최적의 상태는 두 시스템이 <strong>통합적으로</strong> 작동하는 것입니다.</p>
+</details>
+</div>
+</div>
+
+<div class="ccard">
+<div class="ccard-head">
+<div>
+<h3 class="ccard-title">Concept 03. 공감 피로와 그 극복</h3>
+<p class="ccard-summary">무한한 공감은 환상 — 우리 뇌의 에너지는 유한하고, 그것을 지키는 것이 지속 가능한 공감의 열쇠</p>
+</div>
+<div class="ccard-num">3 / 3</div>
+<span class="ccard-toggle">▼</span>
+</div>
+<div class="ccard-body">
+<h4>📖 핵심 정의</h4>
+<p>공감 피로(Empathy Fatigue), 또는 compassion fatigue는 <strong>반복적으로 타인의 고통에 노출될 때 발생하는 정서적, 신체적 소진</strong>입니다. 특히 정서적 공감이 강한 사람, INFP 같은 기질을 가진 사람, 그리고 타인을 돌보는 직업(부모, 의료진, 상담사)에 종사하는 사람에게 자주 나타납니다.</p>
+
+<h4>⚙️ 신경과학적 기제</h4>
+<ul>
+<li><strong>스트레스 호르몬 누적:</strong> 코르티솔의 장기 상승으로 인한 신경계 마모</li>
+<li><strong>도파민 고갈:</strong> 보상 회로의 손상으로 의욕 상실</li>
+<li><strong>기억 피질의 과부하:</strong> 타인의 고통 기억이 뇌 메모리를 차지</li>
+<li><strong>공감 네트워크의 자동화:</strong> 무의식적 감정 시뮬레이션이 계속 활성화</li>
+</ul>
+
+<h4>💡 실제 증상</h4>
+<p><strong>감정적:</strong> 분노, 의욕상실, 냉소주의, 죄책감 | <strong>신체적:</strong> 만성피로, 수면장애, 두통, 면역력 저하 | <strong>행동적:</strong> 사회적 위축, 약물/알코올 의존 증가</p>
+
+<h4>✅ 공감 피로 예방 및 극복법</h4>
+<ul>
+<li><strong>경계선(Boundary) 설정:</strong> '나는 그들의 감정을 100% 책임질 수 없다'는 자각</li>
+<li><strong>인지적 공감으로 전환:</strong> 정서적 공감이 과할 때는 의도적으로 거리를 두고 분석적으로 생각하기</li>
+<li><strong>자기 연민(Self-compassion):</strong> 자신에게도 공감을 베풀기</li>
+<li><strong>신체 활동:</strong> 30분 유산소 운동이 코르티솔을 유의미하게 감소</li>
+<li><strong>마음챙김 명상:</strong> 타인의 감정과 '나'를 분리하는 훈련</li>
+<li><strong>사회적 지지:</strong> 본인의 감정을 나눌 수 있는 신뢰할 만한 관계</li>
+</ul>
+
+<details class="deep-dive">
+<summary>🔬 Deep Dive: 공감 피로 회복의 신경생물학적 메커니즘</summary>
+<p>흥미롭게도, <strong>공감을 '쉬게' 하는 것만으로는 부족합니다.</strong> 강원 대학교의 2019년 연구에 따르면, 공감 피로에서 회복되려면 타인에 대한 긍정적인 감정 경험이 필요합니다. 즉, 당신이 도움을 준 사람이 실제로 좋아지는 것을 보거나, 당신이 누군가에게서 감정적 지지를 받을 때 비로소 신경 회로가 재설정됩니다. 이를 '공감의 선순환(positive empathic cycle)'이라 합니다.</p>
+</details>
+</div>
+</div>
+
+</section>
+
+<!-- ═══ SVG DIAGRAM ═══ -->
+<section class="diagram-section">
+<h2 class="sec-title">
+<span class="icon">🧠</span> 정서적 공감 vs 인지적 공감: 신경회로 비교
+</h2>
+<div class="diagram-wrap">
+<svg viewBox="0 0 780 480" xmlns="http://www.w3.org/2000/svg">
+<!-- Background -->
+<defs>
+<linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" style="stop-color:#12151C;stop-opacity:1" />
+<stop offset="100%" style="stop-color:#161A24;stop-opacity:1" />
+</linearGradient>
+</defs>
+<rect width="780" height="480" fill="url(#bgGrad)"/>
+
+<!-- Title -->
+<text x="390" y="35" font-family="'Cormorant Garamond', serif" font-size="24" font-weight="600" fill="#6BB5BF" text-anchor="middle">두 가지 공감 시스템의 신경회로</text>
+
+<!-- Left Side: Emotional Empathy -->
+<g id="emotional">
+<!-- Box -->
+<rect x="20" y="70" width="340" height="390" fill="rgba(107,191,191,0.05)" stroke="rgba(107,191,191,0.3)" stroke-width="2" rx="8"/>
+<text x="190" y="100" font-family="'Cormorant Garamond', serif" font-size="18" font-weight="600" fill="#6BB5BF" text-anchor="middle">정서적 공감</text>
+<text x="190" y="118" font-family="'Noto Sans KR', sans-serif" font-size="12" fill="#9EA0B8" text-anchor="middle">(Emotional/Affective)</text>
+
+<!-- Brain regions -->
+<circle cx="100" cy="170" r="28" fill="#6BB5BF" opacity="0.3" stroke="#6BB5BF" stroke-width="2"/>
+<text x="100" y="175" font-family="'Noto Sans KR', sans-serif" font-size="10" font-weight="600" fill="#E8E9F3" text-anchor="middle">미러뉴런</text>
+
+<circle cx="260" cy="170" r="28" fill="#6BB5BF" opacity="0.3" stroke="#6BB5BF" stroke-width="2"/>
+<text x="260" y="172" font-family="'Noto Sans KR', sans-serif" font-size="9" font-weight="600" fill="#E8E9F3" text-anchor="middle">편도체</text>
+
+<circle cx="100" cy="280" r="28" fill="#6BB5BF" opacity="0.3" stroke="#6BB5BF" stroke-width="2"/>
+<text x="100" y="285" font-family="'Noto Sans KR', sans-serif" font-size="9" font-weight="600" fill="#E8E9F3" text-anchor="middle">뇌섬엽</text>
+
+<circle cx="260" cy="280" r="28" fill="#6BB5BF" opacity="0.3" stroke="#6BB5BF" stroke-width="2"/>
+<text x="260" y="283" font-family="'Noto Sans KR', sans-serif" font-size="9" font-weight="600" fill="#E8E9F3" text-anchor="middle">전대상피질</text>
+
+<!-- Connections -->
+<path d="M 128 170 L 232 170" stroke="#6BB5BF" stroke-width="2" fill="none"/>
+<path d="M 100 198 L 100 252" stroke="#6BB5BF" stroke-width="2" fill="none"/>
+<path d="M 260 198 L 260 252" stroke="#6BB5BF" stroke-width="2" fill="none"/>
+<path d="M 128 280 L 232 280" stroke="#6BB5BF" stroke-width="2" fill="none"/>
+<path d="M 180 170 L 180 280" stroke="#6BB5BF" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+
+<!-- Properties -->
+<rect x="40" y="340" width="280" height="100" fill="rgba(107,191,191,0.08)" stroke="rgba(107,191,191,0.2)" rx="6"/>
+<text x="50" y="360" font-family="'Noto Sans KR', sans-serif" font-size="11" font-weight="600" fill="#6BB5BF">특징:</text>
+<text x="50" y="377" font-family="'Noto Sans KR', sans-serif" font-size="10" fill="#E8E9F3">• 빠르고 자동적</text>
+<text x="50" y="393" font-family="'Noto Sans KR', sans-serif" font-size="10" fill="#E8E9F3">• 감정의 시뮬레이션</text>
+<text x="50" y="409" font-family="'Noto Sans KR', sans-serif" font-size="10" fill="#E8E9F3">• 공감피로의 원인</text>
+<text x="50" y="425" font-family="'Noto Sans KR', sans-serif" font-size="10" fill="#E8E9F3">• 따뜻한 연결 제공</text>
+</g>
+
+<!-- Right Side: Cognitive Empathy -->
+<g id="cognitive">
+<!-- Box -->
+<rect x="420" y="70" width="340" height="390" fill="rgba(138,106,191,0.05)" stroke="rgba(138,106,191,0.3)" stroke-width="2" rx="8"/>
+<text x="590" y="100" font-family="'Cormorant Garamond', serif" font-size="18" font-weight="600" fill="#8A6ABF" text-anchor="middle">인지적 공감</text>
+<text x="590" y="118" font-family="'Noto Sans KR', sans-serif" font-size="12" fill="#9EA0B8" text-anchor="middle">(Cognitive/Theory of Mind)</text>
+
+<!-- Brain regions -->
+<circle cx="500" cy="170" r="28" fill="#8A6ABF" opacity="0.3" stroke="#8A6ABF" stroke-width="2"/>
+<text x="500" y="172" font-family="'Noto Sans KR', sans-serif" font-size="9" font-weight="600" fill="#E8E9F3" text-anchor="middle">전전두피질</text>
+
+<circle cx="660" cy="170" r="28" fill="#8A6ABF" opacity="0.3" stroke="#8A6ABF" stroke-width="2"/>
+<text x="660" y="175" font-family="'Noto Sans KR', sans-serif" font-size="10" font-weight="600" fill="#E8E9F3" text-anchor="middle">TPJ</text>
+
+<circle cx="500" cy="280" r="28" fill="#8A6ABF" opacity="0.3" stroke="#8A6ABF" stroke-width="2"/>
+<text x="500" y="283" font-family="'Noto Sans KR', sans-serif" font-size="9" font-weight="600" fill="#E8E9F3" text-anchor="middle">STS</text>
+
+<circle cx="660" cy="280" r="28" fill="#8A6ABF" opacity="0.3" stroke="#8A6ABF" stroke-width="2"/>
+<text x="660" y="282" font-family="'Noto Sans KR', sans-serif" font-size="9" font-weight="600" fill="#E8E9F3" text-anchor="middle">PFC</text>
+
+<!-- Connections -->
+<path d="M 528 170 L 632 170" stroke="#8A6ABF" stroke-width="2" fill="none"/>
+<path d="M 500 198 L 500 252" stroke="#8A6ABF" stroke-width="2" fill="none"/>
+<path d="M 660 198 L 660 252" stroke="#8A6ABF" stroke-width="2" fill="none"/>
+<path d="M 528 280 L 632 280" stroke="#8A6ABF" stroke-width="2" fill="none"/>
+<path d="M 580 170 L 580 280" stroke="#8A6ABF" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+
+<!-- Properties -->
+<rect x="440" y="340" width="280" height="100" fill="rgba(138,106,191,0.08)" stroke="rgba(138,106,191,0.2)" rx="6"/>
+<text x="450" y="360" font-family="'Noto Sans KR', sans-serif" font-size="11" font-weight="600" fill="#8A6ABF">특징:</text>
+<text x="450" y="377" font-family="'Noto Sans KR', sans-serif" font-size="10" fill="#E8E9F3">• 느리지만 정확</text>
+<text x="450" y="393" font-family="'Noto Sans KR', sans-serif" font-size="10" fill="#E8E9F3">• 논리적 추론</text>
+<text x="450" y="409" font-family="'Noto Sans KR', sans-serif" font-size="10" fill="#E8E9F3">• 감정 거리유지</text>
+<text x="450" y="425" font-family="'Noto Sans KR', sans-serif" font-size="10" fill="#E8E9F3">• 객관적 조언 제공</text>
+</g>
+</svg>
+</div>
+<div class="diagram-caption">
+<strong>해석:</strong> 두 시스템은 완전히 다른 신경회로를 사용합니다. 정서적 공감은 시각적 정보(상대방의 표정, 몸짓)를 직접 당신의 감정 회로로 매핑하는 반면, 인지적 공감은 그 정보를 일단 논리적으로 처리한 후 상대방의 '마음'을 추론합니다. 최적의 공감은 이 두 시스템이 조화롭게 작동할 때 발생합니다. 예를 들어, 자녀가 울 때 먼저 정서적으로 함께 울어주되(정서적 공감), 이내 '그러면 우리는 이렇게 해 볼까?'라며 논리적 해결책을 제시(인지적 공감)하는 것이 가장 효과적입니다.
+</div>
+</section>
+
+<!-- ═══ PRACTICE ═══ -->
+<section class="practice">
+<h2 class="sec-title">
+<span class="icon">🎯</span> 매일 5분 공감 회로 트레이닝
+</h2>
+
+<div class="proutine">
+<div class="proutine-head">
+<span class="proutine-time t30">30초</span>
+<span class="proutine-name">순간의 공감 점검</span>
+</div>
+<div class="proutine-body">
+<ol>
+<li>누군가가 당신에게 감정을 드러낼 때, <strong>가슴에 손을 얹고 3초 멈춥니다.</strong> 이때 당신이 느끼는 것이 무엇인지 인지합니다. (정서적 공감이 활성화되는 순간)</li>
+<li><strong>'지금 나는 정서적으로 공감하고 있다'</strong> 라고 명시적으로 인지합니다.</li>
+<li>그 다음 <strong>'그들의 입장에서는 어떤 신념을 가지고 있을까?'</strong> 라고 한 번 묻습니다. (인지적 공감으로 전환)</li>
+</ol>
+</div>
+</div>
+
+<div class="proutine">
+<div class="proutine-head">
+<span class="proutine-time t5">5분</span>
+<span class="proutine-name">미러뉴런 자각 연습</span>
+</div>
+<div class="proutine-body">
+<ol>
+<li><strong>거울 앞에 서서</strong> 당신 자신의 얼굴을 바라봅니다.</li>
+<li>천천히 <strong>슬픈 표정, 화난 표정, 기쁜 표정</strong>을 지으면서 당신 안에서 일어나는 감정을 관찰합니다.</li>
+<li>이제 <strong>다른 사람(영상이라도 좋습니다)이 이 표정을 지을 때</strong>를 상상합니다. 당신의 미러뉴런이 반응하는 것을 느껴봅니다.</li>
+<li><strong>의도적으로 '공감 모드'를 껐다가 켜는 연습</strong>을 합니다. '이제 끈다' → '이제 켠다'를 번갈아가며 해봅니다. 이것이 감정 조절의 첫 단계입니다.</li>
+</ol>
+</div>
+</div>
+
+<div class="proutine">
+<div class="proutine-head">
+<span class="proutine-time tday">일일</span>
+<span class="proutine-name">공감 피로 체크 및 복구</span>
+</div>
+<div class="proutine-body">
+<ol>
+<li>잠들기 전, <strong>'오늘 나는 몇 명의 감정을 흡수했는가?'</strong> 를 1-10 스케일로 평가합니다.</li>
+<li>만약 7 이상이라면, <strong>다음 중 하나를 선택합니다:</strong> (1) 30분 산책 (2) 5분 찬물 샤워 (3) 신뢰할 만한 사람과 자신의 감정을 나누기</li>
+<li><strong>'나는 그들의 감정을 100% 고칠 책임이 없다'</strong> 라는 긍정적 자기암시를 3회 반복합니다.</li>
+<li>한 주에 3-4일은 <strong>'공감 휴식일'</strong>을 지정합니다. 이 날은 의도적으로 사회적 상호작용을 최소화합니다.</li>
+</ol>
+</div>
+</div>
+
+<div class="do-dont">
+<div class="do-box">
+<strong>✅ DO</strong>
+<ul style="margin: .6rem 0 0 1rem; font-size: .88rem;">
+<li>두 종류의 공감을 번갈아 사용하기</li>
+<li>정서적 공감을 느낀 후 인지적 거리 두기</li>
+<li>공감 피로의 초기 신호에 즉시 반응</li>
+<li>자신의 감정도 타인과 공유하기</li>
+</ul>
+</div>
+<div class="dont-box">
+<strong>❌ DON'T</strong>
+<ul style="margin: .6rem 0 0 1rem; font-size: .88rem;">
+<li>정서적 공감만 사용해서 감정에 빠져들기</li>
+<li>공감을 완전히 끝버리려고 노력하기</li>
+<li>피로 신호를 무시하고 계속 흡수하기</li>
+<li>타인을 위해 자신을 완전히 희생하기</li>
+</ul>
+</div>
+</div>
+</section>
+
+<!-- ═══ PHILOSOPHY ═══ -->
+<section class="philo">
+<h2 class="sec-title">
+<span class="icon">💭</span> 위대한 사상가들의 공감론
+</h2>
+
+<div class="philosopher">
+<h3>① 막스 셰일러(Max Scheler, 1874-1928) — 정서적 공감의 신비</h3>
+<blockquote>
+"공감은 타인의 정서 상태에 대한 직접적인 경험이다. 우리는 그들의 기쁨을 '우리의' 기쁨으로 경험하며, 이것이 연대의 근본이다."
+</blockquote>
+<div class="analysis">
+<strong>해석:</strong> 독일 철학자 셀러는 정서적 공감을 '감정의 직접 전염'으로 봤습니다. 당신이 당신의 아이가 상받았을 때 느끼는 기쁨은, 당신이 이성적으로 '좋아해야 한다'고 판단한 결과가 아니라, 신경학적 전염입니다. 이것이 부모의 사랑이 그토록 강력한 이유입니다.
+</div>
+</div>
+
+<div class="philosopher">
+<h3>② 장 폴 사르트르(Jean-Paul Sartre, 1905-1980) — 타인의 시선의 무게</h3>
+<blockquote>
+"타인의 시선이 나를 대상으로 만든다. 내가 타인을 본다는 것은, 나 또한 타인에게 보인다는 뜻이다."
+</blockquote>
+<div class="analysis">
+<strong>해석:</strong> 실존주의 철학자 사르트르는 공감을 보다 관점적으로 봤습니다. 당신이 누군가의 고통을 '이해한다'는 것은, 사실 당신도 그렇게 보일 수 있다는 인식으로부터 시작된다는 뜻입니다. 즉, 인지적 공감은 '나도 타인이 될 수 있다'는 깨달음에서 나옵니다. INFP라면 이 역할 전환 능력이 특히 강할 겁니다.
+</div>
+</div>
+
+<div class="night-q">
+<h4>🌙 오늘 밤, 당신에게</h4>
+<p>"당신의 정서적 공감이 강한 것은 약점이 아니라 재능입니다. 하지만 그것을 지키려면, 당신도 당신을 공감해야 합니다. 당신의 피로는 당신만의 책임이 아닙니다."</p>
+</div>
+</section>
+
+<!-- ═══ QUIZ ═══ -->
+<section class="quiz">
+<h2 class="sec-title">
+<span class="icon">❓</span> 자가 진단: 당신의 공감 프로필
+</h2>
+
+<div class="quiz-card">
+<h4>QUIZ 01</h4>
+<div class="q-text">당신의 아이가 학교에서 싸웠다고 화나서 집에 왔습니다. 당신의 첫 반응은?</div>
+<div class="q-options">
+<div class="q-opt" onclick="checkAns(this, 'A')">
+A) 아이를 안아주고 함께 울음 (정서적 공감)
+</div>
+<div class="q-opt" onclick="checkAns(this, 'B')">
+B) "그래서 정확히 무슨 일이 있었어?"라고 물어보고 상황을 분석 (인지적 공감)
+</div>
+<div class="q-opt" onclick="checkAns(this, 'C')">
+C) 둘 다 함께함 (통합적 공감)
+</div>
+</div>
+<div class="q-explain">
+<strong>분석:</strong> A가 본능적 반응이라면, 당신은 정서적 공감이 강합니다. B라면 인지적 공감이 발달했습니다. C라면 가장 이상적인 상태입니다. 중요한 것은 '고착'이 아니라 '선택'입니다. 상황에 따라 두 모드를 전환할 수 있으면 됩니다.
+</div>
+</div>
+
+<div class="quiz-card">
+<h4>QUIZ 02</h4>
+<div class="q-text">당신은 종종 다른 사람의 감정 때문에 밤잠을 못 이루거나 피로함을 느끼십니까?</div>
+<div class="q-options">
+<div class="q-opt" onclick="checkAns(this, 'A')">
+A) 항상 그렇다 (공감 피로 위험군)
+</div>
+<div class="q-opt" onclick="checkAns(this, 'B')">
+B) 가끔 그렇다 (정상 범위)
+</div>
+<div class="q-opt" onclick="checkAns(this, 'C')">
+C) 거의 느끼지 않는다 (인지적 공감 우위)
+</div>
+</div>
+<div class="q-explain">
+<strong>분석:</strong> A라고 답했다면, 당신은 공감 피로의 위험에 노출되어 있습니다. 오늘 배운 '경계선 설정'과 '인지적 공감으로의 전환' 기술을 즉시 적용하세요. 특히 INFP 성향이라면, 이것은 선택이 아니라 생존 기술입니다.
+</div>
+</div>
+
+</section>
+
+<!-- ═══ SPACED REPETITION ═══ -->
+<section class="sr-tracker">
+<h2 class="sec-title">
+<span class="icon">🔄</span> 간격 반복 학습 추적 (Spaced Repetition)
+</h2>
+<p style="font-size: .92rem; color: var(--text2); margin-bottom: 1.2rem;">
+Day 08의 핵심 개념을 다시 만날 권장 시점입니다. 각 날짜를 클릭하면 해당 복습이 완료됩니다.
+</p>
+<div class="sr-grid">
+<div class="sr-day" onclick="markSRDay(this)">
+<small>1st Review</small>
+내일
+</div>
+<div class="sr-day" onclick="markSRDay(this)">
+<small>2nd Review</small>
+3일 뒤
+</div>
+<div class="sr-day" onclick="markSRDay(this)">
+<small>3rd Review</small>
+7일 뒤
+</div>
+<div class="sr-day" onclick="markSRDay(this)">
+<small>4th Review</small>
+14일 뒤
+</div>
+<div class="sr-day" onclick="markSRDay(this)">
+<small>5th Review</small>
+30일 뒤
+</div>
+</div>
+<p style="font-size: .82rem; color: var(--text2); margin-top: 1.5rem; line-height: 1.6;">
+이 패턴은 에빙하우스의 망각곡선(Ebbinghaus Forgetting Curve)에 기반합니다. 뇌가 정보를 장기기억으로 이동시키려면, 망각이 일어나기 직전에 반복 노출이 필요합니다. 신경과학적으로, 각 반복은 시냅스 연결을 더욱 강화합니다.
+</p>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+<div class="foot-nav">
+<a href="day07_감정_조절.html">← Day 07: 감정 조절의 과학</a>
+<a href="day09_대인관계의_신경과학.html">Day 09: 대인관계의 신경과학 →</a>
+</div>
+</footer>
+
+</main>
+
+<script>
+// 애니메이션 트리거
+document.addEventListener('DOMContentLoaded', () => {
+  const anis = document.querySelectorAll('.ani');
+  anis.forEach((el, idx) => {
+    setTimeout(() => el.classList.add('vis'), idx * 100);
+  });
+
+  // 카드 토글
+  document.querySelectorAll('.ccard-head').forEach(head => {
+    head.addEventListener('click', () => {
+      head.parentElement.classList.toggle('open');
+    });
+  });
+
+  // 첫 번째 카드 기본 열기
+  document.querySelector('.ccard-head').parentElement.classList.add('open');
+});
+
+// 퀴즈 기능
+function checkAns(el, ans) {
+  const container = el.parentElement;
+  container.querySelectorAll('.q-opt').forEach(opt => opt.classList.remove('correct', 'wrong'));
+  el.classList.add('correct');
+  el.closest('.quiz-card').querySelector('.q-explain').classList.add('show');
+}
+
+// 스페이스 반복 추적
+function markSRDay(el) {
+  el.classList.toggle('done');
+}
+
+// 스크롤 트리거 애니메이션
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('vis');
+    }
+  });
+});
+
+document.querySelectorAll('.ani').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

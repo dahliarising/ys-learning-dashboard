@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 19: 가치관 명료화 | 22일 신경과학·심리학·철학 시리즈</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --purple: #8A6ABF;
+            --gold: #C9A84C;
+            --green: #6BBF8A;
+            --red: #BF6B6B;
+            --cyan: #6BB5BF;
+            --bg: #0A0C10;
+            --card: #12151C;
+            --card2: #161A24;
+            --text1: #E8E9F3;
+            --text2: #9EA0B8;
+            --border: rgba(138, 106, 191, 0.15);
+            --glow: rgba(138, 106, 191, 0.08);
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text1);
+            font-family: 'Noto Sans KR', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* ========== STICKY HEADER & PROGRESS BAR ========== */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 12, 16, 0.95);
+            border-bottom: 2px solid var(--border);
+            backdrop-filter: blur(10px);
+            padding: 1rem 1.5rem;
+        }
+        
+        .header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--card2);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 86.4%;
+            background: linear-gradient(90deg, var(--purple), var(--cyan));
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+        
+        .progress-text {
+            font-size: 0.85rem;
+            color: var(--text2);
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+        }
+        
+        /* ========== HERO SECTION ========== */
+        .hero {
+            max-width: 900px;
+            margin: 3rem auto 2rem;
+            padding: 2rem 1.5rem;
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(138, 106, 191, 0.1);
+        }
+        
+        .hero-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .hero-gauge {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .gauge-svg {
+            width: 200px;
+            height: 200px;
+        }
+        
+        .hero-content h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            color: var(--purple);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .hero-content h2 {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1.3rem;
+            color: var(--text1);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .badges {
+            display: flex;
+            gap: 0.8rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            background: rgba(201, 168, 76, 0.15);
+            border: 1px solid var(--gold);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--gold);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .badge.part {
+            background: rgba(107, 191, 138, 0.15);
+            border-color: var(--green);
+            color: var(--green);
+        }
+        
+        .badge.time {
+            background: rgba(191, 107, 107, 0.15);
+            border-color: var(--red);
+            color: var(--red);
+        }
+        
+        .hero-question {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(138, 106, 191, 0.08);
+            border-left: 3px solid var(--purple);
+            border-radius: 6px;
+            font-style: italic;
+            color: var(--text2);
+            font-size: 0.95rem;
+        }
+        
+        .keywords {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .keyword {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            background: var(--card2);
+            border: 1px solid var(--cyan);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--cyan);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        @media (max-width: 700px) {
+            .hero-inner {
+                grid-template-columns: 1fr;
+            }
+            .header-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .hero-content h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        /* ========== LEARNING STRATEGY ========== */
+        .section {
+            max-width: 900px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+        }
+        
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+        
+        .learning-slots {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .time-slot {
+            padding: 1.2rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .time-slot:hover {
+            border-color: var(--purple);
+            background: var(--card2);
+            box-shadow: 0 4px 16px rgba(138, 106, 191, 0.15);
+        }
+        
+        .time-slot-title {
+            font-weight: 600;
+            color: var(--cyan);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .time-slot-desc {
+            font-size: 0.9rem;
+            color: var(--text2);
+            line-height: 1.5;
+        }
+        
+        .infp-tip {
+            padding: 1.2rem;
+            background: rgba(107, 191, 138, 0.08);
+            border: 1px solid var(--green);
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .infp-tip-title {
+            color: var(--green);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .infp-tip-text {
+            color: var(--text2);
+            font-size: 0.95rem;
+        }
+        
+        @media (max-width: 700px) {
+            .learning-slots {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* ========== CONCEPT CARDS ========== */
+        .cards-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .concept-card {
+            padding: 1.5rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .concept-card:hover {
+            border-color: var(--purple);
+            background: var(--card2);
+            box-shadow: 0 6px 20px rgba(138, 106, 191, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .concept-card.expanded {
+            background: var(--card2);
+            border-color: var(--purple);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .card-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--purple);
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-toggle {
+            color: var(--text2);
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+        
+        .concept-card.expanded .card-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .card-subtitle {
+            color: var(--gold);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        
+        .concept-card.expanded .card-content {
+            max-height: 1000px;
+        }
+        
+        .deep-dive {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .deep-dive-title {
+            color: var(--cyan);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .deep-dive-text {
+            color: var(--text2);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .personal-context {
+            margin-top: 0.8rem;
+            padding: 0.8rem;
+            background: rgba(138, 106, 191, 0.08);
+            border-left: 3px solid var(--purple);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--text2);
+        }
+        
+        /* ========== SVG DIAGRAM ========== */
+        .diagram-section {
+            margin: 2.5rem 0;
+            padding: 2rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .diagram-svg {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            margin: 1.5rem auto;
+        }
+        
+        .diagram-explanation {
+            color: var(--text2);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-top: 1.5rem;
+        }
+        
+        /* ========== PRACTICE GUIDE ========== */
+        .practice-guide {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .practice-item {
+            padding: 1.2rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .practice-item:hover {
+            border-color: var(--gold);
+            background: var(--card2);
+        }
+        
+        .practice-time {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            background: rgba(201, 168, 76, 0.2);
+            border: 1px solid var(--gold);
+            border-radius: 4px;
+            color: var(--gold);
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+        
+        .practice-title {
+            font-weight: 700;
+            color: var(--purple);
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+        }
+        
+        .practice-desc {
+            color: var(--text2);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 700px) {
+            .practice-guide {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* ========== PHILOSOPHY SECTION ========== */
+        .philosophy-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .philosopher-card {
+            padding: 1.5rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .philosopher-card:hover {
+            border-color: var(--purple);
+            background: var(--card2);
+            box-shadow: 0 6px 20px rgba(138, 106, 191, 0.15);
+        }
+        
+        .philosopher-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .philosopher-idea {
+            color: var(--cyan);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .philosopher-text {
+            color: var(--text2);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .neuroscience-link {
+            padding: 0.8rem;
+            background: rgba(107, 181, 191, 0.08);
+            border-left: 3px solid var(--cyan);
+            border-radius: 4px;
+            color: var(--text2);
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 700px) {
+            .philosophy-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* ========== QUIZ SECTION ========== */
+        .quiz-container {
+            padding: 1.5rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 2.5rem;
+        }
+        
+        .quiz-question {
+            margin-bottom: 1.5rem;
+        }
+        
+        .quiz-q-text {
+            font-weight: 600;
+            color: var(--purple);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        
+        .quiz-option {
+            padding: 0.8rem;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        
+        .quiz-option:hover {
+            border-color: var(--purple);
+            background: rgba(138, 106, 191, 0.1);
+        }
+        
+        .quiz-option input {
+            margin-right: 0.6rem;
+            cursor: pointer;
+        }
+        
+        .quiz-option label {
+            cursor: pointer;
+            display: block;
+        }
+        
+        .quiz-feedback {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        .quiz-feedback.show {
+            display: block;
+        }
+        
+        .quiz-feedback.correct {
+            background: rgba(107, 191, 138, 0.2);
+            border: 1px solid var(--green);
+            color: var(--green);
+        }
+        
+        .quiz-feedback.incorrect {
+            background: rgba(191, 107, 107, 0.2);
+            border: 1px solid var(--red);
+            color: var(--red);
+        }
+        
+        /* ========== SPACED REPETITION ========== */
+        .sr-tracker {
+            padding: 1.5rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .sr-title {
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+        
+        .sr-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .sr-item {
+            padding: 1rem;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .sr-item:hover {
+            border-color: var(--green);
+            background: rgba(107, 191, 138, 0.1);
+        }
+        
+        .sr-item.completed {
+            border-color: var(--green);
+            background: rgba(107, 191, 138, 0.15);
+        }
+        
+        .sr-label {
+            color: var(--text2);
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sr-day {
+            color: var(--purple);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        /* ========== FOOTER ========== */
+        footer {
+            max-width: 900px;
+            margin: 3rem auto 2rem;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text2);
+            font-size: 0.9rem;
+        }
+        
+        .series-banner {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background: rgba(138, 106, 191, 0.1);
+            border: 1px solid var(--purple);
+            border-radius: 8px;
+            color: var(--purple);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 500px) {
+            .header-content {
+                padding: 0.8rem 0;
+            }
+            .header-title {
+                font-size: 1.2rem;
+            }
+            .progress-text {
+                font-size: 0.75rem;
+            }
+            .hero-content h1 {
+                font-size: 1.6rem;
+            }
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 450px) {
+            .badges {
+                gap: 0.6rem;
+            }
+            .badge {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ========== STICKY HEADER ========== -->
+    <header>
+        <div class="header-content">
+            <div class="header-title">Day 19</div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="progress-text">86.4%</div>
+        </div>
+    </header>
+    
+    <!-- ========== HERO SECTION ========== -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-gauge">
+                <svg class="gauge-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background circle -->
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(138, 106, 191, 0.1)" stroke-width="3"/>
+                    <!-- Progress arc (86.4%) -->
+                    <path d="M 100 10 A 90 90 0 1 1 183.5 85.5" fill="none" stroke="url(#arcGradient)" stroke-width="5" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="arcGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#8A6ABF;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#6BB5BF;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Center text -->
+                    <text x="100" y="95" text-anchor="middle" font-size="28" font-weight="700" fill="#C9A84C">19</text>
+                    <text x="100" y="115" text-anchor="middle" font-size="14" fill="#9EA0B8">/ 22</text>
+                </svg>
+            </div>
+            <div class="hero-content">
+                <h1>가치관 명료화</h1>
+                <h2>Values Clarification</h2>
+                <div class="badges">
+                    <span class="badge part">Part 4: 철학 구축</span>
+                    <span class="badge time">25min</span>
+                </div>
+                <div class="hero-question">
+                    "당신이 가장 소중히 여기는 가치는 무엇인가? 그 가치가 당신의 일상 선택에 어떻게 반영되고 있는가?"
+                </div>
+                <div class="keywords">
+                    <span class="keyword">ACT</span>
+                    <span class="keyword">Schwartz</span>
+                    <span class="keyword">intrinsic</span>
+                    <span class="keyword">SDT</span>
+                    <span class="keyword">eudaimonia</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ========== LEARNING STRATEGY ========== -->
+    <section class="section">
+        <h2 class="section-title">학습 전략</h2>
+        
+        <div class="learning-slots">
+            <div class="time-slot">
+                <div class="time-slot-title">⏱️ 0-5분</div>
+                <div class="time-slot-desc">ACT의 가치 작업 기초: 가치와 목표의 신경학적 차이 이해</div>
+            </div>
+            <div class="time-slot">
+                <div class="time-slot-title">⏱️ 5-12분</div>
+                <div class="time-slot-desc">Schwartz 10가지 기본 가치 체계 학습 및 개인 가치 매핑</div>
+            </div>
+            <div class="time-slot">
+                <div class="time-slot-title">⏱️ 12-18분</div>
+                <div class="time-slot-desc">내재적 vs 외재적 동기의 신경과학: fMRI 연구 사례</div>
+            </div>
+            <div class="time-slot">
+                <div class="time-slot-title">⏱️ 18-25분</div>
+                <div class="time-slot-desc">실습: Top 5 가치 선정 워크시트 & 가치 정렬 행동 계획</div>
+            </div>
+        </div>
+        
+        <div class="infp-tip">
+            <div class="infp-tip-title">💡 INFP를 위한 팁</div>
+            <div class="infp-tip-text">
+                INFP의 강점은 깊은 가치 지향성입니다. 이직/이사 같은 인생의 중요한 선택에서 "이것이 내 핵심 가치와 일치하는가?"라는 질문이 당신의 나침반입니다. 오늘 명료화된 가치는 불확실한 결정 순간에 명확한 기준이 될 것입니다.
+            </div>
+        </div>
+    </section>
+    
+    <!-- ========== CONCEPT CARDS ========== -->
+    <section class="section">
+        <h2 class="section-title">핵심 개념</h2>
+        
+        <div class="cards-container">
+            <!-- Card 1: ACT -->
+            <div class="concept-card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">ACT(수용전념치료)의 가치 작업</div>
+                        <div class="card-subtitle">Acceptance and Commitment Therapy</div>
+                    </div>
+                    <div class="card-toggle">▼</div>
+                </div>
+                <div class="card-content">
+                    <p style="color: var(--text2); line-height: 1.6;">
+                        ACT는 심리적 유연성을 키우기 위해 가치를 핵심 요소로 사용합니다. 목표는 달성할 수 있고 실패할 수 있지만, <strong style="color: var(--cyan);">가치는 영원히 추구하는 방향</strong>입니다.
+                    </p>
+                    
+                    <div class="deep-dive">
+                        <div class="deep-dive-title">🔍 Deep Dive: 가치 vs 목표</div>
+                        <div class="deep-dive-text">
+                            <strong>목표(Goals):</strong> "6개월 내 승진하기", "영어 능력 N2 달성"<br>
+                            → 시간-의존적, 달성/미달 결과<br><br>
+                            <strong>가치(Values):</strong> "가족과의 깊은 관계 형성", "성실한 엔지니어링"<br>
+                            → 시간-초월적, 지속적 방향 추구<br><br>
+                            신경과학적으로, 가치 추구는 <strong>뇌의 기저 외측 전전두피질(lateral PFC)</strong>을 활성화하여 장기적 의사결정을 가능하게 합니다.
+                        </div>
+                    </div>
+                    
+                    <div class="personal-context">
+                        <strong>당신의 맥락:</strong> 이직/이사 결정에서 "돈이 얼마나 나을까?"(목표)보다 "이 선택이 내 핵심 가치(가족, 성장, 자율성)와 부합하는가?"(가치)를 먼저 물어보세요.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 2: Schwartz -->
+            <div class="concept-card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Schwartz 10가지 기본 가치</div>
+                        <div class="card-subtitle">보편적 가치 이론</div>
+                    </div>
+                    <div class="card-toggle">▼</div>
+                </div>
+                <div class="card-content">
+                    <p style="color: var(--text2); line-height: 1.6;">
+                        심리학자 Shalom Schwartz는 문화를 초월하여 모든 인간이 추구하는 10가지 기본 가치를 제시했습니다.
+                    </p>
+                    
+                    <div class="deep-dive">
+                        <div class="deep-dive-title">🔍 Deep Dive: 10가지 가치</div>
+                        <div class="deep-dive-text">
+                            <strong>자기초월(Self-Transcendence):</strong><br>
+                            ① 보편주의(Universalism) - 평등, 환경, 사회정의<br>
+                            ② 자비(Benevolence) - 돌봄, 신뢰, 책임<br><br>
+                            <strong>개인지향(Self-Enhancement):</strong><br>
+                            ③ 권력(Power) - 지배, 사회적 지위<br>
+                            ④ 성취(Achievement) - 탁월함, 성공<br><br>
+                            <strong>개방-보수 축:</strong><br>
+                            ⑤ 자율성(Self-Direction) - 독립, 창의성<br>
+                            ⑥ 자극(Stimulation) - 다양함, 모험<br>
+                            ⑦ 쾌락(Hedonism) - 즐거움, 감각<br>
+                            ⑧ 보안(Security) - 안전, 질서, 안정<br>
+                            ⑨ 적응(Conformity) - 의무, 규범 준수<br>
+                            ⑩ 전통(Tradition) - 종교, 문화적 관례<br><br>
+                            <strong>뇌 기반:</strong> PET 스캔 연구(Moll, 2005)에 따르면, 가치 판단은 내측 전전두피질(mPFC), 후대상피질(PCC), 편도체 등 다중 네트워크가 협력하여 작동합니다.
+                        </div>
+                    </div>
+                    
+                    <div class="personal-context">
+                        <strong>당신의 맥락:</strong> 엔지니어로서 아마 '성취', '자율성', '보편주의(기술로 사회 기여)'가 상위권일 가능성이 높습니다. 가족 역할에서는 '자비', '보안'이 부각될 수 있습니다. 역할 간 가치 충돌을 인식하는 것이 첫 단계입니다.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 3: Intrinsic vs Extrinsic -->
+            <div class="concept-card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">내재적 vs 외재적 동기</div>
+                        <div class="card-subtitle">Self-Determination Theory의 신경과학</div>
+                    </div>
+                    <div class="card-toggle">▼</div>
+                </div>
+                <div class="card-content">
+                    <p style="color: var(--text2); line-height: 1.6;">
+                        Ryan & Deci의 자기결정이론(SDT)은 동기의 질이 신경적으로 다르게 처리됨을 보여줍니다.
+                    </p>
+                    
+                    <div class="deep-dive">
+                        <div class="deep-dive-title">🔍 Deep Dive: fMRI 증거</div>
+                        <div class="deep-dive-text">
+                            <strong>내재적 동기(Intrinsic):</strong> "나 자신이 가치 있다고 생각하는 것을 할 때"<br>
+                            → 복측 줄무늬체(ventral striatum), 중뇌 도파민 시스템 활성화<br>
+                            → <strong>지속성, 창의성, 웰빙 증대</strong><br><br>
+                            <strong>외재적 동기(Extrinsic):</strong> "보상/처벌 때문에 할 때"<br>
+                            → 배측 줄무늬체, 외측 전전두피질(OFC) 활성화<br>
+                            → 소진, 감정 소모, 단기 추진력만 가능<br><br>
+                            <strong>연구:</strong> Knutson et al. (2005) - fMRI 연구에서 자율적 행동(기꺼이 선택)은 내측 보상 회로를 더 강하게 활성화시켰고, 장기 만족도가 높았습니다.
+                        </div>
+                    </div>
+                    
+                    <div class="personal-context">
+                        <strong>당신의 맥락:</strong> 회사 엔지니어로서 월급 인상(외재적)만 추구하면 소진될 수 있습니다. "내가 정말 좋아하는 기술 분야는 뭔가?", "이 일이 내 가치관과 맞는가?"라는 질문이 장기 동기 유지의 핵심입니다.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ========== SVG DIAGRAM: SCHWARTZ VALUE CIRCLE ========== -->
+    <section class="section">
+        <div class="diagram-section">
+            <h2 class="section-title">Schwartz 가치 원형</h2>
+            
+            <svg class="diagram-svg" viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg">
+                <!-- Outer circle -->
+                <circle cx="200" cy="200" r="160" fill="none" stroke="rgba(138, 106, 191, 0.3)" stroke-width="2"/>
+                
+                <!-- Inner circle -->
+                <circle cx="200" cy="200" r="80" fill="none" stroke="rgba(138, 106, 191, 0.2)" stroke-width="1"/>
+                
+                <!-- Axes lines -->
+                <line x1="200" y1="40" x2="200" y2="360" stroke="rgba(138, 106, 191, 0.1)" stroke-width="1"/>
+                <line x1="40" y1="200" x2="360" y2="200" stroke="rgba(138, 106, 191, 0.1)" stroke-width="1"/>
+                
+                <!-- Center circle -->
+                <circle cx="200" cy="200" r="20" fill="rgba(138, 106, 191, 0.2)" stroke="var(--purple)" stroke-width="2"/>
+                <text x="200" y="210" text-anchor="middle" font-size="12" fill="var(--text1)" font-weight="600">가치</text>
+                
+                <!-- 10 Values positioned in circular layout -->
+                <!-- 1. Universalism (상단) -->
+                <circle cx="200" cy="60" r="30" fill="rgba(107, 191, 138, 0.2)" stroke="var(--green)" stroke-width="2"/>
+                <text x="200" y="64" text-anchor="middle" font-size="11" fill="var(--green)" font-weight="700">보편주의</text>
+                <text x="200" y="76" text-anchor="middle" font-size="9" fill="var(--text2)">Universalism</text>
+                
+                <!-- 2. Benevolence (상단 우측) -->
+                <circle cx="309" cy="106" r="30" fill="rgba(107, 191, 138, 0.2)" stroke="var(--green)" stroke-width="2"/>
+                <text x="309" y="104" text-anchor="middle" font-size="11" fill="var(--green)" font-weight="700">자비</text>
+                <text x="309" y="116" text-anchor="middle" font-size="9" fill="var(--text2)">Benevolence</text>
+                
+                <!-- 3. Achievement (우측) -->
+                <circle cx="340" cy="200" r="30" fill="rgba(201, 168, 76, 0.2)" stroke="var(--gold)" stroke-width="2"/>
+                <text x="340" y="198" text-anchor="middle" font-size="11" fill="var(--gold)" font-weight="700">성취</text>
+                <text x="340" y="210" text-anchor="middle" font-size="9" fill="var(--text2)">Achievement</text>
+                
+                <!-- 4. Power (우측 하단) -->
+                <circle cx="309" cy="294" r="30" fill="rgba(191, 107, 107, 0.2)" stroke="var(--red)" stroke-width="2"/>
+                <text x="309" y="292" text-anchor="middle" font-size="11" fill="var(--red)" font-weight="700">권력</text>
+                <text x="309" y="304" text-anchor="middle" font-size="9" fill="var(--text2)">Power</text>
+                
+                <!-- 5. Security (하단) -->
+                <circle cx="200" cy="340" r="30" fill="rgba(107, 181, 191, 0.2)" stroke="var(--cyan)" stroke-width="2"/>
+                <text x="200" y="338" text-anchor="middle" font-size="11" fill="var(--cyan)" font-weight="700">보안</text>
+                <text x="200" y="350" text-anchor="middle" font-size="9" fill="var(--text2)">Security</text>
+                
+                <!-- 6. Conformity (좌측 하단) -->
+                <circle cx="91" cy="294" r="30" fill="rgba(107, 181, 191, 0.2)" stroke="var(--cyan)" stroke-width="2"/>
+                <text x="91" y="292" text-anchor="middle" font-size="11" fill="var(--cyan)" font-weight="700">적응</text>
+                <text x="91" y="304" text-anchor="middle" font-size="9" fill="var(--text2)">Conformity</text>
+                
+                <!-- 7. Tradition (좌측) -->
+                <circle cx="60" cy="200" r="30" fill="rgba(191, 107, 107, 0.2)" stroke="var(--red)" stroke-width="2"/>
+                <text x="60" y="198" text-anchor="middle" font-size="11" fill="var(--red)" font-weight="700">전통</text>
+                <text x="60" y="210" text-anchor="middle" font-size="9" fill="var(--text2)">Tradition</text>
+                
+                <!-- 8. Stimulation (좌측 상단) -->
+                <circle cx="91" cy="106" r="30" fill="rgba(201, 168, 76, 0.2)" stroke="var(--gold)" stroke-width="2"/>
+                <text x="91" y="104" text-anchor="middle" font-size="11" fill="var(--gold)" font-weight="700">자극</text>
+                <text x="91" y="116" text-anchor="middle" font-size="9" fill="var(--text2)">Stimulation</text>
+                
+                <!-- 9. Self-Direction (좌측 상단 내부) -->
+                <circle cx="130" cy="130" r="28" fill="rgba(107, 191, 138, 0.2)" stroke="var(--green)" stroke-width="2"/>
+                <text x="130" y="128" text-anchor="middle" font-size="11" fill="var(--green)" font-weight="700">자율성</text>
+                <text x="130" y="140" text-anchor="middle" font-size="9" fill="var(--text2)">Self-Direction</text>
+                
+                <!-- 10. Hedonism (우측 상단 내부) -->
+                <circle cx="270" cy="130" r="28" fill="rgba(201, 168, 76, 0.2)" stroke="var(--gold)" stroke-width="2"/>
+                <text x="270" y="128" text-anchor="middle" font-size="11" fill="var(--gold)" font-weight="700">쾌락</text>
+                <text x="270" y="140" text-anchor="middle" font-size="9" fill="var(--text2)">Hedonism</text>
+                
+                <!-- Legend axes -->
+                <text x="200" y="25" text-anchor="middle" font-size="10" fill="var(--text2)" font-weight="600">자기초월</text>
+                <text x="375" y="205" text-anchor="start" font-size="10" fill="var(--text2)" font-weight="600">개인지향</text>
+                <text x="200" y="385" text-anchor="middle" font-size="10" fill="var(--text2)" font-weight="600">보수</text>
+                <text x="25" y="205" text-anchor="end" font-size="10" fill="var(--text2)" font-weight="600">개방</text>
+            </svg>
+            
+            <div class="diagram-explanation">
+                <p><strong>이 원형의 의미:</strong></p>
+                <p>인접한 가치들은 서로 유사하고, 대각선 위치의 가치들은 상충합니다. 예를 들어 "보편주의"와 "성취"는 다른 방향을 가리킵니다. 당신의 상위 5개 가치가 어디에 위치하는지 보면, 당신의 가치 시스템의 내적 일관성을 파악할 수 있습니다.</p>
+                <p style="margin-top: 1rem; color: var(--cyan);"><strong>개인 워크시트:</strong> 아래 Practice Guide에서 당신의 Top 5 가치를 선정한 후, 이 원형에 표시해 보세요. 당신의 가치가 균형 잡혀 있는가, 아니면 한쪽에 치우쳐 있는가?</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ========== PRACTICE GUIDE ========== -->
+    <section class="section">
+        <h2 class="section-title">실습 가이드</h2>
+        
+        <div class="practice-guide">
+            <div class="practice-item">
+                <div class="practice-time">30초</div>
+                <div class="practice-title">가치 점검 질문</div>
+                <div class="practice-desc">
+                    "지난 주 내가 기꺼이 시간과 에너지를 쓴 3가지 활동은?"<br><br>
+                    그 활동에 반영된 가치가 무엇인지 적어보세요.
+                </div>
+            </div>
+            
+            <div class="practice-item">
+                <div class="practice-time">5분</div>
+                <div class="practice-title">Top 5 가치 선정</div>
+                <div class="practice-desc">
+                    위 10가지 가치 중 당신이 가장 중요하다고 생각하는 5가지를 선택합니다.<br><br>
+                    각 가치를 선택한 이유를 한 문장으로 적어보세요.
+                </div>
+            </div>
+            
+            <div class="practice-item">
+                <div class="practice-time">하루</div>
+                <div class="practice-title">가치 정렬 행동 점검</div>
+                <div class="practice-desc">
+                    내일 하루의 주요 결정(회의 참석, 프로젝트 선택, 저녁 계획)이 당신의 Top 5 가치와 얼마나 일치하는지 평가합니다.<br><br>
+                    1-10점으로 점수를 매기고, 왜 그 점수인지 기록하세요.
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ========== PHILOSOPHY SECTION ========== -->
+    <section class="section">
+        <h2 class="section-title">철학적 기초</h2>
+        
+        <div class="philosophy-cards">
+            <div class="philosopher-card">
+                <div class="philosopher-name">Aristotle</div>
+                <div class="philosopher-idea">Eudaimonia & 덕의 윤리</div>
+                <div class="philosopher-text">
+                    아리스토텔레스는 행복(eudaimonia)이 쾌락이 아니라 "자신의 잠재력을 최대한 발현하는 것"이라 했습니다. 이는 현대의 "자기결정이론"과 맥락을 같이 합니다. 당신의 가치는 당신의 본성을 드러내는 덕(virtue)과 같습니다.
+                </div>
+                <div class="neuroscience-link">
+                    🧠 신경과학: 자신의 가치를 추구할 때 뇌는 "자기 참조 처리"(self-referential processing)를 수행하며, 이는 정서 조절과 장기 동기 유지를 강화합니다.
+                </div>
+            </div>
+            
+            <div class="philosopher-card">
+                <div class="philosopher-name">Kierkegaard</div>
+                <div class="philosopher-idea">진정성 있는 선택</div>
+                <div class="philosopher-text">
+                    키에르케고르는 "자신이 선택한 것에 대한 책임"을 강조했습니다. 사회적 기대(이직하지 말라, 안정적인 직장 유지하라)를 따르는 것과 진정성 있게 자신의 가치를 선택하는 것은 신경적으로도 다릅니다. 후자가 심리적 안녕감을 가져옵니다.
+                </div>
+                <div class="neuroscience-link">
+                    🧠 신경과학: 외부 압력에 저항하고 자신의 가치를 지킬 때 배측 전전두피질(dorsolateral PFC)이 활성화되어 인지적 통제를 강화합니다.
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ========== QUIZ ========== -->
+    <section class="section">
+        <h2 class="section-title">이해도 확인</h2>
+        
+        <div class="quiz-container">
+            <!-- Q1 -->
+            <div class="quiz-question">
+                <div class="quiz-q-text">Q1. ACT에서 "가치"와 "목표"의 가장 중요한 차이는?</div>
+                <div class="quiz-options">
+                    <label class="quiz-option">
+                        <input type="radio" name="q1" value="a"> 
+                        <span>가치는 달성 가능하고 목표는 불가능하다</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="q1" value="b"> 
+                        <span>가치는 시간을 초월한 방향이고 목표는 시간-의존적 성과다</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="q1" value="c"> 
+                        <span>가치는 개인적이고 목표는 사회적이다</span>
+                    </label>
+                </div>
+                <div class="quiz-feedback feedback-q1"></div>
+            </div>
+            
+            <!-- Q2 -->
+            <div class="quiz-question">
+                <div class="quiz-q-text">Q2. Schwartz 가치 원형에서 "보편주의"와 "권력"의 관계는?</div>
+                <div class="quiz-options">
+                    <label class="quiz-option">
+                        <input type="radio" name="q2" value="a"> 
+                        <span>인접하여 상보적이다</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="q2" value="b"> 
+                        <span>대각선 위치하여 상충한다</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="q2" value="c"> 
+                        <span>원 중심에서 동일한 거리에 있다</span>
+                    </label>
+                </div>
+                <div class="quiz-feedback feedback-q2"></div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ========== SPACED REPETITION ========== -->
+    <section class="section">
+        <div class="sr-tracker">
+            <div class="sr-title">🔄 간격 반복 추적</div>
+            <div class="sr-items">
+                <div class="sr-item" onclick="toggleSRItem(this)">
+                    <div class="sr-label">오늘</div>
+                    <div class="sr-day">Day 1</div>
+                </div>
+                <div class="sr-item" onclick="toggleSRItem(this)">
+                    <div class="sr-label">3일 후</div>
+                    <div class="sr-day">Day 3</div>
+                </div>
+                <div class="sr-item" onclick="toggleSRItem(this)">
+                    <div class="sr-label">1주 후</div>
+                    <div class="sr-day">Day 7</div>
+                </div>
+                <div class="sr-item" onclick="toggleSRItem(this)">
+                    <div class="sr-label">2주 후</div>
+                    <div class="sr-day">Day 14</div>
+                </div>
+                <div class="sr-item" onclick="toggleSRItem(this)">
+                    <div class="sr-label">1개월 후</div>
+                    <div class="sr-day">Day 30</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ========== FOOTER ========== -->
+    <footer>
+        <div class="series-banner">
+            Part 4: 나만의 삶의 철학 구축 | Day 19 of 22
+        </div>
+        <p>
+            22일 신경과학·심리학·철학 시리즈<br>
+            당신의 가치 명료화는 불확실한 인생 결정의 나침반이 될 것입니다.<br><br>
+            <strong>다음: Day 20 — 의미 추구와 목적 설계</strong>
+        </p>
+    </footer>
+    
+    <!-- ========== INLINE JAVASCRIPT ========== -->
+    <script>
+        // Toggle concept cards
+        function toggleCard(el) {
+            el.classList.toggle('expanded');
+        }
+        
+        // Check quiz answer
+        function checkAns(questionNum, correctAnswer) {
+            const selected = document.querySelector(`input[name="q${questionNum}"]:checked`);
+            const feedbackEl = document.querySelector(`.feedback-q${questionNum}`);
+            
+            if (!selected) {
+                feedbackEl.textContent = '선택해주세요.';
+                feedbackEl.classList.add('show', 'incorrect');
+                return;
+            }
+            
+            const isCorrect = selected.value === correctAnswer;
+            feedbackEl.classList.add('show');
+            feedbackEl.classList.remove('correct', 'incorrect');
+            
+            if (isCorrect) {
+                feedbackEl.classList.add('correct');
+                feedbackEl.textContent = '✓ 정답입니다! 좋은 이해입니다.';
+            } else {
+                feedbackEl.classList.add('incorrect');
+                feedbackEl.textContent = '✗ 다시 생각해 보세요. 개념 카드를 참고하세요.';
+            }
+        }
+        
+        // Toggle SR item
+        function toggleSRItem(el) {
+            el.classList.toggle('completed');
+        }
+        
+        // Intersection Observer for lazy loading animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        // Observe all sections
+        document.querySelectorAll('.section, .hero').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+        
+        // Add click handlers to quiz options to trigger check
+        document.querySelectorAll('.quiz-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const parent = this.closest('.quiz-question');
+                const index = Array.from(document.querySelectorAll('.quiz-question')).indexOf(parent);
+                const correctAnswers = ['b', 'b'];
+                checkAns(index + 1, correctAnswers[index]);
+            });
+        });
+    </script>
+</body>
+</html>

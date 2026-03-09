@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 14 | Part 2 복습 & 투자 전략 통합 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #9A9890;
+  --text-dim: #5A584F;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 14 / 23</span>
+    <span class="header-title">Part 2 복습 & 투자 전략 통합</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 2 · 주식 투자 심화</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 2 — 주식 투자 심화</div>
+  <h1 class="hero-day">Day 14</h1>
+  <h2 class="hero-subtitle">Part 2 복습 & 투자 전략 통합</h2>
+  <p class="hero-quote">Part 2를 마치면서: 가치 투자는 '저평가 기업 찾기'에서 '나만의 포트폴리오 설계'로 진화합니다.</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 2: 08~14</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:60.9%"></div></div>
+    <div class="progress-label"><span>Day 14</span><span>14 / 23 완료 (60.9%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: Part 2 종합 정리 & 포트폴리오 설계</h3>
+    <p>Day 8~13에서 배운 기업가치평가·반도체산업·기술분석·코리아디스카운트를 통합하여,
+    자신의 자산(3억 2,800만)에 맞는 종합 투자 포트폴리오를 설계합니다.
+    엔지니어 마인드: 분산(Risk Allocation) = 시스템 안정성. 한 종목에 몰아주기는 위험한 설계입니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">00:00~05:00</td><td>Part 2 핵심 정리</td><td>Day 8~13 중요 개념 요약</td></tr>
+<tr><td class="time-col">05:00~10:00</td><td>내 자산 구성 재점검</td><td>현금 vs 주식 vs 채권 비율</td></tr>
+<tr><td class="time-col">10:00~15:00</td><td>종합 투자 전략 수립</td><td>가치투자+기술분석+위험분산</td></tr>
+<tr><td class="time-col">15:00~20:00</td><td>포트폴리오 설계 실습</td><td>내 자산 3억 2,800만 배분</td></tr>
+<tr><td class="time-col">20:00~25:00</td><td>행동계획 & 모니터링</td><td>월간 리밸런싱 규칙</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">Part 2 복습 & 투자 전략 통합</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">Part 2 (Day 8~13) 핵심 정리</div>
+      <div class="card-body">
+            <div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>Day</th><th>주제</th><th>핵심 개념</th><th>실제 사용처</th></tr></thead>
+<tbody>
+<tr><td>8</td><td>기업가치평가</td><td>PER/PBR 분석</td><td>싼 주식 찾기</td></tr>
+<tr><td>9</td><td>반도체산업</td><td>HBM·AI·파운드리</td><td>산업 성장성 평가</td></tr>
+<tr><td>10</td><td>재무제표</td><td>자산·부채·현금흐름</td><td>기업 건전성 확인</td></tr>
+<tr><td>11</td><td>기술적분석</td><td>지지선·저항선·이평선</td><td>매수/매도 타이밍</td></tr>
+<tr><td>12</td><td>타이밍원칙</td><td>저평가+모멘텀+약세장</td><td>위험 최소화 매수</td></tr>
+<tr><td>13</td><td>코리아디스카운트</td><td>PER 저평가+밸류업</td><td>한국 기업 기회 발굴</td></tr>
+</tbody>
+</table>
+</div>
+
+<p style="margin-top:1rem;color:var(--gold);"><strong>통합 규칙:</strong>
+가치(PER 저평가) + 성장(산업/기술) + 타이밍(모멘텀) + 위험분산(포트폴리오) 의 4가지를 모두 만족하는 주식만 매수합니다.
+</p>
+            </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">현재 자산 상태 분석 (학생 자산 기준)</div>
+      <div class="card-body">
+            <div class="formula-block" style="margin-bottom:1rem;">
+<span class="formula-highlight">순자산 3억 2,800만원 구성:</span>
+<span class="formula-line">주택: 7억원 (담보대출 4억 차감) = 3억원</span>
+<span class="formula-line">주식: 2,800만원 (삼성전자·SK하이닉스)</span>
+<span class="formula-line">현금/예금: 2,800만원 (추정)</span>
+<span class="formula-highlight">합계: 3억원 + 2,800만 + 2,800만 = 3억 2,800만</span>
+</div>
+
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>자산</th><th>금액</th><th>비중</th><th>특성</th></tr></thead>
+<tbody>
+<tr><td>부동산</td><td>3억원</td><td>91%</td><td>저유동성, 안정성 높음</td></tr>
+<tr><td>주식</td><td>2,800만</td><td>8.5%</td><td>유동성 높음, 변동성 큼</td></tr>
+<tr><td>현금</td><td>2,800만</td><td>0.5%</td><td>안정성 최고, 기회 자금</td></tr>
+<tr class="highlight-row"><td><strong>총합</strong></td><td><strong>3억 2,800만</strong></td><td><strong>100%</strong></td><td><strong>분석 기준</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<p style="margin-top:1rem;"><strong>관찰:</strong> 부동산 편중도가 91%로 높습니다. 이는 안정성은 있으나 성장성이 제한되는 구조입니다.</p>
+            </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">최적 포트폴리오 배분 (Part 2 수료 후)</div>
+      <div class="card-body">
+            <p style="margin-bottom:1rem;">30대 후반, 부부 모두 엔지니어, 반도체·AI 관심도 높은 학생의 최적 배분:</p>
+
+            <div class="formula-block" style="margin-bottom:1rem;">
+<span class="formula-highlight">기본 배분: 나이(39) 기반 공식</span>
+<span class="formula-line">주식 비중 = 100 - 나이 = 100 - 39 = 61%</span>
+<span class="formula-line">채권/안정자산 = 39%</span>
+
+<span class="formula-highlight" style="margin-top:1rem;">학생 맞춤 조정:</span>
+<span class="formula-line">기본 주식 61% + 반도체 전문성 +10% = 71%</span>
+<span class="formula-line">= 한국 반도체 40% + 글로벌 기술주 20% + 기타 11%</span>
+</div>
+
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>자산군</th><th>비중</th><th>금액</th><th>선택지</th></tr></thead>
+<tbody>
+<tr><td>한국 반도체</td><td>40%</td><td>1억 3,120만</td><td>삼성(60%)+SK하이닉스(40%)</td></tr>
+<tr><td>글로벌 기술주</td><td>20%</td><td>6,560만</td><td>MSFT·NVDA·TSMC ETF</td></tr>
+<tr><td>배당/가치주</td><td>11%</td><td>3,608만</td><td>LG화학·현대차 등</td></tr>
+<tr><td>채권/안정자산</td><td>29%</td><td>9,512만</td><td>국채·회사채·예금</td></tr>
+<tr class="highlight-row"><td><strong>합계</strong></td><td><strong>100%</strong></td><td><strong>3억 2,800만</strong></td><td><strong></strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<p style="margin-top:1rem;color:var(--gold);"><strong>실행 계획:</strong></p>
+<ul style="margin-left:1.5rem;font-size:0.85rem;">
+  <li>현재 주식 2,800만 → 1억 3,120만으로 증액 (추가 1억 250만 매수)</li>
+  <li>분할 매수: 월 1,000만원씩 10개월에 걸쳐 (가격 변동성 분산)</li>
+  <li>배당금 자동 재투자 설정</li>
+  <li>월간 리밸런싱 (분기별 확인)</li>
+</ul>
+            </div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  <div class="chart-container">
+    <div class="chart-title">최적 포트폴리오 배분 (학생 자산 3억 2,800만원 기준)</div>
+    <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+      <defs>
+        <linearGradient id="seg1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#BF4A4A;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#8B2E2E;stop-opacity:1"/>
+        </linearGradient>
+        <linearGradient id="seg2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#4A9EBF;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#2A5F7F;stop-opacity:1"/>
+        </linearGradient>
+        <linearGradient id="seg3" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#C9A84C;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#8B7A2E;stop-opacity:1"/>
+        </linearGradient>
+        <linearGradient id="seg4" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#4ABF7A;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#2A7A4A;stop-opacity:1"/>
+        </linearGradient>
+      </defs>
+
+      <rect width="900" height="500" fill="#0A0C10"/>
+
+      <text x="450" y="35" font-size="16" fill="#E8E6E1" text-anchor="middle" font-weight="600">
+        최적 포트폴리오 배분 (순자산 3억 2,800만원)
+      </text>
+
+      <!-- Pie chart center at 280, 260 with radius 120 -->
+      <!-- Segment 1: Korean Semiconductors 40% (144°) -->
+      <path d="M 280 140 A 120 120 0 0 1 395 178" fill="url(#seg1)" stroke="#0A0C10" stroke-width="2"/>
+      <text x="360" y="155" font-size="12" fill="#E8E6E1" font-weight="600" text-anchor="middle">
+        한국 반도체
+      </text>
+      <text x="360" y="170" font-size="11" fill="#E8E6E1" text-anchor="middle">
+        40%
+      </text>
+      <text x="360" y="185" font-size="10" fill="#9A9890" text-anchor="middle">
+        1억 3,120만
+      </text>
+
+      <!-- Segment 2: Global Tech 20% (72°) -->
+      <path d="M 395 178 A 120 120 0 0 1 400 380" fill="url(#seg2)" stroke="#0A0C10" stroke-width="2"/>
+      <text x="420" y="290" font-size="12" fill="#E8E6E1" font-weight="600" text-anchor="start">
+        글로벌 기술주
+      </text>
+      <text x="420" y="305" font-size="11" fill="#E8E6E1" text-anchor="start">
+        20% (6,560만)
+      </text>
+
+      <!-- Segment 3: Dividend/Value 11% (39.6°) -->
+      <path d="M 400 380 A 120 120 0 0 1 295 390" fill="url(#seg3)" stroke="#0A0C10" stroke-width="2"/>
+      <text x="320" y="405" font-size="12" fill="#E8E6E1" font-weight="600" text-anchor="middle">
+        배당/가치주 11%
+      </text>
+      <text x="320" y="418" font-size="10" fill="#9A9890" text-anchor="middle">
+        3,608만
+      </text>
+
+      <!-- Segment 4: Bonds/Stable 29% (104.4°) -->
+      <path d="M 295 390 A 120 120 0 0 1 280 140" fill="url(#seg4)" stroke="#0A0C10" stroke-width="2"/>
+      <text x="210" y="290" font-size="12" fill="#E8E6E1" font-weight="600" text-anchor="end">
+        채권/안정자산
+      </text>
+      <text x="210" y="305" font-size="11" fill="#E8E6E1" text-anchor="end">
+        29% (9,512만)
+      </text>
+
+      <!-- Center circle (donut effect) -->
+      <circle cx="280" cy="260" r="70" fill="#0A0C10"/>
+      <text x="280" y="255" font-size="13" fill="#C9A84C" text-anchor="middle" font-weight="600">
+        총자산
+      </text>
+      <text x="280" y="270" font-size="14" fill="#E8E6E1" text-anchor="middle" font-weight="700">
+        3.28억
+      </text>
+
+      <!-- Legend -->
+      <rect x="520" y="120" width="15" height="15" fill="#BF4A4A"/>
+      <text x="545" y="131" font-size="11" fill="#E8E6E1">한국 반도체 40% (1억 3,120만)</text>
+
+      <rect x="520" y="155" width="15" height="15" fill="#4A9EBF"/>
+      <text x="545" y="166" font-size="11" fill="#E8E6E1">글로벌 기술주 20% (6,560만)</text>
+
+      <rect x="520" y="190" width="15" height="15" fill="#C9A84C"/>
+      <text x="545" y="201" font-size="11" fill="#E8E6E1">배당/가치주 11% (3,608만)</text>
+
+      <rect x="520" y="225" width="15" height="15" fill="#4ABF7A"/>
+      <text x="545" y="236" font-size="11" fill="#E8E6E1">채권/안정 29% (9,512만)</text>
+
+      <!-- Allocation notes -->
+      <rect x="520" y="280" width="360" height="180" fill="rgba(201,168,76,0.08)" stroke="#C9A84C" stroke-width="1" stroke-dasharray="3,3" rx="6"/>
+
+      <text x="535" y="305" font-size="12" fill="#C9A84C" font-weight="600">배분 근거</text>
+
+      <text x="535" y="330" font-size="10" fill="#E8E6E1">
+        ✓ 나이 39세: 기본 주식 비중 = 100-39 = 61%
+      </text>
+      <text x="535" y="348" font-size="10" fill="#E8E6E1">
+        ✓ 반도체 전문성: +10% 추가 = 71%
+      </text>
+      <text x="535" y="366" font-size="10" fill="#E8E6E1">
+        ✓ 한국 반도체 코어 40% (삼성60%+SK40%)
+      </text>
+      <text x="535" y="384" font-size="10" fill="#E8E6E1">
+        ✓ 글로벌 분산 20% (MSFT·NVDA·TSMC)
+      </text>
+      <text x="535" y="402" font-size="10" fill="#E8E6E1">
+        ✓ 채권/안정 29% (국채·회사채)
+      </text>
+      <text x="535" y="420" font-size="10" fill="#C9A84C" font-weight="500">
+        → 성장성(반도체) + 안정성(채권) 균형
+      </text>
+      <text x="535" y="438" font-size="10" fill="#C9A84C" font-weight="500">
+        → 월 리밸런싱으로 비중 유지
+      </text>
+    </svg>
+  </div>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  
+    <details class="deep-dive">
+      <summary>Part 2 수료: 이제 무엇을 해야 할까? 행동 체크리스트</summary>
+      <div class="deep-dive-content">
+        <p><span class="neuro-tag">신경과학</span> <strong>행동 계획의 중요성:</strong>
+        배운 것을 실행하지 않으면 뇌의 신경회로에 저장되지 않습니다.
+        구체적인 행동 계획을 만들고 반복하면 '투자 직관'이 형성됩니다.</p>
+
+        <p style="margin-top:1rem;"><span class="engineer-tag">엔지니어 체크리스트:</span></p>
+        <ul style="margin-left:1.5rem;font-size:0.85rem;color:var(--text-secondary);line-height:2;">
+          <li>☐ 현재 보유 주식 점검: 삼성전자·SK하이닉스 각각 비중 확인</li>
+          <li>☐ 추가 매수 계획: 월 1,000만원씩 10개월 분할 매수 일정</li>
+          <li>☐ 글로벌 기술주 추가: MSFT/NVDA 또는 ETF 검토</li>
+          <li>☐ 채권 추가: 국채 또는 회사채 매수 (안정성 높음)</li>
+          <li>☐ 배당금 자동 재투자 설정 (거래처 확인)</li>
+          <li>☐ 월간 모니터링: 각 주식의 PER·EPS 변화 추적</li>
+          <li>☐ 분기별 리밸런싱: 목표 비중에서 ±5% 벗어나면 조정</li>
+          <li>☐ 뉴스 알림: 삼성·SK하이닉스 실적 발표 캘린더 등록</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="deep-dive">
+      <summary>Part 3 미리보기: 부동산 사이클 이론 (Day 15~16)</summary>
+      <div class="deep-dive-content">
+        <p>Part 2에서 주식을 배웠다면, Part 3에서는 <strong>부동산 사이클</strong>을 배웁니다.</p>
+
+        <p style="margin-top:1rem;"><span class="neuro-tag">신경과학</span>
+        <strong>장기 트렌드 인식:</strong> 부동산은 18년 주기로 움직입니다.
+        현재 부동산 시장의 위치를 이해하면, 향후 10년의 선택(이사, 갈아타기)을 올바르게 할 수 있습니다.</p>
+
+        <div class="data-table-wrap" style="margin-top:1rem;">
+          <table class="data-table">
+            <thead><tr><th>연도</th><th>부동산 사이클</th><th>학생 상황</th><th>준비 과제</th></tr></thead>
+            <tbody>
+              <tr><td>2023</td><td>약세장 시작</td><td>7억 집 취득 (좋은 타이밍)</td><td>-</td></tr>
+              <tr><td>2024~2025</td><td>저가 구간 (기회)</td><td>수도권 근처 추가 매입 검토</td><td>자금 마련</td></tr>
+              <tr><td>2026~2027</td><td>회복 신호</td><td>2027년 연구소 이전 (이직/이사)</td><td>거주지 결정</td></tr>
+              <tr><td>2028~2032</td><td>상승장 (강세)</td><td>수도권 집값 상승 (수익화)</td><td>차입금 상환</td></tr>
+              <tr><td>2033~2041</td><td>강세장 지속</td><td>부동산 자산 최적화</td><td>-</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:1rem;"><span class="engineer-tag">엔지니어 관점:</span>
+        부동산도 주식처럼 사이클이 있고, 사이클을 이해하면 최적의 진입/진출 시점을 알 수 있습니다.
+        학생은 현재 약세장 저가 구간에 있으므로, 앞으로 5~10년이 큰 기회 윈도우입니다.</p>
+      </div>
+    </details>
+    
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  <div class="sim-box">
+    <h3>Portfolio Implementation Plan (포트폴리오 실행 계획)</h3>
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">
+      현재: 주식 2,800만 | 목표: 주식 2억 원 (부동산 제외)
+    </p>
+
+    <div class="formula-block" style="margin-bottom:1.5rem;">
+      <span class="formula-highlight">현재 상태:</span>
+      <span class="formula-line">주식 비중 = 2,800만 / (3억+2,800만) = 2,800만 / 3억 2,800만 ≈ 8.5%</span>
+      <span class="formula-line">목표 비중 = 주식 71%</span>
+      <span class="formula-highlight">필요 추가 매수 = (2억 - 2,800만) = 1억 7,200만원</span>
+    </div>
+
+    <p style="color:var(--gold);font-weight:500;">10개월 분할 매수 계획:</p>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>월</th><th>매수액</th><th>누적</th><th>추천 대상</th></tr></thead>
+        <tbody>
+          <tr><td>3월 (이번)</td><td>1,500만</td><td>4,300만</td><td>삼성(900+SK하이닉스(600)</td></tr>
+          <tr><td>4월</td><td>1,200만</td><td>5,500만</td><td>글로벌 기술 ETF</td></tr>
+          <tr><td>5월</td><td>1,500만</td><td>7,000만</td><td>삼성 추가</td></tr>
+          <tr><td>6월</td><td>1,200만</td><td>8,200만</td><td>배당/가치주</td></tr>
+          <tr><td>7월</td><td>1,500만</td><td>9,700만</td><td>SK하이닉스 추가</td></tr>
+          <tr><td>8월</td><td>1,200만</td><td>1억 900만</td><td>채권/안정자산</td></tr>
+          <tr><td>9월</td><td>1,500만</td><td>1억 2,400만</td><td>글로벌 기술 ETF</td></tr>
+          <tr><td>10월</td><td>1,200만</td><td>1억 3,600만</td><td>배당주</td></tr>
+          <tr><td>11월</td><td>1,500만</td><td>1억 5,100만</td><td>삼성</td></tr>
+          <tr><td>12월</td><td>1,200만</td><td>1억 6,300만</td><td>채권</td></tr>
+          <tr class="highlight-row"><td><strong>합계</strong></td><td><strong>1억 3,200만</strong></td><td><strong>1억 6,300만</strong></td><td><strong>(목표 대비 -90만)</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="color:var(--gold);margin-top:1rem;"><strong>주의:</strong> 월 매수 순서는 시장 상황에 따라 조정.
+    최우선은 '가격이 저렴한 기간'에 매수하기입니다. 너무 비싼 시점은 피하세요.</p>
+  </div>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    
+    <div class="bias-name">행동 실행 부족 (Planning Fallacy)</div>
+    <p><span class="neuro-tag">신경과학</span> <strong>계획 대 실행의 괴리:</strong>
+    대부분의 학생이 "좋은 포트폴리오 구성을 배웠다"고 만족하지만, 실제로 매수하지 않습니다.
+    이는 뇌의 '계획 착각'(Planning Fallacy)—계획은 세웠으나 실행이 어렵다고 느끼는 현상입니다.</p>
+
+    <p style="margin-top:0.8rem;"><span class="engineer-tag">엔지니어 솔루션:</span>
+    '계획'이 아니라 '자동화'를 만드세요. 자동이체, 자동 재투자 설정, 캘린더 알림 등을 통해
+    뇌의 의사결정 부담을 줄이면 실행률이 90% 이상으로 올라갑니다.</p>
+
+    <p style="margin-top:1rem;padding:1rem;background:rgba(201,168,76,0.1);border-radius:6px;color:var(--gold);border-left:3px solid var(--gold);">
+      <strong>금 조언:</strong> 이 시점이 결정적입니다. 지금 시작하지 않으면 부동산 사이클 상승장(2028~2032)을 주식으로 성과를 내지 못합니다.
+      오늘 거래처에 전화해서 자동이체 설정을 하세요.
+    </p>
+
+    <p style="margin-top:0.8rem;padding:1rem;background:rgba(74,158,191,0.1);border-radius:6px;color:var(--blue);border-left:3px solid var(--blue);">
+      <strong>파 조언:</strong> Part 2를 마쳤으니 이제 Part 3(부동산)로 넘어갑니다.
+      하지만 주식 포트폴리오는 '지속적인 모니터링'이 필요합니다.
+      월 1회 이상 자신의 보유 주식의 PER·뉴스를 확인하는 습관을 만드세요.
+      그것이 '투자 체감도'를 높이고, 최종적으로 수익률 상승으로 이어집니다.
+    </p>
+    
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 최적 포트폴리오에서 주식 비중을 71%로 정한 근거는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 임의로 정함</li>
+<li onclick="checkAnswer(this,'q1',true)">② 나이(39세) 기반 공식 + 반도체 전문성 가산</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 모든 자산을 주식에 투자</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 정부 권장안</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>나이 기반 공식: 100-나이 = 61% + 반도체 전문성 +10% = 71%. 이는 위험 수용도와 성장 기회를 균형지은 배분입니다.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 10개월 분할 매수의 목적은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 한꺼번에 사기 싫어서</li>
+<li onclick="checkAnswer(this,'q2',false)">② 시간을 끌기 위해</li>
+<li onclick="checkAnswer(this,'q2',true)">③ 가격 변동성 분산 (달러 코스트 에버리징)</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 돈이 부족해서</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ③</strong><br>달러 코스트 에버리징(DCA): 일정 금액을 정기적으로 매수하면, 고가 시기와 저가 시기를 분산해 평균 매수가를 낮출 수 있습니다.</div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. Part 3(부동산 사이클)에서 학생에게 가장 중요한 시기는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 2020~2023 (이미 지난 시간)</li>
+<li onclick="checkAnswer(this,'q3',true)">② 2024~2027 (현재~미래, 저가 기회 + 이직 타이밍)</li>
+<li onclick="checkAnswer(this,'q3',false)">③ 2033~2041 (너무 먼 미래)</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 시기는 중요하지 않음</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ②</strong><br>2024~2027은 부동산 약세장(저가 기회)이자 학생이 수도권 이직 고려 중인 시기입니다. 이 윈도우를 놓치면 재정 계획이 틀어질 수 있습니다.</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 14</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 21일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 23일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 27일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">04월 03일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 19일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day13_kospi_discount.html">← Day 13</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 14 / 23</span>
+  <a class="nav-btn" href="day15_real_estate_cycle.html">Day 15 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

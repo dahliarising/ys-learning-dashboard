@@ -1,5 +1,5 @@
-// YS 학습 멘토 Service Worker v1
-const CACHE_NAME = 'ys-learn-v1';
+// 학습 멘토 Service Worker v1
+const CACHE_NAME = 'learn-app-v1';
 const OFFLINE_URL = './dashboard.html';
 
 // Files to cache immediately on install

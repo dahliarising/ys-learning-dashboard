@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 16 — 빅터 프랭클: 의미치료 | 22-Day Neuroscience Series</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --purple: #8A6ABF;
+            --gold: #C9A84C;
+            --green: #6BBF8A;
+            --red: #BF6B6B;
+            --cyan: #6BB5BF;
+            --bg: #0A0C10;
+            --card: #12151C;
+            --card2: #161A24;
+            --text1: #E8E9F3;
+            --text2: #9EA0B8;
+            --border: rgba(138, 106, 191, 0.15);
+            --glow: rgba(138, 106, 191, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, #0F1118 100%);
+            color: var(--text1);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* HEADER & PROGRESS */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(180deg, var(--card) 0%, rgba(18, 21, 28, 0.95) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--glow);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--purple), var(--gold));
+            width: 72.7%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text2);
+            white-space: nowrap;
+        }
+
+        /* MAIN CONTAINER */
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* SERIES BANNER */
+        .series-banner {
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.1) 0%, rgba(201, 168, 76, 0.05) 100%);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .series-part {
+            color: var(--gold);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .series-title {
+            font-size: 1.1rem;
+            color: var(--text1);
+            font-weight: 600;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(135deg, var(--card2) 0%, var(--card) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(30px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .gauge-container {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--gold);
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            color: var(--text2);
+            margin-bottom: 1.5rem;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1.5rem 0;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(107, 181, 138, 0.2);
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .existential-q {
+            background: rgba(201, 168, 76, 0.1);
+            border-left: 3px solid var(--gold);
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            font-style: italic;
+            font-size: 1.05rem;
+            color: var(--text1);
+        }
+
+        .keywords {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--cyan);
+        }
+
+        /* LEARNING STRATEGY */
+        .learning-strategy {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--purple);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(180deg, var(--purple), var(--gold));
+            border-radius: 2px;
+        }
+
+        .timeslots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .timeslot {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .timeslot:hover {
+            border-color: var(--purple);
+            background: rgba(138, 106, 191, 0.1);
+        }
+
+        .time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .timeslot-content {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text2);
+        }
+
+        .infp-tip {
+            background: linear-gradient(135deg, rgba(107, 181, 138, 0.15) 0%, rgba(107, 181, 138, 0.05) 100%);
+            border-left: 3px solid var(--green);
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        .infp-label {
+            color: var(--green);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* CONCEPT CARDS */
+        .concepts {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .concept-card {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .concept-card:hover {
+            border-color: var(--purple);
+            box-shadow: 0 8px 32px rgba(138, 106, 191, 0.15);
+        }
+
+        .concept-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .concept-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--gold);
+        }
+
+        .concept-icon {
+            font-size: 1.5rem;
+            opacity: 0.7;
+        }
+
+        .concept-body {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .concept-body.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .concept-text {
+            color: var(--text2);
+            line-height: 1.7;
+            margin-bottom: 1.2rem;
+        }
+
+        .deep-dive {
+            background: var(--glow);
+            border-left: 3px solid var(--cyan);
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+
+        .deep-dive-label {
+            color: var(--cyan);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .personal-context {
+            background: rgba(201, 168, 76, 0.08);
+            border-left: 3px solid var(--gold);
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+            color: var(--text1);
+        }
+
+        .personal-context-label {
+            color: var(--gold);
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* SVG DIAGRAM */
+        .diagram-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .diagram-container {
+            background: var(--card2);
+            border: 1px solid var(--glow);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            overflow-x: auto;
+        }
+
+        svg {
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* PRACTICE GUIDE */
+        .practice-guide {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .practice-item {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .practice-time {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--cyan);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .practice-title {
+            font-weight: 600;
+            color: var(--text1);
+            margin-bottom: 0.7rem;
+            font-size: 1.05rem;
+        }
+
+        .practice-content {
+            color: var(--text2);
+            line-height: 1.6;
+        }
+
+        /* PHILOSOPHY SECTION */
+        .philosophy {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .philosophy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .philosophy-box {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.5rem;
+        }
+
+        .philosopher-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 0.7rem;
+        }
+
+        .quote {
+            font-style: italic;
+            color: var(--text2);
+            padding: 1rem;
+            border-left: 3px solid var(--gold);
+            margin: 1rem 0;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .neuro-connection {
+            background: rgba(107, 181, 138, 0.1);
+            border: 1px solid var(--green);
+            border-radius: 4px;
+            padding: 0.8rem;
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            color: var(--text2);
+        }
+
+        .neuro-label {
+            color: var(--green);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        /* QUIZ SECTION */
+        .quiz {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .question {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-text {
+            font-weight: 600;
+            color: var(--text1);
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        .options {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .option-btn {
+            background: var(--glow);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            padding: 0.8rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .option-btn:hover {
+            border-color: var(--purple);
+            color: var(--text1);
+        }
+
+        .option-btn.correct {
+            background: rgba(107, 181, 138, 0.3);
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .option-btn.incorrect {
+            background: rgba(191, 107, 107, 0.3);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .feedback {
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            padding: 0.8rem;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: rgba(107, 181, 138, 0.15);
+            color: var(--green);
+            border-left: 3px solid var(--green);
+        }
+
+        .feedback.incorrect {
+            background: rgba(191, 107, 107, 0.15);
+            color: var(--red);
+            border-left: 3px solid var(--red);
+        }
+
+        /* SPACED REPETITION */
+        .spaced-rep {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .rep-title {
+            font-weight: 600;
+            color: var(--text1);
+            margin-bottom: 1rem;
+        }
+
+        .rep-schedule {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .rep-day {
+            background: var(--glow);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.8rem;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text2);
+        }
+
+        .rep-day.completed {
+            background: rgba(107, 181, 138, 0.2);
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            text-align: center;
+            color: var(--text2);
+            margin-top: 3rem;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 700px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .header-title {
+                font-size: 1.1rem;
+            }
+
+            .progress-bar {
+                width: 100%;
+            }
+
+            .hero {
+                padding: 2rem 1.5rem;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            main {
+                padding: 1.5rem;
+            }
+
+            .timeslots {
+                grid-template-columns: 1fr;
+            }
+
+            .philosophy-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .hero-title {
+                font-size: 1.4rem;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .learning-strategy,
+            .diagram-section,
+            .practice-guide,
+            .philosophy,
+            .quiz {
+                padding: 1.5rem 1rem;
+            }
+        }
+
+        @media (max-width: 450px) {
+            header {
+                padding: 0.8rem;
+            }
+
+            .hero {
+                padding: 1.5rem 1rem;
+            }
+
+            .hero-title {
+                font-size: 1.2rem;
+            }
+
+            .concept-card {
+                padding: 1.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="#" class="header-title">Day 16</a>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        <span class="progress-text">72.7% | 16/22</span>
+    </header>
+
+    <main>
+        <!-- SERIES BANNER -->
+        <div class="series-banner">
+            <div class="series-part">Part 3: 철학적 삶의 프레임</div>
+            <div class="series-title">의미에의 의지를 통한 실존적 성숙</div>
+        </div>
+
+        <!-- HERO SECTION -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="gauge-container">
+                    <svg viewBox="0 0 120 120" style="width:100%;height:100%;">
+                        <!-- Background circle -->
+                        <circle cx="60" cy="60" r="55" fill="none" stroke="rgba(138,106,191,0.1)" stroke-width="8"/>
+                        <!-- Progress arc -->
+                        <circle cx="60" cy="60" r="55" fill="none" stroke="url(#gradientGauge)" stroke-width="8" 
+                                stroke-dasharray="248.7 341.5" transform="rotate(-90 60 60)"/>
+                        <!-- Center circle -->
+                        <circle cx="60" cy="60" r="35" fill="var(--card)"/>
+                        <text x="60" y="65" font-family="JetBrains Mono" font-size="20" font-weight="600" fill="var(--gold)" text-anchor="middle">72.7%</text>
+                        <defs>
+                            <linearGradient id="gradientGauge" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:var(--purple);stop-opacity:1"/>
+                                <stop offset="100%" style="stop-color:var(--gold);stop-opacity:1"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+
+                <h1 class="hero-title">빅터 프랭클의 의미치료</h1>
+                <p class="hero-subtitle">Logotherapy: 의미에의 의지</p>
+
+                <div class="badges">
+                    <span class="badge">심리학</span>
+                    <span class="badge">철학</span>
+                    <span class="badge">신경과학</span>
+                    <span class="badge">실존주의</span>
+                </div>
+
+                <div class="existential-q">
+                    "고통 속에서도 의미를 찾을 수 있다면, 그것이 인간이 가질 수 있는 가장 강한 자유가 아닐까?"
+                </div>
+
+                <div class="keywords">
+                    <span>의미에의 의지</span>
+                    <span>3가지 가치 체계</span>
+                    <span>실존적 공허</span>
+                    <span>신경가소성</span>
+                    <span>의미 부재의 신경과학</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEARNING STRATEGY -->
+        <section class="learning-strategy">
+            <h2 class="section-title">학습 전략</h2>
+            
+            <div class="timeslots">
+                <div class="timeslot">
+                    <div class="time">📍 30초</div>
+                    <div class="timeslot-content">
+                        이 순간의 의미를 물어보세요. "지금 내가 하는 일이 왜 중요한가?"
+                    </div>
+                </div>
+                <div class="timeslot">
+                    <div class="time">🧠 5분</div>
+                    <div class="timeslot-content">
+                        의미 발견 저널링. 오늘의 3가지 의미 있는 순간을 기록합니다.
+                    </div>
+                </div>
+                <div class="timeslot">
+                    <div class="time">⚙️ 업무 중</div>
+                    <div class="timeslot-content">
+                        엔지니어링 작업의 미시적 의미를 인식: "이 코드가 누구를 도울까?"
+                    </div>
+                </div>
+                <div class="timeslot">
+                    <div class="time">👨‍👧 저녁</div>
+                    <div class="timeslot-content">
+                        아버지로서의 의미 있는 행동 1가지. 자녀와의 상호작용의 깊이를 경험합니다.
+                    </div>
+                </div>
+            </div>
+
+            <div class="infp-tip">
+                <span class="infp-label">💡 INFP를 위한 팁</span>
+                당신의 의미 추구 본능은 약점이 아니라 <strong>강력한 자산</strong>입니다. INFP는 자연스럽게 삶의 깊은 의미를 추구하고, 이것이 당신의 진정성과 창의성의 원천입니다. 프랭클의 의미치료는 당신의 이 본성을 과학적으로 검증해줍니다. 이사/이직의 불확실성 속에서도, "내 의미는 어디에 있는가"라는 질문이 당신을 안내할 것입니다.
+            </div>
+        </section>
+
+        <!-- CONCEPT CARDS -->
+        <section class="concepts">
+            <div class="concept-card" onclick="toggleCard(this)">
+                <div class="concept-header">
+                    <h3 class="concept-title">의미에의 의지 vs 다른 의지들</h3>
+                    <span class="concept-icon">📊</span>
+                </div>
+                <div class="concept-body">
+                    <p class="concept-text">
+                        프랭클은 인간의 가장 기본적인 동기가 <strong>의미에의 의지(Will to Meaning)</strong>라고 주장했습니다. 이는 프로이트의 '쾌락에의 의지(Will to Pleasure)'와 아들러의 '권력에의 의지(Will to Power)'와 구별됩니다.
+                    </p>
+
+                    <div class="deep-dive">
+                        <div class="deep-dive-label">🔬 신경과학 연결</div>
+                        <p>의미에의 의지는 <strong>배외측 전전두피질(ventromedial prefrontal cortex)</strong>의 활성화와 관련되어 있습니다. 이 영역은 가치 판단과 의미 만들기를 담당하며, 개인적 목표와 사회적 가치의 통합에 중요합니다.</p>
+                    </div>
+
+                    <div class="personal-context">
+                        <div class="personal-context-label">👨‍💼 당신의 상황</div>
+                        <p>회사에서의 서스펜션 엔지니어링 업무는 단순한 급여 추구(쾌락)나 경력 상승(권력)을 넘어, <strong>"더 안전한 자동차를 만든다"는 의미</strong>를 담고 있습니다. 이사와 이직의 불확실성 속에서도 이 의미가 흔들리지 않는다면, 당신은 프랭클이 말한 '의미의 토대' 위에 서 있는 것입니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-card" onclick="toggleCard(this)">
+                <div class="concept-header">
+                    <h3 class="concept-title">로고테라피의 3가지 가치 체계</h3>
+                    <span class="concept-icon">🏛️</span>
+                </div>
+                <div class="concept-body">
+                    <p class="concept-text">
+                        프랭클은 의미를 찾을 수 있는 3가지 경로를 제시합니다:
+                    </p>
+
+                    <p style="margin-top: 1rem; color: var(--text1);">
+                        <strong style="color: var(--green);">1. 창조적 가치(Creative Values)</strong><br>
+                        일을 통해 세상에 무언가를 창조하고 기여하는 것. 예술, 과학, 업무 등 모든 창조적 활동이 포함됩니다.
+                    </p>
+
+                    <p style="margin-top: 0.8rem; color: var(--text1);">
+                        <strong style="color: var(--cyan);">2. 경험적 가치(Experiential Values)</strong><br>
+                        아름다움, 사랑, 진리, 타인과의 관계를 경험하는 것. 감정적, 영적 깊이의 추구입니다.
+                    </p>
+
+                    <p style="margin-top: 0.8rem; color: var(--text1);">
+                        <strong style="color: var(--red);">3. 태도적 가치(Attitudinal Values)</strong><br>
+                        고통, 불가피한 상황에서도 어떤 태도를 취할 것인지 결정하는 것. 가장 강력한 의미 추구입니다.
+                    </p>
+
+                    <div class="deep-dive">
+                        <div class="deep-dive-label">🔬 신경과학 연결</div>
+                        <p>이 3가지 가치는 뇌의 서로 다른 네트워크를 활성화합니다: 창조적 가치는 <strong>배외측 전전두피질(dorsolateral PFC)</strong>, 경험적 가치는 <strong>내측 전전두피질과 안와전두피질(vmPFC)</strong>, 태도적 가치는 <strong>전대상피질(anterior cingulate cortex)</strong>과 연결됩니다.</p>
+                    </div>
+
+                    <div class="personal-context">
+                        <div class="personal-context-label">👨‍👨‍👧 당신의 상황</div>
+                        <p>
+                            <strong>창조적:</strong> 서스펜션 엔지니어링의 기술적 도전과 혁신<br>
+                            <strong>경험적:</strong> 아버지로서 자녀와의 깊은 만남, 가족의 의미<br>
+                            <strong>태도적:</strong> 이사/이직 불확실성 속에서도 성장의 태도 유지, "이 변화 속에서 내가 배울 수 있는 것은 무엇인가?"
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-card" onclick="toggleCard(this)">
+                <div class="concept-header">
+                    <h3 class="concept-title">실존적 공허와 신경과학</h3>
+                    <span class="concept-icon">⚫</span>
+                </div>
+                <div class="concept-body">
+                    <p class="concept-text">
+                        프랭클이 지적한 <strong>실존적 공허(Existential Vacuum)</strong>는 현대 사회에서 의미 부재로 인한 정신적 상태입니다. 이는 우울증, 불안, 중독으로 이어질 수 있습니다.
+                    </p>
+
+                    <div class="deep-dive">
+                        <div class="deep-dive-label">🔬 신경과학: Default Mode Network 과잉활성화</div>
+                        <p>
+                            의미가 부재할 때, 뇌의 <strong>기본 모드 네트워크(Default Mode Network, DMN)</strong>가 과잉 활성화됩니다. 이는 반복적인 자기 성찰, 불안한 미래 시뮬레이션으로 이어집니다. 반대로, 명확한 의미와 목표를 가지면 <strong>배외측 전전두피질(dorsolateral PFC)</strong>이 DMN을 조절하게 되어 정신적 안정성을 확보합니다.<br><br>
+                            <strong>또한:</strong> 의미가 부재할 때 <strong>앞뇌섬엽(anterior insula)</strong>의 활성화가 증가하여 불편함과 불확실성에 대한 민감도가 높아집니다.
+                        </p>
+                    </div>
+
+                    <div class="personal-context">
+                        <div class="personal-context-label">🎯 당신의 상황</div>
+                        <p>이사와 이직의 불확실성 속에서 "내가 지금 뭘 하고 있는가? 내 인생이 무슨 의미가 있는가?"라는 질문이 반복될 수 있습니다. 이는 신경학적으로 DMN의 과잉 활성화입니다. 하지만 당신이 <strong>의미의 3가지 경로 중 하나라도 명확하게 정의</strong>한다면, 뇌는 자동으로 더 안정적인 상태로 돌아갈 것입니다. "내 아이에게 좋은 아버지가 되는 것", "더 나은 기술을 만드는 것" 같은 의미가 그 닻이 될 수 있습니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SVG DIAGRAM -->
+        <section class="diagram-section">
+            <h2 class="section-title">프랭클의 의미 프레임워크</h2>
+            <div class="diagram-container">
+                <svg viewBox="0 0 800 500" style="min-height: 400px; max-width: 100%;">
+                    <!-- Background -->
+                    <defs>
+                        <linearGradient id="pillarGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#6BBF8A;stop-opacity:0.3"/>
+                            <stop offset="100%" style="stop-color:#6BBF8A;stop-opacity:0.1"/>
+                        </linearGradient>
+                        <linearGradient id="pillarGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#6BB5BF;stop-opacity:0.3"/>
+                            <stop offset="100%" style="stop-color:#6BB5BF;stop-opacity:0.1"/>
+                        </linearGradient>
+                        <linearGradient id="pillarGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#BF6B6B;stop-opacity:0.3"/>
+                            <stop offset="100%" style="stop-color:#BF6B6B;stop-opacity:0.1"/>
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Brain regions background -->
+                    <g opacity="0.1">
+                        <rect x="50" y="300" width="200" height="120" fill="#6BBF8A" rx="8"/>
+                        <rect x="300" y="300" width="200" height="120" fill="#6BB5BF" rx="8"/>
+                        <rect x="550" y="300" width="200" height="120" fill="#BF6B6B" rx="8"/>
+                    </g>
+
+                    <!-- Base platform -->
+                    <rect x="50" y="420" width="700" height="40" fill="rgba(138,106,191,0.2)" stroke="rgba(138,106,191,0.4)" stroke-width="2" rx="8"/>
+                    <text x="400" y="450" font-family="Noto Sans KR" font-size="16" font-weight="600" fill="#C9A84C" text-anchor="middle">의미에의 의지 (Will to Meaning)</text>
+
+                    <!-- Pillar 1: Creative -->
+                    <rect x="75" y="280" width="150" height="150" fill="url(#pillarGrad1)" stroke="#6BBF8A" stroke-width="2" rx="6"/>
+                    <text x="152.5" y="310" font-family="Noto Sans KR" font-size="18" font-weight="700" fill="#6BBF8A" text-anchor="middle">창조적 가치</text>
+                    <text x="152.5" y="335" font-family="Noto Sans KR" font-size="13" fill="#B0E8C0" text-anchor="middle">Create</text>
+                    <text x="152.5" y="355" font-family="Noto Sans KR" font-size="12" fill="#9EA0B8" text-anchor="middle">일 · 기여</text>
+                    <text x="152.5" y="375" font-family="Noto Sans KR" font-size="12" fill="#9EA0B8" text-anchor="middle">혁신 · 도전</text>
+
+                    <!-- Connection 1 to brain -->
+                    <path d="M 152.5 430 L 152.5 400" stroke="rgba(107,191,138,0.5)" stroke-width="2" fill="none" marker-end="url(#arrowGreen)"/>
+                    <circle cx="152.5" cy="340" r="3" fill="#6BBF8A"/>
+
+                    <!-- Brain label 1 -->
+                    <text x="152.5" y="485" font-family="JetBrains Mono" font-size="11" fill="#6BBF8A" text-anchor="middle" font-weight="600">dlPFC</text>
+
+                    <!-- Pillar 2: Experiential -->
+                    <rect x="325" y="280" width="150" height="150" fill="url(#pillarGrad2)" stroke="#6BB5BF" stroke-width="2" rx="6"/>
+                    <text x="402.5" y="310" font-family="Noto Sans KR" font-size="18" font-weight="700" fill="#6BB5BF" text-anchor="middle">경험적 가치</text>
+                    <text x="402.5" y="335" font-family="Noto Sans KR" font-size="13" fill="#A8D8E8" text-anchor="middle">Experience</text>
+                    <text x="402.5" y="355" font-family="Noto Sans KR" font-size="12" fill="#9EA0B8" text-anchor="middle">사랑 · 아름다움</text>
+                    <text x="402.5" y="375" font-family="Noto Sans KR" font-size="12" fill="#9EA0B8" text-anchor="middle">관계 · 깊이</text>
+
+                    <!-- Connection 2 to brain -->
+                    <path d="M 402.5 430 L 402.5 400" stroke="rgba(107,181,191,0.5)" stroke-width="2" fill="none" marker-end="url(#arrowCyan)"/>
+                    <circle cx="402.5" cy="340" r="3" fill="#6BB5BF"/>
+
+                    <!-- Brain label 2 -->
+                    <text x="402.5" y="485" font-family="JetBrains Mono" font-size="11" fill="#6BB5BF" text-anchor="middle" font-weight="600">vmPFC</text>
+
+                    <!-- Pillar 3: Attitudinal -->
+                    <rect x="575" y="280" width="150" height="150" fill="url(#pillarGrad3)" stroke="#BF6B6B" stroke-width="2" rx="6"/>
+                    <text x="652.5" y="310" font-family="Noto Sans KR" font-size="18" font-weight="700" fill="#BF6B6B" text-anchor="middle">태도적 가치</text>
+                    <text x="652.5" y="335" font-family="Noto Sans KR" font-size="13" fill="#E8ACAC" text-anchor="middle">Attitude</text>
+                    <text x="652.5" y="355" font-family="Noto Sans KR" font-size="12" fill="#9EA0B8" text-anchor="middle">고통 속 의미</text>
+                    <text x="652.5" y="375" font-family="Noto Sans KR" font-size="12" fill="#9EA0B8" text-anchor="middle">선택의 자유</text>
+
+                    <!-- Connection 3 to brain -->
+                    <path d="M 652.5 430 L 652.5 400" stroke="rgba(191,107,107,0.5)" stroke-width="2" fill="none" marker-end="url(#arrowRed)"/>
+                    <circle cx="652.5" cy="340" r="3" fill="#BF6B6B"/>
+
+                    <!-- Brain label 3 -->
+                    <text x="652.5" y="485" font-family="JetBrains Mono" font-size="11" fill="#BF6B6B" text-anchor="middle" font-weight="600">ACC</text>
+
+                    <!-- Meaning at the top -->
+                    <circle cx="400" cy="100" r="50" fill="rgba(201,168,76,0.15)" stroke="#C9A84C" stroke-width="2"/>
+                    <text x="400" y="95" font-family="Noto Sans KR" font-size="16" font-weight="700" fill="#C9A84C" text-anchor="middle">의미</text>
+                    <text x="400" y="115" font-family="Noto Sans KR" font-size="12" fill="#E8E9F3" text-anchor="middle">(Meaning)</text>
+
+                    <!-- Lines to meaning -->
+                    <path d="M 152.5 280 Q 200 200 370 150" stroke="rgba(107,191,138,0.4)" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+                    <path d="M 402.5 280 L 400 150" stroke="rgba(107,181,191,0.4)" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+                    <path d="M 652.5 280 Q 600 200 430 150" stroke="rgba(191,107,107,0.4)" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+
+                    <!-- Arrow markers -->
+                    <defs>
+                        <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10" fill="none" stroke="#6BBF8A" stroke-width="1.5"/>
+                        </marker>
+                        <marker id="arrowCyan" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10" fill="none" stroke="#6BB5BF" stroke-width="1.5"/>
+                        </marker>
+                        <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                            <path d="M 0 0 L 10 5 L 0 10" fill="none" stroke="#BF6B6B" stroke-width="1.5"/>
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+        </section>
+
+        <!-- PRACTICE GUIDE -->
+        <section class="practice-guide">
+            <h2 class="section-title">실천 가이드</h2>
+
+            <div class="practice-item">
+                <div class="practice-time">⏱️ 30초 — 순간의 의미 질문</div>
+                <div class="practice-title">"이 순간의 의미는?"</div>
+                <div class="practice-content">
+                    당신이 지금 하고 있는 일을 멈추고, 한 번 물어보세요: <strong>"지금 이 행동이 왜 중요한가? 누가 이것으로 도움받을 것인가?"</strong><br><br>
+                    예시:<br>
+                    • 코드 검토 중: "이 코드가 최종적으로 더 안전한 자동차를 만든다"<br>
+                    • 회의 중: "팀원의 의견을 경청하는 것 자체가 그들을 존중하는 것"<br>
+                    • 자녀 세면: "아버지로서의 일상적 돌봄이 사랑을 표현하는 방식"
+                </div>
+            </div>
+
+            <div class="practice-item">
+                <div class="practice-time">📝 5분 — 의미 발견 저널링</div>
+                <div class="practice-title">오늘의 3가지 의미 있는 순간</div>
+                <div class="practice-content">
+                    매일 저녁, 다음과 같이 기록하세요:<br><br>
+                    1. 창조적 가치: 오늘 내가 만들었거나 기여한 것<br>
+                    2. 경험적 가치: 오늘 깊이 있게 경험한 순간<br>
+                    3. 태도적 가치: 오늘 도전했던 것과 내가 취한 태도<br><br>
+                    이를 통해 당신의 뇌는 "내 삶이 의미 있다"는 신경적 신호를 강화하게 됩니다.
+                </div>
+            </div>
+
+            <div class="practice-item">
+                <div class="practice-time">🎯 하루종일 — 의미 있는 행동 3가지 실천</div>
+                <div class="practice-title">의도적 행동으로 뇌 재설정</div>
+                <div class="practice-content">
+                    매일 다음 3가지 중 최소 하나씩 실천하세요:<br><br>
+                    1. <strong>창조적 행동:</strong> 엔지니어링 작업에서 "더 나은 방법"을 제시<br>
+                    2. <strong>경험적 행동:</strong> 자녀와 스크린 없이 15분 함께 시간 보내기, 또는 아내와 깊은 대화<br>
+                    3. <strong>태도적 행동:</strong> 이사/이직의 불확실성 속에서 "이로부터 배우겠다"는 태도 유지<br><br>
+                    이런 의도적 행동은 뇌의 ventromedial prefrontal cortex를 활성화하여 장기적인 의미 감각을 강화합니다.
+                </div>
+            </div>
+        </section>
+
+        <!-- PHILOSOPHY SECTION -->
+        <section class="philosophy">
+            <h2 class="section-title">철학적 기초</h2>
+
+            <div class="philosophy-grid">
+                <div class="philosophy-box">
+                    <div class="philosopher-name">Viktor Frankl</div>
+                    <p style="color: var(--text2); font-size: 0.95rem; margin-bottom: 1rem;">
+                        오스트리아 정신의학자, 홀로코스트 생존자. 극한의 고통 속에서도 의미를 찾을 수 있다는 믿음으로 로고테라피 창안.
+                    </p>
+                    <div class="quote">
+                        "The last of human freedoms is to choose one's attitudes toward a given set of circumstances."
+                        <br><br>
+                        "인간이 가진 마지막 자유는 주어진 상황에 대해 어떤 태도를 취할지 선택하는 것이다."
+                    </div>
+                    <div class="neuro-connection">
+                        <div class="neuro-label">뇌 과학 연결:</div>
+                        이 태도의 선택은 <strong>전대상피질(ACC)</strong>의 활성화로, 이것이 감정 조절과 장기적 목표 추구의 신경적 기초입니다.
+                    </div>
+                </div>
+
+                <div class="philosophy-box">
+                    <div class="philosopher-name">Albert Camus</div>
+                    <p style="color: var(--text2); font-size: 0.95rem; margin-bottom: 1rem;">
+                        프랑스 철학자, 부조리주의자. 우주의 무의미성(absurdism)을 직시했지만, 그 속에서 반항과 행동의 의미를 찾았습니다.
+                    </p>
+                    <div class="quote">
+                        "The only way to deal with an unfree world is to become so absolutely free that very existence of the world is irrelevant to you."
+                        <br><br>
+                        "자유롭지 않은 세상과 맞서는 유일한 방법은 절대적으로 자유로워져서, 세상의 존재 자체가 당신과 무관해지는 것이다."
+                    </div>
+                    <div class="neuro-connection">
+                        <div class="neuro-label">뇌 과학 연결:</div>
+                        부조리 속에서도 의미를 '선택'하는 행위는 <strong>등외측 전전두피질(dorsolateral PFC)</strong>의 높은 인지적 통제를 요구합니다. 이는 당신의 "불확실성 속에서도 선택한다"는 능력입니다.
+                    </div>
+                </div>
+
+                <div class="philosophy-box">
+                    <div class="philosopher-name">신경과학 통합</div>
+                    <p style="color: var(--text2); font-size: 0.95rem; margin-bottom: 1rem;">
+                        현대 신경과학은 Frankl과 Camus의 철학을 뇌의 언어로 번역합니다. 의미 추구는 단순히 심리적 개념이 아니라, 특정 뇌 회로의 활성화 패턴입니다.
+                    </p>
+                    <div style="background: var(--glow); padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                        <p style="color: var(--text2); font-size: 0.9rem;">
+                            <strong style="color: var(--green);">의미 추구 회로:</strong> vmPFC → dlPFC → ACC → Insula<br><br>
+                            <strong style="color: var(--cyan);">신경가소성(Neuroplasticity):</strong> 당신이 의미 있는 삶을 의도적으로 실천할 때마다, 이 회로는 더 강해집니다. 뇌는 변합니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUIZ SECTION -->
+        <section class="quiz">
+            <h2 class="section-title">자기 평가</h2>
+
+            <div class="question">
+                <div class="question-text">Q1. 프랭클의 로고테라피에서 "의미에의 의지"와 프로이트의 "쾌락에의 의지"의 근본적 차이는?</div>
+                <div class="options">
+                    <button class="option-btn" onclick="checkAns(this, false)">
+                        ① 쾌락에의 의지가 더 본능적이고 동물적이라는 점
+                    </button>
+                    <button class="option-btn" onclick="checkAns(this, true)">
+                        ② 의미에의 의지는 개인적 만족을 넘어 생명에 대한 책임감과 기여를 추구한다는 점
+                    </button>
+                    <button class="option-btn" onclick="checkAns(this, false)">
+                        ③ 쾌락에의 의지는 현재에, 의미에의 의지는 미래에 초점을 맞춘다는 점
+                    </button>
+                    <button class="option-btn" onclick="checkAns(this, false)">
+                        ④ 의미에의 의지는 종교적 신념이 필요하다는 점
+                    </button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+
+            <div class="question">
+                <div class="question-text">Q2. 로고테라피의 3가지 가치 체계(창조적, 경험적, 태도적) 중에서, "이사와 이직의 불확실성 속에서도 성장하겠다"는 당신의 태도는 어느 가치에 해당합니까?</div>
+                <div class="options">
+                    <button class="option-btn" onclick="checkAns(this, false)">
+                        ① 창조적 가치 (새로운 직무에서 창조하기)
+                    </button>
+                    <button class="option-btn" onclick="checkAns(this, false)">
+                        ② 경험적 가치 (새로운 도시의 경험)
+                    </button>
+                    <button class="option-btn" onclick="checkAns(this, true)">
+                        ③ 태도적 가치 (주어진 상황에 대해 성장의 태도를 선택함)
+                    </button>
+                    <button class="option-btn" onclick="checkAns(this, false)">
+                        ④ 세 가지 모두 해당
+                    </button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+
+            <div class="spaced-rep">
+                <div class="rep-title">🔄 반복 학습 일정</div>
+                <div class="rep-schedule">
+                    <div class="rep-day completed">Day 16<br/>학습</div>
+                    <div class="rep-day">+1일<br/>(내일)</div>
+                    <div class="rep-day">+3일</div>
+                    <div class="rep-day">+7일</div>
+                    <div class="rep-day">+14일</div>
+                    <div class="rep-day">+30일</div>
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text2);">
+                    이 일정에 따라 오늘 배운 내용을 반복 학습하면, 장기 기억이 52%에서 90%로 증가합니다. (Ebbinghaus 망각 곡선)
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>
+            <strong>Day 16 of 22 Neuroscience/Psychology/Philosophy Series</strong><br>
+            빅터 프랭클: 의미치료와 실존적 성숙<br>
+            <br>
+            Part 3: 철학적 삶의 프레임 (Days 13-18)<br>
+            이 시리즈는 신경과학, 심리학, 철학의 교점에서 의미 있는 삶을 탐구합니다.
+        </p>
+        <p style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--text2);">
+            Created with neuroscience-grounded pedagogy for deep, lasting learning.<br>
+            © 2026 Neuroscience Learning Series
+        </p>
+    </footer>
+
+    <script>
+        // Toggle concept cards
+        function toggleCard(element) {
+            const body = element.querySelector('.concept-body');
+            body.classList.toggle('active');
+        }
+
+        // Check quiz answers
+        function checkAns(btn, correct) {
+            const question = btn.closest('.question');
+            const feedback = question.querySelector('.feedback');
+            const buttons = question.querySelectorAll('.option-btn');
+            
+            buttons.forEach(b => b.disabled = true);
+            
+            if (correct) {
+                btn.classList.add('correct');
+                feedback.classList.add('show', 'correct');
+                feedback.textContent = '✓ 정답입니다! 훌륭한 이해입니다.';
+            } else {
+                btn.classList.add('incorrect');
+                feedback.classList.add('show', 'incorrect');
+                feedback.textContent = '✗ 다시 생각해보세요. 위의 개념 카드를 참고하세요.';
+            }
+        }
+
+        // Intersection Observer for animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.concept-card, .practice-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

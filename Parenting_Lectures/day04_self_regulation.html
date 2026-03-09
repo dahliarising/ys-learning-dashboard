@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 04 - 자기조절력 발달 — 훈육의 과학</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            background-color: #0A0C10;
+            color: #E0E0E0;
+            font-family: 'Noto Sans KR', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0A0C10;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #4ABF8A;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2d8c5f;
+        }
+        
+        /* Fade Up Animation */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-up {
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-bottom: 2px solid #4ABF8A;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(74, 191, 138, 0.15);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4ABF8A;
+            letter-spacing: 1px;
+        }
+        
+        .header-day {
+            background: #181C24;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border-left: 3px solid #C9A84C;
+            font-weight: 600;
+            color: #C9A84C;
+        }
+        
+        .timer-btn {
+            background: linear-gradient(135deg, #4ABF8A 0%, #2d8c5f 100%);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(74, 191, 138, 0.3);
+        }
+        
+        .timer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(74, 191, 138, 0.4);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            margin: 50vh auto;
+            transform: translateY(-50%);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            border: 2px solid #4ABF8A;
+            box-shadow: 0 8px 24px rgba(74, 191, 138, 0.25);
+        }
+        
+        .modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: #4ABF8A;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .timer-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3rem;
+            text-align: center;
+            color: #C9A84C;
+            margin: 1.5rem 0;
+            font-weight: 700;
+        }
+        
+        .timer-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        
+        .timer-controls button {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .start-btn {
+            background: #4ABF8A;
+            color: white;
+        }
+        
+        .start-btn:hover {
+            background: #2d8c5f;
+        }
+        
+        .close-btn {
+            background: #E85D5D;
+            color: white;
+        }
+        
+        .close-btn:hover {
+            background: #c93d3d;
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+            border-left: 5px solid #4ABF8A;
+            box-shadow: 0 4px 12px rgba(74, 191, 138, 0.15);
+        }
+        
+        .part-label {
+            color: #C9A84C;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #4ABF8A;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .hero-subtitle {
+            color: #B0B0B0;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+        
+        .hero-oneliner {
+            color: #E0E0E0;
+            font-size: 1rem;
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            border-left: 3px solid #C9A84C;
+        }
+        
+        .badges {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #181C24;
+            border: 2px solid #4ABF8A;
+            color: #4ABF8A;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        /* Section */
+        .section {
+            margin-bottom: 3rem;
+        }
+        
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: #4ABF8A;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #C9A84C;
+        }
+        
+        /* Strategy Box */
+        .strategy-box {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-left: 5px solid #C9A84C;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(201, 168, 76, 0.1);
+        }
+        
+        .strategy-title {
+            color: #C9A84C;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .strategy-content {
+            color: #D0D0D0;
+            line-height: 1.8;
+        }
+        
+        /* Time Table */
+        .time-table {
+            background: #12151B;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            border: 1px solid #4ABF8A;
+        }
+        
+        .time-row {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            border-bottom: 1px solid #2a3038;
+            padding: 1rem;
+        }
+        
+        .time-row:last-child {
+            border-bottom: none;
+        }
+        
+        .time-col-time {
+            color: #C9A84C;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            padding-right: 1rem;
+        }
+        
+        .time-col-activity {
+            color: #D0D0D0;
+        }
+        
+        /* Science Cards */
+        .science-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (min-width: 768px) {
+            .science-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .science-card {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 2px solid #4ABF8A;
+            box-shadow: 0 4px 12px rgba(74, 191, 138, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .science-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(74, 191, 138, 0.25);
+        }
+        
+        .science-card-title {
+            color: #4ABF8A;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .science-card-content {
+            color: #D0D0D0;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+        
+        .why-box {
+            background: #0A0C10;
+            border-left: 4px solid #C9A84C;
+            padding: 1rem;
+            border-radius: 6px;
+            color: #E0E0E0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .why-label {
+            color: #C9A84C;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* SVG Diagram */
+        .diagram-container {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 2px solid #4ABF8A;
+            overflow-x: auto;
+        }
+        
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Practice Guide */
+        .practice-section {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            border-left: 5px solid #4ABF8A;
+        }
+        
+        .age-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #2a3038;
+        }
+        
+        .age-tab {
+            background: transparent;
+            border: none;
+            color: #B0B0B0;
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .age-tab.active {
+            color: #4ABF8A;
+            border-bottom-color: #4ABF8A;
+        }
+        
+        .age-content {
+            display: none;
+        }
+        
+        .age-content.active {
+            display: block;
+        }
+        
+        .script-box {
+            background: #0A0C10;
+            border-left: 4px solid #4ABF8A;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .script-label {
+            color: #C9A84C;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        }
+        
+        .dialogue {
+            color: #D0D0D0;
+            line-height: 1.8;
+        }
+        
+        .character {
+            color: #4ABF8A;
+            font-weight: 700;
+        }
+        
+        .do-dont {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .do-dont {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .do-box, .dont-box {
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .do-box {
+            background: rgba(74, 191, 138, 0.15);
+            border-left: 4px solid #4ABF8A;
+        }
+        
+        .dont-box {
+            background: rgba(232, 93, 93, 0.15);
+            border-left: 4px solid #E85D5D;
+        }
+        
+        .do-title, .dont-title {
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+        
+        .do-title {
+            color: #4ABF8A;
+        }
+        
+        .dont-title {
+            color: #E85D5D;
+        }
+        
+        .do-content, .dont-content {
+            color: #D0D0D0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        /* Deep Dive Collapsible */
+        .deep-dive-toggle {
+            background: transparent;
+            border: none;
+            color: #4ABF8A;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 1rem;
+            width: 100%;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+        
+        .deep-dive-toggle:hover {
+            background: rgba(74, 191, 138, 0.1);
+        }
+        
+        .deep-dive-toggle.active {
+            color: #C9A84C;
+        }
+        
+        .deep-dive-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .deep-dive-toggle.active .deep-dive-icon {
+            transform: rotate(180deg);
+        }
+        
+        .deep-dive-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(74, 191, 138, 0.05);
+            border-left: 4px solid #4ABF8A;
+            padding: 0;
+        }
+        
+        .deep-dive-content.active {
+            max-height: 1000px;
+            padding: 1.5rem;
+        }
+        
+        /* Tip Box */
+        .tip-box {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            border-left: 5px solid #C9A84C;
+            box-shadow: 0 4px 12px rgba(201, 168, 76, 0.1);
+            margin-bottom: 3rem;
+        }
+        
+        .tip-title {
+            color: #C9A84C;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tip-content {
+            color: #D0D0D0;
+            line-height: 1.8;
+        }
+        
+        /* Quiz Section */
+        .quiz-container {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 2px solid #4ABF8A;
+            margin-bottom: 2rem;
+        }
+        
+        .quiz-title {
+            color: #4ABF8A;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .quiz-question {
+            color: #E0E0E0;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .quiz-option {
+            background: #0A0C10;
+            border: 2px solid #2a3038;
+            color: #D0D0D0;
+            padding: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quiz-option:hover {
+            border-color: #4ABF8A;
+        }
+        
+        .quiz-option.selected {
+            background: #4ABF8A;
+            color: #0A0C10;
+            border-color: #4ABF8A;
+            font-weight: 600;
+        }
+        
+        .quiz-option.correct {
+            background: #4ABF8A;
+            border-color: #4ABF8A;
+            color: #0A0C10;
+        }
+        
+        .quiz-option.incorrect {
+            background: #E85D5D;
+            border-color: #E85D5D;
+            color: white;
+        }
+        
+        .quiz-feedback {
+            color: #C9A84C;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #0A0C10;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .quiz-feedback.show {
+            display: block;
+        }
+        
+        .submit-btn {
+            background: #4ABF8A;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background: #2d8c5f;
+        }
+        
+        /* Spaced Repetition */
+        .spaced-rep {
+            background: #0A0C10;
+            border: 2px solid #C9A84C;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .rep-label {
+            color: #C9A84C;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .rep-schedule {
+            color: #D0D0D0;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .header-left {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .modal-content {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-left">
+            <div class="header-title">과학적 육아 스터디</div>
+            <div class="header-day">DAY 04 / 21</div>
+        </div>
+        <button class="timer-btn" onclick="openTimerModal()">🍅 25분 Pomodoro</button>
+    </header>
+    
+    <!-- Timer Modal -->
+    <div id="timerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Pomodoro Timer</div>
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            <div class="timer-controls">
+                <button class="start-btn" id="startBtn" onclick="startTimer()">START</button>
+                <button class="close-btn" onclick="closeTimerModal()">CLOSE</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero fade-up">
+            <div class="part-label">PART 1 — 발달심리 기초</div>
+            <h1 class="hero-title">자기조절력 발달<br>— 훈육의 과학</h1>
+            <p class="hero-subtitle">뇌과학으로 이해하는 효과적인 훈육 방법</p>
+            <p class="hero-oneliner">"훈육은 처벌이 아니라 아이가 자신의 행동을 이해하고 다시 시도할 기회를 주는 것"</p>
+            <div class="badges">
+                <span class="badge">첫째(5-7세)</span>
+                <span class="badge">둘째(2-4세)</span>
+                <span class="badge">전체</span>
+            </div>
+        </section>
+        
+        <!-- Section 1: Learning Strategy -->
+        <section class="section fade-up">
+            <h2 class="section-title">① 학습 전략</h2>
+            <div class="strategy-box">
+                <div class="strategy-title">오늘의 학습 포인트</div>
+                <div class="strategy-content">
+                    이 강의에서는 훈육(discipline)과 체벌(punishment)의 뇌과학적 차이를 이해하고, 
+                    아이의 자기조절력 발달에 맞는 효과적인 훈육 방법을 배웁니다. 
+                    특히 Time-Out의 문제점과 Time-In의 4단계 방법론(Daniel Siegel)을 익혀 
+                    실제 육아 상황에서 바로 적용할 수 있는 스킬을 개발합니다.
+                </div>
+            </div>
+            
+            <div class="time-table">
+                <div class="time-row">
+                    <div class="time-col-time">0-3분</div>
+                    <div class="time-col-activity">뇌과학: 처벌 vs 훈육의 신경회로</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col-time">3-8분</div>
+                    <div class="time-col-activity">Time-Out 문제점 분석</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col-time">8-13분</div>
+                    <div class="time-col-activity">Time-In 4단계 방법론 학습</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col-time">13-18분</div>
+                    <div class="time-col-activity">5-7세 vs 2-4세 자기조절력 차이</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col-time">18-23분</div>
+                    <div class="time-col-activity">실전 스크립트 및 형제자매 갈등 해결</div>
+                </div>
+                <div class="time-row">
+                    <div class="time-col-time">23-25분</div>
+                    <div class="time-col-activity">퀴즈 및 정리</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 2: Science Cards -->
+        <section class="section fade-up">
+            <h2 class="section-title">② 훈육의 뇌과학</h2>
+            <div class="science-cards">
+                <div class="science-card">
+                    <div class="science-card-title">🧠 처벌(Punishment)의 뇌 반응</div>
+                    <div class="science-card-content">
+                        처벌 시 편도체(amygdala)가 과활성화됩니다. 
+                        이는 공포와 분노의 영역이므로 아이는 행동의 이유를 배우기보다는 
+                        처벌을 피하는 방법만 배우게 됩니다.
+                    </div>
+                    <div class="why-box">
+                        <div class="why-label">이래서 아이가 이렇게 행동해요</div>
+                        처벌을 피하기 위해 거짓말을 하거나, 들키지 않으려고만 신경 쓰고, 
+                        진정한 행동 개선이 일어나지 않습니다.
+                    </div>
+                </div>
+                
+                <div class="science-card">
+                    <div class="science-card-title">🎯 훈육(Discipline)의 뇌 반응</div>
+                    <div class="science-card-content">
+                        훈육은 전전두엽(PFC, prefrontal cortex)을 활성화합니다. 
+                        이곳은 사고, 판단, 자기조절의 영역이므로 아이가 자신의 행동의 결과를 
+                        이해하고 더 나은 선택을 배웁니다.
+                    </div>
+                    <div class="why-box">
+                        <div class="why-label">이래서 아이가 이렇게 행동해요</div>
+                        점진적으로 자기조절력이 발달하고, 비슷한 상황에서 더 나은 선택을 하게 됩니다. 
+                        아이가 스스로 행동의 결과를 예측할 수 있게 됩니다.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="science-cards">
+                <div class="science-card">
+                    <div class="science-card-title">⏱️ Time-Out의 문제점</div>
+                    <div class="science-card-content">
+                        "혼자만 남겨진다"는 경험은 사회적 배제(social exclusion) 스트레스를 유발합니다. 
+                        이는 신체적 고통만큼 강렬한 뇌 반응을 일으켜 아이를 과도하게 불안하게 합니다.
+                    </div>
+                    <div class="why-box">
+                        <div class="why-label">이래서 아이가 이렇게 행동해요</div>
+                        Time-Out 중에는 공포만 느껴 아무것도 배우지 못하고, 
+                        오히려 부모와의 관계 손상으로 이어집니다.
+                    </div>
+                </div>
+                
+                <div class="science-card">
+                    <div class="science-card-title">❤️ Time-In 4단계 (Siegel)</div>
+                    <div class="science-card-content">
+                        1) Connect (연결) - 차분하게 아이 옆에 앉기<br>
+                        2) Empathize (공감) - 감정 인정하기<br>
+                        3) Label (라벨링) - 감정의 이름 붙이기<br>
+                        4) Guide (안내) - 올바른 행동 제시하기
+                    </div>
+                    <div class="why-box">
+                        <div class="why-label">이래서 아이가 이렇게 행동해요</div>
+                        안전감을 유지하면서 뇌의 PFC 영역이 활성화되어 
+                        아이가 자신의 행동을 이해하고 개선할 수 있게 됩니다.
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 3: SVG Diagram -->
+        <section class="section fade-up">
+            <h2 class="section-title">③ 뇌 반응 비교 다이어그램</h2>
+            <div class="diagram-container">
+                <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Title -->
+                    <text x="400" y="30" text-anchor="middle" font-size="20" font-weight="bold" fill="#4ABF8A">
+                        훈육 방식에 따른 뇌 반응 비교
+                    </text>
+                    
+                    <!-- Left side: Punishment -->
+                    <rect x="50" y="80" width="300" height="280" rx="10" fill="#181C24" stroke="#E85D5D" stroke-width="2"/>
+                    <text x="200" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="#E85D5D">
+                        처벌 (Punishment)
+                    </text>
+                    
+                    <!-- Brain illustration - Punishment -->
+                    <circle cx="200" cy="180" r="40" fill="#1a3a3a" stroke="#E85D5D" stroke-width="2"/>
+                    <text x="200" y="185" text-anchor="middle" font-size="11" fill="#E85D5D" font-weight="bold">편도체</text>
+                    <text x="200" y="235" text-anchor="middle" font-size="12" fill="#E85D5D">공포 + 분노</text>
+                    
+                    <text x="200" y="270" text-anchor="middle" font-size="11" fill="#D0D0D0">
+                        결과: 처벌 회피
+                    </text>
+                    <text x="200" y="290" text-anchor="middle" font-size="11" fill="#D0D0D0">
+                        거짓말, 숨김
+                    </text>
+                    <text x="200" y="310" text-anchor="middle" font-size="11" fill="#D0D0D0">
+                        행동 개선 ✗
+                    </text>
+                    
+                    <!-- Right side: Discipline -->
+                    <rect x="450" y="80" width="300" height="280" rx="10" fill="#181C24" stroke="#4ABF8A" stroke-width="2"/>
+                    <text x="600" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="#4ABF8A">
+                        훈육 (Discipline)
+                    </text>
+                    
+                    <!-- Brain illustration - Discipline -->
+                    <circle cx="600" cy="180" r="40" fill="#1a3a2a" stroke="#4ABF8A" stroke-width="2"/>
+                    <text x="600" y="185" text-anchor="middle" font-size="11" fill="#4ABF8A" font-weight="bold">전전두엽</text>
+                    <text x="600" y="235" text-anchor="middle" font-size="12" fill="#4ABF8A">사고 + 판단</text>
+                    
+                    <text x="600" y="270" text-anchor="middle" font-size="11" fill="#D0D0D0">
+                        결과: 행동 이해
+                    </text>
+                    <text x="600" y="290" text-anchor="middle" font-size="11" fill="#D0D0D0">
+                        자기조절력 발달
+                    </text>
+                    <text x="600" y="310" text-anchor="middle" font-size="11" fill="#D0D0D0">
+                        행동 개선 ✓
+                    </text>
+                </svg>
+            </div>
+        </section>
+        
+        <!-- Section 4: Age Differences -->
+        <section class="section fade-up">
+            <h2 class="section-title">④ 발달 단계별 자기조절력</h2>
+            <div class="science-cards">
+                <div class="science-card">
+                    <div class="science-card-title">5-7세 아이의 자기조절력</div>
+                    <div class="science-card-content">
+                        <strong>발달 특징:</strong><br>
+                        - 감정 표현이 더 정교해짐<br>
+                        - 간단한 규칙 이해 가능<br>
+                        - 결과 예측 능력 향상<br>
+                        - 약 15-20초 감정 조절 가능<br>
+                        <br>
+                        <strong>훈육 방식:</strong><br>
+                        - 행동의 원인과 결과 설명 가능<br>
+                        - Time-In 중 대화 가능<br>
+                        - 책임감 발달 시작
+                    </div>
+                </div>
+                
+                <div class="science-card">
+                    <div class="science-card-title">2-4세 아이의 자기조절력</div>
+                    <div class="science-card-content">
+                        <strong>발달 특징:</strong><br>
+                        - 감정 조절이 매우 제한적<br>
+                        - 즉각적인 욕구 만족 추구<br>
+                        - 규칙 이해가 부분적<br>
+                        - 약 5초 감정 조절 능력<br>
+                        <br>
+                        <strong>훈육 방식:</strong><br>
+                        - 짧고 명확한 지시<br>
+                        - 신체적 접근 (안아주기)<br>
+                        - 행동 전환에 집중
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 5: Practical Guide -->
+        <section class="section fade-up">
+            <h2 class="section-title">⑤ 실전 가이드</h2>
+            <div class="practice-section">
+                <div class="age-tabs">
+                    <button class="age-tab active" onclick="switchAge(event, '6yo')">5-7세</button>
+                    <button class="age-tab" onclick="switchAge(event, '3yo')">2-4세</button>
+                </div>
+                
+                <!-- 5-7세 Content -->
+                <div id="6yo" class="age-content active">
+                    <div class="script-box">
+                        <div class="script-label">상황 1: 형이 동생을 밀었을 때</div>
+                        <div class="dialogue">
+                            <div><span class="character">부모:</span> "○○가 화난 거 이해해. 지금 기분 좋지 않지?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">아이:</span> "응, 내 장난감 가져갔어"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "그렇구나. 그래서 밀었을 때 무슨 일이 생각해?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">아이:</span> "동생이 넘어졌어..."</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "그래. 그럼 다음에 화날 땐 어떻게 하면 좋을까?"</div>
+                        </div>
+                    </div>
+                    
+                    <div class="script-box">
+                        <div class="script-label">상황 2: 지시를 안 들었을 때</div>
+                        <div class="dialogue">
+                            <div><span class="character">부모:</span> "방을 정리하라고 했는데, 뭐하고 있니?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">아이:</span> "싫어, 나중에 할 거야"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "지금 화나 보이네. 엄마/아빠 말을 안 들으니까 아쉬워. (안아주기) 우리 함께 정리해볼까?"</div>
+                        </div>
+                    </div>
+                    
+                    <div class="do-dont">
+                        <div class="do-box">
+                            <div class="do-title">✓ 해야 할 것</div>
+                            <div class="do-content">
+                                • 행동의 결과 물어보기<br>
+                                • "왜 그랬어?"라고 동기 탐색<br>
+                                • 아이 감정 인정하기<br>
+                                • 함께 해결책 찾기<br>
+                                • 행동 개선 기회 제공
+                            </div>
+                        </div>
+                        <div class="dont-box">
+                            <div class="dont-title">✗ 피해야 할 것</div>
+                            <div class="dont-content">
+                                • 즉시 혼내기<br>
+                                • "넌 왜 그래?"라고 비난<br>
+                                • 감정 무시하기<br>
+                                • 장시간 Time-Out<br>
+                                • 체벌이나 모욕감
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2-4세 Content -->
+                <div id="3yo" class="age-content">
+                    <div class="script-box">
+                        <div class="script-label">상황 1: 형이 동생을 밀었을 때</div>
+                        <div class="dialogue">
+                            <div><span class="character">부모:</span> "안 돼. 형은 동생이 아프면 안 좋지."</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "(안아주고) 우리 다정하게 해야 해. 보여줄래?"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "(동생이 우는 상황에서) 동생 봐, 아파해. 안아줄까?"</div>
+                        </div>
+                    </div>
+                    
+                    <div class="script-box">
+                        <div class="script-label">상황 2: 고집부릴 때</div>
+                        <div class="dialogue">
+                            <div><span class="character">아이:</span> "우아아아 내가 할 거야!"</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "(차분하게 안아주며) 음, 너가 하고 싶은 거 알았어."</div>
+                            <div style="margin-top: 0.5rem;"><span class="character">부모:</span> "엄마/아빠가 도와줄까? (행동 전환 제시) 아니면 다른 걸 먼저 할까?"</div>
+                        </div>
+                    </div>
+                    
+                    <div class="do-dont">
+                        <div class="do-box">
+                            <div class="do-title">✓ 해야 할 것</div>
+                            <div class="do-content">
+                                • 짧고 명확한 지시<br>
+                                • 신체적 접근 (안아주기)<br>
+                                • 즉시 행동 전환 제시<br>
+                                • 감정 인정 후 해결<br>
+                                • 자주 반복하기
+                            </div>
+                        </div>
+                        <div class="dont-box">
+                            <div class="dont-title">✗ 피해야 할 것</div>
+                            <div class="dont-content">
+                                • 긴 설명<br>
+                                • 혼자 두기<br>
+                                • 복잡한 규칙<br>
+                                • 이유 설명 강요<br>
+                                • 체벌이나 큰 목소리
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 6: Sibling Tip -->
+        <section class="section fade-up">
+            <h2 class="section-title">⑥ 형제자매 팁</h2>
+            <div class="tip-box">
+                <div class="tip-title">형제자매 갈등 중 Time-In 적용하기</div>
+                <div class="tip-content">
+                    <strong>상황: 형이 동생 장난감을 빼앗았을 때</strong><br><br>
+                    
+                    <strong>1단계 - Connect (연결):</strong><br>
+                    형과 동생 모두에게 접근합니다. "엄마가 여기 있어. 괜찮아."<br><br>
+                    
+                    <strong>2단계 - Empathize (공감):</strong><br>
+                    형: "너는 그 장난감이 하고 싶었구나"<br>
+                    동생: "넌 네 장난감 가지고 놀고 싶었지"<br><br>
+                    
+                    <strong>3단계 - Label (라벨링):</strong><br>
+                    "형은 답답한 마음이 컸고, 동생은 화나는 마음이 컸네"<br><br>
+                    
+                    <strong>4단계 - Guide (안내):</strong><br>
+                    "우리 다음엔 어떻게 하면 좋을까? 형이 먼저 물어보고 시간을 정해서 나눠 쓸까?"<br><br>
+                    
+                    <strong>핵심:</strong> 누가 잘못했는지가 아니라, 둘 다 감정이 있었고, 
+                    그걸 더 좋은 방법으로 표현할 수 있다는 걸 배우도록 합니다.
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 7: Deep Dive -->
+        <section class="section fade-up">
+            <h2 class="section-title">⑦ Deep Dive: 신경과학적 이해</h2>
+            
+            <button class="deep-dive-toggle" onclick="toggleDeepDive(this)">
+                신경생물학적 메커니즘: 왜 Time-In이 Time-Out보다 효과적인가?
+                <span class="deep-dive-icon">▼</span>
+            </button>
+            <div class="deep-dive-content">
+                <p style="margin-bottom: 1rem;">
+                    <strong>뇌의 3층 구조 (Triune Brain):</strong><br>
+                    폴 맥클린의 삼중뇌 이론에 따르면, 인간의 뇌는 진화적으로 3개 층으로 구성되어 있습니다.
+                </p>
+                
+                <p style="margin-bottom: 1rem;">
+                    <strong>1. 파충류뇌 (Reptilian Brain) - 뇌간:</strong><br>
+                    생존, 공포, 투쟁-도주 반응 담당. 처벌 시 활성화되어 아이를 생존 모드로 전환합니다.
+                </p>
+                
+                <p style="margin-bottom: 1rem;">
+                    <strong>2. 포유류뇌 (Limbic System) - 감정:</strong><br>
+                    감정 처리, 기억 형성, 사회적 유대 담당. Time-In 중 부모의 존재가 편도체를 진정시킵니다.
+                </p>
+                
+                <p style="margin-bottom: 1rem;">
+                    <strong>3. 포유류뇌 (Neo-cortex) - 전전두엽:</strong><br>
+                    논리, 언어, 자기조절 담당. 안전감 속에서만 활성화되어 학습이 가능합니다.
+                </p>
+                
+                <p style="margin-bottom: 1rem;">
+                    <strong>Time-Out의 문제점:</strong><br>
+                    혼자 남겨진 아이는 "사회적 배제" 스트레스로 뇌간만 활성화. 전전두엽의 학습 영역이 비활성화되어 
+                    아무것도 배우지 못합니다.
+                </p>
+                
+                <p>
+                    <strong>Time-In의 과학적 기전:</strong><br>
+                    부모의 신체 접촉과 공감이 미주신경(vagus nerve)을 자극하여 뇌의 부교감신경계를 활성화합니다. 
+                    이는 안전 신호를 뇌에 보내 편도체를 진정시키고, 전전두엽의 학습 영역을 열어줍니다. 
+                    결과적으로 아이는 안전감 속에서 자신의 행동을 성찰할 수 있게 됩니다.
+                </p>
+            </div>
+        </section>
+        
+        <!-- Section 8: Quizzes -->
+        <section class="section fade-up">
+            <h2 class="section-title">⑧ 학습 점검 퀴즈</h2>
+            
+            <div class="quiz-container">
+                <div class="quiz-title">퀴즈 1: 훈육의 뇌과학</div>
+                <div class="quiz-question">
+                    처벌 시 과활성화되는 뇌의 영역은 무엇이고, 이것이 야기하는 문제는?
+                </div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ① 편도체가 활성화되어 아이가 행동의 이유를 배우지 못하고 처벌만 피함
+                    </div>
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ② 전전두엽이 활성화되어 아이가 너무 많이 생각함
+                    </div>
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ③ 뇌의 어느 영역도 관련 없고 훈육이 가장 중요함
+                    </div>
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ④ 해마가 활성화되어 기억력이 증가함
+                    </div>
+                </div>
+                <button class="submit-btn" onclick="checkAnswer(this, 0)">정답 확인</button>
+                <div class="quiz-feedback">
+                    정답: ① 편도체가 활성화되어 아이가 행동의 이유를 배우지 못하고 처벌만 피합니다. 
+                    이것이 처벌과 훈육의 핵심 차이입니다.
+                </div>
+            </div>
+            
+            <div class="quiz-container">
+                <div class="quiz-title">퀴즈 2: Time-In 4단계</div>
+                <div class="quiz-question">
+                    Daniel Siegel의 Time-In 4단계 중 올바른 순서는?
+                </div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ① Label → Connect → Empathize → Guide
+                    </div>
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ② Connect → Empathize → Label → Guide
+                    </div>
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ③ Empathize → Connect → Guide → Label
+                    </div>
+                    <div class="quiz-option" onclick="selectOption(this)">
+                        ④ Guide → Label → Connect → Empathize
+                    </div>
+                </div>
+                <button class="submit-btn" onclick="checkAnswer(this, 1)">정답 확인</button>
+                <div class="quiz-feedback">
+                    정답: ② Connect → Empathize → Label → Guide<br>
+                    먼저 아이와 연결하고(안아주기), 감정을 인정한 후, 그 감정에 이름을 붙이고, 
+                    마지막으로 올바른 행동을 안내합니다.
+                </div>
+            </div>
+            
+            <div class="spaced-rep">
+                <div class="rep-label">🔄 간격 반복(Spaced Repetition) 추천 일정</div>
+                <div class="rep-schedule">
+                    1차: 오늘 (학습 완료) | 2차: 1일 후 | 3차: 3일 후 | 4차: 1주 후 | 5차: 2주 후
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        let timerInterval;
+        let timeRemaining = 1500;
+        
+        function openTimerModal() {
+            document.getElementById('timerModal').style.display = 'block';
+            updateTimerDisplay();
+        }
+        
+        function closeTimerModal() {
+            document.getElementById('timerModal').style.display = 'none';
+            if (timerInterval) clearInterval(timerInterval);
+            timeRemaining = 1500;
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+        
+        function startTimer() {
+            const startBtn = document.getElementById('startBtn');
+            if (startBtn.textContent === 'START') {
+                startBtn.textContent = 'PAUSE';
+                timerInterval = setInterval(() => {
+                    if (timeRemaining > 0) {
+                        timeRemaining--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        alert('✓ 25분 집중 완료!');
+                        timeRemaining = 1500;
+                        startBtn.textContent = 'START';
+                        updateTimerDisplay();
+                    }
+                }, 1000);
+            } else {
+                startBtn.textContent = 'START';
+                clearInterval(timerInterval);
+            }
+        }
+        
+        function switchAge(event, age) {
+            document.querySelectorAll('.age-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.age-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(age).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function toggleDeepDive(button) {
+            button.classList.toggle('active');
+            const content = button.nextElementSibling;
+            content.classList.toggle('active');
+        }
+        
+        function selectOption(elem) {
+            const container = elem.parentElement.parentElement;
+            container.querySelectorAll('.quiz-option').forEach(el => el.classList.remove('selected'));
+            elem.classList.add('selected');
+        }
+        
+        function checkAnswer(button, correctIndex) {
+            const container = button.parentElement;
+            const options = container.querySelectorAll('.quiz-option');
+            const feedback = container.querySelector('.quiz-feedback');
+            
+            let isCorrect = false;
+            options.forEach((opt, idx) => {
+                opt.classList.remove('correct', 'incorrect');
+                if (opt.classList.contains('selected')) {
+                    if (idx === correctIndex) {
+                        opt.classList.add('correct');
+                        isCorrect = true;
+                    } else {
+                        opt.classList.add('incorrect');
+                    }
+                }
+            });
+            
+            if (!isCorrect) {
+                options[correctIndex].classList.add('correct');
+            }
+            
+            feedback.classList.add('show');
+        }
+        
+        // Intersection Observer for fade-up animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const delay = Array.from(document.querySelectorAll('.fade-up')).indexOf(entry.target) * 0.1;
+                    entry.target.style.animationDelay = delay + 's';
+                    entry.target.classList.remove('fade-up');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('timerModal');
+            if (event.target === modal) {
+                closeTimerModal();
+            }
+        }
+    </script>
+</body>
+</html>

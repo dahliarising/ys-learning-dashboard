@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 10 — 갈등의 신경과학 | 인간 탐구</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --purple: #8A6ABF;
+            --gold: #C9A84C;
+            --green: #6BBF8A;
+            --red: #BF6B6B;
+            --cyan: #6BB5BF;
+            --bg: #0A0C10;
+            --card: #12151C;
+            --card2: #161A24;
+            --text1: #E8E9F3;
+            --text2: #9EA0B8;
+            --border: rgba(138, 106, 191, 0.15);
+            --glow: rgba(138, 106, 191, 0.08);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text1);
+            font-family: 'Noto Sans KR', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===== STICKY HEADER ===== */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.95) 0%, rgba(107, 181, 191, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(138, 106, 191, 0.2);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff 0%, #E8E9F3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(232, 233, 243, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            max-width: 300px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 45.5%;
+            background: linear-gradient(90deg, var(--gold), var(--green));
+            box-shadow: 0 0 10px var(--green);
+            border-radius: 3px;
+        }
+
+        .progress-label {
+            font-size: 0.85rem;
+            color: var(--text2);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @media (max-width: 700px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-title {
+                font-size: 1.5rem;
+            }
+
+            .progress-bar {
+                width: 100%;
+            }
+        }
+
+        /* ===== SERIES BANNER ===== */
+        .series-banner {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.15) 0%, rgba(107, 181, 191, 0.15) 100%);
+            border-top: 2px solid var(--gold);
+            border-bottom: 2px solid var(--cyan);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            font-size: 1rem;
+            color: var(--text2);
+            margin: 2rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 1px;
+        }
+
+        .series-banner strong {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+            align-items: center;
+        }
+
+        .hero-gauge {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gauge-svg {
+            width: 280px;
+            height: 280px;
+            filter: drop-shadow(0 0 20px rgba(138, 106, 191, 0.3));
+        }
+
+        .hero-content h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--gold), var(--green), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .meta-badges {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text2);
+            transition: all 0.3s ease;
+        }
+
+        .badge:hover {
+            border-color: var(--purple);
+            color: var(--text1);
+            box-shadow: 0 0 15px rgba(138, 106, 191, 0.2);
+        }
+
+        .badge.part {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.1) 0%, rgba(107, 181, 191, 0.1) 100%);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .badge.time {
+            background: rgba(191, 107, 107, 0.1);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .badge.difficulty {
+            background: rgba(107, 181, 191, 0.1);
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+
+        .thought-question {
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.1) 0%, rgba(107, 181, 191, 0.1) 100%);
+            border-left: 4px solid var(--purple);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--text1);
+        }
+
+        .keyword-badges {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .keyword {
+            padding: 0.5rem 1rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text2);
+            transition: all 0.3s ease;
+        }
+
+        .keyword:hover {
+            background: var(--card2);
+            border-color: var(--purple);
+            color: var(--gold);
+        }
+
+        @media (max-width: 700px) {
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .gauge-svg {
+                width: 200px;
+                height: 200px;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* ===== LEARNING STRATEGY BOX ===== */
+        .learning-strategy {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 8px 32px rgba(138, 106, 191, 0.1);
+        }
+
+        .learning-strategy h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .time-slot {
+            background: var(--card);
+            border: 1px solid var(--cyan);
+            border-radius: 8px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .time-slot:hover {
+            background: var(--card2);
+            box-shadow: 0 0 20px rgba(107, 181, 191, 0.2);
+        }
+
+        .time-slot-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--cyan);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .time-slot-duration {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text1);
+            margin-bottom: 0.8rem;
+        }
+
+        .time-slot-content {
+            font-size: 0.9rem;
+            color: var(--text2);
+            line-height: 1.5;
+        }
+
+        .infp-tip {
+            background: linear-gradient(135deg, rgba(191, 107, 107, 0.1) 0%, rgba(138, 106, 191, 0.1) 100%);
+            border-left: 4px solid var(--red);
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--text2);
+        }
+
+        .infp-tip strong {
+            color: var(--red);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 700px) {
+            .time-slots {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .learning-strategy {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .time-slots {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== CONCEPT CARDS ===== */
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .concept-card {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .concept-card:hover {
+            border-color: var(--purple);
+            box-shadow: 0 12px 40px rgba(138, 106, 191, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .concept-header {
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.15) 0%, rgba(107, 181, 191, 0.15) 100%);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .concept-header h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--gold);
+        }
+
+        .concept-subtitle {
+            font-size: 0.85rem;
+            color: var(--text2);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .concept-body {
+            padding: 1.5rem;
+        }
+
+        .concept-body p {
+            margin-bottom: 1rem;
+            color: var(--text2);
+            line-height: 1.7;
+        }
+
+        .evidence-box {
+            background: var(--card);
+            border-left: 3px solid var(--green);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .evidence-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--green);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .workplace-scenario {
+            background: var(--card);
+            border-left: 3px solid var(--cyan);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .workplace-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--cyan);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .toggle-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.2) 0%, rgba(107, 181, 191, 0.2) 100%);
+            border: 1px solid var(--border);
+            color: var(--text1);
+            cursor: pointer;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .toggle-btn:hover {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.3) 0%, rgba(107, 181, 191, 0.3) 100%);
+            border-color: var(--purple);
+        }
+
+        .deep-dive {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            animation: slideDown 0.3s ease;
+        }
+
+        .deep-dive.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .concept-cards {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        /* ===== SVG DIAGRAM ===== */
+        .diagram-section {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 8px 32px rgba(138, 106, 191, 0.1);
+        }
+
+        .diagram-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--green);
+        }
+
+        .diagram-container {
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        .conflict-diagram {
+            width: 100%;
+            min-width: 600px;
+            height: 400px;
+        }
+
+        .thomas-kilmann-modes {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .mode-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .mode-card:hover {
+            border-color: var(--purple);
+            box-shadow: 0 0 15px rgba(138, 106, 191, 0.2);
+        }
+
+        .mode-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .mode-korean {
+            font-size: 0.85rem;
+            color: var(--text2);
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .mode-description {
+            font-size: 0.8rem;
+            color: var(--text2);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 700px) {
+            .thomas-kilmann-modes {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+            }
+
+            .diagram-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .thomas-kilmann-modes {
+                grid-template-columns: 1fr;
+            }
+
+            .conflict-diagram {
+                min-width: 100%;
+            }
+        }
+
+        /* ===== PRACTICE GUIDE ===== */
+        .practice-guide {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 8px 32px rgba(138, 106, 191, 0.1);
+        }
+
+        .practice-guide h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--cyan);
+        }
+
+        .practice-tiers {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .practice-tier {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .practice-tier:hover {
+            border-color: var(--purple);
+            box-shadow: 0 0 20px rgba(138, 106, 191, 0.2);
+        }
+
+        .tier-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .tier-duration {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text2);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .tier-exercise {
+            background: linear-gradient(135deg, rgba(107, 181, 191, 0.1) 0%, rgba(138, 106, 191, 0.1) 100%);
+            border-left: 3px solid var(--cyan);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--text2);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 700px) {
+            .practice-tiers {
+                grid-template-columns: 1fr;
+            }
+
+            .practice-guide {
+                padding: 1.5rem;
+            }
+        }
+
+        /* ===== PHILOSOPHY SECTION ===== */
+        .philosophy-section {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 8px 32px rgba(138, 106, 191, 0.1);
+        }
+
+        .philosophy-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--purple);
+        }
+
+        .philosophers {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .philosopher-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .philosopher-card:hover {
+            border-color: var(--purple);
+            box-shadow: 0 12px 40px rgba(138, 106, 191, 0.15);
+        }
+
+        .philosopher-portrait {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.2) 0%, rgba(107, 181, 191, 0.2) 100%);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: rgba(138, 106, 191, 0.3);
+        }
+
+        .philosopher-content {
+            padding: 1.5rem;
+        }
+
+        .philosopher-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .philosopher-era {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text2);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .philosopher-quote {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.1) 0%, rgba(138, 106, 191, 0.1) 100%);
+            border-left: 3px solid var(--gold);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-style: italic;
+            color: var(--text1);
+            line-height: 1.6;
+        }
+
+        .philosopher-connection {
+            font-size: 0.9rem;
+            color: var(--text2);
+            line-height: 1.6;
+        }
+
+        .connection-highlight {
+            color: var(--cyan);
+            font-weight: 500;
+        }
+
+        @media (max-width: 700px) {
+            .philosophers {
+                grid-template-columns: 1fr;
+            }
+
+            .philosophy-section {
+                padding: 1.5rem;
+            }
+        }
+
+        /* ===== QUIZ SECTION ===== */
+        .quiz-section {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 8px 32px rgba(138, 106, 191, 0.1);
+        }
+
+        .quiz-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--red);
+        }
+
+        .quiz-questions {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .question {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .question-text {
+            font-size: 1.05rem;
+            color: var(--text1);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .question-options {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .option-btn {
+            padding: 1rem;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .option-btn:hover {
+            border-color: var(--purple);
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.1) 0%, rgba(138, 106, 191, 0.05) 100%);
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(135deg, rgba(107, 181, 191, 0.2) 0%, rgba(107, 181, 191, 0.1) 100%);
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .option-btn.incorrect {
+            background: linear-gradient(135deg, rgba(191, 107, 107, 0.2) 0%, rgba(191, 107, 107, 0.1) 100%);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .question-feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .question-feedback.show {
+            display: block;
+        }
+
+        .feedback-correct {
+            background: rgba(107, 181, 191, 0.1);
+            border-left: 3px solid var(--green);
+            color: var(--green);
+        }
+
+        .feedback-incorrect {
+            background: rgba(191, 107, 107, 0.1);
+            border-left: 3px solid var(--red);
+            color: var(--red);
+        }
+
+        /* ===== SPACED REPETITION TRACKER ===== */
+        .spaced-repetition {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.1) 0%, rgba(138, 106, 191, 0.1) 100%);
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .spaced-repetition h3 {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .repetition-schedule {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .repetition-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--card);
+            border: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            text-align: center;
+            color: var(--text2);
+        }
+
+        .repetition-circle:hover {
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(201, 168, 76, 0.2);
+        }
+
+        .repetition-circle.completed {
+            background: linear-gradient(135deg, rgba(107, 181, 191, 0.2) 0%, rgba(201, 168, 76, 0.2) 100%);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .repetition-label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        @media (max-width: 500px) {
+            .repetition-schedule {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .repetition-circle {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        /* ===== SCROLL ANIMATIONS ===== */
+        .ani {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .ani.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            text-align: center;
+            color: var(--text2);
+            font-size: 0.9rem;
+        }
+
+        footer p {
+            margin: 0.5rem 0;
+        }
+
+        .footer-highlight {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        @media (max-width: 450px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .sticky-header {
+                padding: 0.8rem 1rem;
+            }
+
+            .header-title {
+                font-size: 1.2rem;
+            }
+
+            .hero-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .concept-header h3 {
+                font-size: 1.2rem;
+            }
+
+            .philosophy-section h2,
+            .practice-guide h2,
+            .diagram-section h2,
+            .learning-strategy h2 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- STICKY HEADER -->
+    <div class="sticky-header">
+        <div class="header-content">
+            <div class="header-title">인간 탐구</div>
+            <div style="flex: 1; display: flex; align-items: center; gap: 1rem;">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="progress-label">Day 10/22 (45.5%)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES BANNER -->
+    <div class="series-banner">
+        <strong>Part 2: 인간관계 심리학</strong> | Day 10 of 22
+    </div>
+
+    <div class="container">
+        <!-- HERO SECTION -->
+        <section class="hero ani">
+            <div class="hero-gauge">
+                <svg class="gauge-svg" viewBox="0 0 200 200">
+                    <!-- Background circle -->
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(138,106,191,0.1)" stroke-width="3"/>
+                    <!-- Progress circle -->
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="url(#gaugeGradient)" stroke-width="3" stroke-dasharray="254" stroke-dashoffset="139" stroke-linecap="round" transform="rotate(-90 100 100)"/>
+                    <!-- Defs -->
+                    <defs>
+                        <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#C9A84C;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#6BBF8A;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Center text -->
+                    <text x="100" y="90" text-anchor="middle" font-size="28" font-weight="700" fill="#E8E9F3" font-family="'Cormorant Garamond', serif">45.5%</text>
+                    <text x="100" y="115" text-anchor="middle" font-size="12" fill="#9EA0B8" font-family="'JetBrains Mono', monospace">진행률</text>
+                </svg>
+            </div>
+
+            <div class="hero-content">
+                <h1>갈등의 신경과학</h1>
+                
+                <div class="meta-badges">
+                    <div class="badge part">📚 Part 2</div>
+                    <div class="badge time">⏱️ 25분</div>
+                    <div class="badge difficulty">★★★ 중급</div>
+                </div>
+
+                <div class="thought-question">
+                    "당신이 동료와의 의견충돌에서 자신도 모르게 방어적으로 변할 때, 뇌에서는 어떤 일이 일어나고 있을까? 그리고 그 반응을 의식적으로 조절할 수 있을까?"
+                </div>
+
+                <div class="keyword-badges">
+                    <span class="keyword">위협감지</span>
+                    <span class="keyword">편도체</span>
+                    <span class="keyword">전투/도피</span>
+                    <span class="keyword">전전두엽</span>
+                    <span class="keyword">갈등해소</span>
+                    <span class="keyword">회피</span>
+                    <span class="keyword">Thomas-Kilmann</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEARNING STRATEGY -->
+        <section class="learning-strategy ani">
+            <h2>📖 학습 전략 (25분)</h2>
+            <div class="time-slots">
+                <div class="time-slot">
+                    <div class="time-slot-label">0-5분</div>
+                    <div class="time-slot-duration">소개</div>
+                    <div class="time-slot-content">갈등 시 뇌의 생리적 반응에 대한 기본 개념 이해</div>
+                </div>
+                <div class="time-slot">
+                    <div class="time-slot-label">5-12분</div>
+                    <div class="time-slot-duration">신경과학</div>
+                    <div class="time-slot-content">위협감지부터 전투/도피까지의 신경생물학적 경로</div>
+                </div>
+                <div class="time-slot">
+                    <div class="time-slot-label">12-20분</div>
+                    <div class="time-slot-duration">실습</div>
+                    <div class="time-slot-content">Thomas-Kilmann 모드 및 르노에서의 실제 사례</div>
+                </div>
+                <div class="time-slot">
+                    <div class="time-slot-label">20-25분</div>
+                    <div class="time-slot-duration">정리</div>
+                    <div class="time-slot-content">실천 방법 및 체크인</div>
+                </div>
+            </div>
+
+            <div class="infp-tip">
+                <strong>💡 INFP를 위한 팁:</strong>
+                갈등 상황에서 INFP는 종종 감정적 반응이 강할 수 있습니다. 오늘의 내용은 당신의 감정을 "뇌의 생리적 반응"으로 이해하는 것을 도와줄 것입니다. 이를 통해 상황을 더 객관적으로 보고, 상대방도 같은 신경생물학적 메커니즘으로 반응하고 있다는 공감능력을 높일 수 있습니다. 유럽 문화와의 직접적인 소통 스타일 차이도 이 렌즈로 다시 볼 가치가 있습니다.
+            </div>
+        </section>
+
+        <!-- CONCEPT CARDS -->
+        <section class="concept-cards ani">
+            <div class="concept-card">
+                <div class="concept-header">
+                    <h3>위협반응 회로</h3>
+                    <div class="concept-subtitle">뇌간 → 편도체 → 시상</div>
+                </div>
+                <div class="concept-body">
+                    <p>갈등 상황이 감지되는 순간, 당신의 뇌는 빠르게 반응합니다. 상대방의 목소리 톤, 얼굴 표정, 신체언어가 신호로 작용하여 시상(thalamus)으로 먼저 들어갑니다.</p>
+                    
+                    <div class="evidence-box">
+                        <div class="evidence-label">🧠 신경과학 증거</div>
+                        <p>편도체(amygdala)의 신경세포들은 정보를 의식적 처리 없이 빠르게 위험 신호로 변환합니다. 이는 약 12밀리초의 초고속 경로이며, 이성적 판단(전전두엽)이 개입하기 전에 신체에 이미 스트레스 호르몬(코르티솔, 아드레날린)을 분비하도록 지시합니다.</p>
+                    </div>
+
+                    <div class="workplace-scenario">
+                        <div class="workplace-label">📍 회사 사례</div>
+                        <p>서스펜션 팀 회의 중 유럽 본사의 새로운 기준 적용에 대해 다른 의견을 제시했을 때, 상대방의 즉각적인 반박 톤에 당신의 몸이 긴장하고 방어적으로 변하는 경험. 이것이 위협반응입니다. 이는 당신이 약해서가 아니라, 뇌가 정상적으로 작동하고 있다는 신호입니다.</p>
+                    </div>
+
+                    <button class="toggle-btn" onclick="toggleCard(this)">Deep Dive 열기 ▼</button>
+                    <div class="deep-dive">
+                        <h4 style="color: var(--gold); margin-bottom: 1rem; font-size: 1.1rem;">더 깊이 있는 이해</h4>
+                        <p style="margin-bottom: 1rem; color: var(--text2);">편도체의 반응은 진화적 관점에서 매우 효율적입니다. 위협이 있을 때 생각할 시간이 없었던 우리의 조상들은 빠른 반응(싸우기, 도망치기, 얼어붙기)으로 생존했습니다. 하지만 현대의 직장 갈등은 신체적 위협이 아닌데도, 뇌는 동일한 메커니즘으로 반응합니다.</p>
+                        <p style="color: var(--text2);">이 과정에서 호르포진(cortisol)이 증가하면 전전두엽의 활동이 억제됩니다. 즉, 당신이 "화났을 때 이성적으로 생각하기 어려운" 이유가 바로 신경생물학입니다. 이를 "뇌의 장악(amygdala hijack)"이라고 부릅니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-header">
+                    <h3>해소 vs 회피</h3>
+                    <div class="concept-subtitle">전전두엽 개입의 중요성</div>
+                </div>
+                <div class="concept-body">
+                    <p>갈등에 대응하는 두 가지 신경학적 경로가 있습니다: 감정 조절과 회피. 앞이마엽(prefrontal cortex, PFC)이 편도체의 신호를 억제하면 해소로 이어지고, 억제하지 못하면 회피(또는 공격성)로 이어집니다.</p>
+                    
+                    <div class="evidence-box">
+                        <div class="evidence-label">🧠 신경과학 증거</div>
+                        <p>fMRI 뇌 영상 연구에서 성공적으로 갈등을 해소한 사람들은 높은 PFC 활동과 감소된 편도체 활동을 보입니다. 반대로 만성적으로 갈등을 회피하는 사람들은 편도체-신경 연결이 더 강해지고, 뇌가 갈등을 더 위협적으로 인식하도록 조건화됩니다.</p>
+                    </div>
+
+                    <div class="workplace-scenario">
+                        <div class="workplace-label">📍 회사 사례</div>
+                        <p>기술적 의견 불일치가 있을 때: "해소 경로"를 선택하면 논점을 객관적으로 분석하고, 상대의 입장을 경청한 후 '우리는 같은 목표를 향하고 있다'는 공통점을 찾습니다. "회피 경로"를 선택하면 침묵하거나, 회의 후 뒷담화를 하거나, 과도하게 방어적으로 반응합니다. 장기적으로 회피는 팀 신뢰도를 낮추고, 당신의 뇌도 점점 더 방어적으로 재조직화됩니다.</p>
+                    </div>
+
+                    <button class="toggle-btn" onclick="toggleCard(this)">Deep Dive 열기 ▼</button>
+                    <div class="deep-dive">
+                        <h4 style="color: var(--gold); margin-bottom: 1rem; font-size: 1.1rem;">더 깊이 있는 이해</h4>
+                        <p style="margin-bottom: 1rem; color: var(--text2);">신경소성(neuroplasticity)은 우리가 반복된 행동으로 뇌를 재구성한다는 의미입니다. 매번 갈등을 회피하면, 당신의 뇌는 '갈등 = 위협'이라는 신경 경로를 더 강화합니다. 반대로 갈등을 직면하고 해소하는 습관을 가지면, PFC-편도체 연결이 강화되어 향후 갈등에 더 빠르고 효과적으로 대응할 수 있는 뇌로 변화합니다.</p>
+                        <p style="color: var(--text2);">6세와 3세 자녀가 있는 당신의 상황을 생각해보면, 아이들도 당신의 갈등 대응 패턴을 모방합니다. 당신이 해소의 신경 경로를 강화하면, 아이들도 자연스럽게 그 모델을 따르게 됩니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SVG DIAGRAM: CONFLICT NEURAL PATHWAY -->
+        <section class="diagram-section ani">
+            <h2>🧠 갈등 신경 경로도</h2>
+            <div class="diagram-container">
+                <svg class="conflict-diagram" viewBox="0 0 1000 400">
+                    <!-- Background -->
+                    <defs>
+                        <linearGradient id="pathGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#BF6B6B;stop-opacity:0.3" />
+                            <stop offset="100%" style="stop-color:#C9A84C;stop-opacity:0.3" />
+                        </linearGradient>
+                        <linearGradient id="pathGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#6BBF8A;stop-opacity:0.3" />
+                            <stop offset="100%" style="stop-color:#6BB5BF;stop-opacity:0.3" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- THREAT DETECTION (Stage 1) -->
+                    <circle cx="100" cy="200" r="45" fill="url(#pathGradient1)" stroke="#BF6B6B" stroke-width="2"/>
+                    <text x="100" y="205" text-anchor="middle" font-size="14" font-weight="600" fill="#E8E9F3" font-family="'Noto Sans KR'">위협감지</text>
+                    <text x="100" y="235" text-anchor="middle" font-size="11" fill="#9EA0B8" font-family="'JetBrains Mono'">상황인식</text>
+
+                    <!-- Arrow 1 -->
+                    <path d="M 150 180 L 220 180" stroke="#BF6B6B" stroke-width="2" fill="none" marker-end="url(#arrowRed)"/>
+
+                    <!-- THALAMUS (Stage 2) -->
+                    <circle cx="270" cy="200" r="40" fill="url(#pathGradient1)" stroke="#C9A84C" stroke-width="2"/>
+                    <text x="270" y="205" text-anchor="middle" font-size="14" font-weight="600" fill="#E8E9F3" font-family="'Noto Sans KR'">시상</text>
+                    <text x="270" y="235" text-anchor="middle" font-size="11" fill="#9EA0B8" font-family="'JetBrains Mono'">정보분류</text>
+
+                    <!-- Arrow to PFC (RESOLUTION PATH) -->
+                    <path d="M 310 170 Q 400 80 480 80" stroke="#6BBF8A" stroke-width="2.5" fill="none" stroke-dasharray="5,5" marker-end="url(#arrowGreen)"/>
+                    <text x="380" y="60" font-size="12" fill="#6BBF8A" font-family="'JetBrains Mono'" font-weight="600">느린 경로</text>
+
+                    <!-- Arrow to Amygdala (FAST PATH) -->
+                    <path d="M 310 230 L 380 280" stroke="#BF6B6B" stroke-width="2.5" fill="none" marker-end="url(#arrowRed)"/>
+                    <text x="340" y="270" font-size="12" fill="#BF6B6B" font-family="'JetBrains Mono'" font-weight="600">빠른 경로</text>
+
+                    <!-- AMYGDALA (Stage 3) -->
+                    <circle cx="450" cy="320" r="45" fill="url(#pathGradient1)" stroke="#BF6B6B" stroke-width="2"/>
+                    <text x="450" y="325" text-anchor="middle" font-size="14" font-weight="600" fill="#E8E9F3" font-family="'Noto Sans KR'">편도체</text>
+                    <text x="450" y="355" text-anchor="middle" font-size="11" fill="#9EA0B8" font-family="'JetBrains Mono'">감정 처리</text>
+
+                    <!-- Arrow to Fight/Flight -->
+                    <path d="M 500 320 L 570 320" stroke="#BF6B6B" stroke-width="2" fill="none" marker-end="url(#arrowRed)"/>
+
+                    <!-- FIGHT/FLIGHT (Stage 4 - Avoidance) -->
+                    <rect x="580" y="290" width="120" height="60" fill="url(#pathGradient1)" stroke="#BF6B6B" stroke-width="2" rx="8"/>
+                    <text x="640" y="315" text-anchor="middle" font-size="13" font-weight="600" fill="#E8E9F3" font-family="'Noto Sans KR'">전투/도피</text>
+                    <text x="640" y="340" text-anchor="middle" font-size="10" fill="#9EA0B8" font-family="'JetBrains Mono'">회피 또는 공격</text>
+
+                    <!-- PFC - RESOLUTION PATH (Stage 4 - Resolution) -->
+                    <circle cx="550" cy="80" r="50" fill="url(#pathGradient2)" stroke="#6BBF8A" stroke-width="2"/>
+                    <text x="550" y="80" text-anchor="middle" font-size="13" font-weight="600" fill="#E8E9F3" font-family="'Noto Sans KR'">전전두엽</text>
+                    <text x="550" y="105" text-anchor="middle" font-size="11" fill="#9EA0B8" font-family="'JetBrains Mono'">(이성적 판단)</text>
+
+                    <!-- Arrow PFC to Resolution -->
+                    <path d="M 600 80 L 680 80" stroke="#6BBF8A" stroke-width="2" fill="none" marker-end="url(#arrowGreen)"/>
+
+                    <!-- RESOLUTION OUTCOME -->
+                    <rect x="690" y="50" width="140" height="60" fill="url(#pathGradient2)" stroke="#6BBF8A" stroke-width="2" rx="8"/>
+                    <text x="760" y="75" text-anchor="middle" font-size="13" font-weight="600" fill="#E8E9F3" font-family="'Noto Sans KR'">갈등 해소</text>
+                    <text x="760" y="100" text-anchor="middle" font-size="10" fill="#9EA0B8" font-family="'JetBrains Mono'">공감과 대화</text>
+
+                    <!-- PFC Inhibition arrow down -->
+                    <path d="M 550 130 Q 530 200 480 260" stroke="#6BBF8A" stroke-width="2" fill="none" stroke-dasharray="5,5" marker-end="url(#arrowGreenInhibit)"/>
+                    <text x="500" y="190" font-size="11" fill="#6BBF8A" font-family="'JetBrains Mono'">억제</text>
+
+                    <!-- Arrow definitions -->
+                    <defs>
+                        <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <path d="M0,0 L0,6 L9,3 z" fill="#BF6B6B"/>
+                        </marker>
+                        <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <path d="M0,0 L0,6 L9,3 z" fill="#6BBF8A"/>
+                        </marker>
+                        <marker id="arrowGreenInhibit" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <path d="M0,0 L0,6 L9,3 z" fill="#6BBF8A"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Timeline at bottom -->
+                    <line x1="100" y1="370" x2="900" y2="370" stroke="rgba(138,106,191,0.2)" stroke-width="1"/>
+                    <text x="100" y="395" font-size="10" fill="#9EA0B8" font-family="'JetBrains Mono'">12ms</text>
+                    <text x="270" y="395" font-size="10" fill="#9EA0B8" font-family="'JetBrains Mono'">30ms</text>
+                    <text x="450" y="395" font-size="10" fill="#9EA0B8" font-family="'JetBrains Mono'">50ms</text>
+                    <text x="620" y="395" font-size="10" fill="#9EA0B8" font-family="'JetBrains Mono'">100ms</text>
+                </svg>
+            </div>
+
+            <h3 style="color: var(--gold); margin-top: 2rem; margin-bottom: 1rem; font-family: 'Cormorant Garamond', serif;">Thomas-Kilmann 갈등 대응 5가지 모드</h3>
+            <div class="thomas-kilmann-modes">
+                <div class="mode-card">
+                    <div class="mode-name">경합</div>
+                    <div class="mode-korean">협력(Collaboration)</div>
+                    <div class="mode-description">상호 만족과 해결을 추구. 최고의 신경학적 해소 경로. PFC 완전 활성화.</div>
+                </div>
+                <div class="mode-card">
+                    <div class="mode-name">조율</div>
+                    <div class="mode-korean">타협(Compromise)</div>
+                    <div class="mode-description">상호 이익의 중간지점 찾기. PFC와 편도체의 균형.</div>
+                </div>
+                <div class="mode-card">
+                    <div class="mode-name">순응</div>
+                    <div class="mode-korean">양보(Accommodation)</div>
+                    <div class="mode-description">상대의 요구 수용. 회피와 유사하나 의식적 선택. 스트레스 호르몬 증가.</div>
+                </div>
+                <div class="mode-card">
+                    <div class="mode-name">회피</div>
+                    <div class="mode-korean">회피(Avoidance)</div>
+                    <div class="mode-description">갈등 무시 또는 연기. 편도체 지배. 만성 스트레스.</div>
+                </div>
+                <div class="mode-card">
+                    <div class="mode-name">경쟁</div>
+                    <div class="mode-korean">주장(Competition)</div>
+                    <div class="mode-description">자신의 욕구 우선. 공격성. 편도체 및 전투 반응 극대화.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRACTICE GUIDE -->
+        <section class="practice-guide ani">
+            <h2>🎯 실천 가이드: 3단계 신경 조절</h2>
+            <p style="color: var(--text2); margin-bottom: 1.5rem;">당신의 뇌를 재훈련하여 갈등을 더 효과적으로 관리하세요. 매일 반복하면 신경소성을 통해 뇌가 변화합니다.</p>
+            
+            <div class="practice-tiers">
+                <div class="practice-tier">
+                    <div class="tier-title">30초 루틴</div>
+                    <div class="tier-duration">일상 어디서든</div>
+                    
+                    <div class="tier-exercise">
+                        <strong>박스 호흡법 (Box Breathing)</strong>
+                        <p style="margin-top: 0.5rem;">4초 들숨 → 4초 참음 → 4초 날숨 → 4초 참음을 3-4회 반복. 이는 미주신경을 자극하여 부교감신경계를 활성화하고 편도체를 진정시킵니다.</p>
+                    </div>
+
+                    <div class="tier-exercise">
+                        <strong>신체 스캔 (30초)</strong>
+                        <p style="margin-top: 0.5rem;">발부터 머리까지 신체 감각에 주의를 집중. 이는 전전두엽을 활성화하고 편도체 반응을 약화시킵니다.</p>
+                    </div>
+                </div>
+
+                <div class="practice-tier">
+                    <div class="tier-title">5분 루틴</div>
+                    <div class="tier-duration">아침 또는 저녁</div>
+                    
+                    <div class="tier-exercise">
+                        <strong>상황 재구성 (Reframing)</strong>
+                        <p style="margin-top: 0.5rem;">최근의 작은 갈등 상황을 생각하고, "상대는 나를 공격하는 것이 아니라 자신의 입장을 설명하려 한 것이다"라고 다시 해석. PFC를 강화하는 운동입니다.</p>
+                    </div>
+
+                    <div class="tier-exercise">
+                        <strong>감정 라벨링 (Emotion Labeling)</strong>
+                        <p style="margin-top: 0.5rem;">"나는 지금 불안함을 느낀다" 또는 "좌절감을 경험하고 있다"고 말하기. 감정을 언어화하면 PFC가 활성화되고 편도체 반응이 약 30% 감소합니다 (Matthew Lieberman의 연구).</p>
+                    </div>
+                </div>
+
+                <div class="practice-tier">
+                    <div class="tier-title">하루 루틴</div>
+                    <div class="tier-duration">일주일에 3-4회</div>
+                    
+                    <div class="tier-exercise">
+                        <strong>갈등 시뮬레이션</strong>
+                        <p style="margin-top: 0.5rem;">상상 속에서 어려운 대화 상황을 재현하고, Thomas-Kilmann "경합" 또는 "조율" 모드로 대응해보기. 실제 상황 전에 뇌를 준비시킵니다.</p>
+                    </div>
+
+                    <div class="tier-exercise">
+                        <strong>공감 명상 (Loving-Kindness)</strong>
+                        <p style="margin-top: 0.5rem;">갈등을 경험한 상대방을 떠올리고, "그 사람도 나처럼 고민하고, 두려워하고, 행복해지고 싶을 것이다"라는 생각을 15분 동안 반복. 이는 미러 뉴런 시스템을 활성화하여 공감능력을 높입니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PHILOSOPHY SECTION -->
+        <section class="philosophy-section ani">
+            <h2>🏛️ 철학적 맥락: 갈등과 인간성</h2>
+            
+            <div class="philosophers">
+                <div class="philosopher-card">
+                    <div class="philosopher-portrait">🔥</div>
+                    <div class="philosopher-content">
+                        <div class="philosopher-name">헤라클레이토스</div>
+                        <div class="philosopher-era">BC 544-484 | 고대 그리스</div>
+                        <div class="philosopher-quote">
+                            "전쟁은 모든 것의 아버지이다. 대립과 갈등 없이는 아무것도 존재하지 않는다."
+                        </div>
+                        <div class="philosopher-connection">
+                            <span class="connection-highlight">신경과학과의 연결:</span> 헤라클레이토스는 대립의 필요성을 말했습니다. 현대 신경과학에서도 마찬가지입니다. 뇌의 신경소성은 도전과 스트레스를 통해 작동합니다. 갈등을 완전히 회피하는 것이 아니라 건강하게 마주치는 것이 뇌 발달의 핵심입니다. 당신이 회사와 유럽 문화 간의 차이를 경험하는 것은, 뇌를 더 유연하게 만드는 기회입니다.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="philosopher-card">
+                    <div class="philosopher-portrait">🤝</div>
+                    <div class="philosopher-content">
+                        <div class="philosopher-name">한나 아렌트</div>
+                        <div class="philosopher-era">1906-1975 | 현대 철학</div>
+                        <div class="philosopher-quote">
+                            "인간의 다양성(plurality)이 인간 조건의 기본이다. 우리는 혼자 살 수 없으며, 진정한 정치와 성장은 타자와의 대화 속에서만 일어난다."
+                        </div>
+                        <div class="philosopher-connection">
+                            <span class="connection-highlight">신경과학과의 연결:</span> 아렌트는 개인의 차이를 존중하는 것의 중요성을 강조했습니다. 신경과학에서도 뇌는 다양성을 통해 성장합니다. 거울신경계(mirror neuron system)는 타인과의 상호작용 속에서만 활성화됩니다. 회사의 국제 팀 환경에서, 유럽 동료들과의 직접적인 갈등과 대화는 당신의 뇌를 더 세계적으로 만듭니다. 또한 6세와 3세 자녀가 있는 당신의 입장에서, 갈등을 피하지 않고 마주하는 모습은 자녀들에게 "인간의 다양성을 존중하는 방법"을 가르치는 최고의 교육입니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUIZ SECTION -->
+        <section class="quiz-section ani">
+            <h2>🧩 자가 진단 퀴즈</h2>
+
+            <div class="quiz-questions">
+                <div class="question">
+                    <div class="question-text">
+                        Q1. 갈등 상황에서 편도체가 활성화될 때, 뇌에서 일어나는 과정은?
+                    </div>
+                    <div class="question-options">
+                        <button class="option-btn" onclick="checkAns(this, false)">①  전전두엽이 즉시 감정을 조절하여 이성적 판단이 가능해진다.</button>
+                        <button class="option-btn" onclick="checkAns(this, true)">②  스트레스 호르몬(코르티솔, 아드레날린)이 분비되고 전전두엽의 활동이 억제되어 이성적 판단이 어려워진다.</button>
+                        <button class="option-btn" onclick="checkAns(this, false)">③  편도체가 모든 정보를 처리하고 신체가 반응하기까지 약 1초 이상 걸린다.</button>
+                        <button class="option-btn" onclick="checkAns(this, false)">④  호르몬 분비는 없고 순수하게 감정적 판단만 일어난다.</button>
+                    </div>
+                    <div class="question-feedback"></div>
+                </div>
+
+                <div class="question">
+                    <div class="question-text">
+                        Q2. Thomas-Kilmann 갈등 대응 모드 중, 신경학적으로 가장 건강한 장기 결과를 만드는 모드는?
+                    </div>
+                    <div class="question-options">
+                        <button class="option-btn" onclick="checkAns(this, false)">①  회피 (Avoidance) - 시간이 지나면 자동으로 해결된다.</button>
+                        <button class="option-btn" onclick="checkAns(this, false)">②  경쟁 (Competition) - 강한 태도를 보여 상대가 물러난다.</button>
+                        <button class="option-btn" onclick="checkAns(this, true)">③  경합 (Collaboration) - 상호 만족을 추구하여 PFC 네트워크를 강화한다.</button>
+                        <button class="option-btn" onclick="checkAns(this, false)">④  순응 (Accommodation) - 자신을 희생하는 것이 도덕적이다.</button>
+                    </div>
+                    <div class="question-feedback"></div>
+                </div>
+            </div>
+
+            <div class="spaced-repetition">
+                <h3>📅 반복 복습 일정 (Spaced Repetition)</h3>
+                <p style="margin-bottom: 1.5rem; color: var(--text2);">각 원을 클릭하여 해당 날짜의 복습 완료 여부를 표시하세요. 신경과학에 따르면 1일, 3일, 7일, 14일, 30일에 복습하면 장기기억이 강화됩니다.</p>
+                <div class="repetition-schedule">
+                    <div class="repetition-circle" onclick="this.classList.toggle('completed')">
+                        <span class="repetition-label">Day 1</span>
+                        <span>오늘</span>
+                    </div>
+                    <div class="repetition-circle" onclick="this.classList.toggle('completed')">
+                        <span class="repetition-label">Day 3</span>
+                        <span>3/11</span>
+                    </div>
+                    <div class="repetition-circle" onclick="this.classList.toggle('completed')">
+                        <span class="repetition-label">Day 7</span>
+                        <span>3/15</span>
+                    </div>
+                    <div class="repetition-circle" onclick="this.classList.toggle('completed')">
+                        <span class="repetition-label">Day 14</span>
+                        <span>3/22</span>
+                    </div>
+                    <div class="repetition-circle" onclick="this.classList.toggle('completed')">
+                        <span class="repetition-label">Day 30</span>
+                        <span>4/7</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p><span class="footer-highlight">인간 탐구 시리즈</span> — 당신의 뇌와 마음을 이해하는 22일 여정</p>
+        <p>Part 2: 인간관계 심리학 (Days 07-12)</p>
+        <p style="margin-top: 1rem; font-size: 0.8rem; color: #6BB5BF;">이 콘텐츠는 신경과학, 심리학, 철학의 최신 연구에 기반하며, 개인의 성장과 자기이해를 목표로 합니다.</p>
+        <p style="margin-top: 1rem; font-size: 0.8rem; color: #6BB5BF;">2027년 새 지역 이전을 앞두고 있는 당신의 스트레스 관리와 가족 관계 발전에 도움이 되기를 바랍니다.</p>
+    </footer>
+
+    <script>
+        // Toggle concept card Deep Dive sections
+        function toggleCard(btn) {
+            const deepDive = btn.nextElementSibling;
+            if (deepDive && deepDive.classList.contains('deep-dive')) {
+                deepDive.classList.toggle('active');
+                btn.textContent = deepDive.classList.contains('active') ? 'Deep Dive 닫기 ▲' : 'Deep Dive 열기 ▼';
+            }
+        }
+
+        // Quiz answer checker
+        function checkAns(btn, isCorrect) {
+            const question = btn.closest('.question');
+            const options = question.querySelectorAll('.option-btn');
+            const feedback = question.querySelector('.question-feedback');
+
+            // Disable all buttons
+            options.forEach(opt => opt.disabled = true);
+
+            // Remove previous styling
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedback.classList.add('show', 'feedback-correct');
+                feedback.innerHTML = '✓ 정답입니다! 훌륭한 이해입니다.';
+            } else {
+                btn.classList.add('incorrect');
+                // Find and highlight correct answer
+                options.forEach(opt => {
+                    if (opt.onclick && opt.onclick.toString().includes('true')) {
+                        opt.classList.add('correct');
+                    }
+                });
+                feedback.classList.add('show', 'feedback-incorrect');
+                feedback.innerHTML = '✗ 다시 생각해보세요. 올바른 답변은 표시되어 있습니다.';
+            }
+        }
+
+        // Scroll animation with IntersectionObserver
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.ani').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

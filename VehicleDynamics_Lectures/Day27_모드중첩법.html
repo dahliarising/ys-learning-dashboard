@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 27 — 모드 중첩법 | YS 진동학 마스터</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600;700&family=Noto+Sans+KR:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0C10;--surface:#12151C;--surface2:#1A1E28;--border:#252A38;--gold:#C9A84C;--gold-light:#E8C96A;--blue:#4A9EBF;--green:#4ABF8A;--purple:#8A6ABF;--orange:#BF6A4A;--text:#D8D3C8;--text-dim:#7A7A8A;--text-bright:#F0EBE0}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-weight:300;line-height:1.8;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+.sticky-header{position:sticky;top:0;z-index:100;background:rgba(10,12,16,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 0}
+.header-inner{max-width:960px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
+.header-brand{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:16px;color:var(--gold)}
+.header-progress-wrap{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-dim)}
+.header-progress-bar{width:120px;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
+.header-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px}
+.container{max-width:960px;margin:0 auto;padding:0 24px 80px}
+.series-info{text-align:center;padding:16px 0 0;font-size:13px;color:var(--text-dim);letter-spacing:.5px}
+.hero{text-align:center;padding:60px 0 48px;animation:fadeUp .8s ease both}
+.hero-day{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px}
+.hero-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:42px;color:var(--text-bright);line-height:1.2;margin-bottom:6px}
+.hero-title-en{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:20px;color:var(--text-dim);margin-bottom:32px}
+
+
+.gauge-wrap{display:flex;justify-content:center;margin-bottom:28px}
+.gauge-svg{width:100px;height:100px}
+.gauge-bg{fill:none;stroke:var(--surface2);stroke-width:6}
+.gauge-fill{fill:none;stroke:var(--gold);stroke-width:6;stroke-linecap:round;stroke-dasharray:251;transition:stroke-dashoffset 1s ease}
+.gauge-text{font-family:'JetBrains Mono',monospace;font-size:16px;fill:var(--gold-light);text-anchor:middle}
+.gauge-label{font-size:9px;fill:var(--text-dim);text-anchor:middle}
+.meta-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.meta-badge{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:13px;color:var(--text-dim)}
+.meta-badge span{color:var(--text-bright);font-weight:400}
+.section{margin-top:56px;animation:fadeUp .6s ease both}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.section-title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:28px;color:var(--text-bright);margin-bottom:20px}
+.brain-box{background:linear-gradient(135deg,rgba(138,106,191,.1),rgba(138,106,191,.04));border:1px solid rgba(138,106,191,.3);border-radius:16px;padding:28px 32px}
+.brain-box h3{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--purple);margin-bottom:16px}
+.brain-box p,.brain-box li{font-size:14px;color:var(--text);margin-bottom:8px}
+.brain-box ul{padding-left:20px}
+.brain-box li::marker{color:var(--purple)}
+.time-split{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.time-block{background:rgba(138,106,191,.08);border:1px solid rgba(138,106,191,.2);border-radius:8px;padding:10px;text-align:center;font-size:12px}
+.time-block .t-range{color:var(--purple);font-weight:700;font-size:13px;display:block;margin-bottom:2px}
+.time-block .t-desc{color:var(--text-dim)}
+.intuition-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 32px}
+.intuition-card p{font-size:15px;margin-bottom:12px}
+.highlight{color:var(--gold-light);font-weight:400}
+.deriv-card{background:var(--surface);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;padding:24px 28px;margin-bottom:20px}
+.deriv-step-num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+
+
+.deriv-explain{font-size:14px;color:var(--text)}
+.deriv-explain .label{color:var(--blue);font-weight:400}
+.deriv-explain p{margin-bottom:8px}
+.arrow-connector{text-align:center;color:var(--gold);font-size:24px;margin:-8px 0 12px;opacity:.5}
+.checkpoint{background:rgba(74,191,138,.08);border:1px solid rgba(74,191,138,.25);border-radius:10px;padding:14px 20px;margin:24px 0;font-size:14px;color:var(--green)}
+.param-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table.param-table{width:100%;border-collapse:collapse;font-size:13px}
+table.param-table th{background:var(--surface2);color:var(--gold);font-family:'JetBrains Mono',monospace;font-weight:500;padding:12px 14px;text-align:left;border-bottom:1px solid var(--border);font-size:11px;letter-spacing:1px;text-transform:uppercase}
+table.param-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+table.param-table tr:last-child td{border-bottom:none}
+.sym{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:15px}
+.simpack-module{background:var(--surface);border:1px solid rgba(74,158,191,.3);border-radius:16px;overflow:hidden}
+.simpack-header{background:linear-gradient(135deg,rgba(74,158,191,.15),rgba(74,158,191,.05));padding:16px 28px;border-bottom:1px solid rgba(74,158,191,.2);display:flex;align-items:center;gap:10px}
+.simpack-badge{background:var(--blue);color:#fff;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;padding:3px 10px;border-radius:4px;letter-spacing:1px}
+.simpack-header span{color:var(--blue);font-weight:400;font-size:15px}
+.simpack-body{padding:24px 28px}
+.simpack-row{background:var(--surface2);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.simpack-row .sp-sym{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:16px;font-weight:500}
+.simpack-row .sp-path{font-family:'JetBrains Mono',monospace;color:var(--blue);font-size:12px;margin:6px 0}
+.simpack-row .sp-detail{font-size:13px;color:var(--text-dim)}
+.sp-warn{background:rgba(191,106,74,.1);border:1px solid rgba(191,106,74,.3);border-radius:8px;padding:10px 14px;margin-top:8px;font-size:12px;color:var(--orange)}
+.accordion{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.accordion-toggle{width:100%;background:var(--surface);border:none;padding:18px 24px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;color:var(--text-bright);font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:400}
+.accordion-toggle:hover{background:var(--surface2)}
+.accordion-arrow{color:var(--gold);font-size:18px;transition:transform .3s}
+.accordion-content{max-height:0;overflow:hidden;transition:max-height .4s ease;background:var(--surface)}
+.accordion-content.open{max-height:5000px}
+.accordion-inner{padding:0 24px 24px}
+.accordion-inner p{font-size:14px;margin-bottom:10px}
+.accordion-inner .deriv-equation{margin-top:12px}
+.quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:16px}
+.quiz-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:10px}
+.quiz-q{font-size:15px;color:var(--text-bright);margin-bottom:16px;font-weight:400}
+.quiz-options{display:grid;gap:8px}
+.quiz-opt{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;cursor:pointer;font-size:14px;color:var(--text);transition:all .2s}
+.quiz-opt:hover{border-color:var(--gold);color:var(--text-bright)}
+.quiz-opt.correct{background:rgba(74,191,138,.12);border-color:var(--green);color:var(--green)}
+.quiz-opt.wrong{background:rgba(191,74,74,.12);border-color:#bf4a4a;color:#bf4a4a}
+.quiz-opt.disabled{pointer-events:none;opacity:.7}
+.quiz-feedback{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.correct-fb{background:rgba(74,191,138,.08);color:var(--green)}
+.quiz-feedback.wrong-fb{background:rgba(191,74,74,.08);color:#bf4a4a}
+.solution-panel{display:none;margin-top:16px;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.2);border-radius:12px;overflow:hidden;animation:solReveal .4s ease}
+.solution-panel.show{display:block}
+@keyframes solReveal{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.sol-header{background:rgba(201,168,76,.1);padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);font-weight:500;letter-spacing:1px;border-bottom:1px solid rgba(201,168,76,.15)}
+.sol-step{padding:10px 20px;font-size:13px;color:var(--text);border-bottom:1px solid rgba(201,168,76,.08);display:flex;align-items:baseline;gap:12px}
+.sol-step:last-of-type{border-bottom:none}
+.sol-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);font-weight:500;min-width:50px;letter-spacing:1px;flex-shrink:0}
+.sol-step.highlight-step{background:rgba(201,168,76,.08)}
+.sol-insight{padding:16px 20px;background:rgba(74,191,138,.06);border-top:1px solid rgba(74,191,138,.15);font-size:13px;color:var(--text);line-height:1.9}
+.sol-insight strong{color:var(--green)}
+.sr-track{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+.sr-dot{width:52px;height:52px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;font-family:'JetBrains Mono',monospace}
+.sr-dot.today{background:var(--gold);color:var(--bg);font-weight:700}
+.sr-dot.future{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim)}
+.sr-dot .sr-label{font-size:8px}
+.next-preview{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:20px 24px;margin-top:24px}
+.next-preview h4{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:18px;color:var(--gold);margin-bottom:8px}
+.next-preview p{font-size:14px;color:var(--text-dim)}
+.footer{text-align:center;padding:40px 0 20px;font-size:12px;color:var(--text-dim);border-top:1px solid var(--border);margin-top:60px}
+.placeholder-box{background:var(--surface);border:2px dashed var(--border);border-radius:16px;padding:40px;text-align:center;color:var(--text-dim);font-size:14px;margin:20px 0}
+.placeholder-box .ph-icon{font-size:36px;margin-bottom:12px;display:block}
+.nav-links{display:flex;justify-content:space-between;margin-top:40px;font-size:14px}
+.nav-links a{color:var(--gold);text-decoration:none;padding:8px 16px;border:1px solid var(--border);border-radius:8px;transition:all .2s}
+.nav-links a:hover{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.diagram-wrap{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin:20px 0;text-align:center;overflow-x:auto}
+.diagram-wrap svg{max-width:100%;height:auto}
+.diagram-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;text-align:center}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.hero-equation code{font-size:18px}.container{padding:0 16px 60px}.time-split{grid-template-columns:repeat(2,1fr)}.deriv-equation code{font-size:16px}}
+
+@media print{body{background:#fff;color:#222}.sticky-header{display:none}.hero{padding:20px 0}.section{margin-top:24px;break-inside:avoid}.diagram-wrap{border:1px solid #ccc}.quiz-opt{border:1px solid #999}code{color:#333}}
+.memory-hook{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:14px}
+.memory-hook strong{color:var(--gold-light)}
+.vehicle-example{background:linear-gradient(135deg,rgba(74,158,191,.08),rgba(74,158,191,.02));border:1px solid rgba(74,158,191,.25);border-radius:12px;padding:20px 24px;margin-top:20px}
+.vehicle-example h4{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:17px;color:var(--blue);margin-bottom:12px}
+.vehicle-example p{font-size:13px;margin-bottom:6px}
+.vehicle-example .calc{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:13px;background:#0D1017;padding:6px 12px;border-radius:6px;display:inline-block;margin:4px 0}
+
+
+/* 인라인 수식도 부드럽게 */
+
+/* ══════ Mobile KaTeX Fix ══════ */
+.deriv-equation{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.deriv-equation code{white-space:normal;word-wrap:break-word}
+.katex{font-size:1.1em}
+@media(max-width:640px){
+  .hero-equation{padding:16px 20px !important;max-width:100%;overflow-x:auto !important;display:block !important;text-align:center}
+    .hero-equation code{font-size:15px !important;white-space:normal !important;word-break:break-all}
+  .deriv-equation{padding:12px 14px !important;margin-bottom:12px}
+    .deriv-equation code{font-size:14px !important}
+  .deriv-equation::before{width:2px}
+    .eq-tooltip{max-width:280px !important;font-size:12px !important}
+}
+@media(max-width:380px){
+      .hero-equation{padding:12px 14px !important}
+}
+
+/* ══════ Interactive Formula Explorer ══════ */
+.eq-explorer{position:relative;cursor:pointer}
+.eq-tooltip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1A1E28,#12151C);border:1px solid var(--gold);border-radius:10px;padding:12px 16px;min-width:220px;max-width:340px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 12px rgba(201,168,76,.15);animation:tooltipIn .2s ease;pointer-events:none}
+.eq-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--gold)}
+.eq-explorer:hover .eq-tooltip,.eq-explorer:focus .eq-tooltip,.eq-explorer.active .eq-tooltip{display:block}
+@keyframes tooltipIn{from{opacity:0;transform:translateX(-50%) translateY(4px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.eq-tooltip .tt-symbol{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--gold-light);font-weight:700;margin-bottom:6px}
+.eq-tooltip .tt-name{font-size:13px;color:var(--text-bright);font-weight:400;margin-bottom:4px}
+.eq-tooltip .tt-unit{font-size:11px;color:var(--blue);font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+.eq-tooltip .tt-xm3{font-size:12px;color:var(--green);padding:6px 8px;background:rgba(74,191,138,.08);border-radius:6px;margin-top:6px}
+.eq-tooltip .tt-xm3::before{content:'🚗 Ref: ';font-weight:700}
+.eq-tooltip .tt-meaning{font-size:12px;color:var(--text-dim);margin-top:4px;line-height:1.6}
+
+
+</style>
+
+<!-- KaTeX Math Rendering -->
+<style id="katex-inline-css">@font-face{font-display:block;font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_AMS-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Script-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size1-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size2-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size3-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size4-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0;text-rendering:auto}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.16.38"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathboldfrak,.katex .textboldfrak{font-family:KaTeX_Fraktur;font-weight:700}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .mathsfit,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .smash{display:inline;line-height:0}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.2777777778em;margin-right:-.5555555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.1666666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.6666666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.4566666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.1466666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.7142857143em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.8571428571em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.1428571429em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.2857142857em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.4285714286em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.7142857143em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.0571428571em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.4685714286em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.9628571429em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.5542857143em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.7777777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.8888888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.1111111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.3044444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.7644444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.5833333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.7283333333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.0733333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.4861111111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.4402777778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.7277777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.2893518519em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.4050925926em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.462962963em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.5208333333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.2002314815em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.4398148148em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.2410800386em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.2892960463em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.337512054em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.3857280617em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.4339440694em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.4821600771em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.5785920926em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.6943105111em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.8331726133em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.1996142719em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.2009646302em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.2411575563em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.2813504823em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.3215434084em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.3617363344em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.4019292605em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.4823151125em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.578778135em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.6945337621em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.8336012862em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex svg{fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+</style>
+<style id="math-enhanced-style">
+/* ══════ KaTeX Pre-rendered Math Styling ══════ */
+/* Hero equation - 메인 수식 */
+.hero-equation .katex-display{margin:0!important;padding:0!important}
+.hero-equation .katex{font-size:1.5em!important;color:#E8C96A!important}
+.hero-equation .katex .mord{color:#E8C96A!important}
+.hero-equation .katex .mbin{color:#4A9EBF!important}
+.hero-equation .katex .mrel{color:#4ABF8A!important}
+.hero-equation .katex .mop{color:#E8C96A!important}
+.hero-equation .katex .mopen,.hero-equation .katex .mclose{color:#BF8A4A!important}
+.hero-equation .katex .sqrt .sqrt-sign{color:#C9A84C!important}
+.hero-equation .katex .frac-line{border-bottom-color:#C9A84C!important}
+.hero-equation .katex .accent-body{color:#E8C96A!important}
+
+/* Derivation equation - 유도 단계 수식 */
+.deriv-equation .katex-display{margin:0!important;padding:0!important}
+.deriv-equation .katex{font-size:1.15em!important;color:#E8C96A!important}
+.deriv-equation .katex .mord{color:#E8C96A!important}
+.deriv-equation .katex .mord.mathnormal{color:#E8C96A!important}
+.deriv-equation .katex .mbin{color:#4A9EBF!important}
+.deriv-equation .katex .mrel{color:#4ABF8A!important}
+.deriv-equation .katex .mop{color:#E8C96A!important}
+.deriv-equation .katex .sqrt .sqrt-sign{color:#C9A84C!important}
+.deriv-equation .katex .sqrt .vlist{color:#E8C96A!important}
+.deriv-equation .katex .frac-line{border-bottom-color:#C9A84C!important}
+.deriv-equation .katex .mopen,.deriv-equation .katex .mclose{color:#BF8A4A!important}
+.deriv-equation .katex .accent-body{color:#E8C96A!important}
+
+/* 일반 영역 수식 */
+.katex{color:#E8C96A!important}
+.katex .mord{color:#E8C96A!important}
+.katex .mbin{color:#4A9EBF!important}
+.katex .mrel{color:#4ABF8A!important}
+.katex .mop{color:#E8C96A!important}
+.katex .frac-line{border-bottom-color:rgba(201,168,76,0.6)!important}
+.katex .sqrt .sqrt-sign{color:#C9A84C!important}
+
+/* katex-display 블록 스타일 */
+.katex-display{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:4px 0}
+.katex-display>.katex{text-align:center!important}
+
+/* Hero equation 박스 강화 */
+.hero-equation{display:inline-block;background:linear-gradient(135deg,#0D1017 0%,#151A25 100%);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:24px 48px;margin-bottom:32px;box-shadow:0 4px 20px rgba(201,168,76,0.1),0 0 40px rgba(201,168,76,0.03);position:relative;overflow:visible;max-width:100%}
+.hero-equation::before{content:'';position:absolute;inset:-1px;border-radius:16px;background:linear-gradient(135deg,rgba(201,168,76,0.2),transparent,rgba(201,168,76,0.1));z-index:0;pointer-events:none}
+
+/* Deriv equation 박스 강화 */
+.deriv-equation{background:linear-gradient(135deg,rgba(13,16,23,0.8),rgba(21,26,37,0.6));border-left:3px solid #C9A84C;border-radius:0 12px 12px 0;padding:16px 20px;margin:12px 0;box-shadow:0 2px 12px rgba(0,0,0,0.3);transition:border-color 0.3s,box-shadow 0.3s}
+.deriv-equation:hover{border-left-color:#E8C96A;box-shadow:0 4px 16px rgba(201,168,76,0.15)}
+
+/* 모바일 반응형 */
+@media(max-width:640px){
+  .hero-equation{padding:16px 20px!important;max-width:100%;overflow-x:auto!important;display:block!important}
+  .hero-equation .katex{font-size:1.1em!important}
+  .deriv-equation .katex{font-size:0.95em!important}
+  .deriv-equation{padding:12px 14px;margin:8px 0}
+}
+@media(max-width:380px){
+  .hero-equation .katex{font-size:0.9em!important}
+  .deriv-equation .katex{font-size:0.85em!important}
+}
+
+/* 체크포인트/파라미터 테이블 내 수식 */
+.checkpoint .katex{font-size:0.9em!important}
+.param-table .katex{font-size:0.95em!important}
+td .katex,th .katex{font-size:0.9em!important}
+
+/* 수식 에러 폴백 */
+.katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
+</style>
+</head>
+<body>
+
+<!-- ① STICKY HEADER -->
+<header class="sticky-header">
+  <div class="header-inner">
+    <div class="header-brand"><a href="index.html" style="color:inherit;text-decoration:none;">YS · 진동학 마스터</a> / Day 27</div>
+    <div class="header-progress-wrap">
+      <span>27 / 33</span>
+      <div class="header-progress-bar"><div class="header-progress-fill" style="width:82%"></div></div>
+      <span>82%</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+<div class="series-info">이 시리즈 예상 총 Day: 33일 &nbsp;|&nbsp; PART 4 — 주파수 영역 해석</div>
+
+<!-- ② HERO -->
+<section class="hero">
+  <div class="hero-day">— DAY 27 —</div>
+  <h1 class="hero-title">모드 중첩법</h1>
+  <p class="hero-title-en">Modal Superposition Method</p>
+  <div class="hero-equation"><span class="hero-math">모달좌표 변환 → 응답 재구성</span></div>
+  <div class="gauge-wrap">
+    <svg class="gauge-svg" viewBox="0 0 100 100">
+      <circle class="gauge-bg" cx="50" cy="50" r="40"/>
+      <circle class="gauge-fill" cx="50" cy="50" r="40" transform="rotate(-90 50 50)" style="stroke-dashoffset:45"/>
+      <text class="gauge-text" x="50" y="48">82%</text>
+      <text class="gauge-label" x="50" y="62">DAY 27/33</text>
+    </svg>
+  </div>
+  <div class="meta-badges">
+    <div class="meta-badge">⏱ 포모도로 <span>25분</span></div>
+    <div class="meta-badge">📐 수식 <span>4단계</span></div>
+    <div class="meta-badge">⭐ 난이도 <span>★★★★☆</span></div>
+    <div class="meta-badge">🔁 복습 <span>D+1, D+3, D+7</span></div>
+  </div>
+</section>
+
+<div style="max-width:960px;margin:0 auto;padding:0 24px">
+  <div style="background:linear-gradient(135deg,rgba(74,158,191,.08),rgba(74,158,191,.03));border:1px solid rgba(74,158,191,.2);border-radius:10px;padding:12px 18px;margin-top:-20px;margin-bottom:24px;font-size:13px;color:var(--text-dim);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:18px">🔍</span>
+    <span><strong style="color:var(--blue)">수식 탐색기</strong> — 파라미터 테이블의 기호나 계산식 위에 <strong style="color:var(--text-bright)">마우스를 올리거나 터치</strong>하면 물리적 의미·단위·레퍼런스 실차값이 표시됩니다.</span>
+  </div>
+</div>
+
+
+<!-- ③ 뇌과학 학습 전략 -->
+<section class="section">
+  <div class="section-label">Learning Strategy</div>
+  <div class="brain-box">
+    <h3>🧠 뇌과학 기반 수식 학습 전략</h3>
+    
+        <p><strong style="color:var(--purple);">수식 보기 전 30초 루틴</strong> — 오케스트라의 각 악기(모드)가 독립적으로 연주하고, 지휘자(중첩)가 이를 합치면 하나의 곡(응답)이 된다. &#x27;분해 → 독립 풀기 → 재합성&#x27; 3단계를 기억.</p>
+        <p><strong style="color:var(--purple);">오늘의 학습 기법:</strong> 오케스트라 비유 (Orchestra Analogy)</p>
+    <div class="time-split">
+      <div class="time-block"><span class="t-range">0~5분</span><span class="t-desc">물리적 직관</span></div>
+      <div class="time-block"><span class="t-range">5~18분</span><span class="t-desc">수식 유도</span></div>
+      <div class="time-block"><span class="t-range">18~23분</span><span class="t-desc">Simpack 매핑</span></div>
+      <div class="time-block"><span class="t-range">23~25분</span><span class="t-desc">퀴즈 복습</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ④ 물리적 직관 -->
+<section class="section">
+  <div class="section-label">Step 1 — Physical Intuition</div>
+  <h2 class="section-title">왜 이 수식이 필요한가?</h2>
+    <div style="background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:14px 20px;margin:20px 0;font-size:13px;">
+      <strong style="color:var(--gold);">💡 수식 유도 읽는 법</strong> — 각 STEP의 <span style="color:var(--blue);">파란색 라벨</span>은 "왜 이 변환을 하는가"를 설명합니다. 수식만 보지 말고 <span style="color:var(--gold-light);">동기 → 변환 → 의미</span> 순서로 읽으세요. 눈으로 3번 읽는 것보다 <strong>손으로 1번 쓰는 것</strong>이 기억에 4배 효과적입니다.
+    </div>
+
+  <div class="intuition-card">
+    <p>MDOF 강제진동을 직접 풀려면 n×n 연립미분방정식을 풀어야 한다. 모드 중첩법은 &#x27;모드 좌표 변환&#x27;으로 이를 n개의 독립 1DOF 문제로 분해한다. 각 1DOF를 풀고 다시 합치면 원래 응답이 된다. 계산 효율이 비약적으로 좋아지고, &#x27;어떤 모드가 응답에 지배적인가&#x27;를 직관적으로 파악할 수 있다.</p>
+  </div>
+  
+  <div class="diagram-wrap">
+    <div class="diagram-label">Diagram A — 물리계 도해</div>
+    <svg viewBox="0 0 480 200" width="480" height="200" xmlns="http://www.w3.org/2000/svg">
+    
+  <defs>
+    <marker id="arrowGold" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#E8C96A"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#4ABF8A"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#4A9EBF"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#BF6A4A"/>
+    </marker>
+    <marker id="arrowPurple" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#8A6ABF"/>
+    </marker>
+    <marker id="arrowDim" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#7A7A8A"/>
+    </marker>
+  </defs>
+
+    <!-- Physical coordinates -->
+    <rect x="20" y="50" width="120" height="80" rx="8" fill="#1A1E28" stroke="#4A9EBF" stroke-width="1.5"/>
+    <text x="80" y="78" font-family="JetBrains Mono" font-size="12" fill="#4A9EBF" text-anchor="middle">{x}</text>
+    <text x="80" y="98" font-family="Noto Sans KR" font-size="9" fill="#7A7A8A" text-anchor="middle">물리 좌표</text>
+    <text x="80" y="115" font-family="JetBrains Mono" font-size="9" fill="#7A7A8A" text-anchor="middle">N-DOF coupled</text>
+    <!-- Phi transform -->
+    <line x1="145" y1="90" x2="195" y2="90" stroke="#E8C96A" stroke-width="2" marker-end="url(#arrowGold)"/>
+    <text x="170" y="80" font-family="JetBrains Mono" font-size="11" fill="#E8C96A" text-anchor="middle">[Φ]</text>
+    <!-- Modal coordinates -->
+    <rect x="200" y="50" width="120" height="80" rx="8" fill="#1A1E28" stroke="#4ABF8A" stroke-width="1.5"/>
+    <text x="260" y="78" font-family="JetBrains Mono" font-size="12" fill="#4ABF8A" text-anchor="middle">{η}</text>
+    <text x="260" y="98" font-family="Noto Sans KR" font-size="9" fill="#7A7A8A" text-anchor="middle">모드 좌표</text>
+    <text x="260" y="115" font-family="JetBrains Mono" font-size="9" fill="#7A7A8A" text-anchor="middle">N × 1-DOF</text>
+    <!-- Sum back -->
+    <line x1="325" y1="90" x2="365" y2="90" stroke="#E8C96A" stroke-width="2" marker-end="url(#arrowGold)"/>
+    <text x="345" y="80" font-family="JetBrains Mono" font-size="10" fill="#E8C96A" text-anchor="middle">Σ</text>
+    <!-- Result -->
+    <rect x="370" y="50" width="100" height="80" rx="8" fill="#1A1E28" stroke="#8A6ABF" stroke-width="1.5"/>
+    <text x="420" y="78" font-family="JetBrains Mono" font-size="12" fill="#8A6ABF" text-anchor="middle">x(t)</text>
+    <text x="420" y="98" font-family="Noto Sans KR" font-size="9" fill="#7A7A8A" text-anchor="middle">응답 합성</text>
+    <!-- Equation -->
+    <text x="240" y="175" font-family="JetBrains Mono" font-size="11" fill="#C9A84C" text-anchor="middle">{x} = [Φ]{η} → 비연성 SDOF 합</text>
+  </svg>
+  </div>
+</section>
+
+<!-- ⑤ 수식 단계별 풀이 -->
+<section class="section">
+  <div class="section-label">Step 2 — Derivation</div>
+  <h2 class="section-title">수식 한 줄씩 유도</h2>
+  
+    <div class="deriv-card">
+      <div class="deriv-step-num">Step 1: 모달 좌표 변환</div>
+      <div class="deriv-equation"><span class="katex-eq"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>x</mi><mo>=</mo><mo stretchy="false">[</mo><mi mathvariant="normal">Φ</mi><mo stretchy="false">]</mo><mi>q</mi><mo separator="true">,</mo><mo stretchy="false">[</mo><mi mathvariant="normal">Φ</mi><mo stretchy="false">]</mo><mo>=</mo><mo stretchy="false">[</mo><msub><mi>φ</mi><mn>1</mn></msub><msub><mi>φ</mi><mn>2</mn></msub><mo>⋅</mo><mo>⋅</mo><mo>⋅</mo><msub><mi>φ</mi><mi>n</mi></msub><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">{x} = [Φ]{q}, [Φ] = [{\varphi_1} {\varphi_2} \cdot \cdot \cdot {\varphi_n}]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord"><span class="mord mathnormal">x</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">Φ</span><span class="mclose">]</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">q</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">[</span><span class="mord">Φ</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord"><span class="mord"><span class="mord mathnormal">φ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span class="mord"><span class="mord"><span class="mord mathnormal">φ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4445em;"></span><span class="mord">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">φ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span class="mclose">]</span></span></span></span></span></span></div>
+      <div class="deriv-explain">
+        <p><span class="label">이 항의 의미:</span> 물리 좌표 {x}를 모드 형상 매트릭스 [Φ]와 모달 좌표 {q}의 곱으로 표현한다. q_i는 i번째 모드의 &#x27;참여 정도(진폭)&#x27;를 나타낸다.</p>
+        <p><span class="label">부호/변환 이유:</span> [Φ]는 n×n 정방 매트릭스. 각 열이 하나의 모드 형상 벡터.</p>
+        <p><span class="label">이전 단계와의 연결:</span> Day 26에서 구한 고유벡터 {φ_i}들을 열로 배열한 것이 [Φ]이다.</p>
+      </div>
+    </div>
+    <div class="arrow-connector">↓</div>
+
+    <div class="deriv-card">
+      <div class="deriv-step-num">Step 2: 디커플된 모달 방정식</div>
+      <div class="deriv-equation"><span class="katex-eq"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mover accent="true"><mi>m</mi><mo>~</mo></mover><mi>i</mi></msub><mo>⋅</mo><msub><mover accent="true"><mi>q</mi><mo>¨</mo></mover><mi>i</mi></msub><mo>+</mo><msub><mover accent="true"><mi>c</mi><mo>~</mo></mover><mi>i</mi></msub><mo>⋅</mo><msub><mover accent="true"><mi>q</mi><mo>˙</mo></mover><mi>i</mi></msub><mo>+</mo><msub><mover accent="true"><mi>k</mi><mo>~</mo></mover><mi>i</mi></msub><mo>⋅</mo><msub><mi>q</mi><mi>i</mi></msub><mo>=</mo><msub><mover accent="true"><mi>f</mi><mo>~</mo></mover><mi>i</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">m̃_i \cdot q̈_i + c̃_i \cdot q̇_i + k̃_i \cdot q_i = f̃_i(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8179em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">m</span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8623em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">¨</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8179em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">c</span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1944em;"><span class="mord">~</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8623em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0556em;"><span class="mord">˙</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0813em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9313em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span></span><span style="top:-3.6134em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0315em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1813em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9313em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span><span style="top:-3.6134em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">~</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span></span></span></div>
+      <div class="deriv-explain">
+        <p><span class="label">이 항의 의미:</span> 모드 형상의 직교성 덕분에 각 모달 좌표 q_i는 독립적인 1DOF 방정식을 따른다. m̃_i = {φ_i}ᵀ[M]{φ_i}가 모달 질량이다.</p>
+        <p><span class="label">부호/변환 이유:</span> f̃_i = {φ_i}ᵀ{F(t)}는 모달 힘. 물리 외력을 모드 공간으로 투영한 것이다.</p>
+        <p><span class="label">이전 단계와의 연결:</span> Day 26의 직교성 조건이 여기서 결정적 역할을 한다. 직교성이 없으면 디커플링 불가.</p>
+      </div>
+    </div>
+    <div class="arrow-connector">↓</div>
+
+    <div class="deriv-card">
+      <div class="deriv-step-num">Step 3: 모달 응답 → 물리 응답 재구성</div>
+      <div class="deriv-equation"><span class="katex-eq"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mrow><mi>x</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mo>=</mo><msubsup><mi mathvariant="normal">Σ</mi><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><msub><mi>φ</mi><mi>i</mi></msub><mo>⋅</mo><msub><mi>q</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>≈</mo><msubsup><mi mathvariant="normal">Σ</mi><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>m</mi></msubsup><msub><mi>φ</mi><mi>i</mi></msub><mo>⋅</mo><msub><mi>q</mi><mi>i</mi></msub><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo separator="true">,</mo><mi>m</mi><mo>&lt;</mo><mo>&lt;</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">{x(t)} = Σ_{i=1}^{n} {\varphi_i} \cdot q_i(t) \approx Σ_{i=1}^{m} {\varphi_i} \cdot q_i(t), m &lt;&lt; n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9614em;vertical-align:-0.247em;"></span><span class="mord"><span class="mord">Σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7144em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord"><span class="mord mathnormal">φ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9614em;vertical-align:-0.247em;"></span><span class="mord"><span class="mord">Σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7144em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">m</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord"><span class="mord mathnormal">φ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span></span></span></div>
+      <div class="deriv-explain">
+        <p><span class="label">이 항의 의미:</span> 각 모달 응답 q_i(t)에 해당 모드 형상 φ_i를 곱하고 합산하면 물리 응답이 된다. 핵심: 하위 m개 모드만으로도 충분히 정확한 근사가 가능(모드 절단).</p>
+        <p><span class="label">부호/변환 이유:</span> m/n의 비가 모드 절단 비율. 차량에서 0~50Hz 범위의 모드만 사용하면 대부분의 승차감 분석이 가능.</p>
+        <p><span class="label">이전 단계와의 연결:</span> Day 08~11의 쿼터카/하프카 응답을 모드 중첩으로 해석하면 각 모드의 기여도를 분리할 수 있다.</p>
+      </div>
+    </div>
+    
+    <div class="checkpoint"><strong>✓ 물리적 직관 체크:</strong> 이 수식에서 각 항의 물리적 의미를 손가락으로 짚으며 설명할 수 있나요? "이 항은 ___를 의미하고, 저 항은 ___의 영향"이라고 말해보세요.</div>
+    <div class="arrow-connector">↓</div>
+
+    <div class="deriv-card">
+      <div class="deriv-step-num">Step 4: 모달 참여 계수</div>
+      <div class="deriv-equation"><span class="katex-eq"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="normal">Γ</mi><mi>i</mi></msub><mo>=</mo><msup><msub><mi>φ</mi><mi>i</mi></msub><mi>T</mi></msup><mo stretchy="false">[</mo><mi>M</mi><mo stretchy="false">]</mo><mn>1</mn><mi mathvariant="normal">/</mi><msub><mover accent="true"><mi>m</mi><mo>~</mo></mover><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Γ_i = {\varphi_i}ᵀ [M] {1} / m̃_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord">Γ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1413em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord"><span class="mord"><span class="mord mathnormal">φ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mclose">]</span><span class="mord"><span class="mord">1</span></span><span class="mord">/</span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">m</span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></span></div>
+      <div class="deriv-explain">
+        <p><span class="label">이 항의 의미:</span> 모달 참여 계수는 &#x27;이 모드가 전체 응답에 얼마나 기여하는가&#x27;의 지표다. {1}은 단위 벡터(균일 가진 방향).</p>
+        <p><span class="label">부호/변환 이유:</span> Γ_i가 큰 모드가 응답을 지배한다. 차량에서 바디 바운스 모드의 Γ가 가장 크다.</p>
+        <p><span class="label">이전 단계와의 연결:</span> Day 15 복습에서 &#x27;어떤 모드가 중요한가?&#x27;라는 질문의 정량적 답이 바로 이 참여 계수다.</p>
+      </div>
+    </div>
+</section>
+
+<!-- ⑥ 파라미터 테이블 -->
+<section class="section">
+  <div class="section-label">Step 3 — Parameter Mapping</div>
+  <h2 class="section-title">수식 파라미터 완전 해부</h2>
+  
+    <div class="param-table-wrap">
+      <table class="param-table">
+        <thead><tr>
+          <th>기호</th><th>명칭 (한/영)</th><th>단위</th><th>물리적 의미</th><th>차량 부품</th><th>전형적 범위</th>
+        </tr></thead>
+        <tbody>
+        <tr>
+          <td><span class="sym">{q}</span></td>
+          <td>모달 좌표 / Modal Coordinate</td>
+          <td>—</td>
+          <td>각 모드의 참여 진폭</td>
+          <td>모드 중첩 중간 결과</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><span class="sym">m̃_i</span></td>
+          <td>모달 질량 / Modal Mass</td>
+          <td>kg</td>
+          <td>{φ_i}ᵀ[M]{φ_i}</td>
+          <td>모드별 유효 질량</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><span class="sym">Γ_i</span></td>
+          <td>모달 참여 계수 / Modal Participation Factor</td>
+          <td>—</td>
+          <td>모드별 응답 기여도</td>
+          <td>설계 우선순위 결정</td>
+          <td>0~1</td>
+        </tr>
+        <tr>
+          <td><span class="sym">m</span></td>
+          <td>사용 모드 수 / Number of Retained Modes</td>
+          <td>—</td>
+          <td>모드 절단 수</td>
+          <td>정확도-효율 트레이드오프</td>
+          <td>5~50</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+</section>
+
+<!-- ⑦ SVG 다이어그램 B -->
+<section class="section">
+  <div class="section-label">Response Visualization</div>
+  <h2 class="section-title">응답 곡선 / 주요 그래프</h2>
+  <div class="placeholder-box">
+    <span class="ph-icon">📈</span>
+    Day 27 전용 SVG 다이어그램이 여기에 들어갑니다.<br>
+    시간축/주파수축 응답 곡선, 위상 플롯, 또는 Bode 선도 등
+  </div>
+</section>
+
+<!-- ⑧ Simpack 매핑 -->
+<section class="section">
+  <div class="section-label">Step 4 — Simpack Mapping</div>
+  <h2 class="section-title">Simpack 입력 매핑</h2>
+  
+    <div class="simpack-module">
+      <div class="simpack-header">
+        <span class="simpack-badge">SIMPACK</span>
+        <span>Day 27 파라미터 입력 가이드</span>
+      </div>
+      <div class="simpack-body">
+
+      <div class="sp-workflow">
+        <div class="sp-wf-step">
+          <span class="wf-num">①</span>
+          <span class="wf-title">모델 생성</span>
+          <span class="wf-desc">Body + Joint + Force 정의</span>
+        </div>
+        <div class="sp-wf-step">
+          <span class="wf-num">②</span>
+          <span class="wf-title">해석 실행</span>
+          <span class="wf-desc">시간영역/주파수영역 선택</span>
+        </div>
+        <div class="sp-wf-step">
+          <span class="wf-num">③</span>
+          <span class="wf-title">결과 검증</span>
+          <span class="wf-desc">해석해와 수치 비교</span>
+        </div>
+      </div>
+
+      <div class="simpack-row">
+        <div class="sp-sym">Modal</div>
+        <div class="sp-path">Analysis &gt; Modal Reduction</div>
+        <div class="sp-detail"><strong>필드:</strong> Number of Modes<br><strong>단위:</strong> —</div>
+        <div class="sp-warn">⚠ 모드 수가 너무 적으면 고주파 응답 누락, 너무 많으면 계산 시간 증가</div>
+      </div>
+      <div class="simpack-row">
+        <div class="sp-sym">Γ_i</div>
+        <div class="sp-path">Analysis &gt; Eigenvalue &gt; Modal Participation</div>
+        <div class="sp-detail"><strong>필드:</strong> Participation Factors<br><strong>단위:</strong> —</div>
+        <div class="sp-warn">⚠ 수직(Z) 방향 참여 계수가 큰 모드에 집중. 회전 방향도 확인할 것</div>
+      </div>
+      </div>
+    </div>
+</section>
+
+<!-- ⑨ Deep Dive -->
+<section class="section">
+  <div class="section-label">Deep Dive</div>
+  <h2 class="section-title">심화 학습</h2>
+  
+    <div class="accordion">
+      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <span>💡 Craig-Bampton 방법: 유연체 모델의 핵심 — 클릭하여 펼치기</span>
+        <span class="accordion-arrow">▼</span>
+      </button>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+        <p>Simpack에서 유연 차체(flex body)를 사용할 때 Craig-Bampton 방법이 적용된다. 이 방법은 (1) 경계 자유도(마운트 포인트)의 정적 모드와 (2) 고정 경계 내부의 동적 모드를 합성한다. FE 모델에서 수만 자유도를 수십 개의 모드로 축소하여 MBD 해석에 사용한다. OEM에서는 NASTRAN → Craig-Bampton → Simpack fbi 파일 workflow가 표준이다.</p>
+        </div>
+      </div>
+    
+    <div class="accordion" style="margin-top:12px">
+      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <span>💡 Craig-Bampton 방법 — Simpack 유연체의 핵심</span>
+        <span class="accordion-arrow">▼</span>
+      </button>
+      <div class="accordion-content" id="deepdive2">
+        <div class="accordion-inner">
+        <p><strong>■ Craig-Bampton (CB) 축소법</strong></p>
+<p>구조물의 DOF를 대폭 줄이면서 동적 특성 보존</p>
+<p>경계 DOF(인터페이스) + 내부 모드(고정경계 모드) 조합</p>
+<p><strong>■ Simpack에서의 활용</strong></p>
+<p>1️⃣ FE 모델(NASTRAN/ABAQUS)에서 CB 축소 → .fbi/.SID 파일 생성</p>
+<p>2️⃣ Simpack에 Flexbody로 import</p>
+<p>3️⃣ 인터페이스 노드에 Joint/Force Element 연결</p>
+<p><strong>■ 레퍼런스 차량 적용 예</strong></p>
+<p>서브프레임: FE 모델 ~50만 DOF → CB 축소 ~200 DOF</p>
+<p>첫 20개 모드로 300 Hz까지 정확도 95%+ 달성</p>
+        </div>
+      </div>
+    </div>
+</div>
+</section>
+
+
+<!-- Vehicle Example -->
+<section class="section">
+  <div class="section-label">Vehicle Application</div>
+  <h2 class="section-title">실차 적용</h2>
+  <div class="vehicle-example">
+  <h4>🚗 레퍼런스 차량 모드 중첩 적용</h4>
+  <p><strong>쿼터카 2DOF 모드 참여율:</strong></p>
+  <div class="calc">1차 모드(바운스, 1.3Hz): 참여율 92% — 지배적!</div>
+  <div class="calc">2차 모드(휠홉, 11Hz): 참여율 8% — 고주파 미세 기여</div>
+  <p>→ 승차감 분석에서 1차 모드만으로도 90%+ 정확도!</p>
+</div>
+</section>
+
+<!-- Memory Hook -->
+<section class="section">
+  <div class="section-label">Memory Hook</div>
+  <h2 class="section-title">기억 고리</h2>
+  <div class="memory-hook">
+  <strong>🧠 암기법 — "모드 중첩 = 오케스트라 합주"</strong><br>
+  🎵 각 악기(모드) = 독립 연주 / 지휘자(모달좌표) = 각 악기의 볼륨 조절<br>
+  {x} = [Φ]{q} → 물리응답 = 모드형상 × 모달참여 / 주요 악기만 남겨도 OK = 모드 절단!
+</div>
+</section>
+
+<!-- ⑩ 퀴즈 -->
+<section class="section">
+  <div class="section-label">Quiz</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
+  
+    <div class="quiz-card">
+      <div class="quiz-num">QUESTION 01 — 수식 빈칸 채우기</div>
+      <p class="quiz-q">모드 중첩법에서 물리좌표와 모달좌표의 관계는 {x} = [___]{q}이다.</p>
+      <div style="margin-top:12px">
+        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q1')">정답 확인</button>
+      </div>
+      <div class="quiz-feedback correct-fb" id="q1-fb" style="display:none;margin-top:10px">
+        ✅ Φ (모드 형상 매트릭스)
+      </div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-num">QUESTION 02 — 물리적 의미 연결</div>
+      <p class="quiz-q">모드 절단(mode truncation)이 가능한 이유는?</p>
+      <div style="margin-top:12px">
+        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q2')">정답 확인</button>
+      </div>
+      <div class="quiz-feedback correct-fb" id="q2-fb" style="display:none;margin-top:10px">
+        ✅ 고주파 모드의 응답 기여도(모달 참여 계수)가 작고, 하위 소수의 모드가 전체 응답의 90%+ 를 차지하기 때문이다
+      </div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-num">QUESTION 03 — Simpack 적용</div>
+      <p class="quiz-q">Simpack에서 Craig-Bampton 유연체를 사용하는 이유는?</p>
+      <div style="margin-top:12px">
+        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q3')">정답 확인</button>
+      </div>
+      <div class="quiz-feedback correct-fb" id="q3-fb" style="display:none;margin-top:10px">
+        ✅ FE 모델의 수만 자유도를 수십 개의 모달 좌표로 축소하여, 정확도를 유지하면서 MBD 해석 시간을 대폭 단축한다
+      </div>
+    </div>
+</section>
+
+<!-- ⑪ 간격 반복 + 내일 예고 -->
+<section class="section">
+  <div class="section-label">Spaced Repetition</div>
+  <h2 class="section-title">간격 반복 스케줄</h2>
+  <div class="sr-track">
+    <div class="sr-dot today"><span>D+0</span><span class="sr-label">오늘</span></div>
+    <div class="sr-dot future"><span>D+1</span><span class="sr-label">내일</span></div>
+    <div class="sr-dot future"><span>D+3</span><span class="sr-label">3일후</span></div>
+    <div class="sr-dot future"><span>D+7</span><span class="sr-label">7일후</span></div>
+    <div class="sr-dot future"><span>D+14</span><span class="sr-label">14일후</span></div>
+  </div>
+  
+    <div class="next-preview">
+      <h4>→ Day 28 미리보기: Part 4 복습</h4>
+      <p>PART 4 총정리! FFT → PSD → FRF → 고유치 → 모드 중첩까지, 주파수 영역 해석 전체 흐름을 하나의 파이프라인으로 연결한다.</p>
+    </div>
+</section>
+
+<!-- Navigation -->
+<div class="nav-links">
+  <a href="Day26_고유치문제.html">← Day 26: 고유치 문제</a>
+  <a href="index.html">📋 목차</a>
+  <a href="Day28_Part4복습.html">Day 28: Part 4 복습 →</a>
+</div>
+
+<div class="footer">
+  YS · Vehicle Dynamics Study Series — Day 27 of 33<br>
+  Designed for 25-min Pomodoro sessions · Vehicle Dynamics Study
+</div>
+
+</div>
+
+<script>
+function toggleAccordion(btn){
+  const c=btn.nextElementSibling;const a=btn.querySelector('.accordion-arrow');
+  c.classList.toggle('open');a.style.transform=c.classList.contains('open')?'rotate(180deg)':'rotate(0deg)';
+}
+function toggleAnswer(qId){
+  const fb=document.getElementById(qId+'-fb');
+  if(fb.style.display==='none'){fb.style.display='block';}else{fb.style.display='none';}
+}
+function checkAnswer(qId,el,isCorrect){
+  const opts=document.querySelectorAll('#'+qId+' .quiz-opt');
+  const fb=document.getElementById(qId+'-fb');
+  const sol=document.getElementById(qId+'-sol');
+  opts.forEach(o=>{
+    o.classList.add('disabled');
+    if(o===el) o.classList.add(isCorrect?'correct':'wrong');
+    if(!isCorrect&&o.getAttribute('onclick')&&o.getAttribute('onclick').includes('true')) o.classList.add('correct');
+  });
+  fb.classList.add('show');
+  fb.classList.add(isCorrect?'correct-fb':'wrong-fb');
+  fb.textContent=isCorrect?'✅ 정답입니다! 아래에서 상세 풀이를 확인하세요.':'❌ 오답입니다. 아래 풀이를 통해 정답을 확인하세요.';
+  if(sol) sol.classList.add('show');
+});
+  fb.classList.add('show');
+  fb.classList.add(isCorrect?'correct-fb':'wrong-fb');
+  
+}
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.style.opacity='1';x.target.style.transform='translateY(0)'}});},{threshold:.1});
+document.querySelectorAll('.section').forEach(s=>{s.style.opacity='0';s.style.transform='translateY(24px)';s.style.transition='opacity .6s ease, transform .6s ease';obs.observe(s);});
+</script>
+
+
+
+<script>
+/* ══════ Interactive Formula Explorer ══════ */
+const EQ_DATA = {
+  'ω': {sym:'ω', name:'각진동수 (Angular Frequency)', unit:'rad/s', xm3:'', meaning:'1초 동안 회전하는 라디안 수. 2πf와 같음'},
+  'ωₙ': {sym:'ωₙ', name:'고유진동수 (Natural Frequency)', unit:'rad/s', xm3:'8.04 rad/s (바운스)', meaning:'외력 없이 시스템이 자유진동하는 고유한 주파수'},
+  'ω_n': {sym:'ωₙ', name:'고유진동수 (Natural Frequency)', unit:'rad/s', xm3:'8.04 rad/s (바운스)', meaning:'외력 없이 시스템이 자유진동하는 고유한 주파수'},
+  'fₙ': {sym:'fₙ', name:'고유주파수 (Natural Freq in Hz)', unit:'Hz (= cycles/s)', xm3:'1.28 Hz', meaning:'ωₙ/2π. 1초 동안 진동 왕복 횟수'},
+  'f_n': {sym:'fₙ', name:'고유주파수 (Natural Freq in Hz)', unit:'Hz (= cycles/s)', xm3:'1.28 Hz', meaning:'ωₙ/2π. 1초 동안 진동 왕복 횟수'},
+  'ζ': {sym:'ζ (제타)', name:'감쇠비 (Damping Ratio)', unit:'무차원', xm3:'0.512', meaning:'임계감쇠 대비 실제 감쇠의 비율. 0=무감쇠, 1=임계감쇠'},
+  'mₛ': {sym:'mₛ', name:'스프링상 질량 (Sprung Mass)', unit:'kg', xm3:'340 kg (¼차량)', meaning:'서스펜션 위의 차체 질량. 승차감의 관성 결정'},
+  'm_s': {sym:'mₛ', name:'스프링상 질량 (Sprung Mass)', unit:'kg', xm3:'340 kg (¼차량)', meaning:'서스펜션 위의 차체 질량. 승차감의 관성 결정'},
+  'mᵤ': {sym:'mᵤ', name:'스프링하 질량 (Unsprung Mass)', unit:'kg', xm3:'45 kg', meaning:'서스펜션 아래의 휠+타이어+너클 질량'},
+  'm_u': {sym:'mᵤ', name:'스프링하 질량 (Unsprung Mass)', unit:'kg', xm3:'45 kg', meaning:'서스펜션 아래의 휠+타이어+너클 질량'},
+  'kₛ': {sym:'kₛ', name:'스프링 강성 (Spring Rate)', unit:'N/mm', xm3:'22 N/mm', meaning:'단위 변위당 복원력. 높으면 딱딱, 낮으면 부드러움'},
+  'k_s': {sym:'kₛ', name:'스프링 강성 (Spring Rate)', unit:'N/mm', xm3:'22 N/mm', meaning:'단위 변위당 복원력. 높으면 딱딱, 낮으면 부드러움'},
+  'kₜ': {sym:'kₜ', name:'타이어 강성 (Tire Stiffness)', unit:'N/mm', xm3:'220 N/mm', meaning:'타이어의 수직 강성. 스프링의 약 10배'},
+  'k_t': {sym:'kₜ', name:'타이어 강성 (Tire Stiffness)', unit:'N/mm', xm3:'220 N/mm', meaning:'타이어의 수직 강성. 스프링의 약 10배'},
+  'cₛ': {sym:'cₛ', name:'댐퍼 감쇠계수 (Damping Coeff)', unit:'N·s/m', xm3:'2,800 N·s/m', meaning:'속도에 비례하는 감쇠력 계수. 에너지 소산율 결정'},
+  'c_s': {sym:'cₛ', name:'댐퍼 감쇠계수 (Damping Coeff)', unit:'N·s/m', xm3:'2,800 N·s/m', meaning:'속도에 비례하는 감쇠력 계수. 에너지 소산율 결정'},
+  'c': {sym:'c', name:'감쇠계수 (Damping Coefficient)', unit:'N·s/m', xm3:'2,800 N·s/m', meaning:'속도에 비례하는 저항력 계수'},
+  'k': {sym:'k', name:'강성 (Stiffness)', unit:'N/m', xm3:'22,000 N/m', meaning:'단위 변위당 복원력의 크기'},
+  'm': {sym:'m', name:'질량 (Mass)', unit:'kg', xm3:'340 kg', meaning:'관성의 척도. 클수록 가속이 어려움'},
+  'x': {sym:'x(t)', name:'변위 (Displacement)', unit:'m (또는 mm)', xm3:'—', meaning:'평형 위치로부터의 거리. 시간의 함수'},
+  'ẋ': {sym:'ẋ = dx/dt', name:'속도 (Velocity)', unit:'m/s', xm3:'—', meaning:'변위의 시간 미분. 운동 방향과 빠르기'},
+  'ẍ': {sym:'ẍ = d²x/dt²', name:'가속도 (Acceleration)', unit:'m/s²', xm3:'—', meaning:'속도의 시간 미분. 힘에 비례 (F=ma)'},
+  'Tₙ': {sym:'Tₙ', name:'고유주기 (Natural Period)', unit:'s', xm3:'0.78 s', meaning:'1/fₙ. 한 번 완전히 왕복하는 데 걸리는 시간'},
+  'T_n': {sym:'Tₙ', name:'고유주기 (Natural Period)', unit:'s', xm3:'0.78 s', meaning:'1/fₙ. 한 번 완전히 왕복하는 데 걸리는 시간'},
+  'δ': {sym:'δ', name:'정적 처짐 (Static Deflection)', unit:'mm', xm3:'~15 mm', meaning:'중력에 의한 스프링 처짐. mg/k'},
+  'φ': {sym:'φ', name:'위상각 (Phase Angle)', unit:'rad', xm3:'—', meaning:'입력 대비 응답의 시간 지연을 각도로 표현'},
+  'H': {sym:'H(ω)', name:'주파수응답함수 (FRF)', unit:'무차원 또는 mm/N', xm3:'—', meaning:'주파수별 입력 대비 출력의 크기와 위상'},
+  'PSD': {sym:'PSD', name:'파워스펙트럼밀도', unit:'g²/Hz 또는 m²/s³', xm3:'—', meaning:'주파수 대역별 에너지 분포. 노면 거칠기 표현'},
+};
+
+// 터치 디바이스 지원
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.eq-explorer').forEach(el => {
+    el.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      // 다른 모든 활성 툴팁 닫기
+      document.querySelectorAll('.eq-explorer.active').forEach(a => {
+        if (a !== el) a.classList.remove('active');
+      });
+      el.classList.toggle('active');
+    });
+  });
+  // 빈 곳 터치하면 모든 툴팁 닫기
+  document.addEventListener('touchstart', function(e) {
+    if (!e.target.closest('.eq-explorer')) {
+      document.querySelectorAll('.eq-explorer.active').forEach(a => a.classList.remove('active'));
+    }
+  });
+});
+
+// 파라미터 테이블의 .sym 요소에 탐색기 기능 자동 부착
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.sym, .calc').forEach(el => {
+    const text = el.textContent.trim();
+    // EQ_DATA에서 매칭 시도
+    for (const [key, data] of Object.entries(EQ_DATA)) {
+      if (text.includes(key) || text === key) {
+        el.classList.add('eq-explorer');
+        el.style.position = 'relative';
+        el.setAttribute('tabindex', '0');
+        el.setAttribute('role', 'button');
+        el.setAttribute('aria-label', data.name);
+        const tooltip = document.createElement('div');
+        tooltip.className = 'eq-tooltip';
+        tooltip.innerHTML = '<div class="tt-symbol">' + data.sym + '</div>'
+          + '<div class="tt-name">' + data.name + '</div>'
+          + '<div class="tt-unit">단위: ' + data.unit + '</div>'
+          + (data.xm3 ? '<div class="tt-xm3">' + data.xm3 + '</div>' : '')
+          + '<div class="tt-meaning">' + data.meaning + '</div>';
+        el.appendChild(tooltip);
+        break;
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>

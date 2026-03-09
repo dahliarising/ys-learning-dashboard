@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 22 — 이메일 교정 실습 | Email Correction Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════ RESET & BASE ═══════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-alt: #181C26;
+  --terracotta: #BF6A4A;
+  --gold: #C9A84C;
+  --text: #E8E4DF;
+  --text-dim: #8A8680;
+  --text-bright: #F5F2ED;
+  --accent-glow: rgba(191,106,74,0.15);
+  --gold-glow: rgba(201,168,76,0.12);
+  --border: #2A2D35;
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Noto Sans KR', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+  --error-color: #E85D5D;
+  --success-color: #5DB860;
+}
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.75;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--terracotta); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ═══════════════════ STICKY HEADER ═══════════════════ */
+.sticky-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sticky-header .logo {
+  font-family: var(--font-heading);
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--terracotta);
+  letter-spacing: 0.05em;
+}
+.sticky-header .day-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--gold);
+  background: var(--gold-glow);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid rgba(201,168,76,0.25);
+}
+.sticky-header .series-info {
+  font-size: 0.7rem; color: var(--text-dim);
+}
+
+/* ═══════════════════ HERO SECTION ═══════════════════ */
+.hero {
+  text-align: center;
+  padding: 4rem 1.5rem 3rem;
+  background: linear-gradient(180deg, rgba(191,106,74,0.08) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+}
+.hero .overline {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 0.4rem;
+  line-height: 1.2;
+}
+.hero .subtitle {
+  font-size: 1rem; color: var(--text-dim);
+  margin-bottom: 2rem;
+}
+.hero-email {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+.hero-email::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--terracotta), var(--gold));
+}
+.hero-email .subject {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  letter-spacing: 0.05em;
+}
+.hero-email .greeting {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 0.8rem;
+}
+.hero-email .body {
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+.hero-email .closing {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  margin-top: 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+/* ═══════════════════ SECTION LAYOUT ═══════════════════ */
+.container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+section { padding: 3rem 0; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 1.8rem; font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 1.5rem;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+.card-alt { background: var(--bg-card-alt); }
+
+/* ═══════════════════ BRAIN SCIENCE BOX ═══════════════════ */
+.brain-box {
+  background: linear-gradient(135deg, rgba(191,106,74,0.08), rgba(201,168,76,0.06));
+  border: 1px solid rgba(191,106,74,0.2);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.brain-box h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem; font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.brain-box .strategy {
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--terracotta);
+}
+.brain-box .strategy strong { color: var(--gold); font-weight: 500; }
+.brain-box .strategy p { font-size: 0.9rem; color: var(--text-dim); margin-top: 0.2rem; }
+.tip-highlight { color: var(--terracotta); font-weight: 500; }
+.time-table {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(10,12,16,0.5);
+  border-radius: 8px;
+}
+.time-table .time { font-family: var(--font-mono); color: var(--gold); font-size: 0.8rem; }
+.time-table .task { color: var(--text); }
+
+/* ═══════════════════ 5-COLUMN TABLE ═══════════════════ */
+.expr-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.expr-table th {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 0.8rem 0.6rem;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+.expr-table td {
+  padding: 1.2rem 0.6rem;
+  border-bottom: 1px solid rgba(42,45,53,0.6);
+  font-size: 0.85rem;
+}
+.expr-table tbody tr:hover {
+  background: rgba(191,106,74,0.05);
+}
+.col-fr {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--terracotta);
+  font-size: 0.95rem;
+}
+.col-ipa {
+  font-family: var(--font-mono);
+  color: var(--gold);
+  font-style: italic;
+  font-size: 0.8rem;
+}
+.col-approx {
+  font-family: var(--font-mono);
+  color: var(--text);
+  font-size: 0.8rem;
+}
+.col-meaning {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+.col-context {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+/* ═══════════════════ EMAIL CORRECTION ═══════════════════ */
+.email-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+@media (max-width: 768px) {
+  .email-comparison { grid-template-columns: 1fr; }
+}
+.email-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.email-box.incorrect {
+  border-left: 4px solid var(--error-color);
+}
+.email-box.correct {
+  border-left: 4px solid var(--success-color);
+}
+.email-header {
+  background: var(--bg-card-alt);
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.email-header .label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.email-header .status {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+}
+.email-box.incorrect .status {
+  color: var(--error-color);
+}
+.email-box.correct .status {
+  color: var(--success-color);
+}
+.email-content {
+  padding: 1.5rem;
+}
+.email-field {
+  margin-bottom: 1rem;
+}
+.email-field-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+.email-field-value {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+.email-body {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.error-highlight {
+  background: rgba(232,93,93,0.15);
+  color: var(--error-color);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-weight: 500;
+}
+.correction-highlight {
+  background: rgba(93,184,96,0.15);
+  color: var(--success-color);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+/* ═══════════════════ ERROR PATTERN SVG ═══════════════════ */
+.svg-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+.svg-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--terracotta);
+  margin-bottom: 1rem;
+}
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ═══════════════════ DIALOGUE BOX ═══════════════════ */
+.dialogue {
+  background: linear-gradient(135deg, rgba(191,106,74,0.08), rgba(201,168,76,0.04));
+  border: 1px solid rgba(191,106,74,0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+.dialogue-item {
+  margin-bottom: 1.2rem;
+  display: flex;
+  gap: 1rem;
+}
+.dialogue-item:last-child {
+  margin-bottom: 0;
+}
+.speaker {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  min-width: 90px;
+  padding-top: 0.1rem;
+}
+.speech {
+  flex: 1;
+}
+.speech .fr {
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+}
+.speech .ko {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* ═══════════════════ SPOT THE ERROR EXERCISE ═══════════════════ */
+.exercise-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.exercise-item:hover {
+  border-color: var(--terracotta);
+  background: var(--bg-card-alt);
+}
+.exercise-number {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+.exercise-sentence {
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 0.8rem;
+  line-height: 1.6;
+}
+.exercise-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.exercise-item.active .exercise-answer {
+  max-height: 500px;
+}
+.answer-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--success-color);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  margin-top: 0.8rem;
+}
+.answer-content {
+  background: rgba(93,184,96,0.08);
+  border-left: 2px solid var(--success-color);
+  padding: 0.8rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+/* ═══════════════════ INLINE PLAYBACK ═══════════════════ */
+.inline-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(191,106,74,0.1);
+  border: 1px solid rgba(191,106,74,0.2);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--terracotta);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.inline-play:hover {
+  background: rgba(191,106,74,0.15);
+  border-color: rgba(191,106,74,0.3);
+}
+.inline-play.playing {
+  background: rgba(191,106,74,0.2);
+  border-color: var(--terracotta);
+}
+
+/* ═══════════════════ FOOTER ═══════════════════ */
+footer {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+
+<div class="sticky-header">
+  <div class="logo">🇫🇷 French Learning Module</div>
+  <div class="day-tag">DAY 22</div>
+  <div class="series-info">Email Correction Practice | Renault Korea Engineering</div>
+</div>
+
+<section class="hero">
+  <div class="container">
+    <div class="overline">Module 22 · 격식체 작문</div>
+    <h1>이메일 교정 실습</h1>
+    <p class="subtitle">French Email Correction Practice for Automotive Engineers</p>
+
+    <div class="hero-email">
+      <div class="subject">Objet: 부품 공급 일정 협의</div>
+      <div class="greeting">Monsieur Martin,</div>
+      <div class="body">Je vous prie de trouver ci-joint le calendrier de livraison des composants pour le projet K-SUV. Nous avons besoin de votre confirmation avant vendredi.</div>
+      <div class="closing">Veuillez me faire savoir à votre convenance.<br/><br/>Cordialement,<br/>Ing. Park (Responsable Technique)</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-label">Learning Objectives</div>
+    <h2 class="section-title">오늘의 학습 목표</h2>
+
+    <div class="brain-box">
+      <h3>🧠 Why Email Correction Matters</h3>
+      <div class="strategy">
+        <strong>Common Mistakes by Korean Speakers</strong>
+        <p>Articles, prepositions, formality registers, and false cognates cause 80% of errors in workplace emails.</p>
+      </div>
+      <div class="strategy">
+        <strong>Business Context</strong>
+        <p>At Renault Korea, email is the primary written communication channel with French headquarters. Errors undermine credibility.</p>
+      </div>
+      <div class="strategy">
+        <strong>Recovery Strategy</strong>
+        <p>Master 3 critical email formulas, recognize false friends, and develop a pre-send checklist.</p>
+      </div>
+
+      <div class="time-table">
+        <div class="time">00:00-05:00</div>
+        <div class="task">Introduction: Common Email Errors in Korean-French Communication</div>
+        <div class="time">05:00-10:00</div>
+        <div class="task">Expression Table: 5-Column Email Correction Framework</div>
+        <div class="time">10:00-15:00</div>
+        <div class="task">Before/After Email Examples with Highlighted Corrections</div>
+        <div class="time">15:00-20:00</div>
+        <div class="task">Error Pattern SVG + Formal Email Structure Guide</div>
+        <div class="time">20:00-25:00</div>
+        <div class="task">Spot-the-Error Exercises (5 automotive email scenarios)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-label">Email Correction Framework</div>
+    <h2 class="section-title">이메일 교정 표준식</h2>
+    <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Korean engineers' common mistakes and French corrections</p>
+
+    <table class="expr-table">
+      <thead>
+        <tr>
+          <th>프랑스어</th>
+          <th>IPA</th>
+          <th>한국어 근사음</th>
+          <th>한국어 뜻</th>
+          <th>사용 상황 (Email Context)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="col-fr">Je vous prie de</td>
+          <td class="col-ipa">/ʒə vu prie də/</td>
+          <td class="col-approx">쥐 우 쁘리 드</td>
+          <td class="col-meaning">I humbly request</td>
+          <td class="col-context">Formal request opening. NOT "Je demande vous"</td>
+        </tr>
+        <tr>
+          <td class="col-fr">Veuillez trouver ci-joint</td>
+          <td class="col-ipa">/vœ-yay troov-ay see-zhwah/</td>
+          <td class="col-approx">뷔이예 뜨루베 씨-쥐와</td>
+          <td class="col-meaning">Please find attached</td>
+          <td class="col-context">Attachment notification. NOT "Veuillez trouver joint"</td>
+        </tr>
+        <tr>
+          <td class="col-fr">Je vous remercie de</td>
+          <td class="col-ipa">/ʒə vu rə-mer-si də/</td>
+          <td class="col-approx">쥐 우 르므르씨 드</td>
+          <td class="col-meaning">Thank you for</td>
+          <td class="col-context">Formal thanks. NOT "Je remercie à vous"</td>
+        </tr>
+        <tr>
+          <td class="col-fr">Cordialement</td>
+          <td class="col-ipa">/kor-dyal-mah/</td>
+          <td class="col-approx">꼬르디알마</td>
+          <td class="col-meaning">Sincerely</td>
+          <td class="col-context">Professional closing. Standard at Renault</td>
+        </tr>
+        <tr>
+          <td class="col-fr">À votre convenance</td>
+          <td class="col-ipa">/a votr kohn-vuh-nahns/</td>
+          <td class="col-approx">아 보트르 꼽벼낭스</td>
+          <td class="col-meaning">At your convenience</td>
+          <td class="col-context">When asking availability. Polite register</td>
+        </tr>
+        <tr>
+          <td class="col-fr">Pouvez-vous confirmer</td>
+          <td class="col-ipa">/poo-vay-voo kohn-fir-may/</td>
+          <td class="col-approx">뿌베-우 꼼피르메</td>
+          <td class="col-meaning">Can you confirm</td>
+          <td class="col-context">Polite question. Use "vous" form</td>
+        </tr>
+        <tr>
+          <td class="col-fr">Auriez-vous la gentillesse</td>
+          <td class="col-ipa">/or-yay-voo la zhahn-tee-yes/</td>
+          <td class="col-approx">오리예-우 라 장틸레스</td>
+          <td class="col-meaning">Would you be so kind</td>
+          <td class="col-context">Highly formal requests. Conditional vous</td>
+        </tr>
+        <tr>
+          <td class="col-fr">Concernant le calendrier</td>
+          <td class="col-ipa">/kohn-sir-nahn lə ka-lahn-dree-ay/</td>
+          <td class="col-approx">꼼써르낭 르 깔랑드리에</td>
+          <td class="col-meaning">Regarding the schedule</td>
+          <td class="col-context">Topic introduction. Professional tone</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-label">Before & After</div>
+    <h2 class="section-title">교정 실습: 이메일 비교</h2>
+    <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Incorrect vs. Correct Email Examples</p>
+
+    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; color: var(--gold); margin: 2rem 0 1rem;">Exemple 1: Parts Delivery Schedule</h3>
+    <div class="email-comparison">
+      <div class="email-box incorrect">
+        <div class="email-header">
+          <div class="label">❌ Incorrect</div>
+          <div class="status">7 errors</div>
+        </div>
+        <div class="email-content">
+          <div class="email-field">
+            <div class="email-field-label">Objet:</div>
+            <div class="email-field-value">Livraison de pièces</div>
+          </div>
+          <div class="email-field">
+            <div class="email-field-label">À:</div>
+            <div class="email-field-value">martin@renault.fr</div>
+          </div>
+          <div class="email-body">
+            <p>Bonjour Martin,</p>
+            <p style="margin-top: 0.8rem;">
+              Je demande <span class="error-highlight">vous</span> le calendrier de livraison.
+              <span class="error-highlight">Veuillez trouver joint</span> le document.
+              <span class="error-highlight">Je suis très besoin</span> de votre confirmation avant vendredi.
+            </p>
+            <p style="margin-top: 0.8rem;">
+              <span class="error-highlight">À bientôt,</span><br/>
+              Park
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="email-box correct">
+        <div class="email-header">
+          <div class="label">✓ Correct</div>
+          <div class="status">0 errors</div>
+        </div>
+        <div class="email-content">
+          <div class="email-field">
+            <div class="email-field-label">Objet:</div>
+            <div class="email-field-value">Calendrier de livraison — Composants K-SUV</div>
+          </div>
+          <div class="email-field">
+            <div class="email-field-label">À:</div>
+            <div class="email-field-value">martin@renault.fr</div>
+          </div>
+          <div class="email-body">
+            <p>Monsieur Martin,</p>
+            <p style="margin-top: 0.8rem;">
+              <span class="correction-highlight">Je vous prie de</span> considérer le calendrier de livraison ci-dessous.
+              <span class="correction-highlight">Veuillez trouver ci-joint</span> le document détaillé.
+              <span class="correction-highlight">J'aurais besoin</span> de votre confirmation avant vendredi.
+            </p>
+            <p style="margin-top: 0.8rem;">
+              <span class="correction-highlight">Cordialement,</span><br/>
+              Ingénieur Park<br/>
+              Responsable Technique<br/>
+              Renault Korea Engineering
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 1.5rem; border-left: 3px solid var(--gold);">
+      <h4 style="color: var(--gold); margin-bottom: 1rem; font-family: var(--font-heading);">Key Corrections</h4>
+      <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--error-color);">✗</span>
+          "Je demande vous" → "Je vous prie de" (Asking with respect)
+        </li>
+        <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--error-color);">✗</span>
+          "Veuillez trouver joint" → "Veuillez trouver ci-joint" (Complete formula)
+        </li>
+        <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--error-color);">✗</span>
+          "Je suis très besoin" → "J'aurais besoin" (Conditional politeness)
+        </li>
+        <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--error-color);">✗</span>
+          "À bientôt," → "Cordialement," (Professional register)
+        </li>
+        <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--error-color);">✗</span>
+          Subject line should be specific and detailed
+        </li>
+        <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--error-color);">✗</span>
+          Use "Monsieur/Madame" instead of first names in formal email
+        </li>
+        <li style="padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--error-color);">✗</span>
+          Sign with title and department at Renault
+        </li>
+      </ul>
+    </div>
+
+    <h3 style="font-family: var(--font-heading); font-size: 1.2rem; color: var(--gold); margin: 2.5rem 0 1rem;">Exemple 2: Urgent Clarification Request</h3>
+    <div class="email-comparison">
+      <div class="email-box incorrect">
+        <div class="email-header">
+          <div class="label">❌ Incorrect</div>
+          <div class="status">6 errors</div>
+        </div>
+        <div class="email-content">
+          <div class="email-field">
+            <div class="email-field-label">Objet:</div>
+            <div class="email-field-value">Question sur suspension</div>
+          </div>
+          <div class="email-body">
+            <p>Martin,</p>
+            <p style="margin-top: 0.8rem;">
+              Je besoin <span class="error-highlight">à clarifier</span> une point importante.
+              <span class="error-highlight">Est-ce que</span> vous pouvez m'aider?
+              <span class="error-highlight">C'est urgent!</span>
+            </p>
+            <p style="margin-top: 0.8rem;">
+              <span class="error-highlight">Merci beaucoup!</span><br/>
+              Park
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="email-box correct">
+        <div class="email-header">
+          <div class="label">✓ Correct</div>
+          <div class="status">0 errors</div>
+        </div>
+        <div class="email-content">
+          <div class="email-field">
+            <div class="email-field-label">Objet:</div>
+            <div class="email-field-value">Demande de clarification urgente — Spécifications suspension K-SUV</div>
+          </div>
+          <div class="email-body">
+            <p>Monsieur Martin,</p>
+            <p style="margin-top: 0.8rem;">
+              <span class="correction-highlight">J'aurais besoin de clarifier</span> un point important concernant les spécifications de suspension.
+              <span class="correction-highlight">Pouvez-vous</span> m'aider à ce sujet?
+              <span class="correction-highlight">Cela demande une réponse rapide.</span>
+            </p>
+            <p style="margin-top: 0.8rem;">
+              <span class="correction-highlight">Je vous remercie d'avance,</span><br/>
+              Ingénieur Park<br/>
+              Département Suspension<br/>
+              Renault Korea
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 1.5rem; border-left: 3px solid var(--gold);">
+      <h4 style="color: var(--gold); margin-bottom: 1rem; font-family: var(--font-heading);">Key Corrections</h4>
+      <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--error-color);">✗</span>
+          "Je besoin à clarifier" → "J'aurais besoin de clarifier" (Subjunctive needed)
+        </li>
+        <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--error-color);">✗</span>
+          "une point" → "un point" (False friend: "point" is masculine)
+        </li>
+        <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--error-color);">✗</span>
+          "Est-ce que vous pouvez" → "Pouvez-vous" (Too casual/indirect)
+        </li>
+        <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--error-color);">✗</span>
+          "C'est urgent!" → "Cela demande une réponse rapide." (Professional tone)
+        </li>
+        <li style="margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--error-color);">✗</span>
+          "Merci beaucoup!" → "Je vous remercie d'avance," (Formal register)
+        </li>
+        <li style="padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--error-color);">✗</span>
+          No department or title in signature
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-label">Error Patterns</div>
+    <h2 class="section-title">흔한 오류 패턴 분석</h2>
+    <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Error patterns by Korean engineering professionals</p>
+
+    <div class="svg-container">
+      <div class="svg-title">Email Error Distribution (Korean → French)</div>
+      <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background -->
+        <rect width="800" height="400" fill="#12151C"/>
+
+        <!-- Title -->
+        <text x="400" y="30" font-size="20" font-weight="bold" fill="#BF6A4A" text-anchor="middle">이메일 오류 패턴</text>
+
+        <!-- Error category 1: Articles -->
+        <rect x="50" y="80" width="140" height="280" fill="#E85D5D" opacity="0.3" stroke="#E85D5D" stroke-width="2"/>
+        <text x="120" y="380" font-size="12" fill="#C9A84C" text-anchor="middle" font-weight="bold">Articles</text>
+        <text x="120" y="360" font-size="11" fill="#E8E4DF" text-anchor="middle">32%</text>
+        <text x="120" y="150" font-size="10" fill="#E8E4DF" text-anchor="middle">Missing/Wrong</text>
+        <text x="120" y="165" font-size="10" fill="#E8E4DF" text-anchor="middle">Articles</text>
+
+        <!-- Error category 2: Prepositions -->
+        <rect x="220" y="120" width="140" height="240" fill="#E85D5D" opacity="0.3" stroke="#E85D5D" stroke-width="2"/>
+        <text x="290" y="380" font-size="12" fill="#C9A84C" text-anchor="middle" font-weight="bold">Prepositions</text>
+        <text x="290" y="360" font-size="11" fill="#E8E4DF" text-anchor="middle">24%</text>
+        <text x="290" y="180" font-size="10" fill="#E8E4DF" text-anchor="middle">Wrong preposition</text>
+        <text x="290" y="195" font-size="10" fill="#E8E4DF" text-anchor="middle">choice</text>
+
+        <!-- Error category 3: Formality -->
+        <rect x="390" y="60" width="140" height="300" fill="#E85D5D" opacity="0.3" stroke="#E85D5D" stroke-width="2"/>
+        <text x="460" y="380" font-size="12" fill="#C9A84C" text-anchor="middle" font-weight="bold">Register</text>
+        <text x="460" y="360" font-size="11" fill="#E8E4DF" text-anchor="middle">28%</text>
+        <text x="460" y="160" font-size="10" fill="#E8E4DF" text-anchor="middle">Too casual/</text>
+        <text x="460" y="175" font-size="10" fill="#E8E4DF" text-anchor="middle">informal</text>
+
+        <!-- Error category 4: False Friends -->
+        <rect x="560" y="180" width="140" height="180" fill="#E85D5D" opacity="0.3" stroke="#E85D5D" stroke-width="2"/>
+        <text x="630" y="380" font-size="12" fill="#C9A84C" text-anchor="middle" font-weight="bold">False Friends</text>
+        <text x="630" y="360" font-size="11" fill="#E8E4DF" text-anchor="middle">12%</text>
+        <text x="630" y="250" font-size="10" fill="#E8E4DF" text-anchor="middle">Cognate</text>
+        <text x="630" y="265" font-size="10" fill="#E8E4DF" text-anchor="middle">mistakes</text>
+
+        <!-- Error category 5: Grammar -->
+        <rect x="730" y="140" width="50" height="220" fill="#E85D5D" opacity="0.3" stroke="#E85D5D" stroke-width="2"/>
+        <text x="755" y="380" font-size="10" fill="#C9A84C" text-anchor="middle" font-weight="bold">Other</text>
+        <text x="755" y="360" font-size="11" fill="#E8E4DF" text-anchor="middle">4%</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-label">Formal Email Structure</div>
+    <h2 class="section-title">격식 이메일 구조</h2>
+    <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Complete business email template</p>
+
+    <div class="card">
+      <h3 style="color: var(--gold); margin-bottom: 1rem; font-family: var(--font-heading);">Professional Email Structure</h3>
+
+      <div style="background: var(--bg-card-alt); border-left: 3px solid var(--terracotta); padding: 1.2rem; margin: 1rem 0; border-radius: 6px;">
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); margin-bottom: 0.5rem; letter-spacing: 0.05em;">OBJET LINE</div>
+        <div style="font-size: 0.9rem; color: var(--text);">
+          <strong>Objet:</strong> [Specific topic] — [Department/Project name]<br/>
+          <span style="color: var(--text-dim); font-size: 0.8rem;">Example: "Livraison de composants — Projet K-SUV"</span>
+        </div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border-left: 3px solid var(--gold); padding: 1.2rem; margin: 1rem 0; border-radius: 6px;">
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); margin-bottom: 0.5rem; letter-spacing: 0.05em;">GREETING</div>
+        <div style="font-size: 0.9rem; color: var(--text);">
+          <strong>Monsieur [Nom],</strong> or <strong>Madame [Nom],</strong><br/>
+          <span style="color: var(--text-dim); font-size: 0.8rem;">NEVER: "Martin" or "Bonjour Martin" in formal context</span>
+        </div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border-left: 3px solid var(--terracotta); padding: 1.2rem; margin: 1rem 0; border-radius: 6px;">
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); margin-bottom: 0.5rem; letter-spacing: 0.05em;">OPENING STATEMENT</div>
+        <div style="font-size: 0.9rem; color: var(--text);">
+          <strong>Je vous prie de</strong> [+infinitive] or <strong>Je vous remercie de</strong> [+infinitive]<br/>
+          <span style="color: var(--text-dim); font-size: 0.8rem;">Opens email with respect and structure</span>
+        </div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border-left: 3px solid var(--gold); padding: 1.2rem; margin: 1rem 0; border-radius: 6px;">
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); margin-bottom: 0.5rem; letter-spacing: 0.05em;">MAIN CONTENT</div>
+        <div style="font-size: 0.9rem; color: var(--text);">
+          • Use complete sentences (not sentence fragments)<br/>
+          • <strong>Vous form</strong> consistently<br/>
+          • Clear paragraph breaks (1-2 topics per paragraph)<br/>
+          • Attachment notation: <strong>Veuillez trouver ci-joint</strong> le document
+        </div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border-left: 3px solid var(--terracotta); padding: 1.2rem; margin: 1rem 0; border-radius: 6px;">
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); margin-bottom: 0.5rem; letter-spacing: 0.05em;">CLOSING STATEMENT</div>
+        <div style="font-size: 0.9rem; color: var(--text);">
+          <strong>Je vous remercie d'avance,</strong> or <strong>À votre convenance,</strong><br/>
+          <span style="color: var(--text-dim); font-size: 0.8rem;">Professional and polite</span>
+        </div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border-left: 3px solid var(--gold); padding: 1.2rem; margin: 1rem 0; border-radius: 6px;">
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); margin-bottom: 0.5rem; letter-spacing: 0.05em;">SIGN-OFF</div>
+        <div style="font-size: 0.9rem; color: var(--text);">
+          <strong>Cordialement,</strong><br/>
+          [Full Name]<br/>
+          [Title]<br/>
+          [Department]<br/>
+          Renault Korea Engineering
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-label">Dialogue Practice</div>
+    <h2 class="section-title">대화 연습: 이메일 피드백</h2>
+    <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Vous (Korean Engineer) ↔ Martin (French Colleague)</p>
+
+    <div class="dialogue">
+      <div class="dialogue-item">
+        <div class="speaker">Vous</div>
+        <div class="speech">
+          <div class="fr">Martin, j'aurais une question sur la grammaire de mon email...</div>
+          <div class="ko">Martin, 내 이메일 문법에 대해 한 가지 질문이 있는데요...</div>
+        </div>
+      </div>
+
+      <div class="dialogue-item">
+        <div class="speaker">Martin</div>
+        <div class="speech">
+          <div class="fr">Bien sûr, n'hésitez pas. Quel est le problème?</div>
+          <div class="ko">물론이죠, 편하게 말씀해요. 뭐가 문제인가요?</div>
+        </div>
+      </div>
+
+      <div class="dialogue-item">
+        <div class="speaker">Vous</div>
+        <div class="speech">
+          <div class="fr">Je me demande si je dois utiliser "Je demande vous" ou "Je vous prie de"...</div>
+          <div class="ko">저는 "Je demande vous"를 써야 하는지 "Je vous prie de"를 써야 하는지 궁금해요...</div>
+        </div>
+      </div>
+
+      <div class="dialogue-item">
+        <div class="speaker">Martin</div>
+        <div class="speech">
+          <div class="fr">Ah! Toujours "Je vous prie de" dans un email professionnel. "Je demande vous" n'existe pas en français. C'est un faux ami pour vous, les Coréens.</div>
+          <div class="ko">아! 전문 이메일에서는 항상 "Je vous prie de"를 써야 해요. "Je demande vous"는 프랑스어에 없어요. 한국분들에게는 이건 거짓 친구예요.</div>
+        </div>
+      </div>
+
+      <div class="dialogue-item">
+        <div class="speaker">Vous</div>
+        <div class="speech">
+          <div class="fr">Merci! Et pour les pièces jointes, comment on dit exactement?</div>
+          <div class="ko">감사합니다! 그리고 첨부 파일은 정확히 뭐라고 하죠?</div>
+        </div>
+      </div>
+
+      <div class="dialogue-item">
+        <div class="speaker">Martin</div>
+        <div class="speech">
+          <div class="fr">Toujours "Veuillez trouver ci-joint". Pas "Veuillez trouver joint"... c'est incomplet. Le "ci-joint" doit être là.</div>
+          <div class="ko">항상 "Veuillez trouver ci-joint"예요. "Veuillez trouver joint"은 안 돼요... 완전하지 않으니까요. "ci-joint"는 반드시 있어야 해요.</div>
+        </div>
+      </div>
+
+      <div class="dialogue-item">
+        <div class="speaker">Vous</div>
+        <div class="speech">
+          <div class="fr">D'accord. Je vais utiliser cette structure à partir de maintenant.</div>
+          <div class="ko">알겠어요. 지금부터 이 구조를 사용할게요.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-label">Spot the Error</div>
+    <h2 class="section-title">오류 찾기 연습</h2>
+    <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Click each email to reveal corrections (Automotive context)</p>
+
+    <div class="exercise-item" onclick="this.classList.toggle('active')">
+      <div class="exercise-number">Exercise 01</div>
+      <div class="exercise-sentence">
+        <strong>Sujet:</strong> Questions<br/>
+        <strong>Email:</strong> Martin, Je demande vous une question sur les spécifications de suspension. Je suis très besoin de votre aide.
+      </div>
+      <div class="exercise-answer">
+        <div class="answer-label">✓ Correction</div>
+        <div class="answer-content">
+          <strong>Sujet:</strong> Demande de clarification — Spécifications de suspension K-SUV<br/><br/>
+          <strong>Email:</strong> Monsieur Martin, Je vous prie de répondre à ma question concernant les spécifications de suspension. J'aurais besoin de votre aide.
+          <br/><br/>
+          <strong>Errors:</strong> "Je demande vous" (wrong construction), too generic subject line, "Je suis très besoin" (wrong auxiliary + preposition), no formal greeting, no signature
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-item" onclick="this.classList.toggle('active')">
+      <div class="exercise-number">Exercise 02</div>
+      <div class="exercise-sentence">
+        <strong>Sujet:</strong> Livraison<br/>
+        <strong>Email:</strong> Veuillez trouver joint le rapport de test. Est-ce que vous pouvez confirmer la réception? À bientôt!
+      </div>
+      <div class="exercise-answer">
+        <div class="answer-label">✓ Correction</div>
+        <div class="answer-content">
+          <strong>Sujet:</strong> Livraison du rapport de test — Suspension avant K-SUV<br/><br/>
+          <strong>Email:</strong> Monsieur Martin, Veuillez trouver ci-joint le rapport de test complet. Pouvez-vous confirmer la réception? Cordialement, Ing. Park
+          <br/><br/>
+          <strong>Errors:</strong> "Veuillez trouver joint" (missing "ci-"), "Est-ce que" (too casual), "À bientôt!" (informal), no recipient name, no proper signature with title
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-item" onclick="this.classList.toggle('active')">
+      <div class="exercise-number">Exercise 03</div>
+      <div class="exercise-sentence">
+        <strong>Sujet:</strong> Point important<br/>
+        <strong>Email:</strong> Madame, Je vous remercie à votre aide avec le projet. Je vous demande à clarifier un point sur la chaîne de montage.
+      </div>
+      <div class="exercise-answer">
+        <div class="answer-label">✓ Correction</div>
+        <div class="answer-content">
+          <strong>Sujet:</strong> Demande de clarification — Processus de chaîne de montage K-SUV<br/><br/>
+          <strong>Email:</strong> Madame Dupont, Je vous remercie de votre aide avec le projet. Je vous prie de clarifier un point technique concernant la chaîne de montage.
+          <br/><br/>
+          <strong>Errors:</strong> "remercie à" (wrong preposition, should be "de"), "demande à clarifier" (wrong structure, should be "prie de"), vague subject line, no formal name in greeting
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-item" onclick="this.classList.toggle('active')">
+      <div class="exercise-number">Exercise 04</div>
+      <div class="exercise-sentence">
+        <strong>Sujet:</strong> Urgent<br/>
+        <strong>Email:</strong> Martin! Les documents pour le meeting sont très importants. Vous devez me les envoyer aujourd'hui! C'est très urgent!
+      </div>
+      <div class="exercise-answer">
+        <div class="answer-label">✓ Correction</div>
+        <div class="answer-content">
+          <strong>Sujet:</strong> Documents urgents requis — Réunion de synthèse K-SUV<br/><br/>
+          <strong>Email:</strong> Monsieur Martin, Auriez-vous la gentillesse de m'envoyer les documents pour la réunion de synthèse? Cela demande une réponse rapide. Je vous remercie d'avance. Cordialement, Ing. Park
+          <br/><br/>
+          <strong>Errors:</strong> "Martin!" (too casual), "très important/très urgent" (overuse of "très", unprofessional tone), imperative commands (should be polite conditional), no formal structure, exclamation marks in formal email
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-item" onclick="this.classList.toggle('active')">
+      <div class="exercise-number">Exercise 05</div>
+      <div class="exercise-sentence">
+        <strong>Sujet:</strong> Questions sur calibrage<br/>
+        <strong>Email:</strong> Bonjour, Je suis besoin de votre expertise pour une question difficile. Vous êtes l'expert de ce domaine, oui? Je demande vous pour m'aider à résoudre ce problème très difficile.
+      </div>
+      <div class="exercise-answer">
+        <div class="answer-label">✓ Correction</div>
+        <div class="answer-content">
+          <strong>Sujet:</strong> Question technique urgente — Procédé de calibrage suspension K-SUV<br/><br/>
+          <strong>Email:</strong> Monsieur Martin, Je vous prie de m'aider concernant un point technique spécifique de calibrage de suspension. Étant donné votre expertise dans ce domaine, j'aurais besoin de votre contribution. À votre convenance. Cordialement, Ing. Park
+          <br/><br/>
+          <strong>Errors:</strong> "Bonjour" (too casual), "Je suis besoin" (wrong auxiliary), redundant question, "Je demande vous" (wrong construction), excessive repetition of "difficile", no signature
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-label">Key Takeaways</div>
+    <h2 class="section-title">핵심 요약</h2>
+
+    <div class="card" style="border-left: 3px solid var(--gold);">
+      <h3 style="color: var(--gold); margin-bottom: 1rem;">3 Critical Email Formulas</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+        <div style="background: var(--bg-card-alt); padding: 1rem; border-radius: 8px;">
+          <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--terracotta); margin-bottom: 0.5rem; letter-spacing: 0.05em;">FORMULA 1</div>
+          <div style="font-size: 0.9rem; color: var(--text);">
+            <strong>Je vous prie de</strong> [infinitive]
+            <div style="color: var(--text-dim); font-size: 0.8rem; margin-top: 0.4rem;">Formal requests. Use in emails.</div>
+          </div>
+        </div>
+        <div style="background: var(--bg-card-alt); padding: 1rem; border-radius: 8px;">
+          <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--terracotta); margin-bottom: 0.5rem; letter-spacing: 0.05em;">FORMULA 2</div>
+          <div style="font-size: 0.9rem; color: var(--text);">
+            <strong>Veuillez trouver ci-joint</strong> [noun]
+            <div style="color: var(--text-dim); font-size: 0.8rem; margin-top: 0.4rem;">Attachment notification. Complete formula.</div>
+          </div>
+        </div>
+        <div style="background: var(--bg-card-alt); padding: 1rem; border-radius: 8px;">
+          <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--terracotta); margin-bottom: 0.5rem; letter-spacing: 0.05em;">FORMULA 3</div>
+          <div style="font-size: 0.9rem; color: var(--text);">
+            <strong>Je vous remercie de</strong> [noun/gerund]
+            <div style="color: var(--text-dim); font-size: 0.8rem; margin-top: 0.4rem;">Formal thanks. Always with "de", not "à".</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border-left: 3px solid var(--gold); margin-top: 1.5rem;">
+      <h3 style="color: var(--gold); margin-bottom: 1rem;">Pre-Send Checklist</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 0.7rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--gold);">▢</span>
+          Subject line is specific and includes project/department
+        </li>
+        <li style="margin-bottom: 0.7rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--gold);">▢</span>
+          Greeting uses "Monsieur/Madame [Name]"
+        </li>
+        <li style="margin-bottom: 0.7rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--gold);">▢</span>
+          Email opens with "Je vous prie de" or "Je vous remercie de"
+        </li>
+        <li style="margin-bottom: 0.7rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--gold);">▢</span>
+          Attachments labeled: "Veuillez trouver ci-joint"
+        </li>
+        <li style="margin-bottom: 0.7rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--gold);">▢</span>
+          Vous form used consistently throughout
+        </li>
+        <li style="margin-bottom: 0.7rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--gold);">▢</span>
+          Closing uses "Cordialement," or "À votre convenance,"
+        </li>
+        <li style="margin-bottom: 0.7rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--gold);">▢</span>
+          Signature includes title, department, and Renault affiliation
+        </li>
+        <li style="margin-bottom: 0.7rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--gold);">▢</span>
+          No colloquial expressions ("à bientôt", "super", "cool")
+        </li>
+        <li style="margin-bottom: 0.7rem; padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--gold);">▢</span>
+          No excessive exclamation marks or overused adjectives
+        </li>
+        <li style="padding-left: 1.5rem; position: relative;">
+          <span style="position: absolute; left: 0; color: var(--gold);">▢</span>
+          Grammar and spelling checked (use French spellchecker)
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Day 22 — Email Correction Practice | Renault Korea Engineering Language Program</p>
+    <p style="margin-top: 0.5rem;">For questions about formal email structure, consult your French colleague or Renault HR communication guidelines.</p>
+  </div>
+</footer>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ═══════════════════ VOICE SELECTION ═══════════════════ */
+  var selectedFrVoice = null;
+
+  function getFrenchVoices() {
+    var voices = window.speechSynthesis.getVoices();
+    return voices.filter(function(v) { return v.lang && v.lang.startsWith('fr'); });
+  }
+
+  function initFrenchVoice() {
+    var voices = getFrenchVoices();
+    if (voices.length > 0) {
+      var preferred = voices.find(function(v) { return v.name.includes('Google') || v.name.includes('Microsoft'); }) || voices[0];
+      selectedFrVoice = preferred;
+    }
+  }
+
+  function speakFr(text, rate, pitch) {
+    if (!window.speechSynthesis) return;
+    rate = rate || 0.9;
+    pitch = pitch || 1.0;
+    var utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'fr-FR';
+    utter.rate = rate;
+    utter.pitch = pitch;
+    if (selectedFrVoice) utter.voice = selectedFrVoice;
+    window.speechSynthesis.speak(utter);
+  }
+
+  /* ═══════════════════ INLINE PLAYBACK ═══════════════════ */
+  function addInlinePlayButtons() {
+    document.querySelectorAll('.inline-play').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var text = btn.getAttribute('data-text');
+        var rate = parseFloat(btn.getAttribute('data-rate') || '0.9');
+        speakFr(text, rate, 1.0);
+        btn.classList.add('playing');
+        setTimeout(function() { btn.classList.remove('playing'); }, 1000);
+      });
+    });
+  }
+
+  /* ═══════════════════ INITIALIZATION ═══════════════════ */
+  function init() {
+    function waitForVoices(cb) {
+      var voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) { cb(); return; }
+      var tries = 0;
+      var interval = setInterval(function() {
+        voices = window.speechSynthesis.getVoices(); tries++;
+        if (voices.length > 0 || tries > 20) { clearInterval(interval); cb(); }
+      }, 100);
+      window.speechSynthesis.addEventListener('voiceschanged', function() { clearInterval(interval); cb(); }, { once: true });
+    }
+    waitForVoices(function() { initFrenchVoice(); addInlinePlayButtons(); });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+  // ─── Shadowing Practice ───
+  function buildShadowingSection() {
+    if (document.getElementById('shadowingPractice')) return;
+    var phrases = [];
+    document.querySelectorAll('.fr-word, td:first-child').forEach(function(el) {
+      var text = el.textContent.trim();
+      if (text && text.length > 2 && text.length < 120 && /[a-zàâéèêëïîôùûüÿçœæ]/i.test(text)) {
+        if (phrases.indexOf(text) === -1) phrases.push(text);
+      }
+    });
+    if (phrases.length === 0) return;
+    phrases = phrases.slice(0, 20);
+    var container = document.querySelector('.container');
+    if (!container) return;
+    var section = document.createElement('section');
+    section.className = 'card';
+    section.id = 'shadowingPractice';
+    section.innerHTML = '<h2>🎧 쉐도잉 연습</h2>' +
+      '<p style="color:var(--text-dim,#999);margin-bottom:1rem;">프랑스어 원어민 음성을 듣고 따라 읽으세요. 3초 후 다음 문장으로 넘어갑니다.</p>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;margin-bottom:1rem;">' +
+        '<button id="shadowStart" style="background:var(--terracotta,#BF6A4A);color:#fff;border:none;padding:0.6rem 1.2rem;border-radius:8px;cursor:pointer;font-size:0.95rem;">▶ 시작</button>' +
+        '<button id="shadowStop" style="background:var(--bg-card,#1a1a2e);color:var(--text,#eee);border:1px solid var(--border,#333);padding:0.6rem 1.2rem;border-radius:8px;cursor:pointer;font-size:0.95rem;" disabled>⏹ 정지</button>' +
+        '<div style="display:flex;align-items:center;gap:0.5rem;"><span style="color:var(--text-dim,#999);font-size:0.85rem;">속도:</span>' +
+          '<input type="range" id="shadowSpeed" min="0.4" max="1.2" step="0.1" value="0.8" style="width:80px;">' +
+          '<span id="shadowSpeedLabel" style="color:var(--text-dim,#999);font-size:0.85rem;">0.8x</span>' +
+        '</div>' +
+      '</div>' +
+      '<div id="shadowProgress" style="background:var(--bg,#0a0c10);border-radius:8px;height:6px;margin-bottom:1rem;overflow:hidden;">' +
+        '<div id="shadowBar" style="height:100%;width:0%;background:var(--gold,#C9A84C);transition:width 0.3s;border-radius:8px;"></div>' +
+      '</div>' +
+      '<div id="shadowCurrent" style="text-align:center;font-size:1.3rem;font-family:var(--font-heading,serif);color:var(--terracotta,#BF6A4A);min-height:2rem;margin-bottom:0.5rem;"></div>' +
+      '<div id="shadowStatus" style="text-align:center;color:var(--text-dim,#999);font-size:0.85rem;"></div>';
+    container.appendChild(section);
+    var shadowPhrases = phrases;
+    var shadowIdx = 0, shadowTimer = null, shadowRunning = false;
+    var startBtn = document.getElementById('shadowStart');
+    var stopBtn = document.getElementById('shadowStop');
+    var speedSlider = document.getElementById('shadowSpeed');
+    var speedLabel = document.getElementById('shadowSpeedLabel');
+    var currentEl = document.getElementById('shadowCurrent');
+    var statusEl = document.getElementById('shadowStatus');
+    var barEl = document.getElementById('shadowBar');
+    if (speedSlider) speedSlider.addEventListener('input', function() { speedLabel.textContent = this.value + 'x'; });
+    function playShadowPhrase() {
+      if (!shadowRunning || shadowIdx >= shadowPhrases.length) {
+        stopShadow();
+        if (shadowIdx >= shadowPhrases.length) statusEl.textContent = '✅ 완료!';
+        return;
+      }
+      var text = shadowPhrases[shadowIdx];
+      currentEl.textContent = text;
+      statusEl.textContent = (shadowIdx + 1) + ' / ' + shadowPhrases.length;
+      barEl.style.width = ((shadowIdx + 1) / shadowPhrases.length * 100) + '%';
+      var utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'fr-FR';
+      utter.rate = parseFloat(speedSlider ? speedSlider.value : 0.8);
+      var voice = getFrenchVoice();
+      if (voice) utter.voice = voice;
+      utter.onend = function() {
+        shadowIdx++;
+        shadowTimer = setTimeout(playShadowPhrase, 3000);
+      };
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utter);
+    }
+    function startShadow() {
+      shadowIdx = 0; shadowRunning = true;
+      startBtn.disabled = true; stopBtn.disabled = false;
+      playShadowPhrase();
+    }
+    function stopShadow() {
+      shadowRunning = false;
+      window.speechSynthesis.cancel();
+      if (shadowTimer) clearTimeout(shadowTimer);
+      startBtn.disabled = false; stopBtn.disabled = true;
+    }
+    startBtn.addEventListener('click', startShadow);
+    stopBtn.addEventListener('click', stopShadow);
+  }
+  // ─── End Shadowing ───
+
+  // Auto-init shadowing
+  waitForVoices(function() { initFrenchVoice(); buildShadowingSection(); });
+</script>
+
+</body>
+</html>

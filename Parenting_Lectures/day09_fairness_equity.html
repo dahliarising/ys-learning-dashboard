@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAY 09: 공정성 vs 형평성 | 과학적 육아 스터디</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0A0C10;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4ABF8A;
+            border-radius: 6px;
+            border: 3px solid #0A0C10;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3da870;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #0A0C10;
+            color: #E8E8E8;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* FadeUp Animation */
+        @keyframes fadeUpIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-up {
+            opacity: 0;
+            animation: fadeUpIn 0.8s ease-out forwards;
+        }
+
+        /* ===== STICKY HEADER ===== */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-bottom: 2px solid #4ABF8A;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4ABF8A;
+            letter-spacing: 1px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .day-counter {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #C9A84C;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .pomodoro-btn {
+            background: #4ABF8A;
+            color: #0A0C10;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pomodoro-btn:hover {
+            background: #3da870;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 191, 138, 0.3);
+        }
+
+        /* ===== POMODORO MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #181C24;
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: #4ABF8A;
+            margin-bottom: 1rem;
+        }
+
+        .timer-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3rem;
+            color: #C9A84C;
+            margin: 1.5rem 0;
+            font-weight: 700;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-start {
+            background: #4ABF8A;
+            color: #0A0C10;
+        }
+
+        .btn-start:hover {
+            background: #3da870;
+        }
+
+        .btn-reset {
+            background: #E85D5D;
+            color: #FFF;
+        }
+
+        .btn-reset:hover {
+            background: #d84747;
+        }
+
+        .btn-close {
+            background: #555;
+            color: #FFF;
+        }
+
+        .btn-close:hover {
+            background: #777;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            padding: 3rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-bottom: 2px solid #C9A84C;
+            margin-bottom: 2rem;
+        }
+
+        .part-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #4ABF8A;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .hero h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #E8E8E8;
+            margin: 1rem 0;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #C9A84C;
+            margin: 1rem 0 1.5rem;
+            font-weight: 500;
+        }
+
+        .quote {
+            font-style: italic;
+            color: #A8A8A8;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-left: 4px solid #4ABF8A;
+            background: rgba(74, 191, 138, 0.05);
+            border-radius: 6px;
+        }
+
+        .badges {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: #4ABF8A;
+            color: #0A0C10;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ===== STRATEGY BOX ===== */
+        .strategy-box {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .strategy-box h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #4ABF8A;
+            margin-bottom: 1.5rem;
+        }
+
+        .strategy-content {
+            color: #D8D8D8;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== SCIENCE CARDS ===== */
+        .cards-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .science-card {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .science-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(74, 191, 138, 0.2);
+        }
+
+        .science-card h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: #4ABF8A;
+            margin-bottom: 1rem;
+        }
+
+        .science-content {
+            color: #D8D8D8;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .behavior-box {
+            background: rgba(201, 168, 76, 0.1);
+            border-left: 4px solid #C9A84C;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+
+        .behavior-box h5 {
+            color: #C9A84C;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .behavior-box p {
+            color: #D8D8D8;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ===== DEEP DIVE SECTION ===== */
+        .deep-dive {
+            margin: 2rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #C9A84C;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .deep-dive-header {
+            padding: 1.5rem 2rem;
+            background: rgba(201, 168, 76, 0.15);
+            border-bottom: 2px solid #C9A84C;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .deep-dive-header:hover {
+            background: rgba(201, 168, 76, 0.25);
+        }
+
+        .deep-dive-header h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: #C9A84C;
+            margin: 0;
+        }
+
+        .toggle-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.open {
+            transform: rotate(180deg);
+        }
+
+        .deep-dive-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .deep-dive-content.open {
+            max-height: 2000px;
+        }
+
+        .deep-dive-body {
+            padding: 2rem;
+            color: #D8D8D8;
+            line-height: 1.8;
+        }
+
+        .research-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(74, 191, 138, 0.2);
+        }
+
+        .research-item:last-child {
+            border-bottom: none;
+        }
+
+        .research-item h5 {
+            color: #4ABF8A;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== SVG DIAGRAM ===== */
+        .diagram-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .diagram-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #4ABF8A;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        svg {
+            width: 100%;
+            max-width: 900px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* ===== PRACTICAL GUIDE ===== */
+        .guide-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #C9A84C;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .guide-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #C9A84C;
+            margin-bottom: 1.5rem;
+        }
+
+        .age-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #4ABF8A;
+            flex-wrap: wrap;
+        }
+
+        .age-tab {
+            background: transparent;
+            border: none;
+            color: #A8A8A8;
+            padding: 0.8rem 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .age-tab.active {
+            color: #C9A84C;
+            border-bottom-color: #C9A84C;
+        }
+
+        .age-content {
+            display: none;
+        }
+
+        .age-content.active {
+            display: block;
+        }
+
+        .script-box {
+            background: #0A0C10;
+            border-left: 4px solid #4ABF8A;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 6px;
+        }
+
+        .speaker {
+            font-family: 'JetBrains Mono', monospace;
+            color: #C9A84C;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .dialogue {
+            color: #D8D8D8;
+            margin: 0.5rem 0 1rem 1rem;
+            padding-left: 1rem;
+            border-left: 2px solid #4ABF8A;
+            line-height: 1.6;
+        }
+
+        /* ===== SIBLING TIP ===== */
+        .sibling-tip {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.1) 0%, rgba(74, 191, 138, 0.1) 100%);
+            border: 2px solid #C9A84C;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .sibling-tip h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #C9A84C;
+            margin-bottom: 1rem;
+        }
+
+        .tip-content {
+            color: #D8D8D8;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .tip-content p {
+            margin-bottom: 1rem;
+        }
+
+        /* ===== QUIZ SECTION ===== */
+        .quiz-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .quiz-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #4ABF8A;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .quiz-question {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-num {
+            font-family: 'JetBrains Mono', monospace;
+            color: #C9A84C;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .question-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            color: #E8E8E8;
+            margin: 0.8rem 0;
+            font-weight: 600;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .option {
+            background: #0A0C10;
+            border: 2px solid #4ABF8A;
+            border-radius: 6px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .option:hover {
+            background: rgba(74, 191, 138, 0.1);
+            border-color: #C9A84C;
+        }
+
+        .option input[type="radio"] {
+            cursor: pointer;
+            accent-color: #4ABF8A;
+        }
+
+        .option.correct {
+            background: rgba(74, 191, 138, 0.3);
+            border-color: #4ABF8A;
+        }
+
+        .option.incorrect {
+            background: rgba(232, 93, 93, 0.3);
+            border-color: #E85D5D;
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: rgba(74, 191, 138, 0.2);
+            border-left: 4px solid #4ABF8A;
+            color: #A8E8C8;
+        }
+
+        .feedback.incorrect {
+            background: rgba(232, 93, 93, 0.2);
+            border-left: 4px solid #E85D5D;
+            color: #F5A8A8;
+        }
+
+        .submit-btn {
+            background: #4ABF8A;
+            color: #0A0C10;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #3da870;
+            transform: translateY(-2px);
+        }
+
+        /* ===== TRACKER GRID ===== */
+        .tracker-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #C9A84C;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .tracker-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #C9A84C;
+            margin-bottom: 1.5rem;
+        }
+
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 0.8rem;
+        }
+
+        .tracker-day {
+            aspect-ratio: 1;
+            background: #0A0C10;
+            border: 2px solid #4ABF8A;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tracker-day:hover {
+            background: rgba(74, 191, 138, 0.1);
+        }
+
+        .tracker-day.completed {
+            background: #4ABF8A;
+            color: #0A0C10;
+        }
+
+        .tracker-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #C9A84C;
+        }
+
+        .tracker-day.completed .tracker-num {
+            color: #0A0C10;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            header h1 {
+                font-size: 1.4rem;
+            }
+
+            .header-right {
+                gap: 1rem;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .hero {
+                padding: 2rem 1rem;
+            }
+
+            .strategy-box,
+            .cards-section,
+            .diagram-section,
+            .guide-section,
+            .sibling-tip,
+            .quiz-section,
+            .tracker-section,
+            .deep-dive {
+                margin: 1.5rem 1rem;
+            }
+
+            .age-tabs {
+                flex-direction: column;
+            }
+
+            .age-tab {
+                width: 100%;
+                border-bottom: none;
+                border-left: 3px solid transparent;
+            }
+
+            .age-tab.active {
+                border-left-color: #C9A84C;
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- STICKY HEADER -->
+    <header>
+        <h1>과학적 육아 스터디</h1>
+        <div class="header-right">
+            <span class="day-counter">DAY 09 / 21</span>
+            <button class="pomodoro-btn" onclick="openPomodoro()">⏱ 뽀모도로</button>
+        </div>
+    </header>
+
+    <!-- POMODORO MODAL -->
+    <div class="modal" id="pomodoroModal">
+        <div class="modal-content">
+            <h2>뽀모도로 타이머</h2>
+            <p style="color: #A8A8A8; margin-bottom: 1rem;">25분 집중 학습</p>
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            <div class="modal-buttons">
+                <button class="btn btn-start" onclick="toggleTimer()">시작</button>
+                <button class="btn btn-reset" onclick="resetTimer()">초기화</button>
+                <button class="btn btn-close" onclick="closePomodoro()">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <section class="hero fade-up">
+        <div class="part-label">PART 2 — 자매 관계 설계</div>
+        <h2>공정성 vs 형평성</h2>
+        <p class="subtitle">Fairness vs Equity: 다르지만 공정한 대응의 발달심리학</p>
+        <p class="quote">"'똑같이'는 공정하지 않습니다. '각자 필요한 것'을 주는 것이 공정합니다. 이것을 5-7세는 이해하지 못하고, 2-4세는 완전히 다른 세계에 살고 있습니다." - 장 피아제 (발달심리학)</p>
+        <div class="badges">
+            <span class="badge">첫째 · 5-7세</span>
+            <span class="badge">둘째 · 2-4세</span>
+            <span class="badge">공정성 발달</span>
+        </div>
+    </section>
+
+    <!-- STRATEGY BOX -->
+    <section class="strategy-box fade-up">
+        <h3>🧠 뇌과학 학습 전략</h3>
+        <div class="strategy-content">
+            <p>
+                <strong>공정성의 발달은 연령에 따라 완전히 다릅니다.</strong>
+                5-7세는 "결과의 동등함"에 집착하고, 2-4세는 "소유"의 본능이 강합니다.
+                이는 부모의 "불공정"이 아니라, 아이들의 뇌가 공정함을 다르게 인식하는 증거입니다.
+            </p>
+            <p style="margin-top: 1rem;">
+                이번 학습의 목표: 부모가 "공정성" vs "형평성"의 개념을 이해하고,
+                "똑같이"라는 첫째의 외침에 과학적으로 대응하는 기술 습득하기.
+            </p>
+        </div>
+    </section>
+
+    <!-- SCIENCE CARDS -->
+    <section class="cards-section fade-up">
+        <div class="cards-grid">
+            <div class="science-card">
+                <h4>5-7세의 공정성: 결과 동등성</h4>
+                <div class="science-content">
+                    Piaget의 발달심리학에 따르면, 6-7세 아이는 "분배정의(Distributive Justice)"의 단계에 있습니다.
+                    이 단계에서 아이들은 "물리적 결과가 정확히 같아야 공정"이라고 믿습니다.
+                    뇌의 전두엽이 "의도"를 고려할 만큼 발달하지 않았기 때문입니다.
+                </div>
+                <div class="behavior-box">
+                    <h5>이래서 아이가 이렇게 행동해요</h5>
+                    <p>
+                        "나한테는 왜 초콜렛 5개인데 동생한테는 3개야?"
+                        "내 케이크가 더 작아!" (실제로는 같은 크기)
+                        "불공정해!"라는 외침은, 2-4세보다 나은 인지 능력이 생겼다는 신호입니다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="science-card">
+                <h4>2-4세의 공정성: 소유 본능</h4>
+                <div class="science-content">
+                    2-4세는 아직 "공정"의 개념 자체가 없습니다.
+                    대신 강력한 소유 본능("내 거!")이 있으며, "나도 갖고 싶다"는 욕구 중심입니다.
+                    이는 뇌의 초기 자기중심성(egocentralism)의 정상적 발달입니다.
+                </div>
+                <div class="behavior-box">
+                    <h5>이래서 아이가 이렇게 행동해요</h5>
+                    <p>
+                        "내 거!" (소유권 주장)
+                        "나도 원해!" (욕구 표현)
+                        "나도 똑같이!" (모방 욕구)
+                        공정성이 아니라 욕구와 소유의 언어입니다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="science-card">
+                <h4>공정성 vs 형평성</h4>
+                <div class="science-content">
+                    공정성(Fairness)은 모두에게 똑같이 주는 것.
+                    형평성(Equity)은 각자의 필요에 맞춰 주는 것.
+                    과학적 부모는 아이들의 발달 단계에 맞춰 "형평성"을 실천하되,
+                    이를 "공정하다"고 설명하는 능력이 필요합니다.
+                </div>
+                <div class="behavior-box">
+                    <h5>이래서 부모가 이렇게 해야 해요</h5>
+                    <p>
+                        "다르지만 공정해"는 개념을 인식 속에 심기 (설명).
+                        2-4세는 많은 관심과 간단한 규칙을 필요로 하고,
+                        5-7세는 자율성과 복잡한 논리를 필요로 한다는 것을 설명하기.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DEEP DIVE: 발달심리학 심화 -->
+    <section class="deep-dive fade-up">
+        <div class="deep-dive-header" onclick="toggleDeepDive(this)">
+            <h3>심화 학습: 공정성 인식의 발달 단계</h3>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="deep-dive-content">
+            <div class="deep-dive-body">
+                <div class="research-item">
+                    <h5>Piaget의 공정성 발달 이론 (1932)</h5>
+                    <p>
+                        Piaget는 아이들의 공정성 인식이 단계별로 발달한다고 제시했습니다.
+                        3-5세: "절대적 복종" 단계 - 아이는 규칙이 변할 수 없다고 믿고, 결과만 봅니다.
+                        6-8세: "상호성" 단계 - 아이는 "눈에는 눈"을 시작하고, 물리적 동등성을 중시합니다.
+                        9세 이상: "형평성" 단계 - 아이는 의도와 상황을 고려하기 시작합니다.
+                        우리 가정의 첫째(5-7세)는 정확히 "상호성" 단계에 있으므로, 똑같음을 강조하는 것이 정상입니다.
+                        (참고: Piaget, J. (1932). The Moral Judgment of the Child)
+                    </p>
+                </div>
+                <div class="research-item">
+                    <h5>자기중심성(Egocentrism)과 2-4세</h5>
+                    <p>
+                        2-4세는 여전히 자기중심적 사고(egocentric thinking) 단계에 있습니다.
+                        이는 인지적 미성숙이 아니라, 정상적 발달입니다.
+                        "나"의 관점에서만 세상을 볼 수 있기 때문에,
+                        "공정"의 개념이 없습니다. 대신 "내 욕구"가 전부입니다.
+                        따라서 2-4세가 "나도 똑같이!"라고 할 때,
+                        이는 공정성 주장이 아니라 소유 욕구입니다.
+                        (참고: Piaget의 전조작기, Preoperational Stage)
+                    </p>
+                </div>
+                <div class="research-item">
+                    <h5>전두엽 발달과 "공정함" 이해</h5>
+                    <p>
+                        공정성을 이해하려면 전두엽(prefrontal cortex)의 발달이 필요합니다.
+                        특히 배외측 전두엽(dorsolateral prefrontal cortex, dlPFC)은
+                        "의도 이해"와 "사회적 규칙" 처리에 관여합니다.
+                        5-7세의 dlPFC는 기초적으로 기능하지만, 여전히 미성숙합니다.
+                        따라서 5-7세는 "결과"는 이해하지만 "의도"는 완전히 이해하지 못합니다.
+                        (참고: Steinbeis et al., 2012 - Social Cognitive Neuroscience)
+                    </p>
+                </div>
+                <div class="research-item">
+                    <h5>정보처리 이론으로 본 공정성 발달</h5>
+                    <p>
+                        아이들이 "공정함"을 판단할 때 어떤 정보를 처리하는지 봅시다:
+                        2-4세: 결과 → 욕구 (자신이 원하는 것을 받았는가?)
+                        5-7세: 결과 → 동등성 (모두 똑같은가?)
+                        9세 이상: 결과 + 의도 + 상황 → 형평성 (각자의 필요에 맞게 분배되었는가?)
+                        이는 뇌의 정보처리 능력이 발달함에 따라,
+                        더 많은 변수를 고려할 수 있게 됨을 의미합니다.
+                        부모의 설명이 "5-7세가 이해할 수 있는 수준의 정보"를 전달해야
+                        아이가 점진적으로 개념을 습득합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SVG DIAGRAM -->
+    <section class="diagram-section fade-up">
+        <h3>공정성 vs 형평성: 시각적 비교</h3>
+        <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <polygon points="0 0, 10 3, 0 6" fill="#4ABF8A" />
+                </marker>
+            </defs>
+
+            <g id="equality">
+                <rect x="30" y="30" width="350" height="440" rx="8" fill="#4ABF8A" opacity="0.1" stroke="#4ABF8A" stroke-width="2" />
+                <text x="205" y="60" font-family="Noto Sans KR" font-size="14" fill="#4ABF8A" text-anchor="middle" font-weight="700">공정성 (Equality)</text>
+                <text x="205" y="78" font-family="Noto Sans KR" font-size="11" fill="#A8A8A8" text-anchor="middle">"모두에게 똑같이"</text>
+
+                <text x="205" y="120" font-family="Noto Sans KR" font-size="11" fill="#D8D8D8" text-anchor="middle" font-weight="600">시나리오: 간식 나누기</text>
+
+                <circle cx="100" cy="170" r="25" fill="#4ABF8A" opacity="0.3" />
+                <text x="100" y="176" font-family="Noto Sans KR" font-size="11" fill="#4ABF8A" text-anchor="middle" font-weight="600">5-7세</text>
+
+                <circle cx="310" cy="170" r="20" fill="#C9A84C" opacity="0.3" />
+                <text x="310" y="175" font-family="Noto Sans KR" font-size="10" fill="#C9A84C" text-anchor="middle" font-weight="600">2-4세</text>
+
+                <g id="cookies-eq-1">
+                    <rect x="75" y="220" width="15" height="15" rx="3" fill="#C9A84C" />
+                    <rect x="95" y="220" width="15" height="15" rx="3" fill="#C9A84C" />
+                    <rect x="115" y="220" width="15" height="15" rx="3" fill="#C9A84C" />
+                </g>
+                <text x="100" y="250" font-family="Noto Sans KR" font-size="10" fill="#D8D8D8" text-anchor="middle">3개</text>
+
+                <g id="cookies-eq-2">
+                    <rect x="285" y="220" width="15" height="15" rx="3" fill="#C9A84C" />
+                    <rect x="305" y="220" width="15" height="15" rx="3" fill="#C9A84C" />
+                    <rect x="325" y="220" width="15" height="15" rx="3" fill="#C9A84C" />
+                </g>
+                <text x="310" y="250" font-family="Noto Sans KR" font-size="10" fill="#D8D8D8" text-anchor="middle">3개</text>
+
+                <text x="205" y="300" font-family="Noto Sans KR" font-size="10" fill="#D8D8D8" text-anchor="middle" font-weight="600">결과:</text>
+                <text x="205" y="325" font-family="Noto Sans KR" font-size="10" fill="#D8D8D8" text-anchor="middle">✓ 5-7세 만족: "공정해!"</text>
+                <text x="205" y="345" font-family="Noto Sans KR" font-size="10" fill="#D8D8D8" text-anchor="middle">✗ 2-4세 불만족:</text>
+                <text x="205" y="363" font-family="Noto Sans KR" font-size="10" fill="#A8A8A8" text-anchor="middle">"나 이게 아니라</text>
+                <text x="205" y="378" font-family="Noto Sans KR" font-size="10" fill="#A8A8A8" text-anchor="middle">그것 더 큰 거 원해!"</text>
+
+                <text x="205" y="415" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle" font-style="italic">결과 중심, 특별성 무시</text>
+            </g>
+
+            <g id="equity">
+                <rect x="520" y="30" width="350" height="440" rx="8" fill="#4ABF8A" opacity="0.1" stroke="#4ABF8A" stroke-width="2" />
+                <text x="695" y="60" font-family="Noto Sans KR" font-size="14" fill="#4ABF8A" text-anchor="middle" font-weight="700">형평성 (Equity)</text>
+                <text x="695" y="78" font-family="Noto Sans KR" font-size="11" fill="#A8A8A8" text-anchor="middle">"각자 필요한 것"</text>
+
+                <text x="695" y="120" font-family="Noto Sans KR" font-size="11" fill="#D8D8D8" text-anchor="middle" font-weight="600">시나리오: 간식 나누기</text>
+
+                <circle cx="590" cy="170" r="25" fill="#4ABF8A" opacity="0.3" />
+                <text x="590" y="176" font-family="Noto Sans KR" font-size="11" fill="#4ABF8A" text-anchor="middle" font-weight="600">5-7세</text>
+
+                <circle cx="800" cy="170" r="20" fill="#C9A84C" opacity="0.3" />
+                <text x="800" y="175" font-family="Noto Sans KR" font-size="10" fill="#C9A84C" text-anchor="middle" font-weight="600">2-4세</text>
+
+                <g id="cookies-eq-1">
+                    <rect x="565" y="220" width="12" height="12" rx="2" fill="#C9A84C" />
+                    <rect x="581" y="220" width="12" height="12" rx="2" fill="#C9A84C" />
+                    <rect x="597" y="220" width="12" height="12" rx="2" fill="#C9A84C" />
+                    <rect x="613" y="220" width="12" height="12" rx="2" fill="#C9A84C" />
+                    <rect x="629" y="220" width="12" height="12" rx="2" fill="#C9A84C" />
+                </g>
+                <text x="590" y="250" font-family="Noto Sans KR" font-size="10" fill="#D8D8D8" text-anchor="middle">5개</text>
+
+                <g id="cookies-eq-2">
+                    <rect x="775" y="220" width="15" height="15" rx="3" fill="#E85D5D" />
+                    <rect x="795" y="220" width="15" height="15" rx="3" fill="#E85D5D" />
+                </g>
+                <text x="800" y="250" font-family="Noto Sans KR" font-size="10" fill="#D8D8D8" text-anchor="middle">2개 (큰 거)</text>
+
+                <text x="695" y="300" font-family="Noto Sans KR" font-size="10" fill="#D8D8D8" text-anchor="middle" font-weight="600">결과:</text>
+                <text x="695" y="325" font-family="Noto Sans KR" font-size="10" fill="#D8D8D8" text-anchor="middle">✓ 5-7세: "각자 다르구나"</text>
+                <text x="695" y="345" font-family="Noto Sans KR" font-size="10" fill="#D8D8D8" text-anchor="middle">✓ 2-4세 만족:</text>
+                <text x="695" y="363" font-family="Noto Sans KR" font-size="10" fill="#A8A8A8" text-anchor="middle">"내 거 크다! 좋아!"</text>
+
+                <text x="695" y="415" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle" font-style="italic">필요 중심, 각자 만족</text>
+            </g>
+        </svg>
+    </section>
+
+    <!-- PRACTICAL GUIDE -->
+    <section class="guide-section fade-up">
+        <h3>👨‍👧 아빠 실전 가이드: "똑같이" 요구 대응</h3>
+
+        <div class="age-tabs">
+            <button class="age-tab active" onclick="switchTab(event, 'snack')">간식 나누기</button>
+            <button class="age-tab" onclick="switchTab(event, 'playtime')">놀이시간</button>
+            <button class="age-tab" onclick="switchTab(event, 'gifts')">선물 줄 때</button>
+        </div>
+
+        <div id="snack" class="age-content active">
+            <h4 style="color: #4ABF8A; margin-bottom: 1.5rem; font-weight: 600;">간식 나눌 때</h4>
+
+            <div class="script-box">
+                <div class="speaker">상황: 첫째가 "나도 똑같이 줄래!"라고 항의</div>
+                <div class="dialogue">
+                    ❌ 잘못된 대응: "그래 같이 줄게" (결과 동등성으로 2-4세 불만족)<br><br>
+                    ✅ 올바른 대응:<br>
+                    <strong>아빠:</strong> "우리 OO, 뭐가 싫어?" (감정 확인)<br>
+                    <strong>첫째:</strong> "나도 똑같이 줘!"<br>
+                    <strong>아빠:</strong> "알겠어. 그런데 우리 둘째는 치아가 작으니까 좀 더 작은 조각이 맛있어. 동생은 큰 조각을 깨물기가 힘들거든. 우리 언니는 치아가 크니까, 큰 조각이 더 맛있지?" (발달 단계 설명)<br>
+                    <strong>첫째:</strong> "그럼 내 거는... 크니까... 맞네"<br>
+                    <strong>아빠:</strong> "정확해! 우리 언니는 이런 걸 이해할 수 있어서 정말 놀라워."<br>
+                </div>
+                <p style="color: #A8A8A8; font-size: 0.85rem; margin-top: 1rem;">
+                    💡 핵심: 감정 인정 → 객관적 이유 설명 → 5-7세의 논리 자발적 발견 → 칭찬.
+                </p>
+            </div>
+
+            <div class="script-box">
+                <div class="speaker">심화: 첫째가 계속 "불공정해!"라고 울 때</div>
+                <div class="dialogue">
+                    ✅ 올바른 대응:<br>
+                    <strong>아빠:</strong> "불공정하게 느껴지는구나. 그런 기분도 있을 수 있지." (감정 수용)<br>
+                    <strong>아빠:</strong> "근데 아빠가 생각하기에 공정한 것은 '모두에게 똑같이'가 아니라 '각자 필요한 것'을 주는 거야." (개념 교육)<br>
+                    <strong>아빠:</strong> "너는 이미 우리 동생보다 키도 크고 힘도 세고 똑똑하잖아. 그래서 다른 것들이 필요한 거야. 이게 공정한 거 맞지?"<br>
+                </div>
+            </div>
+        </div>
+
+        <div id="playtime" class="age-content">
+            <h4 style="color: #4ABF8A; margin-bottom: 1.5rem; font-weight: 600;">놀이시간 배분</h4>
+
+            <div class="script-box">
+                <div class="speaker">상황: 첫째가 "나도 똑같이 시간 줘!"</div>
+                <div class="dialogue">
+                    ✅ 올바른 대응:<br>
+                    <strong>아빠:</strong> "우리 OO, 뭐가 하고 싶어?" (욕구 파악)<br>
+                    <strong>첫째:</strong> "내가 동생이랑 똑같이 놀이 시간 가져야 공정해!"<br>
+                    <strong>아빠:</strong> "좋은 생각이야. 그런데 우리 동생은 5분이 최대지만, 우리 언니는 30분도 집중할 수 있잖아. 그래서 언니랑 더 오래 놀면 더 재미있는 게 있어. 이게 공정한 거야." (발달 단계 설명)<br>
+                    <strong>아빠:</strong> "그리고 동생이랑 놀 때는 우리 언니가 도와줘야 하니까, 그것도 특별한 역할이야."<br>
+                </div>
+            </div>
+        </div>
+
+        <div id="gifts" class="age-content">
+            <h4 style="color: #4ABF8A; margin-bottom: 1.5rem; font-weight: 600;">선물 줄 때</h4>
+
+            <div class="script-box">
+                <div class="speaker">상황: 생일 선물 가격/크기가 다를 때</div>
+                <div class="dialogue">
+                    ✅ 올바른 대응 방법:<br>
+                    1️⃣ <strong>미리 설명:</strong> "우리 언니는 이미 한글을 배우고 있으니까, 책을 줄 거고, 우리 동생은 아직 손가락이 작으니까 큰 블록 세트를 줄 거야. 각자 좋아할 것 생각해서." (형평성 설명)<br><br>
+                    2️⃣ <strong>선물 받을 때:</strong> "이게 너한테 맞는 선물이 뭘까?" (함께 고르기)<br><br>
+                    3️⃣ <strong>불만 표현 시:</strong> "이거 비싼데 난 왜 저걸 가져?"<br>
+                    <strong>아빠:</strong> "가격은 같지 않을 수 있지. 하지만 중요한 건 '네게 맞는가'야. 이 책은 너한테 딱 맞는 책이야."<br>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SIBLING TIP -->
+    <section class="sibling-tip fade-up">
+        <h3>👯‍♀️ 자매 관계 팁: 각 아이의 필요에 맞춘 "다르지만 공정한" 대응</h3>
+        <div class="tip-content">
+            <p>
+                <strong>핵심 원칙:</strong> 공정성의 발달은 연령에 따라 다릅니다.
+                5-7세는 "똑같음"에 집착하지만, 이를 논리로 설득할 수 있습니다.
+                2-4세는 공정성을 모르므로, "결과의 만족"에만 신경 쓰면 됩니다.
+            </p>
+            <p>
+                <strong>"다르지만 공정한" 메시지 전달:</strong>
+                단순히 다르게 주는 것이 아니라, "왜 다르게 주는가"를 설명하면,
+                5-7세는 논리를 이해하고, 2-4세는 상관없고, 부모는 일관성을 유지합니다.
+                이 설명은 5-7세에게 "나도 이해할 수 있는 논리"를 제시함으로써,
+                형평성의 개념을 점진적으로 습득하게 합니다.
+            </p>
+            <p>
+                <strong>부모의 역할:</strong>
+                "공정함"의 개념을 아이들에게 교육하는 것은 부모의 책임입니다.
+                "똑같이"를 거부하되, 그 이유를 명확하게 설명하면,
+                5-7세 아이도 점차 "형평성"의 개념을 이해하게 됩니다.
+                이 이해는 이후 학교 생활과 사회생활에서의 도덕적 발달 기반이 됩니다.
+                Kohlberg의 도덕 발달 이론에 따르면, 이 시기의 경험이
+                이후 "공정한 사람"으로 성장할 기초를 만듭니다.
+            </p>
+        </div>
+    </section>
+
+    <!-- QUIZ SECTION -->
+    <section class="quiz-section fade-up">
+        <h3>🧪 학습 점검 & 인출 연습</h3>
+
+        <div class="quiz-question">
+            <div class="question-num">문제 1</div>
+            <div class="question-text">5-7세와 2-4세가 "공정함"을 다르게 인식하는 발달심리학적 이유는?</div>
+            <div class="options">
+                <label class="option">
+                    <input type="radio" name="q1" value="a">
+                    <span>① 5-7세가 더 이기적이기 때문</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q1" value="b">
+                    <span>② 전두엽과 인지 발달 단계가 다르기 때문 (5-7세: 결과 동등성, 2-4세: 소유 본능)</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q1" value="c">
+                    <span>③ 부모의 양육 방식 차이</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q1" value="d">
+                    <span>④ 유전적 성향 차이</span>
+                </label>
+            </div>
+            <button class="submit-btn" onclick="checkAnswer(1, 'b')">확인</button>
+            <div class="feedback" id="feedback1"></div>
+        </div>
+
+        <div class="quiz-question">
+            <div class="question-num">문제 2</div>
+            <div class="question-text">첫째가 "나도 똑같이!"라고 할 때, 가장 효과적인 부모 응답은?</div>
+            <div class="options">
+                <label class="option">
+                    <input type="radio" name="q2" value="a">
+                    <span>① 무조건 똑같이 주기 (조화 유지)</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q2" value="b">
+                    <span>② 감정 수용 + 객관적 이유 설명 + 논리적 설득</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q2" value="c">
+                    <span>③ "그런 말 하지 마" (비판)</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q2" value="d">
+                    <span>④ 상황을 무시하고 넘어가기</span>
+                </label>
+            </div>
+            <button class="submit-btn" onclick="checkAnswer(2, 'b')">확인</button>
+            <div class="feedback" id="feedback2"></div>
+        </div>
+    </section>
+
+    <!-- TRACKER SECTION -->
+    <section class="tracker-section fade-up">
+        <h3>📊 학습 완료 트래커</h3>
+        <p style="color: #A8A8A8; margin-bottom: 1.5rem; font-size: 0.9rem;">매일 학습을 완료했으면 클릭하여 표시하세요.</p>
+        <div class="tracker-grid" id="trackerGrid"></div>
+    </section>
+
+    <script>
+        // IntersectionObserver for fadeUp animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = '0s';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-up').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Pomodoro Timer
+        let timerInterval = null;
+        let timeLeft = 1500;
+        let isRunning = false;
+
+        function openPomodoro() {
+            document.getElementById('pomodoroModal').classList.add('active');
+        }
+
+        function closePomodoro() {
+            document.getElementById('pomodoroModal').classList.remove('active');
+        }
+
+        function updateDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timerDisplay').textContent =
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                document.querySelector('.btn-start').textContent = '재개';
+            } else {
+                isRunning = true;
+                document.querySelector('.btn-start').textContent = '일시정지';
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        alert('뽀모도로 세션 완료! 잠시 쉬어가세요.');
+                        resetTimer();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 1500;
+            isRunning = false;
+            updateDisplay();
+            document.querySelector('.btn-start').textContent = '시작';
+        }
+
+        // Deep Dive Toggle
+        function toggleDeepDive(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            
+            content.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // Quiz Logic
+        function checkAnswer(questionNum, correctAnswer) {
+            const selected = document.querySelector(`input[name="q${questionNum}"]:checked`);
+            if (!selected) {
+                alert('답을 선택해주세요.');
+                return;
+            }
+
+            const feedback = document.getElementById(`feedback${questionNum}`);
+            const options = document.querySelectorAll(`input[name="q${questionNum}"]`);
+
+            options.forEach(opt => {
+                const label = opt.closest('.option');
+                label.classList.remove('correct', 'incorrect');
+                if (opt.checked) {
+                    if (opt.value === correctAnswer) {
+                        label.classList.add('correct');
+                    } else {
+                        label.classList.add('incorrect');
+                    }
+                }
+            });
+
+            feedback.classList.add('show');
+            if (selected.value === correctAnswer) {
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                feedback.innerHTML = '✓ 정답입니다! 공정성 발달을 잘 이해했네요.';
+            } else {
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                feedback.innerHTML = '✗ 다시 생각해보세요. 학습 자료를 다시 읽어보시길 권장합니다.';
+            }
+        }
+
+        // Age Tab Switching
+        function switchTab(event, tabId) {
+            event.preventDefault();
+
+            document.querySelectorAll('.age-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            document.querySelectorAll('.age-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Tracker Grid
+        function initializeTracker() {
+            const tracker = document.getElementById('trackerGrid');
+            for (let i = 1; i <= 21; i++) {
+                const day = document.createElement('div');
+                day.className = 'tracker-day';
+                day.innerHTML = `<span class="tracker-num">D${i}</span>`;
+                day.onclick = () => day.classList.toggle('completed');
+                tracker.appendChild(day);
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            updateDisplay();
+            initializeTracker();
+        });
+    </script>
+</body>
+</html>

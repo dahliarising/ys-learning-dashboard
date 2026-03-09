@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAY 08: 형제 질투의 신경학 | 과학적 육아 스터디</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0A0C10;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4ABF8A;
+            border-radius: 6px;
+            border: 3px solid #0A0C10;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3da870;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #0A0C10;
+            color: #E8E8E8;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* FadeUp Animation */
+        @keyframes fadeUpIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-up {
+            opacity: 0;
+            animation: fadeUpIn 0.8s ease-out forwards;
+        }
+
+        /* ===== STICKY HEADER ===== */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-bottom: 2px solid #4ABF8A;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4ABF8A;
+            letter-spacing: 1px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .day-counter {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #C9A84C;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .pomodoro-btn {
+            background: #4ABF8A;
+            color: #0A0C10;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pomodoro-btn:hover {
+            background: #3da870;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 191, 138, 0.3);
+        }
+
+        /* ===== POMODORO MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #181C24;
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: #4ABF8A;
+            margin-bottom: 1rem;
+        }
+
+        .timer-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3rem;
+            color: #C9A84C;
+            margin: 1.5rem 0;
+            font-weight: 700;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-start {
+            background: #4ABF8A;
+            color: #0A0C10;
+        }
+
+        .btn-start:hover {
+            background: #3da870;
+        }
+
+        .btn-reset {
+            background: #E85D5D;
+            color: #FFF;
+        }
+
+        .btn-reset:hover {
+            background: #d84747;
+        }
+
+        .btn-close {
+            background: #555;
+            color: #FFF;
+        }
+
+        .btn-close:hover {
+            background: #777;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            padding: 3rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-bottom: 2px solid #C9A84C;
+            margin-bottom: 2rem;
+        }
+
+        .part-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #4ABF8A;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .hero h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #E8E8E8;
+            margin: 1rem 0;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #C9A84C;
+            margin: 1rem 0 1.5rem;
+            font-weight: 500;
+        }
+
+        .quote {
+            font-style: italic;
+            color: #A8A8A8;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-left: 4px solid #4ABF8A;
+            background: rgba(74, 191, 138, 0.05);
+            border-radius: 6px;
+        }
+
+        .badges {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: #4ABF8A;
+            color: #0A0C10;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ===== STRATEGY BOX ===== */
+        .strategy-box {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .strategy-box h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #4ABF8A;
+            margin-bottom: 1.5rem;
+        }
+
+        .strategy-content {
+            color: #D8D8D8;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== SCIENCE CARDS ===== */
+        .cards-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .science-card {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .science-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(74, 191, 138, 0.2);
+        }
+
+        .science-card h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: #4ABF8A;
+            margin-bottom: 1rem;
+        }
+
+        .science-content {
+            color: #D8D8D8;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .behavior-box {
+            background: rgba(201, 168, 76, 0.1);
+            border-left: 4px solid #C9A84C;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+
+        .behavior-box h5 {
+            color: #C9A84C;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .behavior-box p {
+            color: #D8D8D8;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ===== DEEP DIVE SECTION ===== */
+        .deep-dive {
+            margin: 2rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #C9A84C;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .deep-dive-header {
+            padding: 1.5rem 2rem;
+            background: rgba(201, 168, 76, 0.15);
+            border-bottom: 2px solid #C9A84C;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .deep-dive-header:hover {
+            background: rgba(201, 168, 76, 0.25);
+        }
+
+        .deep-dive-header h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: #C9A84C;
+            margin: 0;
+        }
+
+        .toggle-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.open {
+            transform: rotate(180deg);
+        }
+
+        .deep-dive-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .deep-dive-content.open {
+            max-height: 2000px;
+        }
+
+        .deep-dive-body {
+            padding: 2rem;
+            color: #D8D8D8;
+            line-height: 1.8;
+        }
+
+        .research-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(74, 191, 138, 0.2);
+        }
+
+        .research-item:last-child {
+            border-bottom: none;
+        }
+
+        .research-item h5 {
+            color: #4ABF8A;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== SVG DIAGRAM ===== */
+        .diagram-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .diagram-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #4ABF8A;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        svg {
+            width: 100%;
+            max-width: 800px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* ===== PRACTICAL GUIDE ===== */
+        .guide-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #C9A84C;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .guide-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #C9A84C;
+            margin-bottom: 1.5rem;
+        }
+
+        .age-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #4ABF8A;
+            flex-wrap: wrap;
+        }
+
+        .age-tab {
+            background: transparent;
+            border: none;
+            color: #A8A8A8;
+            padding: 0.8rem 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .age-tab.active {
+            color: #C9A84C;
+            border-bottom-color: #C9A84C;
+        }
+
+        .age-content {
+            display: none;
+        }
+
+        .age-content.active {
+            display: block;
+        }
+
+        .script-box {
+            background: #0A0C10;
+            border-left: 4px solid #4ABF8A;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 6px;
+        }
+
+        .speaker {
+            font-family: 'JetBrains Mono', monospace;
+            color: #C9A84C;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .dialogue {
+            color: #D8D8D8;
+            margin: 0.5rem 0 1rem 1rem;
+            padding-left: 1rem;
+            border-left: 2px solid #4ABF8A;
+            line-height: 1.6;
+        }
+
+        .principle-box {
+            background: rgba(74, 191, 138, 0.1);
+            border-left: 4px solid #4ABF8A;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 6px;
+            color: #D8D8D8;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ===== COUPLE TIP ===== */
+        .couple-tip {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.1) 0%, rgba(74, 191, 138, 0.1) 100%);
+            border: 2px solid #C9A84C;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .couple-tip h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #C9A84C;
+            margin-bottom: 1rem;
+        }
+
+        .tip-content {
+            color: #D8D8D8;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .tip-content p {
+            margin-bottom: 1rem;
+        }
+
+        /* ===== QUIZ SECTION ===== */
+        .quiz-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .quiz-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #4ABF8A;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .quiz-question {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-num {
+            font-family: 'JetBrains Mono', monospace;
+            color: #C9A84C;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .question-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            color: #E8E8E8;
+            margin: 0.8rem 0;
+            font-weight: 600;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .option {
+            background: #0A0C10;
+            border: 2px solid #4ABF8A;
+            border-radius: 6px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .option:hover {
+            background: rgba(74, 191, 138, 0.1);
+            border-color: #C9A84C;
+        }
+
+        .option input[type="radio"] {
+            cursor: pointer;
+            accent-color: #4ABF8A;
+        }
+
+        .option.correct {
+            background: rgba(74, 191, 138, 0.3);
+            border-color: #4ABF8A;
+        }
+
+        .option.incorrect {
+            background: rgba(232, 93, 93, 0.3);
+            border-color: #E85D5D;
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: rgba(74, 191, 138, 0.2);
+            border-left: 4px solid #4ABF8A;
+            color: #A8E8C8;
+        }
+
+        .feedback.incorrect {
+            background: rgba(232, 93, 93, 0.2);
+            border-left: 4px solid #E85D5D;
+            color: #F5A8A8;
+        }
+
+        .submit-btn {
+            background: #4ABF8A;
+            color: #0A0C10;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #3da870;
+            transform: translateY(-2px);
+        }
+
+        /* ===== TRACKER GRID ===== */
+        .tracker-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #C9A84C;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .tracker-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #C9A84C;
+            margin-bottom: 1.5rem;
+        }
+
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 0.8rem;
+        }
+
+        .tracker-day {
+            aspect-ratio: 1;
+            background: #0A0C10;
+            border: 2px solid #4ABF8A;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tracker-day:hover {
+            background: rgba(74, 191, 138, 0.1);
+        }
+
+        .tracker-day.completed {
+            background: #4ABF8A;
+            color: #0A0C10;
+        }
+
+        .tracker-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #C9A84C;
+        }
+
+        .tracker-day.completed .tracker-num {
+            color: #0A0C10;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            header h1 {
+                font-size: 1.4rem;
+            }
+
+            .header-right {
+                gap: 1rem;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .hero {
+                padding: 2rem 1rem;
+            }
+
+            .strategy-box,
+            .cards-section,
+            .diagram-section,
+            .guide-section,
+            .couple-tip,
+            .quiz-section,
+            .tracker-section,
+            .deep-dive {
+                margin: 1.5rem 1rem;
+            }
+
+            .age-tabs {
+                flex-direction: column;
+            }
+
+            .age-tab {
+                width: 100%;
+                border-bottom: none;
+                border-left: 3px solid transparent;
+            }
+
+            .age-tab.active {
+                border-left-color: #C9A84C;
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- STICKY HEADER -->
+    <header>
+        <h1>과학적 육아 스터디</h1>
+        <div class="header-right">
+            <span class="day-counter">DAY 08 / 21</span>
+            <button class="pomodoro-btn" onclick="openPomodoro()">⏱ 뽀모도로</button>
+        </div>
+    </header>
+
+    <!-- POMODORO MODAL -->
+    <div class="modal" id="pomodoroModal">
+        <div class="modal-content">
+            <h2>뽀모도로 타이머</h2>
+            <p style="color: #A8A8A8; margin-bottom: 1rem;">25분 집중 학습</p>
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            <div class="modal-buttons">
+                <button class="btn btn-start" onclick="toggleTimer()">시작</button>
+                <button class="btn btn-reset" onclick="resetTimer()">초기화</button>
+                <button class="btn btn-close" onclick="closePomodoro()">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <section class="hero fade-up">
+        <div class="part-label">PART 2 — 자매 관계 설계</div>
+        <h2>형제 질투의 신경학</h2>
+        <p class="subtitle">Sibling Jealousy: 코르티솔 급등과 퇴행 행동의 뇌과학</p>
+        <p class="quote">"신생아가 태어나면 첫째는 신경생물학적 위기를 경험합니다. 이는 '나쁜 아이'의 신호가 아니라, 뇌가 변화에 대응하는 정상적 반응입니다." - 다니엘 시겔 (UCLA 신경심리학)</p>
+        <div class="badges">
+            <span class="badge">첫째 · 5-7세</span>
+            <span class="badge">둘째 · 2-4세</span>
+            <span class="badge">형제관계</span>
+        </div>
+    </section>
+
+    <!-- STRATEGY BOX -->
+    <section class="strategy-box fade-up">
+        <h3>🧠 뇌과학 학습 전략</h3>
+        <div class="strategy-content">
+            <p>
+                <strong>형제 질투는 감정 문제가 아니라 신경생물학적 반응입니다.</strong>
+                부모의 관심이 분산되면, 첫째의 뇌에서는 스트레스 호르몬인 코르티솔이 급등합니다.
+                이 시기 부모의 이해와 일관된 대응이 첫째의 뇌 회로를 안정화시킵니다.
+            </p>
+            <p style="margin-top: 1rem;">
+                이번 학습의 목표: 첫째의 "나도 아기야", "왜 나한테만 엄격해?", "동생이 없으면 좋겠어"라는 표현 뒤의 신경학을 이해하고,
+                이에 대한 과학적 대응 스크립트를 습득하기.
+            </p>
+        </div>
+    </section>
+
+    <!-- SCIENCE CARDS -->
+    <section class="cards-section fade-up">
+        <div class="cards-grid">
+            <div class="science-card">
+                <h4>코르티솔의 급등</h4>
+                <div class="science-content">
+                    신생아 탄생 후 첫째는 부모의 관심 분산을 신경 시스템이 "위협"으로 인식합니다.
+                    시상하부-뇌하수체-부신축(HPA axis)이 활성화되어 코르티솔이 평소보다 2-3배 상승합니다.
+                    이는 아이를 "전투 또는 도피" 상태로 만듭니다.
+                </div>
+                <div class="behavior-box">
+                    <h5>이래서 아이가 이렇게 행동해요</h5>
+                    <p>
+                        평소 온순한 첫째가 동생 앞에서 공격적으로 변하거나, 작은 일에도 큰 화를 냅니다.
+                        또는 극도로 집착적이 되어 엄마에게 계속 매달립니다 (도피 반응).
+                    </p>
+                </div>
+            </div>
+
+            <div class="science-card">
+                <h4>옥시토신 경쟁</h4>
+                <div class="science-content">
+                    옥시토신은 "사랑 호르몬"으로 애착을 형성하는 신경 전달 물질입니다.
+                    부모가 신생아(둘째)와의 상호작용으로 옥시토신을 분비할 때,
+                    첫째는 자신의 옥시토신 공급원(엄마, 아빠)이 자신에게서 떠났다고 뇌가 해석합니다.
+                </div>
+                <div class="behavior-box">
+                    <h5>이래서 아이가 이렇게 행동해요</h5>
+                    <p>
+                        "엄마는 동생만 좋아해", "아빠가 나한테 관심 없어" 같은 발언이 나옵니다.
+                        이는 객관적 현실보다는 뇌가 감지한 "옥시토신 공급 감소"를 반영합니다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="science-card">
+                <h4>퇴행 행동(Regression)</h4>
+                <div class="science-content">
+                    스트레스 상황에서 아이의 뇌는 "안전한 시기"로 회귀합니다.
+                    이는 진화적으로 성숙한 행동보다 애착 추구가 더 긴급하다는 신호입니다.
+                    퇴행 행동은 약함이 아니라, 뇌의 생존 전략입니다.
+                </div>
+                <div class="behavior-box">
+                    <h5>이래서 아이가 이렇게 행동해요</h5>
+                    <p>
+                        이미 화장실 학습을 완료한 4-5세 아이가 갑자기 실수를 하고,
+                        젖병을 달라고 하거나, 아기 말투를 사용합니다.
+                        이는 "나도 돌봐줘"라는 애착 신호입니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DEEP DIVE: 신경학 심화 -->
+    <section class="deep-dive fade-up">
+        <div class="deep-dive-header" onclick="toggleDeepDive(this)">
+            <h3>심화 학습: 형제 질투의 신경학적 메커니즘</h3>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="deep-dive-content">
+            <div class="deep-dive-body">
+                <div class="research-item">
+                    <h5>HPA Axis의 활성화</h5>
+                    <p>
+                        시상하부(hypothalamus)에서 코르티코트로핀-방출 호르몬(CRH)이 분비되면,
+                        뇌하수체(pituitary)의 전엽에서 부신피질자극호르몬(ACTH)을 방출합니다.
+                        이는 부신(adrenal gland)의 외피질에서 코르티솔 생성을 촉발합니다.
+                        신생아 탄생 후 첫째의 이 축은 지속적으로 활성화되어 만성적 스트레스 상태를 만듭니다.
+                        (참고: Gunnar & Quevedo, 2007)
+                    </p>
+                </div>
+                <div class="research-item">
+                    <h5>옥시토신과 도파민의 불균형</h5>
+                    <p>
+                        부모가 신생아와의 상호작용에서 옥시토신과 도파민의 강화 쌍곡선을 경험하면,
+                        첫째와의 상호작용 중 이들 호르몬의 분비가 상대적으로 감소합니다.
+                        신경영상 연구(fMRI)에서 보면, 첫째는 이를 "보상 감소"로 해석하여
+                        뇌의 보상 회로(ventral striatum)의 활성화가 둔화됩니다.
+                        (참고: Insel & Young, 2001; 애착 신경생물학)
+                    </p>
+                </div>
+                <div class="research-item">
+                    <h5>전두엽 발달과의 관계</h5>
+                    <p>
+                        첫째가 스트레스를 받으면, 뇌의 전두엽피질(prefrontal cortex, PFC)의 기능이 저하됩니다.
+                        이는 행동 억제(behavioral inhibition)와 감정 조절(emotion regulation)을 어렵게 만듭니다.
+                        반복된 스트레스 노출은 전두엽의 회백질 밀도를 감소시킬 수 있으며,
+                        이는 장기적 자기 조절 능력 저하로 이어집니다.
+                        하지만 부모의 일관된 애정과 재보증은 이를 회복시킵니다.
+                        (참고: Tottenham et al., 2010)
+                    </p>
+                </div>
+                <div class="research-item">
+                    <h5>신경가소성(Neuroplasticity)의 희망</h5>
+                    <p>
+                        5-7세 아이의 뇌는 여전히 매우 가소적입니다.
+                        부모의 일관된 "재보증"과 "함께하는 시간"은 이완된 HPA 축을 안정화시키고,
+                        옥시토신 분비를 정상화하며, 전두엽 기능을 회복시킵니다.
+                        특히 "일대일 시간"은 신경생물학적으로 첫째의 뇌에
+                        "넌 여전히 중요하다"는 신호를 전달합니다.
+                        (참고: Siegel & Hartzell, 2003 - Parenting From the Inside Out)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SVG DIAGRAM -->
+    <section class="diagram-section fade-up">
+        <h3>형제 질투의 신경학적 경로</h3>
+        <svg viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <polygon points="0 0, 10 3, 0 6" fill="#E85D5D" />
+                </marker>
+                <marker id="arrowGold" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <polygon points="0 0, 10 3, 0 6" fill="#C9A84C" />
+                </marker>
+            </defs>
+
+            <text x="400" y="25" font-family="Noto Sans KR" font-size="12" fill="#C9A84C" text-anchor="middle" font-weight="600">둘째 탄생 → 첫째의 신경 반응</text>
+
+            <rect x="50" y="60" width="100" height="50" rx="8" fill="#E85D5D" opacity="0.2" stroke="#E85D5D" stroke-width="2" />
+            <text x="100" y="82" font-family="Noto Sans KR" font-size="11" fill="#E85D5D" text-anchor="middle" font-weight="600">둘째 탄생</text>
+            <text x="100" y="100" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle">(관심 분산)</text>
+
+            <path d="M 150 85 L 210 85" stroke="#E85D5D" stroke-width="2" fill="none" marker-end="url(#arrowRed)" />
+
+            <rect x="210" y="60" width="100" height="50" rx="8" fill="#E85D5D" opacity="0.2" stroke="#E85D5D" stroke-width="2" />
+            <text x="260" y="82" font-family="Noto Sans KR" font-size="11" fill="#E85D5D" text-anchor="middle" font-weight="600">관심 분산</text>
+            <text x="260" y="100" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle">(감지)</text>
+
+            <path d="M 310 85 L 370 85" stroke="#E85D5D" stroke-width="2" fill="none" marker-end="url(#arrowRed)" />
+
+            <rect x="370" y="60" width="100" height="50" rx="8" fill="#C9A84C" opacity="0.2" stroke="#C9A84C" stroke-width="2" />
+            <text x="420" y="82" font-family="Noto Sans KR" font-size="11" fill="#C9A84C" text-anchor="middle" font-weight="600">뇌 반응</text>
+            <text x="420" y="100" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle">(위협 감지)</text>
+
+            <text x="50" y="175" font-family="Noto Sans KR" font-size="10" fill="#C9A84C" font-weight="600">코르티솔 ↑</text>
+            <path d="M 420 110 L 100 170" stroke="#C9A84C" stroke-width="2" stroke-dasharray="5,5" fill="none" />
+
+            <rect x="20" y="180" width="160" height="80" rx="8" fill="#C9A84C" opacity="0.1" stroke="#C9A84C" stroke-width="2" />
+            <text x="100" y="205" font-family="Noto Sans KR" font-size="10" fill="#C9A84C" text-anchor="middle" font-weight="600">스트레스 증가</text>
+            <text x="100" y="222" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle">• 불안감 증가</text>
+            <text x="100" y="237" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle">• 공격성/불안정</text>
+            <text x="100" y="252" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle">• 수면 문제</text>
+
+            <text x="650" y="175" font-family="Noto Sans KR" font-size="10" fill="#C9A84C" font-weight="600">옥시토신 ↓</text>
+            <path d="M 420 110 L 740 170" stroke="#C9A84C" stroke-width="2" stroke-dasharray="5,5" fill="none" />
+
+            <rect x="620" y="180" width="160" height="80" rx="8" fill="#C9A84C" opacity="0.1" stroke="#C9A84C" stroke-width="2" />
+            <text x="700" y="205" font-family="Noto Sans KR" font-size="10" fill="#C9A84C" text-anchor="middle" font-weight="600">애착 욕구 증가</text>
+            <text x="700" y="222" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle">• 엄마/아빠 집착</text>
+            <text x="700" y="237" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle">• 감정 폭발</text>
+            <text x="700" y="252" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle">• 퇴행 행동</text>
+
+            <path d="M 180 260 L 350 330" stroke="#C9A84C" stroke-width="2" stroke-dasharray="5,5" fill="none" />
+            <path d="M 780 260 L 610 330" stroke="#C9A84C" stroke-width="2" stroke-dasharray="5,5" fill="none" />
+
+            <rect x="300" y="340" width="200" height="80" rx="8" fill="#E85D5D" opacity="0.15" stroke="#E85D5D" stroke-width="2" />
+            <text x="400" y="362" font-family="Noto Sans KR" font-size="11" fill="#E85D5D" text-anchor="middle" font-weight="600">관찰 가능한 행동</text>
+            <text x="400" y="380" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle">동생에 대한 공격성, 질투 표현, 퇴행,</text>
+            <text x="400" y="395" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle">부모 무시, "아빠/엄마 싫어" 발언</text>
+
+            <text x="400" y="440" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8" text-anchor="middle" font-style="italic">💡 이 모든 것은 정상적인 신경 반응입니다. 부모의 일관된 대응으로 안정화됩니다.</text>
+        </svg>
+    </section>
+
+    <!-- PRACTICAL GUIDE -->
+    <section class="guide-section fade-up">
+        <h3>👨‍👧 아빠 실전 가이드: 형제 질투 대응 스크립트</h3>
+
+        <div class="age-tabs">
+            <button class="age-tab active" onclick="switchTab(event, 'age6')">첫째 · 5-7세</button>
+            <button class="age-tab" onclick="switchTab(event, 'jealousy')">관계 촉진</button>
+        </div>
+
+        <div id="age6" class="age-content active">
+            <h4 style="color: #4ABF8A; margin-bottom: 1.5rem; font-weight: 600;">첫째가 질투를 표현할 때</h4>
+
+            <div class="script-box">
+                <div class="speaker">상황: 첫째가 "아빠, 이제 나는 왜 봐주지 않아?"라고 울분함</div>
+                <div class="dialogue">
+                    ❌ 잘못된 대응: "언니/오빠가 뭐 하는 거야? 진짜 이래?"<br>
+                    (비판 → 코르티솔 더 상승 → 방어적 반응)<br><br>
+                    ✅ 올바른 대응:<br>
+                    <strong>아빠:</strong> "그래, 아빠가 동생 봐준다고 넌 덜 본다고 느껴지는구나. 그런 기분 이해해." (공감)<br>
+                    <strong>아빠:</strong> "근데 사실 아빠의 사랑은 줄어들지 않았어. 더 나뉘는 거야. 넌 여전히 정말 소중해." (재보증)<br>
+                    <strong>아빠:</strong> "우리 지금 둘이서만 뭔가 할래? 블록? 아니면 밖에서 자전거 탈래?" (즉시 행동)<br>
+                </div>
+                <p style="color: #A8A8A8; font-size: 0.85rem; margin-top: 1rem;">
+                    💡 핵심: 감정 인정(공감) → 논리적 재보증 → 즉시 행동으로 입증. 약속만 하고 미루면 신뢰 깨짐.
+                </p>
+            </div>
+
+            <div class="script-box">
+                <div class="speaker">상황: 첫째가 "동생 없으면 좋겠어" / "엄마는 동생만 좋아해"</div>
+                <div class="dialogue">
+                    ❌ 잘못된 대응: "그런 말 하면 안 돼!", "형이 이런 말을 하냐고?"<br>
+                    (도덕적 비난 → 위축, 감정 억압)<br><br>
+                    ✅ 올바른 대응:<br>
+                    <strong>아빠:</strong> "그런 기분이 드는 거구나. 정말 힘들겠네." (감정 인정)<br>
+                    <strong>아빠:</strong> "근데 사실 엄마는 너를 낳고 기르면서 엄청 사랑했어. 동생이 태어났다고 그 사랑이 없어지는 건 아니야." (객관적 재보증)<br>
+                    <strong>아빠:</strong> "우리 함께 엄마한테 뭔가 해줄 수 있는 걸 생각해 볼까? 깜짝 선물?" (결합 강화)<br>
+                </div>
+                <p style="color: #A8A8A8; font-size: 0.85rem; margin-top: 1rem;">
+                    💡 핵심: 부정하지 말고 감정을 수용하되, 객관적 사실로 재보증하고, 부모와의 긍정적 경험을 함께 만들기.
+                </p>
+            </div>
+
+            <div class="principle-box">
+                <strong>3가지 응답 원칙: 허용 → 공감 → 점진적 전환</strong><br><br>
+                1️⃣ <strong>허용:</strong> "엄마/아빠가 보여주지 않는 걸 느껴도 괜찮아" (감정 수용)<br>
+                2️⃣ <strong>공감:</strong> "그런 기분은 정말 힘들겠네. 이해해" (감정 인정)<br>
+                3️⃣ <strong>점진적 전환:</strong> 1-2주 후, "그래도 엄마가 널 사랑한다는 걸 어떻게 알 수 있을까?" (관점 변화 유도)
+            </div>
+
+            <div class="script-box">
+                <div class="speaker">상황: 첫째가 퇴행 행동 (기저귀 차달라, 아기 말, 엄마만 찾음)</div>
+                <div class="dialogue">
+                    ✅ 올바른 대응:<br>
+                    <strong>아빠:</strong> "우리 OO가 지금 좀 불안하구나. 그럴 때 아기처럼 있어도 괜찮아." (수용)<br>
+                    <strong>아빠:</strong> (기저귀 요청시) "알겠어. 오늘은 특별히 아기처럼 해줄게." (판단 없이 충족)<br>
+                    <strong>아빠:</strong> 2-3일 후, "이제 기저귀 안 해도 될 것 같은데 어때?" (스스로 돌아오도록 유도)<br>
+                </div>
+                <p style="color: #A8A8A8; font-size: 0.85rem; margin-top: 1rem;">
+                    💡 핵심: 퇴행은 "약함"이 아니라 "애착 욕구"입니다. 비난하면 더 고착되고, 수용하면 자연스럽게 회복됩니다.
+                </p>
+            </div>
+        </div>
+
+        <div id="jealousy" class="age-content">
+            <h4 style="color: #4ABF8A; margin-bottom: 1.5rem; font-weight: 600;">동생과 함께 있을 때 첫째의 역할 강화</h4>
+
+            <div class="script-box">
+                <div class="speaker">전략: 둘째 돌봄 중 첫째를 "조력자"로 만들기</div>
+                <div class="dialogue">
+                    <strong>상황:</strong> 아빠가 2-4세 둘째를 목욕시킬 때<br>
+                    <strong>아빠:</strong> "OO, 우리 동생이 물을 무서워하는데, 언니가 어떻게 도와줄 수 있을까?"<br>
+                    <strong>첫째:</strong> "물 온도 확인해볼까?" (스스로 역할 찾음)<br>
+                    <strong>아빠:</strong> "오! 정말 좋은 생각이야! 언니는 정말 똑똑해. 동생이 얼마나 고마워할 거 같아."<br><br>
+                    <strong>효과:</strong> 첫째는 질투에서 "책임감"으로 전환되고, 동생과의 유대감이 자연스럽게 생깁니다.
+                </div>
+            </div>
+
+            <div class="script-box">
+                <div class="speaker">전략: 첫째만의 특별한 역할 창출</div>
+                <div class="dialogue">
+                    "우리 동생이 새로운 단어를 배우고 있는데, 언니가 더 잘 알려줄 수 있을 것 같아."<br>
+                    "언니, 동생이 자전거를 배우고 싶어 하는데 어떻게 도와줄까?"<br>
+                    "우리 언니가 그림을 정말 잘 그리니까, 동생한테 보여줄 수 있을 것 같아."<br><br>
+                    💡 핵심: 형제 관계에서의 "경쟁"을 "협력"으로 변환하고, 첫째만이 할 수 있는 역할을 명확히 하기.
+                </div>
+            </div>
+
+            <div class="principle-box">
+                <strong>부모의 행동 변화 필요:</strong><br><br>
+                • 첫째와 둘째를 따로 시간 배정 (주 1-2회, 30분씩 "아빠와 나만의 시간")<br>
+                • 첫째의 "어른스러운" 행동만 칭찬하지 말고, "감정 표현"도 인정하기<br>
+                • 동생 앞에서 첫째를 "모범"으로 삼지 않기 ("언니는 이 나이에 이랬어"는 금지)<br>
+                • 둘째 돌봄 중에도 첫째를 "외출"시키지 않고, "함께"의 메시지 전달
+            </div>
+        </div>
+    </section>
+
+    <!-- COUPLE TIP -->
+    <section class="couple-tip fade-up">
+        <h3>👫 부부 팁: 형제 질투 상황에서 일관된 대응</h3>
+        <div class="tip-content">
+            <p>
+                <strong>첫째의 질투에 대응하는 부모의 반응이 다르면, 첫째의 뇌는 더 혼란스러워집니다.</strong>
+                엄마가 "동생을 봐줘야 하니까 이해해"라고 말하고, 아빠가 "넌 형이니까 양보해야지"라고 말하면,
+                첫째는 어디에 기댈지 모르고 더 불안정해집니다.
+            </p>
+            <p>
+                <strong>일관된 메시지 예시:</strong><br>
+                "엄마와 아빠 모두 너를 똑같이 사랑한다. 동생 때문에 줄어들지 않는다."<br>
+                "너의 기분을 이해하고 받아들인다. 그 기분이 이상한 게 아니다."<br>
+                "우리는 항상 너의 편이다. 실수해도, 화나도, 질투해도 괜찮다."
+            </p>
+            <p>
+                <strong>부부가 함께 할 일:</strong><br>
+                주 1회 이상 첫째와 "둘이서만"의 시간을 만들되, 엄마와 아빠 따로따로.
+                이는 첫째에게 "넌 충분히 사랑받는다"는 신경학적 재보증입니다.
+                또한 부부가 이 시간을 약속하고 지키는 것 자체가 형제 질투를 경감시키는 가장 효과적인 개입입니다.
+            </p>
+        </div>
+    </section>
+
+    <!-- QUIZ SECTION -->
+    <section class="quiz-section fade-up">
+        <h3>🧪 학습 점검 & 인출 연습</h3>
+
+        <div class="quiz-question">
+            <div class="question-num">문제 1</div>
+            <div class="question-text">신생아 탄생 후 첫째의 뇌에서 일어나는 주요 신경 변화는?</div>
+            <div class="options">
+                <label class="option">
+                    <input type="radio" name="q1" value="a">
+                    <span>① 코르티솔 급등 (스트레스 호르몬)</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q1" value="b">
+                    <span>② 세로토닌 감소 (행복감 저하)</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q1" value="c">
+                    <span>③ 도파민 증가 (동기 강화)</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q1" value="d">
+                    <span>④ 변화 없음</span>
+                </label>
+            </div>
+            <button class="submit-btn" onclick="checkAnswer(1, 'a')">확인</button>
+            <div class="feedback" id="feedback1"></div>
+        </div>
+
+        <div class="quiz-question">
+            <div class="question-num">문제 2</div>
+            <div class="question-text">첫째가 "동생 없으면 좋겠어"라고 말할 때, 가장 좋은 부모 응답은?</div>
+            <div class="options">
+                <label class="option">
+                    <input type="radio" name="q2" value="a">
+                    <span>① "그런 말 하면 안 돼!" (도덕적 비난)</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q2" value="b">
+                    <span>② "그런 기분이 드는구나. 정상이야. 그래도 우린 너를 사랑해." (공감 + 재보증)</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q2" value="c">
+                    <span>③ "형(언니) 답지 않게" (비교와 기준 강요)</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q2" value="d">
+                    <span>④ 무시하고 넘어가기</span>
+                </label>
+            </div>
+            <button class="submit-btn" onclick="checkAnswer(2, 'b')">확인</button>
+            <div class="feedback" id="feedback2"></div>
+        </div>
+    </section>
+
+    <!-- TRACKER SECTION -->
+    <section class="tracker-section fade-up">
+        <h3>📊 학습 완료 트래커</h3>
+        <p style="color: #A8A8A8; margin-bottom: 1.5rem; font-size: 0.9rem;">매일 학습을 완료했으면 클릭하여 표시하세요.</p>
+        <div class="tracker-grid" id="trackerGrid"></div>
+    </section>
+
+    <script>
+        // IntersectionObserver for fadeUp animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = '0s';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-up').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Pomodoro Timer
+        let timerInterval = null;
+        let timeLeft = 1500;
+        let isRunning = false;
+
+        function openPomodoro() {
+            document.getElementById('pomodoroModal').classList.add('active');
+        }
+
+        function closePomodoro() {
+            document.getElementById('pomodoroModal').classList.remove('active');
+        }
+
+        function updateDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timerDisplay').textContent =
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                document.querySelector('.btn-start').textContent = '재개';
+            } else {
+                isRunning = true;
+                document.querySelector('.btn-start').textContent = '일시정지';
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        alert('뽀모도로 세션 완료! 잠시 쉬어가세요.');
+                        resetTimer();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 1500;
+            isRunning = false;
+            updateDisplay();
+            document.querySelector('.btn-start').textContent = '시작';
+        }
+
+        // Deep Dive Toggle
+        function toggleDeepDive(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            
+            content.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // Quiz Logic
+        function checkAnswer(questionNum, correctAnswer) {
+            const selected = document.querySelector(`input[name="q${questionNum}"]:checked`);
+            if (!selected) {
+                alert('답을 선택해주세요.');
+                return;
+            }
+
+            const feedback = document.getElementById(`feedback${questionNum}`);
+            const options = document.querySelectorAll(`input[name="q${questionNum}"]`);
+
+            options.forEach(opt => {
+                const label = opt.closest('.option');
+                label.classList.remove('correct', 'incorrect');
+                if (opt.checked) {
+                    if (opt.value === correctAnswer) {
+                        label.classList.add('correct');
+                    } else {
+                        label.classList.add('incorrect');
+                    }
+                }
+            });
+
+            feedback.classList.add('show');
+            if (selected.value === correctAnswer) {
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                feedback.innerHTML = '✓ 정답입니다! 형제 질투의 신경학을 잘 이해했네요.';
+            } else {
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                feedback.innerHTML = '✗ 다시 생각해보세요. 학습 자료를 다시 읽어보시길 권장합니다.';
+            }
+        }
+
+        // Age Tab Switching
+        function switchTab(event, tabId) {
+            event.preventDefault();
+
+            document.querySelectorAll('.age-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            document.querySelectorAll('.age-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Tracker Grid
+        function initializeTracker() {
+            const tracker = document.getElementById('trackerGrid');
+            for (let i = 1; i <= 21; i++) {
+                const day = document.createElement('div');
+                day.className = 'tracker-day';
+                day.innerHTML = `<span class="tracker-num">D${i}</span>`;
+                day.onclick = () => day.classList.toggle('completed');
+                tracker.appendChild(day);
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            updateDisplay();
+            initializeTracker();
+        });
+    </script>
+</body>
+</html>

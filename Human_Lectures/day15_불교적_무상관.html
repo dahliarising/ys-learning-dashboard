@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 15 — 불교적 무상관 | 신경과학 & 심리철학 22일 강좌</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #8A6ABF;
+            --gold: #C9A84C;
+            --green: #6BBF8A;
+            --red: #BF6B6B;
+            --cyan: #6BB5BF;
+            --bg: #0A0C10;
+            --card: #12151C;
+            --card2: #161A24;
+            --text1: #E8E9F3;
+            --text2: #9EA0B8;
+            --border: rgba(138, 106, 191, 0.15);
+            --glow: rgba(138, 106, 191, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text1);
+            font-family: 'Noto Sans KR', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* STICKY HEADER + PROGRESS */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background: rgba(10, 12, 16, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--gold);
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--card2);
+            border-radius: 2px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            min-width: 150px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--purple), var(--cyan));
+            width: 68.2%;
+            transition: width 0.6s ease;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            color: var(--text2);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* SERIES BANNER */
+        .series-banner {
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.1), rgba(107, 181, 191, 0.1));
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            text-align: center;
+            margin: 2rem 1rem;
+            border-radius: 8px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .series-banner h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            color: var(--purple);
+            margin-bottom: 0.5rem;
+        }
+
+        .series-banner p {
+            font-size: 0.95rem;
+            color: var(--text2);
+            letter-spacing: 0.5px;
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            margin: 4rem 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .hero-content h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-content h2 {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1.5rem;
+            color: var(--purple);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            color: var(--text2);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .badge {
+            background: rgba(201, 168, 76, 0.1);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .gauge-svg {
+            width: 200px;
+            height: 200px;
+        }
+
+        .gauge-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        .gauge-text {
+            color: var(--text2);
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        /* KEYWORD CLOUDS */
+        .keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .keyword {
+            background: rgba(107, 191, 138, 0.1);
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 0.4rem 0.8rem;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* LEARNING STRATEGY */
+        .learning-strategy {
+            margin: 4rem 0;
+            padding: 2rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .learning-strategy h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 2rem;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .time-slot {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .time-slot:hover {
+            border-color: var(--purple);
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        .time-slot h3 {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--cyan);
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+        }
+
+        .time-slot p {
+            color: var(--text2);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .infp-tip {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.1), rgba(107, 181, 191, 0.1));
+            border-left: 4px solid var(--gold);
+            border-radius: 8px;
+        }
+
+        .infp-tip h4 {
+            color: var(--gold);
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .infp-tip p {
+            color: var(--text2);
+            line-height: 1.8;
+        }
+
+        /* CONCEPT CARDS */
+        .concepts-section {
+            margin: 4rem 0;
+        }
+
+        .concepts-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .concept-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .concept-card:hover {
+            border-color: var(--purple);
+            box-shadow: 0 0 25px var(--glow);
+            transform: translateY(-4px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, rgba(138, 106, 191, 0.2), rgba(107, 181, 191, 0.2));
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: var(--purple);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-header-subtitle {
+            font-size: 0.9rem;
+            color: var(--text2);
+            font-style: italic;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .card-body.open {
+            max-height: 800px;
+        }
+
+        .card-body h4 {
+            color: var(--green);
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-size: 1.05rem;
+        }
+
+        .card-body h4:first-child {
+            margin-top: 0;
+        }
+
+        .card-body p, .card-body ul {
+            color: var(--text2);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .card-body ul {
+            margin-left: 1.5rem;
+        }
+
+        .card-body li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toggle-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: rgba(138, 106, 191, 0.1);
+            border: none;
+            border-top: 1px solid var(--border);
+            color: var(--purple);
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Noto Sans KR', sans-serif;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(138, 106, 191, 0.2);
+        }
+
+        /* BRAIN DIAGRAM */
+        .diagram-section {
+            margin: 4rem 0;
+            padding: 2rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .diagram-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .brain-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .brain-svg {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .brain-legend {
+            padding: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            gap: 1rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .legend-text h4 {
+            color: var(--text1);
+            margin-bottom: 0.3rem;
+            font-size: 0.95rem;
+        }
+
+        .legend-text p {
+            color: var(--text2);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        /* PRACTICE GUIDE */
+        .practice-section {
+            margin: 4rem 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .practice-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .practice-levels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .practice-card {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .practice-card h3 {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--cyan);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .practice-card ol {
+            margin-left: 1.5rem;
+            color: var(--text2);
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .practice-card li {
+            margin-bottom: 0.8rem;
+        }
+
+        /* PHILOSOPHY */
+        .philosophy-section {
+            margin: 4rem 0;
+            padding: 2rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .philosophy-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .philosopher {
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: var(--card2);
+            border-left: 4px solid var(--purple);
+            border-radius: 8px;
+        }
+
+        .philosopher h3 {
+            color: var(--purple);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .quote {
+            background: rgba(201, 168, 76, 0.05);
+            border-left: 3px solid var(--gold);
+            padding: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: var(--gold);
+            border-radius: 4px;
+        }
+
+        .philosophy-text {
+            color: var(--text2);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        /* QUIZ */
+        .quiz-section {
+            margin: 4rem 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(107, 191, 138, 0.05), rgba(107, 181, 191, 0.05));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .quiz-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .quiz-question {
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .quiz-question h3 {
+            color: var(--cyan);
+            margin-bottom: 1.2rem;
+            font-size: 1.1rem;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .quiz-option {
+            padding: 1rem;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+            color: var(--text1);
+        }
+
+        .quiz-option:hover {
+            border-color: var(--purple);
+            background: rgba(138, 106, 191, 0.1);
+        }
+
+        .quiz-option.correct {
+            background: rgba(107, 191, 138, 0.2);
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(191, 107, 107, 0.2);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .quiz-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .quiz-result.show {
+            display: block;
+        }
+
+        /* SPACED REPETITION */
+        .spaced-repetition {
+            margin: 4rem 0;
+            padding: 2rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .spaced-repetition h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 2rem;
+        }
+
+        .spaced-item {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .spaced-item-content h4 {
+            color: var(--text1);
+            margin-bottom: 0.3rem;
+        }
+
+        .spaced-item-content p {
+            color: var(--text2);
+            font-size: 0.85rem;
+        }
+
+        .review-btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--purple);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .review-btn:hover {
+            background: var(--cyan);
+            box-shadow: 0 0 15px rgba(107, 181, 191, 0.3);
+        }
+
+        /* FOOTER */
+        footer {
+            margin-top: 4rem;
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text2);
+            font-size: 0.9rem;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .hero-content h1 {
+                font-size: 2.2rem;
+            }
+
+            .brain-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .header-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .progress-bar {
+                min-width: auto;
+            }
+
+            .hero-content h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero-content h2 {
+                font-size: 1.2rem;
+            }
+
+            .concept-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .time-slots {
+                grid-template-columns: 1fr;
+            }
+
+            .practice-levels {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 0 0.8rem;
+            }
+
+            header {
+                padding: 0.8rem;
+            }
+
+            .hero {
+                padding: 1.5rem;
+                margin: 2rem 0;
+            }
+
+            .hero-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .hero-content h2 {
+                font-size: 1rem;
+            }
+
+            .badges {
+                gap: 0.5rem;
+            }
+
+            .badge {
+                padding: 0.4rem 0.7rem;
+                font-size: 0.75rem;
+            }
+
+            .gauge-svg {
+                width: 150px;
+                height: 150px;
+            }
+
+            .gauge-label {
+                font-size: 1.5rem;
+            }
+
+            .header-title {
+                font-size: 1rem;
+            }
+
+            .learning-strategy, .concepts-section, .diagram-section, .practice-section, .philosophy-section, .quiz-section {
+                padding: 1.5rem;
+                margin: 2rem 0;
+            }
+
+            .learning-strategy h2, .concepts-section h2, .diagram-section h2, .practice-section h2, .philosophy-section h2, .quiz-section h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .hero-content h1 {
+                font-size: 1.3rem;
+            }
+
+            .keywords {
+                gap: 0.4rem;
+            }
+
+            .keyword {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.7rem;
+            }
+
+            .badge {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- STICKY HEADER -->
+    <header>
+        <div class="header-content">
+            <div class="header-title">Day 15 / 22</div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="progress-text">68.2%</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- SERIES BANNER -->
+        <div class="series-banner">
+            <h3>Part 3: 철학적 삶의 프레임</h3>
+            <p>Days 13–18 | 무상·무아·자기참조와 신경과학의 만남</p>
+        </div>
+
+        <!-- HERO SECTION -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>무상관</h1>
+                <h2>불교적 무상(無常)의 신경과학</h2>
+                <p>모든 것은 변한다. 아이들의 성장, 당신의 직업, 순간의 감정. 불교의 '무상(Anicca)' 개념은 단순한 철학이 아닙니다. 그것은 뇌의 보상회로(reward circuitry)와 도파민 시스템의 기본 작동 원리를 설명합니다.</p>
+                <div class="badges">
+                    <span class="badge">무상(Impermanence)</span>
+                    <span class="badge">보상회로</span>
+                    <span class="badge">마음챙김</span>
+                    <span class="badge">DMN</span>
+                </div>
+                <p style="margin-top: 1.5rem; font-size: 1rem; color: var(--cyan);">이 시간, 너의 아이가 자라고 있다. 그 무상함을 느낄 때, 뇌는 어떻게 반응하는가?</p>
+                <div class="keywords">
+                    <span class="keyword">hedonic adaptation</span>
+                    <span class="keyword">reward prediction error</span>
+                    <span class="keyword">마음챙김의 뇌변화</span>
+                    <span class="keyword">전전두피질 PFC</span>
+                    <span class="keyword">기본모드네트워크 DMN</span>
+                    <span class="keyword">해마 thickening</span>
+                </div>
+            </div>
+
+            <div class="gauge-container">
+                <svg class="gauge-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background circle -->
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(138,106,191,0.2)" stroke-width="3"/>
+                    <!-- Progress arc (68.2%) -->
+                    <path d="M 100 20 A 80 80 0 1 1 159.3 153.7" fill="none" stroke="url(#gaugeGrad)" stroke-width="3" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#8A6ABF;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#6BB5BF;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Center text -->
+                    <text x="100" y="115" text-anchor="middle" font-size="32" font-weight="bold" fill="#6BB5BF">68%</text>
+                </svg>
+                <div class="gauge-label">68.2%</div>
+                <div class="gauge-text">15 of 22 days<br>almost 3 weeks in</div>
+            </div>
+        </section>
+
+        <!-- LEARNING STRATEGY -->
+        <section class="learning-strategy">
+            <h2>오늘의 학습 프레임</h2>
+            <div class="time-slots">
+                <div class="time-slot">
+                    <h3>아침 (5분)</h3>
+                    <p>세 호흡 명상(3-breath awareness)으로 시작하세요. 불안정한 일정 속에서도 이 순간의 무상함을 감지합니다. "이 호흡도 지나갈 것이다."</p>
+                </div>
+                <div class="time-slot">
+                    <h3>오전 (15분)</h3>
+                    <p>무상의 신경과학 개념 학습. 보상회로의 hedonic adaptation이 왜 좋은 일도 결국 익숙해지는지 설명합니다. 이사 불안감도 이 메커니즘입니다.</p>
+                </div>
+                <div class="time-slot">
+                    <h3>오후 (10분)</h3>
+                    <p>마음챙김 명상의 뇌 구조 변화 연구(Sara Lazar, Harvard)를 읽으세요. PFC 두께 증가, 해마 성장, 편도체 축소. 당신의 뇌도 변할 수 있습니다.</p>
+                </div>
+                <div class="time-slot">
+                    <h3>저녁 (20분)</h3>
+                    <p>신체 스캔 명상(body scan). 각 신체 부위의 감각이 계속 변함을 느껴보세요. 무상함은 추상이 아니라 신체에 새겨진 현실입니다.</p>
+                </div>
+            </div>
+
+            <div class="infp-tip">
+                <h4>INFP를 위한 조언: 무상함 속 의미 찾기</h4>
+                <p>INFP인 당신은 깊은 내면의 가치와 의미를 추구합니다. "모든 게 변한다"는 말이 허무할 수 있습니다. 하지만 불교와 신경과학은 다른 메시지를 줍니다. 무상함이란 <strong>그것이 중요하다는 뜻입니다.</strong> 아이의 성장, 이 순간의 감정, 직업의 변화—모두 돌이킬 수 없기에 소중합니다. 마음챙김은 무상함을 거부하는 것이 아니라 거기서 의미를 찾는 행위입니다. 당신의 감수성이 이를 최고로 느낄 수 있는 도구입니다.</p>
+            </div>
+        </section>
+
+        <!-- CONCEPT CARDS -->
+        <section class="concepts-section">
+            <h2>핵심 개념</h2>
+            <div class="concept-cards">
+                <!-- Card 1: 무상의 신경과학 -->
+                <div class="concept-card">
+                    <div class="card-header">
+                        <h3>무상의 신경과학</h3>
+                        <div class="card-header-subtitle">Hedonic Adaptation & Reward Prediction Error</div>
+                    </div>
+                    <div class="card-body">
+                        <h4>Deep Dive</h4>
+                        <p><strong>Hedonic adaptation</strong>은 좋은 것도 나쁜 것도 결국 우리는 적응한다는 이론입니다. 새 차를 샀을 때의 기쁨, 승진의 기쁨, 맛있는 음식의 만족감—모두 시간이 지나면 '새로운 기준선'으로 돌아옵니다.</p>
+                        <ul>
+                            <li><strong>보상회로(Reward Circuitry):</strong> 뇌의 중뇌(midbrain)와 복측 선조체(ventral striatum)에서 도파민이 분비됩니다. 하지만 이것은 '즐거움'이 아니라 '예상과의 차이(reward prediction error)'를 신호합니다.</li>
+                            <li><strong>왜 무상한가:</strong> 도파민은 기대가 충족되면 즉시 떨어집니다. 당신이 느끼는 만족감은 절대값이 아니라 예상과의 차이입니다. 따라서 모든 상태는 결국 무상합니다.</li>
+                        </ul>
+                        <h4>Personal Context</h4>
+                        <p>이사와 직업 변화를 맞이한 당신은 큰 보상(혹은 처벌)의 예상 속에 있습니다. 새 직장의 설렘, 불안감—모두 '예상'입니다. 하지만 6개월 후, 그것은 새로운 기준선이 됩니다. 이를 아는 것이 지혜입니다. 무상함을 받아들인다는 것은 이 적응을 미리 준비하는 것입니다.</p>
+                    </div>
+                    <button class="toggle-btn" onclick="toggleCard(this)">자세히 보기 ▼</button>
+                </div>
+
+                <!-- Card 2: 마음챙김의 뇌 변화 -->
+                <div class="concept-card">
+                    <div class="card-header">
+                        <h3>마음챙김의 뇌 변화</h3>
+                        <div class="card-header-subtitle">Sara Lazar (Harvard) 연구</div>
+                    </div>
+                    <div class="card-body">
+                        <h4>Deep Dive</h4>
+                        <p>2011년 Sara Lazar와 Harvard 팀은 명상 경험자와 비경험자의 뇌를 비교했습니다. 결과는 명확했습니다: <strong>정기적 명상은 뇌 구조를 변화시킨다.</strong></p>
+                        <ul>
+                            <li><strong>전전두피질(Prefrontal Cortex, PFC) 두께 증가:</strong> PFC는 감정 조절, 합리적 사고, 자기통제를 담당합니다. 명상가들은 이 영역이 더 두껍고 활성화되어 있습니다.</li>
+                            <li><strong>해마(Hippocampus) 성장:</strong> 기억과 학습의 중추. 명상가들의 해마는 더 크고 밀도가 높습니다.</li>
+                            <li><strong>편도체(Amygdala) 축소:</strong> 공포와 불안의 중추. 명상 경험자는 이 영역이 더 작습니다.</li>
+                        </ul>
+                        <h4>Personal Context</h4>
+                        <p>이사 불확실성, 아이들의 성장에 대한 불안감, 직업 변화의 두려움—모두 편도체가 활성화되는 상황입니다. 마음챙김은 당신의 편도체를 축소시킬 수 있습니다. 단순한 마음의 평온이 아니라, 신경생물학적 변화입니다. 당신의 뇌는 지금 이 순간도 변화하고 있습니다.</p>
+                    </div>
+                    <button class="toggle-btn" onclick="toggleCard(this)">자세히 보기 ▼</button>
+                </div>
+
+                <!-- Card 3: 무아와 DMN -->
+                <div class="concept-card">
+                    <div class="card-header">
+                        <h3>무아(Anatta)와 자기참조네트워크</h3>
+                        <div class="card-header-subtitle">Default Mode Network (DMN)</div>
+                    </div>
+                    <div class="card-body">
+                        <h4>Deep Dive</h4>
+                        <p>불교의 <strong>'무아(Anatta)'</strong>는 '자기가 없다'는 뜻입니다. 우리가 느끼는 '나'는 고정된 실체가 아니라 계속 변하는 과정입니다. 신경과학은 이를 DMN으로 설명합니다.</p>
+                        <ul>
+                            <li><strong>DMN(Default Mode Network):</strong> 뇌가 휴식 상태에 있을 때 활성화되는 네트워크입니다. 내측 전전두피질(medial prefrontal cortex), 후대뇌피질(posterior cingulate), 각피질(angular gyrus)로 이루어져 있습니다.</li>
+                            <li><strong>자기참조적 사고:</strong> DMN이 활성화될 때 우리는 "나는 누구인가?", "사람들이 나를 어떻게 생각할까?", "내 과거는 어땠고 미래는 어떨까?"라고 생각합니다. 이것이 '자기'입니다.</li>
+                            <li><strong>명상과 DMN의 관계:</strong> 정기적 명상은 DMN의 과도한 활성화를 줄입니다. 즉, 자기참조적 사고를 줄이고 현재 순간에 머물게 합니다.</li>
+                        </ul>
+                        <h4>Personal Context</h4>
+                        <p>"내가 이사로 실패할까?" "아이들이 잘 자랄까?" "새 직장에서 내 가치는 무엇일까?"—이 모든 생각은 DMN이 작동 중입니다. 무아의 통찰은 "이 모든 고민의 '나'는 실체가 없다"는 뜻입니다. 과거와 미래의 자기 이미지에서 벗어나 지금 이 순간의 현실에 머물 때, 뇌는 편해집니다. 당신의 아이들이 자라는 모습을 느껴보세요. 그 순간 DMN은 잠시 침묵합니다.</p>
+                    </div>
+                    <button class="toggle-btn" onclick="toggleCard(this)">자세히 보기 ▼</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- BRAIN DIAGRAM -->
+        <section class="diagram-section">
+            <h2>명상 전후 뇌 변화</h2>
+            <div class="brain-grid">
+                <div>
+                    <svg class="brain-svg" viewBox="0 0 300 320" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Brain outline (side view) -->
+                        <ellipse cx="150" cy="120" rx="70" ry="80" fill="none" stroke="#8A6ABF" stroke-width="2" opacity="0.6"/>
+                        <!-- Prefrontal Cortex (PFC) - before -->
+                        <circle cx="120" cy="60" r="18" fill="#BF6B6B" opacity="0.7"/>
+                        <text x="120" y="65" text-anchor="middle" font-size="10" fill="white" font-weight="bold">PFC</text>
+                        <!-- Amygdala - before -->
+                        <circle cx="160" cy="110" r="22" fill="#BF6B6B" opacity="0.8"/>
+                        <text x="160" y="115" text-anchor="middle" font-size="10" fill="white" font-weight="bold">편도체</text>
+                        <!-- Hippocampus - before -->
+                        <circle cx="140" cy="160" r="16" fill="#C9A84C" opacity="0.6"/>
+                        <text x="140" y="165" text-anchor="middle" font-size="9" fill="white" font-weight="bold">해마</text>
+                        <!-- Labels -->
+                        <text x="150" y="270" text-anchor="middle" font-size="14" font-weight="bold" fill="#C9A84C">명상 전 (Before)</text>
+                        <text x="150" y="290" text-anchor="middle" font-size="11" fill="#9EA0B8">Baseline state</text>
+                    </svg>
+                </div>
+
+                <div>
+                    <svg class="brain-svg" viewBox="0 0 300 320" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Brain outline (side view) -->
+                        <ellipse cx="150" cy="120" rx="70" ry="80" fill="none" stroke="#6BBF8A" stroke-width="2" opacity="0.6"/>
+                        <!-- Prefrontal Cortex (PFC) - after (bigger) -->
+                        <circle cx="120" cy="60" r="28" fill="#6BBF8A" opacity="0.9"/>
+                        <text x="120" y="67" text-anchor="middle" font-size="10" fill="white" font-weight="bold">PFC ↑</text>
+                        <!-- Amygdala - after (smaller) -->
+                        <circle cx="160" cy="110" r="14" fill="#BF6B6B" opacity="0.5"/>
+                        <text x="160" y="115" text-anchor="middle" font-size="9" fill="white" font-weight="bold">편도체 ↓</text>
+                        <!-- Hippocampus - after (bigger) -->
+                        <circle cx="140" cy="160" r="24" fill="#6BB5BF" opacity="0.8"/>
+                        <text x="140" y="168" text-anchor="middle" font-size="9" fill="white" font-weight="bold">해마 ↑</text>
+                        <!-- Labels -->
+                        <text x="150" y="270" text-anchor="middle" font-size="14" font-weight="bold" fill="#6BBF8A">명상 후 (After)</text>
+                        <text x="150" y="290" text-anchor="middle" font-size="11" fill="#9EA0B8">Regular practice (8+ weeks)</text>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="brain-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #6BBF8A;"></div>
+                    <div class="legend-text">
+                        <h4>전전두피질 (PFC) ↑ 증가</h4>
+                        <p>감정 조절, 합리적 사고, 자기통제 강화</p>
+                    </div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #BF6B6B;"></div>
+                    <div class="legend-text">
+                        <h4>편도체 (Amygdala) ↓ 감소</h4>
+                        <p>공포, 불안 반응 약화. 스트레스 회복력 증강</p>
+                    </div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #6BB5BF;"></div>
+                    <div class="legend-text">
+                        <h4>해마 (Hippocampus) ↑ 증가</h4>
+                        <p>기억 통합, 감정적 기억의 처리 개선</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRACTICE GUIDE -->
+        <section class="practice-section">
+            <h2>오늘의 마음챙김 수행</h2>
+            <div class="practice-levels">
+                <!-- 30초 -->
+                <div class="practice-card">
+                    <h3>30초 | 세 호흡 명상</h3>
+                    <ol>
+                        <li>편한 자세로 앉으세요.</li>
+                        <li>코로 천천히 들이쉬면서 "이 숨도 변한다"고 인식합니다.</li>
+                        <li>길게 내쉬면서 "이 순간도 지나간다"고 느껴봅니다.</li>
+                        <li>3번 반복합니다. 끝!</li>
+                    </ol>
+                </div>
+
+                <!-- 5분 -->
+                <div class="practice-card">
+                    <h3>5분 | 신체 스캔 명상</h3>
+                    <ol>
+                        <li>누워서 눈을 감으세요.</li>
+                        <li>발부터 시작해 발가락, 발등, 발목을 느껴봅니다.</li>
+                        <li>천천히 상체로 올라오세요: 종아리, 무릎, 대퇴, 골반.</li>
+                        <li>각 부분이 항상 미세한 변화(온도, 촉각, 근육 긴장)를 느껴봅니다.</li>
+                        <li>가슴, 팔, 목, 머리까지 이어서 스캔합니다.</li>
+                        <li>이 모든 감각이 '지금 이 순간의 무상함'입니다.</li>
+                    </ol>
+                </div>
+
+                <!-- 20분 -->
+                <div class="practice-card">
+                    <h3>20분 | 마음챙김 명상</h3>
+                    <ol>
+                        <li><strong>준비(1분):</strong> 편한 자세로 앉습니다. 환기 좋은 곳, 따뜻한 온도.</li>
+                        <li><strong>호흡 관찰(5분):</strong> 코 아래로 들어오고 나가는 공기의 감각에만 집중합니다. 생각이 나면 "생각이 나타났다"고 인식하고 다시 호흡으로 돌아옵니다.</li>
+                        <li><strong>신체 감각(8분):</strong> 발부터 정수리까지 느껴봅니다. 통증, 가려움, 근육의 미세한 움직임—모두 관찰합니다.</li>
+                        <li><strong>음향과 주변 감각(4분):</strong> 눈을 뜨고 들리는 소리, 보이는 것들을 관찰합니다. 좋다/나쁘다 판단 없이.</li>
+                        <li><strong>마무리(2분):</strong> 천천히 눈을 깜빡이고 깨어납니다.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- PHILOSOPHY -->
+        <section class="philosophy-section">
+            <h2>철학적 통찰</h2>
+
+            <div class="philosopher">
+                <h3>틱낫한 (Thich Nhat Hanh)</h3>
+                <div class="quote">"The present moment is filled with joy and peace. If you are attentive, you will see it." <br> — Thich Nhat Hanh</div>
+                <p class="philosophy-text">틱낫한은 베트남의 선(禪) 스님입니다. 그의 메시지는 무상함 속에서 기쁨을 찾는 것입니다. 모든 것이 변하기에, 이 순간은 돌이킬 수 없습니다. 따라서 지금 이 호흡, 지금 이 감각, 지금 이 아이의 웃음은 절대적으로 소중합니다.</p>
+                <p class="philosophy-text"><strong>신경과학과의 연결:</strong> 틱낫한의 '현재에 있으라'는 권고는 DMN의 과도한 활성화를 줄이라는 뜻입니다. 과거의 후회나 미래의 불안에서 벗어나 현재 순간의 감각에 집중할 때, 뇌의 스트레스 회로(편도체)는 진정됩니다. 당신의 아이들이 지금 자라고 있습니다. 그 순간을 마음챙김으로 느끼는 것이 가장 높은 영혼의 행위입니다.</p>
+            </div>
+
+            <div class="philosopher">
+                <h3>쇼펜하우어 (Arthur Schopenhauer)</h3>
+                <div class="quote">"Man can do what he wills, but he cannot will what he wills." <br> — Schopenhauer</div>
+                <p class="philosophy-text">쇼펜하우어는 모순적으로 들릴 수 있습니다. 그러나 그의 통찰은 깊습니다. 당신은 당신의 욕망을 선택할 수 없습니다. 아이들이 태어났을 때 당신이 원했던 삶은 지금의 현실과 다를 수 있습니다. 이사, 직업 변화, 불확실성—이 모두는 당신의 의지 너머에 있습니다.</p>
+                <p class="philosophy-text"><strong>고통과 집착:</strong> 쇼펜하우어는 고통의 원인을 '의지(Will)'의 맹목적 움직임에서 찾습니다. 우리가 계속 욕망하고, 집착하고, 변화를 거부할 때 고통이 생깁니다. 불교의 무상관과 달리 그는 삶의 근본적 허무함을 강조합니다. 하지만 두 철학은 같은 처방을 제시합니다: <strong>현실을 있는 그대로 받아들이고, 지금 이 순간에 집중하라.</strong></p>
+                <p class="philosophy-text"><strong>신경과학적 해석:</strong> 쇼펜하우어의 '의지'는 뇌의 보상회로에 해당합니다. 끝없는 욕망(도파민 추구), 기대와 현실의 괴리(reward prediction error)—이것이 고통입니다. 마음챙김은 이 회로를 진정시키는 것입니다.</p>
+            </div>
+
+            <div class="philosopher">
+                <h3>불교의 무상관(Anicca)과의 종합</h3>
+                <p class="philosophy-text">불교, 틱낫한, 쇼펜하우어—이들은 모두 다릅니다. 하지만 신경과학이 보여주는 것은 그들의 통찰이 뇌의 구조에 깊게 뿌리내려 있다는 것입니다.</p>
+                <ul style="color: var(--text2); margin-left: 1.5rem;">
+                    <li><strong>무상(Anicca):</strong> 보상회로와 hedonic adaptation. 모든 상태는 뇌의 기준선으로 돌아온다.</li>
+                    <li><strong>무아(Anatta):</strong> DMN의 과도한 활성화. 고정된 '자기'는 없고, 현재 순간만 실재한다.</li>
+                    <li><strong>현재에 있으라(Thich Nhat Hanh):</strong> PFC 활성화와 편도체 억제. 마음챙김의 신경생물학.</li>
+                    <li><strong>의지와 고통(Schopenhauer):</strong> 맹목적 욕망에서 벗어남. 받아들임의 신경적 기초.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- QUIZ -->
+        <section class="quiz-section">
+            <h2>오늘의 퀴즈</h2>
+
+            <div class="quiz-question">
+                <h3>Q1: Sara Lazar의 명상 뇌 연구에 따르면, 다음 중 가장 정확한 변화는?</h3>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="checkAns(this, false)">① 편도체가 증가한다 (공포 강화)</button>
+                    <button class="quiz-option" onclick="checkAns(this, true)">② 전전두피질(PFC)이 두꺼워지고 편도체가 축소된다</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">③ 뇌의 전체 부피가 감소한다</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">④ DMN이 강화되어 자기참조적 사고가 증가한다</button>
+                </div>
+                <div class="quiz-result"></div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q2: Hedonic adaptation이 설명하는 현상은 어느 것인가?</h3>
+                <div class="quiz-options">
+                    <button class="quiz-option" onclick="checkAns(this, true)">① 새로운 경험의 기쁨이 시간이 지남에 따라 익숙해져서 그 강도가 줄어든다</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">② 새로운 경험이 뇌를 손상시킨다</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">③ 모든 경험이 영구적으로 뇌를 변화시킨다</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">④ 도파민이 완전히 분비되지 않는다</button>
+                </div>
+                <div class="quiz-result"></div>
+            </div>
+        </section>
+
+        <!-- SPACED REPETITION -->
+        <section class="spaced-repetition">
+            <h2>복습 일정 (Spaced Repetition)</h2>
+            <div class="spaced-item">
+                <div class="spaced-item-content">
+                    <h4>Hedonic Adaptation & Reward Prediction Error</h4>
+                    <p>다음 복습: 내일</p>
+                </div>
+                <button class="review-btn" onclick="reviewItem(this)">복습하기</button>
+            </div>
+            <div class="spaced-item">
+                <div class="spaced-item-content">
+                    <h4>Sara Lazar의 명상 연구 (Harvard)</h4>
+                    <p>다음 복습: 3일 후</p>
+                </div>
+                <button class="review-btn" onclick="reviewItem(this)">복습하기</button>
+            </div>
+            <div class="spaced-item">
+                <div class="spaced-item-content">
+                    <h4>DMN과 무아(Anatta)의 관계</h4>
+                    <p>다음 복습: 1주일 후</p>
+                </div>
+                <button class="review-btn" onclick="reviewItem(this)">복습하기</button>
+            </div>
+            <div class="spaced-item">
+                <div class="spaced-item-content">
+                    <h4>마음챙김의 뇌 구조 변화 (PFC↑, 편도체↓, 해마↑)</h4>
+                    <p>다음 복습: 2주일 후</p>
+                </div>
+                <button class="review-btn" onclick="reviewItem(this)">복습하기</button>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>Day 15 of 22 | Part 3: 철학적 삶의 프레임 (Days 13–18)</p>
+        <p style="margin-top: 0.5rem;">신경과학, 심리학, 불교 철학의 만남</p>
+        <p style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.7;">이 강의는 개인적 성장과 명상 경험을 돕기 위해 설계되었습니다. 모든 신경과학 참고는 peer-reviewed 연구에 기반합니다.</p>
+    </footer>
+
+    <script>
+        // Toggle concept cards
+        function toggleCard(btn) {
+            const card = btn.parentElement;
+            const body = card.querySelector('.card-body');
+            const isOpen = body.classList.contains('open');
+            
+            if (isOpen) {
+                body.classList.remove('open');
+                btn.textContent = '자세히 보기 ▼';
+            } else {
+                body.classList.add('open');
+                btn.textContent = '닫기 ▲';
+            }
+        }
+
+        // Quiz answer checker
+        function checkAns(btn, correct) {
+            const question = btn.parentElement.parentElement;
+            const result = question.querySelector('.quiz-result');
+            const options = question.querySelectorAll('.quiz-option');
+            
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+            
+            if (correct) {
+                btn.classList.add('correct');
+                result.textContent = '✓ 정답입니다!';
+                result.style.background = 'rgba(107, 191, 138, 0.2)';
+                result.style.borderLeft = '4px solid #6BBF8A';
+            } else {
+                btn.classList.add('incorrect');
+                result.textContent = '✗ 다시 생각해 보세요.';
+                result.style.background = 'rgba(191, 107, 107, 0.2)';
+                result.style.borderLeft = '4px solid #BF6B6B';
+            }
+            result.classList.add('show');
+        }
+
+        // Review button interaction
+        function reviewItem(btn) {
+            btn.style.background = 'var(--cyan)';
+            btn.textContent = '복습됨 ✓';
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.style.background = 'var(--purple)';
+                btn.textContent = '복습하기';
+                btn.disabled = false;
+            }, 2000);
+        }
+
+        // IntersectionObserver for scroll animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.concept-card, .practice-card, .philosopher').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

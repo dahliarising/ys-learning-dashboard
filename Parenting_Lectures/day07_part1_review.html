@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAY 07: Part 1 복습 | 과학적 육아 스터디</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #0A0C10;
+            color: #E8E8E8;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===== CUSTOM SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0A0C10;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4ABF8A;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3da870;
+        }
+
+        /* ===== FADE-UP ANIMATION ===== */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        /* ===== STICKY HEADER ===== */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-bottom: 2px solid #4ABF8A;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4ABF8A;
+            letter-spacing: 1px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .day-counter {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #C9A84C;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .pomodoro-btn {
+            background: #4ABF8A;
+            color: #0A0C10;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pomodoro-btn:hover {
+            background: #3da870;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 191, 138, 0.3);
+        }
+
+        /* ===== POMODORO MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #181C24;
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: #4ABF8A;
+            margin-bottom: 1rem;
+        }
+
+        .timer-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3rem;
+            color: #C9A84C;
+            margin: 1.5rem 0;
+            font-weight: 700;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-start {
+            background: #4ABF8A;
+            color: #0A0C10;
+        }
+
+        .btn-start:hover {
+            background: #3da870;
+        }
+
+        .btn-reset {
+            background: #E85D5D;
+            color: #FFF;
+        }
+
+        .btn-reset:hover {
+            background: #d84747;
+        }
+
+        .btn-close {
+            background: #555;
+            color: #FFF;
+        }
+
+        .btn-close:hover {
+            background: #777;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            padding: 3rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border-bottom: 2px solid #C9A84C;
+            margin-bottom: 2rem;
+        }
+
+        .part-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #4ABF8A;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .hero h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #E8E8E8;
+            margin: 1rem 0;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #C9A84C;
+            margin: 1rem 0 1.5rem;
+            font-weight: 500;
+        }
+
+        .quote {
+            font-style: italic;
+            color: #A8A8A8;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-left: 4px solid #4ABF8A;
+            background: rgba(74, 191, 138, 0.05);
+            border-radius: 6px;
+        }
+
+        .badges {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: #4ABF8A;
+            color: #0A0C10;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ===== STRATEGY BOX ===== */
+        .strategy-box {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .strategy-box h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #4ABF8A;
+            margin-bottom: 1.5rem;
+        }
+
+        .strategy-content {
+            color: #D8D8D8;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== CONCEPT CARDS ===== */
+        .cards-section {
+            margin: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .concept-card {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(74, 191, 138, 0.2);
+        }
+
+        .concept-day {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #C9A84C;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .concept-card h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: #4ABF8A;
+            margin-bottom: 1rem;
+        }
+
+        .concept-content {
+            color: #D8D8D8;
+            line-height: 1.7;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .key-insight {
+            background: rgba(201, 168, 76, 0.1);
+            border-left: 3px solid #C9A84C;
+            padding: 0.8rem;
+            border-radius: 4px;
+            color: #D8D8D8;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        /* ===== MINDMAP SVG ===== */
+        .diagram-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .diagram-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #4ABF8A;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        svg {
+            width: 100%;
+            max-width: 900px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* ===== PRACTICAL GUIDE ===== */
+        .guide-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #C9A84C;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .guide-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #C9A84C;
+            margin-bottom: 1.5rem;
+        }
+
+        .checklist {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .check-item {
+            background: #0A0C10;
+            border-left: 4px solid #4ABF8A;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .check-box {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #4ABF8A;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .check-box:hover {
+            background: rgba(74, 191, 138, 0.1);
+        }
+
+        .check-box.checked {
+            background: #4ABF8A;
+            color: #0A0C10;
+        }
+
+        .check-box.checked::after {
+            content: '✓';
+            font-weight: 700;
+        }
+
+        .check-text {
+            flex: 1;
+            color: #D8D8D8;
+            line-height: 1.6;
+        }
+
+        /* ===== RELATIONSHIP TIP ===== */
+        .relationship-tip {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.1) 0%, rgba(74, 191, 138, 0.1) 100%);
+            border: 2px solid #C9A84C;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .relationship-tip h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #C9A84C;
+            margin-bottom: 1rem;
+        }
+
+        .tip-content {
+            color: #D8D8D8;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .tip-content p {
+            margin-bottom: 1rem;
+        }
+
+        /* ===== QUIZ SECTION ===== */
+        .quiz-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .quiz-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #4ABF8A;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .quiz-question {
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #4ABF8A;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-num {
+            font-family: 'JetBrains Mono', monospace;
+            color: #C9A84C;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .question-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            color: #E8E8E8;
+            margin: 0.8rem 0;
+            font-weight: 600;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .option {
+            background: #0A0C10;
+            border: 2px solid #4ABF8A;
+            border-radius: 6px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .option:hover {
+            background: rgba(74, 191, 138, 0.1);
+            border-color: #C9A84C;
+        }
+
+        .option input[type="radio"] {
+            cursor: pointer;
+            accent-color: #4ABF8A;
+        }
+
+        .option.correct {
+            background: rgba(74, 191, 138, 0.3);
+            border-color: #4ABF8A;
+        }
+
+        .option.incorrect {
+            background: rgba(232, 93, 93, 0.3);
+            border-color: #E85D5D;
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: rgba(74, 191, 138, 0.2);
+            border-left: 4px solid #4ABF8A;
+            color: #A8E8C8;
+        }
+
+        .feedback.incorrect {
+            background: rgba(232, 93, 93, 0.2);
+            border-left: 4px solid #E85D5D;
+            color: #F5A8A8;
+        }
+
+        .submit-btn {
+            background: #4ABF8A;
+            color: #0A0C10;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #3da870;
+            transform: translateY(-2px);
+        }
+
+        /* ===== TRACKER GRID ===== */
+        .tracker-section {
+            margin: 2rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            background: linear-gradient(135deg, #12151B 0%, #181C24 100%);
+            border: 2px solid #C9A84C;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .tracker-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: #C9A84C;
+            margin-bottom: 1.5rem;
+        }
+
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 0.8rem;
+        }
+
+        .tracker-day {
+            aspect-ratio: 1;
+            background: #0A0C10;
+            border: 2px solid #4ABF8A;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tracker-day:hover {
+            background: rgba(74, 191, 138, 0.1);
+        }
+
+        .tracker-day.completed {
+            background: #4ABF8A;
+            color: #0A0C10;
+        }
+
+        .tracker-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #C9A84C;
+        }
+
+        .tracker-day.completed .tracker-num {
+            color: #0A0C10;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            header h1 {
+                font-size: 1.4rem;
+            }
+
+            .header-right {
+                gap: 1rem;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .hero {
+                padding: 2rem 1rem;
+            }
+
+            .strategy-box,
+            .cards-section,
+            .diagram-section,
+            .guide-section,
+            .relationship-tip,
+            .quiz-section,
+            .tracker-section {
+                margin: 1.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- STICKY HEADER -->
+    <header>
+        <h1>과학적 육아 스터디</h1>
+        <div class="header-right">
+            <span class="day-counter">DAY 07 / 21</span>
+            <button class="pomodoro-btn" onclick="openPomodoro()">⏱ 뽀모도로</button>
+        </div>
+    </header>
+
+    <!-- POMODORO MODAL -->
+    <div class="modal" id="pomodoroModal">
+        <div class="modal-content">
+            <h2>뽀모도로 타이머</h2>
+            <p style="color: #A8A8A8; margin-bottom: 1rem;">25분 집중 학습</p>
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            <div class="modal-buttons">
+                <button class="btn btn-start" onclick="toggleTimer()">시작</button>
+                <button class="btn btn-reset" onclick="resetTimer()">초기화</button>
+                <button class="btn btn-close" onclick="closePomodoro()">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <section class="hero fade-up">
+        <div class="part-label">PART 1 — 발달심리 기초 · 복습</div>
+        <h2>Day 01~06 핵심 개념 총정리</h2>
+        <p class="subtitle">Retrieval Practice: 인출 연습으로 장기기억 강화</p>
+        <p class="quote">"배운 것을 기억하는 가장 좋은 방법은 다시 보지 않고 떠올리기(Retrieval)입니다. 이번 주는 지난 6일간 배운 핵심을 다시 생각해봅시다."</p>
+        <div class="badges">
+            <span class="badge">Part 1 통합</span>
+            <span class="badge">복습</span>
+            <span class="badge">첫째/둘째</span>
+        </div>
+    </section>
+
+    <!-- STRATEGY BOX -->
+    <section class="strategy-box fade-up">
+        <h3>🧠 뇌과학 학습 전략: 인출 연습</h3>
+        <div class="strategy-content">
+            <p>
+                <strong>인출 연습(Retrieval Practice)</strong>이란 학습한 정보를 다시 보지 않고 기억해내는 과정입니다.
+                심리학 연구에 따르면, 텍스트를 다시 읽는 것보다 떠올려내기가 장기기억 형성에 훨씬 더 효과적입니다.
+                오늘은 Day 01~06의 핵심 개념을 카드로 정리하고, 각 개념의 본질을 다시 생각해봅시다.
+            </p>
+        </div>
+    </section>
+
+    <!-- CONCEPT CARDS -->
+    <section class="cards-section fade-up">
+        <div class="cards-grid">
+            <!-- Day 01 -->
+            <div class="concept-card">
+                <div class="concept-day">DAY 01</div>
+                <h4>전두엽 발달 차이</h4>
+                <div class="concept-content">
+                    2-4세와 5-7세 아이의 전두엽(실행기능 담당)은 완전히 다른 발달 단계에 있습니다.
+                    5-7세는 기본 자제력이 생기기 시작하고, 2-4세는 충동 조절이 거의 불가능합니다.
+                </div>
+                <div class="key-insight">
+                    💡 <strong>핵심:</strong> 같은 실수를 해도, 연령별로 대응을 다르게 해야 합니다.
+                    "왜 이걸 했어?"라는 설명 요구는 2-4세에게 비현실적입니다.
+                </div>
+            </div>
+
+            <!-- Day 02 -->
+            <div class="concept-card">
+                <div class="concept-day">DAY 02</div>
+                <h4>안정 애착 4유형</h4>
+                <div class="concept-content">
+                    Ainsworth의 연구는 부모와의 관계 유형이 아이의 심리 발달을 형성한다고 증명했습니다.
+                    안정 애착은 부모의 일관된 반응성(responsive)으로 형성됩니다.
+                </div>
+                <div class="key-insight">
+                    💡 <strong>핵심:</strong> 완벽한 부모가 아니어도 괜찮습니다.
+                    "반응성"이 중요합니다 - 아이의 신호에 민감하게 반응하고, 실수 후 회복하면 됩니다.
+                </div>
+            </div>
+
+            <!-- Day 03 -->
+            <div class="concept-card">
+                <div class="concept-day">DAY 03</div>
+                <h4>아빠 놀이의 뇌과학</h4>
+                <div class="concept-content">
+                    아빠의 신체적, 역동적 놀이는 아이의 전두엽과 소뇌 발달을 촉진합니다.
+                    엄마와 다른 "아빠식 놀이"는 필수적인 발달 경험입니다.
+                </div>
+                <div class="key-insight">
+                    💡 <strong>핵심:</strong> 아빠는 "육아 파트너"가 아니라 "독특한 신경발달 촉진자"입니다.
+                    역동적, 조금 거친 놀이를 주저하지 마세요.
+                </div>
+            </div>
+
+            <!-- Day 04 -->
+            <div class="concept-card">
+                <div class="concept-day">DAY 04</div>
+                <h4>훈육 vs 처벌</h4>
+                <div class="concept-content">
+                    훈육은 "가르침"이고, 처벌은 "고통"입니다.
+                    2-4세, 5-7세 모두에게 일관된 훈육(consequence with 설명)이 도움이 되지만,
+                    처벌은 공포 반응(편도체)만 활성화시킵니다.
+                </div>
+                <div class="key-insight">
+                    💡 <strong>핵심:</strong> 행동 → 자연스러운 결과 → 간단한 설명의 순서가 뇌과학적으로 최적입니다.
+                    감정적 처벌은 신뢰 관계를 깨뜨립니다.
+                </div>
+            </div>
+
+            <!-- Day 05 -->
+            <div class="concept-card">
+                <div class="concept-day">DAY 05</div>
+                <h4>마법적 사고 → 논리</h4>
+                <div class="concept-content">
+                    2-4세는 여전히 마법적 사고(사건 간 인과성을 비논리적으로 이해)에 있고,
+                    5-7세는 구체적 조작기 초반입니다. 이는 뇌의 과학적 사실이지, 지능의 문제가 아닙니다.
+                </div>
+                <div class="key-insight">
+                    💡 <strong>핵심:</strong> "왜?"에 논리적 답을 하려고 할 필요 없습니다.
+                    관찰과 경험을 통해 인과성을 스스로 발견하도록 유도하세요.
+                </div>
+            </div>
+
+            <!-- Day 06 -->
+            <div class="concept-card">
+                <div class="concept-day">DAY 06</div>
+                <h4>언어 폭발기 활용</h4>
+                <div class="concept-content">
+                    18개월~2-4세의 언어 폭발기는 하루에 1,000단어 노출의 효과가 명확합니다.
+                    Hart & Risley 연구는 부모의 대화량이 이후 발달을 예측한다고 입증했습니다.
+                </div>
+                <div class="key-insight">
+                    💡 <strong>핵심:</strong> 이 시기 부모의 대화는 선택이 아니라 투자입니다.
+                    하루 25분 규칙적 대화(아침, 책, 놀이, 저녁)로 어휘 폭발을 가속화하세요.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MINDMAP SVG -->
+    <section class="diagram-section fade-up">
+        <h3>Part 1 통합 개념도: 발달심리 기초</h3>
+        <svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+            <!-- Center concept -->
+            <circle cx="450" cy="300" r="50" fill="#4ABF8A" opacity="0.2" stroke="#4ABF8A" stroke-width="2" />
+            <text x="450" y="295" font-family="Noto Sans KR" font-size="13" fill="#4ABF8A" text-anchor="middle" font-weight="700">뇌 발달</text>
+            <text x="450" y="312" font-family="Noto Sans KR" font-size="13" fill="#4ABF8A" text-anchor="middle" font-weight="700">기초</text>
+
+            <!-- Branch 1: 신경 발달 -->
+            <circle cx="150" cy="150" r="35" fill="#4ABF8A" opacity="0.2" stroke="#4ABF8A" stroke-width="2" />
+            <text x="150" y="150" font-family="Noto Sans KR" font-size="11" fill="#4ABF8A" text-anchor="middle" font-weight="600">신경</text>
+            <text x="150" y="165" font-family="Noto Sans KR" font-size="11" fill="#4ABF8A" text-anchor="middle" font-weight="600">발달</text>
+            <line x1="400" y1="260" x2="185" y2="180" stroke="#4ABF8A" stroke-width="1.5" stroke-dasharray="3,3" />
+            <text x="280" y="215" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8">전두엽</text>
+
+            <!-- Branch 1a: 전두엽 -->
+            <rect x="90" y="200" width="60" height="40" rx="6" fill="#C9A84C" opacity="0.2" stroke="#C9A84C" stroke-width="1" />
+            <text x="120" y="220" font-family="Noto Sans KR" font-size="9" fill="#C9A84C" text-anchor="middle">실행기능</text>
+            <text x="120" y="233" font-family="Noto Sans KR" font-size="8" fill="#A8A8A8" text-anchor="middle">(Day 01)</text>
+            <line x1="150" y1="185" x2="120" y2="200" stroke="#4ABF8A" stroke-width="1" stroke-dasharray="2,2" />
+
+            <!-- Branch 1b: 언어 -->
+            <rect x="10" y="260" width="60" height="40" rx="6" fill="#C9A84C" opacity="0.2" stroke="#C9A84C" stroke-width="1" />
+            <text x="40" y="280" font-family="Noto Sans KR" font-size="9" fill="#C9A84C" text-anchor="middle">언어 회로</text>
+            <text x="40" y="293" font-family="Noto Sans KR" font-size="8" fill="#A8A8A8" text-anchor="middle">(Day 06)</text>
+            <line x1="150" y1="185" x2="70" y2="260" stroke="#4ABF8A" stroke-width="1" stroke-dasharray="2,2" />
+
+            <!-- Branch 2: 관계 기반 -->
+            <circle cx="750" cy="150" r="35" fill="#4ABF8A" opacity="0.2" stroke="#4ABF8A" stroke-width="2" />
+            <text x="750" y="150" font-family="Noto Sans KR" font-size="11" fill="#4ABF8A" text-anchor="middle" font-weight="600">관계</text>
+            <text x="750" y="165" font-family="Noto Sans KR" font-size="11" fill="#4ABF8A" text-anchor="middle" font-weight="600">기반</text>
+            <line x1="500" y1="260" x2="715" y2="180" stroke="#4ABF8A" stroke-width="1.5" stroke-dasharray="3,3" />
+            <text x="620" y="215" font-family="Noto Sans KR" font-size="9" fill="#A8A8A8">애착</text>
+
+            <!-- Branch 2a: 애착 -->
+            <rect x="690" y="200" width="60" height="40" rx="6" fill="#C9A84C" opacity="0.2" stroke="#C9A84C" stroke-width="1" />
+            <text x="720" y="220" font-family="Noto Sans KR" font-size="9" fill="#C9A84C" text-anchor="middle">안정 애착</text>
+            <text x="720" y="233" font-family="Noto Sans KR" font-size="8" fill="#A8A8A8" text-anchor="middle">(Day 02)</text>
+            <line x1="750" y1="185" x2="720" y2="200" stroke="#4ABF8A" stroke-width="1" stroke-dasharray="2,2" />
+
+            <!-- Branch 2b: 아빠 역할 -->
+            <rect x="810" y="260" width="60" height="40" rx="6" fill="#C9A84C" opacity="0.2" stroke="#C9A84C" stroke-width="1" />
+            <text x="840" y="280" font-family="Noto Sans KR" font-size="9" fill="#C9A84C" text-anchor="middle">아빠 놀이</text>
+            <text x="840" y="293" font-family="Noto Sans KR" font-size="8" fill="#A8A8A8" text-anchor="middle">(Day 03)</text>
+            <line x1="750" y1="185" x2="830" y2="260" stroke="#4ABF8A" stroke-width="1" stroke-dasharray="2,2" />
+
+            <!-- Branch 3: 학습 & 행동 -->
+            <circle cx="450" cy="480" r="35" fill="#4ABF8A" opacity="0.2" stroke="#4ABF8A" stroke-width="2" />
+            <text x="450" y="475" font-family="Noto Sans KR" font-size="11" fill="#4ABF8A" text-anchor="middle" font-weight="600">학습</text>
+            <text x="450" y="490" font-family="Noto Sans KR" font-size="11" fill="#4ABF8A" text-anchor="middle" font-weight="600">&행동</text>
+            <line x1="450" y1="350" x2="450" y2="445" stroke="#4ABF8A" stroke-width="1.5" stroke-dasharray="3,3" />
+
+            <!-- Branch 3a: 훈육 -->
+            <rect x="300" y="440" width="60" height="40" rx="6" fill="#C9A84C" opacity="0.2" stroke="#C9A84C" stroke-width="1" />
+            <text x="330" y="460" font-family="Noto Sans KR" font-size="9" fill="#C9A84C" text-anchor="middle">훈육</text>
+            <text x="330" y="473" font-family="Noto Sans KR" font-size="8" fill="#A8A8A8" text-anchor="middle">(Day 04)</text>
+            <line x1="450" y1="445" x2="360" y2="440" stroke="#4ABF8A" stroke-width="1" stroke-dasharray="2,2" />
+
+            <!-- Branch 3b: 인지 발달 -->
+            <rect x="540" y="440" width="60" height="40" rx="6" fill="#C9A84C" opacity="0.2" stroke="#C9A84C" stroke-width="1" />
+            <text x="570" y="460" font-family="Noto Sans KR" font-size="9" fill="#C9A84C" text-anchor="middle">논리</text>
+            <text x="570" y="473" font-family="Noto Sans KR" font-size="8" fill="#A8A8A8" text-anchor="middle">(Day 05)</text>
+            <line x1="450" y1="445" x2="540" y2="440" stroke="#4ABF8A" stroke-width="1" stroke-dasharray="2,2" />
+
+            <!-- Legend -->
+            <text x="50" y="570" font-family="Noto Sans KR" font-size="10" fill="#A8A8A8">점선: 상위 개념으로의 연결</text>
+            <text x="350" y="570" font-family="Noto Sans KR" font-size="10" fill="#A8A8A8">노란색 박스: 각 Day 핵심 개념</text>
+        </svg>
+    </section>
+
+    <!-- PRACTICAL GUIDE -->
+    <section class="guide-section fade-up">
+        <h3>✅ 이번 주 아빠 체크리스트</h3>
+        <p style="color: #A8A8A8; margin-bottom: 1.5rem; font-size: 0.9rem;">
+            Part 1의 6가지 핵심을 실제 생활에서 실천했는지 체크하세요. 매일 하나 이상씩 의식적으로 적용하면, 1주일 후 아이와의 상호작용이 크게 달라집니다.
+        </p>
+        <div class="checklist">
+            <div class="check-item">
+                <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+                <div class="check-text">
+                    <strong>2-4세와 5-7세 뇌 발달 차이 인식:</strong> 이 주에 아이가 실수할 때마다,
+                    "이건 발달 단계이지, 의도적 나쁜 행동이 아니다"라고 자신에게 상기했나요?
+                </div>
+            </div>
+            <div class="check-item">
+                <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+                <div class="check-text">
+                    <strong>아이의 신호에 반응성 높이기:</strong> 아이가 말을 걸었을 때,
+                    즉시 반응하고 관심을 보였나요? (반응성은 애착의 핵심)
+                </div>
+            </div>
+            <div class="check-item">
+                <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+                <div class="check-text">
+                    <strong>아빠만의 역동적 놀이 시간:</strong> 하루 10-15분이라도 아빠식 신체 놀이를 했나요?
+                    (쌓기 블록 무너뜨리기, 베개 던지기, 숨바꼭질 등)
+                </div>
+            </div>
+            <div class="check-item">
+                <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+                <div class="check-text">
+                    <strong>훈육의 원칙 적용:</strong> 아이가 잘못했을 때, 먼저 감정 표현(처벌) 대신
+                    자연스러운 결과를 경험하게 한 후 간단히 설명했나요?
+                </div>
+            </div>
+            <div class="check-item">
+                <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+                <div class="check-text">
+                    <strong>아이의 "왜?"를 존중하기:</strong> 논리적 답변을 강요하지 않고,
+                    아이가 관찰과 경험을 통해 스스로 발견하도록 유도했나요?
+                </div>
+            </div>
+            <div class="check-item">
+                <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+                <div class="check-text">
+                    <strong>언어 폭발기 활용 (2-4세):</strong> 하루 25분의 의도적 대화
+                    (아침 5분 + 책 8분 + 명명 7분 + 저녁 5분)를 실행했나요?
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RELATIONSHIP TIP -->
+    <section class="relationship-tip fade-up">
+        <h3>👯‍♀️ 자매 관계 팁: Part 1 통합 가이드</h3>
+        <div class="tip-content">
+            <p>
+                <strong>5-7세 첫째와 2-4세 둘째를 같은 잣대로 재지 마세요.</strong>
+                Part 1에서 배운 모든 개념 (전두엽 발달, 애착, 훈육, 논리, 언어)은 연령에 따라 완전히 달라집니다.
+            </p>
+            <p>
+                <strong>첫째를 "모범생"으로 만들지 마세요.</strong> 5-7세는 이미 자제력과 논리적 사고가 발달했으므로,
+                더 높은 기준의 행동을 기대하는 것이 자연스럽습니다. 하지만 "넌 형이니까 양보해야 해", "언니는 왜 이렇게 안 하니?"는
+                우월성과 책임감을 과도하게 부여합니다.
+            </p>
+            <p>
+                <strong>둘째의 "퇴행" 행동을 이해하세요.</strong> 2-4세가 기저귀를 찬 지 오래되었는데 다시 요구하거나,
+                아기처럼 말하거나, 엄마에게만 매달릴 때, 이는 정상입니다. Day 02의 "안정 애착" 개념을 기억하세요.
+                부모의 관심이 분산되는 것에 대한 신경생물학적 반응입니다.
+            </p>
+            <p>
+                <strong>아빠 놀이의 역할을 양쪽 모두에게 제공하세요.</strong> 5-7세는 더 복잡한 규칙 게임을,
+                2-4세는 신체적 안전감과 감각 자극을 필요로 합니다. 아빠만이 제공할 수 있는 이 경험은 자매 관계에도 긍정적 영향을 줍니다.
+            </p>
+        </div>
+    </section>
+
+    <!-- QUIZ SECTION -->
+    <section class="quiz-section fade-up">
+        <h3>🧪 종합 복습 퀴즈</h3>
+
+        <!-- Quiz 1 -->
+        <div class="quiz-question">
+            <div class="question-num">문제 1</div>
+            <div class="question-text">2-4세가 실수를 반복할 때, 뇌과학적으로 정확한 이해는?</div>
+            <div class="options">
+                <label class="option">
+                    <input type="radio" name="q1" value="a">
+                    <span>① 아이가 나쁜 습관을 들인 것 (강화 필요)</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q1" value="b">
+                    <span>② 전두엽 미발달로 인한 자제력 부족 (발달 과정)</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q1" value="c">
+                    <span>③ 부모의 훈육이 약해서 (엄격함 필요)</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q1" value="d">
+                    <span>④ 집중력 문제 (의학적 검진 필요)</span>
+                </label>
+            </div>
+            <button class="submit-btn" onclick="checkAnswer(1, 'b')">확인</button>
+            <div class="feedback" id="feedback1"></div>
+        </div>
+
+        <!-- Quiz 2 -->
+        <div class="quiz-question">
+            <div class="question-num">문제 2</div>
+            <div class="question-text">아빠 놀이가 아이의 뇌 발달에 중요한 이유는?</div>
+            <div class="options">
+                <label class="option">
+                    <input type="radio" name="q2" value="a">
+                    <span>① 남자다운 역할 모델 제공</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q2" value="b">
+                    <span>② 엄마와 다른 신체적, 역동적 자극이 전두엽과 소뇌 발달 촉진</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q2" value="c">
+                    <span>③ 돌봄의 부담 분산</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q2" value="d">
+                    <span>④ 아이의 스트레스 해소</span>
+                </label>
+            </div>
+            <button class="submit-btn" onclick="checkAnswer(2, 'b')">확인</button>
+            <div class="feedback" id="feedback2"></div>
+        </div>
+
+        <!-- Quiz 3 -->
+        <div class="quiz-question">
+            <div class="question-num">문제 3</div>
+            <div class="question-text">훈육과 처벌의 가장 큰 뇌과학적 차이는?</div>
+            <div class="options">
+                <label class="option">
+                    <input type="radio" name="q3" value="a">
+                    <span>① 처벌이 더 효과적이다</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q3" value="b">
+                    <span>② 훈육은 학습(전두엽)을 활성화, 처벌은 공포(편도체) 반응만 남김</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q3" value="c">
+                    <span>③ 훈육은 비용이 더 든다</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q3" value="d">
+                    <span>④ 큰 차이가 없다</span>
+                </label>
+            </div>
+            <button class="submit-btn" onclick="checkAnswer(3, 'b')">확인</button>
+            <div class="feedback" id="feedback3"></div>
+        </div>
+
+        <!-- Quiz 4 -->
+        <div class="quiz-question">
+            <div class="question-num">문제 4</div>
+            <div class="question-text">안정 애착의 핵심 요소는 무엇인가?</div>
+            <div class="options">
+                <label class="option">
+                    <input type="radio" name="q4" value="a">
+                    <span>① 부모의 완벽성</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q4" value="b">
+                    <span>② 부모의 일관된 반응성(아이 신호에 민감하게 반응)</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q4" value="c">
+                    <span>③ 아이의 순종성</span>
+                </label>
+                <label class="option">
+                    <input type="radio" name="q4" value="d">
+                    <span>④ 풍요로운 경제 상태</span>
+                </label>
+            </div>
+            <button class="submit-btn" onclick="checkAnswer(4, 'b')">확인</button>
+            <div class="feedback" id="feedback4"></div>
+        </div>
+    </section>
+
+    <!-- TRACKER SECTION -->
+    <section class="tracker-section fade-up">
+        <h3>📊 학습 완료 트래커</h3>
+        <p style="color: #A8A8A8; margin-bottom: 1.5rem; font-size: 0.9rem;">매일 학습을 완료했으면 클릭하여 표시하세요.</p>
+        <div class="tracker-grid" id="trackerGrid"></div>
+    </section>
+
+    <script>
+        // IntersectionObserver for Fade-Up Animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Pomodoro Timer
+        let timerInterval = null;
+        let timeLeft = 1500;
+        let isRunning = false;
+
+        function openPomodoro() {
+            document.getElementById('pomodoroModal').classList.add('active');
+        }
+
+        function closePomodoro() {
+            document.getElementById('pomodoroModal').classList.remove('active');
+        }
+
+        function updateDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timerDisplay').textContent =
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                document.querySelector('.btn-start').textContent = '재개';
+            } else {
+                isRunning = true;
+                document.querySelector('.btn-start').textContent = '일시정지';
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        alert('뽀모도로 세션 완료! 잠시 쉬어가세요.');
+                        resetTimer();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 1500;
+            isRunning = false;
+            updateDisplay();
+            document.querySelector('.btn-start').textContent = '시작';
+        }
+
+        // Quiz Logic
+        function checkAnswer(questionNum, correctAnswer) {
+            const selected = document.querySelector(`input[name="q${questionNum}"]:checked`);
+            if (!selected) {
+                alert('답을 선택해주세요.');
+                return;
+            }
+
+            const feedback = document.getElementById(`feedback${questionNum}`);
+            const options = document.querySelectorAll(`input[name="q${questionNum}"]`);
+
+            options.forEach(opt => {
+                const label = opt.closest('.option');
+                label.classList.remove('correct', 'incorrect');
+                if (opt.checked) {
+                    if (opt.value === correctAnswer) {
+                        label.classList.add('correct');
+                    } else {
+                        label.classList.add('incorrect');
+                    }
+                }
+            });
+
+            feedback.classList.add('show');
+            if (selected.value === correctAnswer) {
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                feedback.innerHTML = '✓ 정답입니다! Part 1의 개념이 잘 정착되었네요.';
+            } else {
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                feedback.innerHTML = '✗ 다시 생각해보세요. 해당 Day의 핵심 개념을 다시 읽어보시길 권장합니다.';
+            }
+        }
+
+        // Tracker Grid
+        function initializeTracker() {
+            const tracker = document.getElementById('trackerGrid');
+            for (let i = 1; i <= 21; i++) {
+                const day = document.createElement('div');
+                day.className = 'tracker-day';
+                day.innerHTML = `<span class="tracker-num">D${i}</span>`;
+                day.onclick = () => day.classList.toggle('completed');
+                tracker.appendChild(day);
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            updateDisplay();
+            initializeTracker();
+
+            // Observe fade-up elements
+            document.querySelectorAll('.fade-up').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#12151C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="에너지 OS">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2312151C'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='%23E8C96A'>⚡</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>에너지 OS — Day 36 | Part 6 리뷰 — 컨디션 통합 관리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {--bg:#0A0C10;--surface:#12151C;--surface2:#1A1E28;--border:#252A38;--gold:#C9A84C;--gold-light:#E8C96A;--blue:#4A9EBF;--green:#4ABF8A;--purple:#8A6ABF;--orange:#BF6A4A;--red:#BF4A4A;--text:#D8D3C8;--text-dim:#7A7A8A;--text-bright:#F0EBE0;--accent:#C9A84C;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-weight:400;line-height:1.75;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+.container{max-width:960px;margin:0 auto;padding:0 24px 80px;}.sticky-header{position:sticky;top:0;z-index:100;background:rgba(10,12,16,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;}
+.sticky-header .brand{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:1.1rem;color:var(--gold);}.sticky-header .part-label{font-size:0.8rem;color:var(--accent);font-family:'JetBrains Mono',monospace;background:rgba(201,168,76,0.12);padding:4px 12px;border-radius:20px;}
+.hero{text-align:center;padding:60px 0 40px;}.hero .series-note{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text-dim);margin-bottom:12px;}.hero .day-num{font-family:'Cormorant Garamond',serif;font-size:4rem;font-weight:700;color:var(--accent);line-height:1;margin-bottom:8px;}
+.hero .day-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--text-bright);margin-bottom:4px;}.hero .day-title-en{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--text-dim);margin-bottom:20px;}
+.hero .quote{font-style:italic;color:var(--gold-light);font-size:1.05rem;margin-bottom:30px;padding:0 20px;}.progress-ring-wrap{display:inline-block;position:relative;width:100px;height:100px;margin-bottom:24px;}
+.progress-ring-wrap .ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--accent);}.progress-ring-wrap .ring-text small{font-size:0.6rem;color:var(--text-dim);font-weight:400;}
+.meta-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;}.meta-badge{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:0.78rem;color:var(--text);font-family:'JetBrains Mono',monospace;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--text-bright);margin:48px 0 20px;padding-left:16px;border-left:3px solid var(--accent);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:20px;transition:border-color 0.3s;}.card:hover{border-color:var(--accent);}.card-label{font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin-bottom:8px;}
+.card h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:var(--text-bright);margin-bottom:12px;}.card p,.card li{font-size:0.92rem;line-height:1.8;}.card ul{padding-left:20px;}.card ul li{margin-bottom:6px;}
+.brain-box{background:rgba(138,106,191,0.08);border:1px solid rgba(138,106,191,0.25);border-radius:12px;padding:24px 28px;margin-bottom:24px;}.brain-box .box-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;color:var(--purple);margin-bottom:12px;}
+.time-table{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:0.85rem;font-family:'JetBrains Mono',monospace;}.time-table .tt-time{color:var(--gold);font-weight:500;}
+details{margin-top:12px;border-top:1px solid var(--border);padding-top:12px;}details summary{cursor:pointer;font-size:0.82rem;color:var(--accent);font-family:'JetBrains Mono',monospace;}details summary:hover{color:var(--gold);}details .detail-body{margin-top:10px;font-size:0.85rem;color:var(--text-dim);line-height:1.7;}
+.svg-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin:24px 0;overflow-x:auto;}.svg-section .svg-title{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;}
+.protocol-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:20px 0;}.protocol-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:20px;}
+.protocol-card .p-time{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}.protocol-card h4{font-size:1rem;font-weight:700;color:var(--text-bright);margin-bottom:8px;}
+.check-item{display:flex;align-items:flex-start;gap:8px;font-size:0.85rem;margin-bottom:6px;}.check-item input[type="checkbox"]{accent-color:var(--accent);margin-top:4px;flex-shrink:0;}
+.energy-log{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;margin:24px 0;}.energy-log h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);margin-bottom:16px;}
+.log-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;}.log-row label{font-size:0.85rem;min-width:160px;}.log-row input[type="range"]{flex:1;min-width:120px;accent-color:var(--accent);}.log-row .range-val{font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:var(--accent);min-width:30px;text-align:center;}
+.log-row input[type="number"],.log-row input[type="text"]{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text-bright);font-family:'JetBrains Mono',monospace;font-size:0.85rem;padding:6px 10px;width:80px;}
+.log-save-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;cursor:pointer;margin-top:12px;}.log-save-btn:hover{opacity:0.85;}.log-status{font-size:0.8rem;color:var(--green);margin-top:8px;min-height:20px;}
+.quiz-section{margin:32px 0;}.quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;}.quiz-card .q-num{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
+.quiz-card .q-text{font-size:0.95rem;color:var(--text-bright);margin-bottom:14px;font-weight:500;}.quiz-card .q-options{display:flex;flex-direction:column;gap:8px;}.quiz-card .q-opt{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:0.85rem;cursor:pointer;transition:all 0.25s;color:var(--text);}
+.quiz-card .q-opt:hover{border-color:var(--accent);background:rgba(201,168,76,0.1);}.quiz-card .q-opt.correct{border-color:var(--green)!important;background:rgba(74,191,138,0.12)!important;color:var(--green)!important;}.quiz-card .q-opt.wrong{border-color:var(--red)!important;background:rgba(191,74,74,0.12)!important;color:var(--red)!important;}
+.quiz-card .q-feedback{margin-top:10px;font-size:0.82rem;min-height:20px;line-height:1.6;}
+.spaced-rep{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin:24px 0;}.sr-grid{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;}.sr-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;text-align:center;}.sr-item.today{border-color:var(--accent);color:var(--accent);}.sr-item .sr-day{font-weight:700;}.sr-item .sr-label{color:var(--text-dim);font-size:0.65rem;}
+.next-preview{background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.06));border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin:24px 0;text-align:center;}.next-preview .np-label{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
+.next-preview .np-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:var(--text-bright);}.next-preview .np-desc{font-size:0.85rem;color:var(--text-dim);margin-top:6px;}
+/* ═══ FADE-UP (SAFE) ═══ */
+.fade-up {
+  opacity: 1;
+  transform: translateY(0);
+}
+.js-ready .fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.js-ready .fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.comparison-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:0.85rem;}.comparison-table th{background:var(--surface2);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);}.comparison-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}.comparison-table tr:hover td{background:rgba(201,168,76,0.04);}
+.highlight-num{font-family:'JetBrains Mono',monospace;color:var(--gold);font-weight:700;}.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:2px 8px;border-radius:4px;margin:2px;}.tag-red{background:rgba(191,74,74,0.15);color:var(--red);}.tag-orange{background:rgba(191,106,74,0.15);color:var(--orange);}.tag-blue{background:rgba(74,158,191,0.15);color:var(--blue);}.tag-green{background:rgba(74,191,138,0.15);color:var(--green);}.tag-purple{background:rgba(138,106,191,0.15);color:var(--purple);}.tag-gold{background:rgba(201,168,76,0.15);color:var(--gold);}
+.nav-links{display:flex;justify-content:space-between;margin:30px 0 10px;font-family:'JetBrains Mono',monospace;font-size:0.82rem;}.nav-links a{color:var(--accent);text-decoration:none;}.nav-links a:hover{color:var(--gold);}
+/* ── Mobile Optimization ── */
+@media (max-width:480px){
+  :root{--pad:12px;}
+  body{font-size:14px;}
+  .container{padding:0 12px 60px;}
+  .hero .day-num{font-size:2.5rem;}
+  .hero .day-title{font-size:1.15rem;line-height:1.4;}
+  .hero .day-title-en{font-size:0.7rem;}
+  .hero .quote{font-size:0.8rem;padding:8px 12px;}
+  .progress-ring-wrap svg{width:70px;height:70px;}
+  .ring-text{font-size:0.7rem;}
+  .meta-badges{gap:4px;flex-wrap:wrap;}
+  .meta-badge{font-size:0.65rem;padding:3px 8px;}
+  .card{padding:14px;margin-bottom:12px;}
+  .card h3{font-size:1rem;}
+  .card p,.card li{font-size:0.82rem;line-height:1.6;}
+  .section-title{font-size:1.15rem;}
+  .svg-section{margin:12px -12px;padding:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .svg-section svg{min-width:300px;max-width:100%;height:auto;}
+  .svg-title{font-size:0.8rem;}
+  .comparison-table{font-size:0.75rem;}
+  .comparison-table th,.comparison-table td{padding:6px 8px;}
+  .protocol-grid{grid-template-columns:1fr;gap:10px;}
+  .protocol-card{padding:14px;}
+  .protocol-card h4{font-size:0.9rem;}
+  .time-table{font-size:0.75rem;gap:4px 8px;}
+  .brain-box{padding:14px;}
+  .quiz-card{padding:14px;}
+  .q-text{font-size:0.85rem;}
+  .q-opt{padding:10px 12px;font-size:0.82rem;min-height:44px;display:flex;align-items:center;}
+  .log-row{flex-direction:column;gap:4px;}
+  .log-row label{font-size:0.8rem;}
+  .energy-log{padding:14px;}
+  .spaced-rep{padding:14px;}
+  .sr-grid{gap:6px;}
+  .sr-item{padding:6px 4px;}
+  .sr-day{font-size:0.75rem;}
+  .next-preview{padding:14px;}
+  .sticky-header{padding:6px 12px;font-size:0.72rem;}
+  .sticky-header .brand{font-size:0.72rem;}
+  .sticky-header .part-label{font-size:0.65rem;}
+  .nav-links{flex-direction:column;gap:6px;align-items:stretch;}
+  .nav-links a{text-align:center;padding:10px;font-size:0.82rem;}
+  .detail-panel{padding:12px;}
+  .detail-panel .metric{font-size:0.7rem;padding:3px 8px;}
+  .svg-tooltip{max-width:200px;font-size:0.72rem;padding:8px 10px;}
+  details summary{font-size:0.82rem;padding:8px;}
+  .highlight-num{font-size:0.9em;}
+  .check-item{font-size:0.8rem;min-height:36px;}
+  .check-item input[type="checkbox"]{width:18px;height:18px;}
+}
+@media (max-width:360px){
+  .hero .day-num{font-size:2rem;}
+  .hero .day-title{font-size:1rem;}
+  .card{padding:12px;}
+  .svg-section svg{min-width:500px;}
+}
+@media (min-width:481px) and (max-width:768px){
+  .container{padding:0 20px 60px;}
+  .protocol-grid{grid-template-columns:1fr;}
+  .svg-section svg{min-width:700px;}
+  .nav-links a{padding:10px 16px;}
+}
+/* Touch-friendly enhancements */
+@media (hover:none) and (pointer:coarse){
+  .q-opt{min-height:48px;padding:12px 14px;}
+  .check-item{min-height:40px;}
+  .nav-links a{min-height:44px;display:flex;align-items:center;justify-content:center;}
+  .log-save-btn{min-height:48px;font-size:0.9rem;}
+  .svg-hotspot{pointer-events:auto;}
+  details summary{min-height:44px;display:flex;align-items:center;}
+}
+/* Swipe navigation indicator */
+.swipe-hint{display:none;text-align:center;padding:8px;font-size:0.72rem;color:var(--text-dim);opacity:0.6;}
+@media (hover:none) and (pointer:coarse){.swipe-hint{display:block;}}
+/* Bottom navigation bar for mobile */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(18,21,28,0.97);border-top:1px solid var(--border);padding:8px 16px;z-index:200;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+.mobile-nav .mn-inner{display:flex;justify-content:space-between;align-items:center;max-width:600px;margin:0 auto;}
+.mobile-nav a{color:var(--accent);text-decoration:none;font-family:'JetBrains Mono',monospace;font-size:0.8rem;padding:8px 16px;border-radius:6px;background:rgba(var(--accent-rgb,138,106,191),0.1);min-width:80px;text-align:center;transition:background 0.2s;}
+.mobile-nav a:active{background:rgba(var(--accent-rgb,138,106,191),0.25);}
+.mobile-nav .mn-current{color:var(--gold);font-size:0.85rem;font-weight:700;}
+@media (max-width:640px){.mobile-nav{display:block;}}
+@media (max-width:640px){.nav-links{display:none;}}
+
+@keyframes hrv-wave{0%{stroke-dashoffset:500}100%{stroke-dashoffset:0}}
+@keyframes status-blink{0%,100%{opacity:0.5}50%{opacity:1}}
+@keyframes recovery-fill{0%{width:0}100%{width:100%}}
+.anim-hrv{stroke-dasharray:500;animation:hrv-wave 2s ease-out forwards;}
+.anim-status{animation:status-blink 2s ease-in-out infinite;}
+.anim-fill{animation:recovery-fill 1.5s ease-out forwards;}
+
+/* ── Interactive SVG System ── */
+.svg-interactive{position:relative;overflow:visible;}
+.svg-tooltip{position:absolute;background:rgba(18,21,28,0.96);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;color:var(--text);font-size:0.78rem;line-height:1.5;max-width:260px;pointer-events:none;opacity:0;transform:translateY(8px);transition:opacity 0.25s ease,transform 0.25s ease;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,0.4);backdrop-filter:blur(8px);}
+.svg-tooltip.visible{opacity:1;transform:translateY(0);}
+.svg-tooltip .tip-title{font-weight:700;color:var(--accent);margin-bottom:4px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.5px;text-transform:uppercase;}
+.svg-tooltip .tip-value{font-family:'JetBrains Mono',monospace;color:var(--gold);font-size:0.82rem;}
+.svg-tooltip .tip-desc{color:#B0ADAA;margin-top:3px;}
+.svg-hotspot{cursor:pointer;transition:opacity 0.2s,filter 0.2s;}
+.svg-hotspot:hover{filter:brightness(1.4) drop-shadow(0 0 6px var(--accent));opacity:1 !important;}
+.svg-hotspot.focused{filter:brightness(1.5) drop-shadow(0 0 10px var(--accent));}
+.svg-hotspot:not(.focused):not(:hover){opacity:0.65;transition:opacity 0.4s;}
+.svg-focus-active .svg-hotspot:not(.focused):not(:hover){opacity:0.3;}
+.svg-label-popup{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--accent);color:#12151C;padding:3px 8px;border-radius:4px;font-size:0.7rem;font-weight:700;white-space:nowrap;opacity:0;transition:opacity 0.2s;pointer-events:none;}
+.svg-hotspot:hover+.svg-label-popup,.svg-hotspot:hover .svg-label-popup{opacity:1;}
+.detail-panel{background:rgba(30,33,45,0.95);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:10px;display:none;animation:panelSlide 0.3s ease;}
+.detail-panel.active{display:block;}
+@keyframes panelSlide{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.detail-panel h4{color:var(--accent);font-size:0.85rem;margin:0 0 8px;}
+.detail-panel .metric{display:inline-flex;align-items:center;gap:4px;background:rgba(var(--accent-rgb,138,106,191),0.1);padding:4px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:0.75rem;margin:3px 4px 3px 0;}
+.detail-panel .metric-val{color:var(--accent);font-weight:700;}
+.detail-panel .insight{font-size:0.78rem;color:#B0ADAA;line-height:1.6;margin-top:8px;}
+.detail-panel .close-btn{position:absolute;top:8px;right:12px;cursor:pointer;color:#7A7A8A;font-size:1rem;}
+.detail-panel .close-btn:hover{color:var(--accent);}
+
+</style>
+
+<noscript><style>.fade-up{opacity:1!important;transform:none!important;}.mobile-nav{display:block!important;}</style></noscript>
+</head>
+<body>
+<script>
+// ═══ Fade-Up Failsafe ═══
+document.body.classList.add('js-ready');
+setTimeout(function(){
+  document.querySelectorAll('.fade-up:not(.visible)').forEach(function(el){
+    el.classList.add('visible');
+  });
+}, 3000);
+</script>
+
+<header class="sticky-header">
+  <div class="brand">에너지 OS / Day 36</div>
+  <div class="part-label">PART 6: 컨디션 관리</div>
+</header>
+<div class="container">
+<div class="nav-links"><a href="day35_travel_seasonal.html">&larr; Day 35</a><a href="day37_morning_routine.html">Day 37 &rarr;</a></div>
+<section class="hero fade-up">
+  <div class="series-note">이 시리즈 예상 총 Day: 50일 · PART 6/9</div>
+  <div class="day-num">36</div>
+  <div class="day-title">Part 6 리뷰 — 컨디션 통합 관리</div>
+  <div class="day-title-en">Part 6 Review — Condition Management OS</div>
+  <div class="quote">"What gets measured gets managed. — Peter Drucker"</div>
+  <div class="progress-ring-wrap">
+    <svg width="100" height="100" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border)" stroke-width="4"/>
+      <circle cx="50" cy="50" r="42" fill="none" stroke="var(--accent)" stroke-width="4" stroke-dasharray="263.9" stroke-dashoffset="73.9" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+    </svg>
+    <div class="ring-text">36/50<small>DAYS</small></div>
+  </div>
+  <div class="meta-badges">
+    <span class="meta-badge">⏱ 25 min</span>
+    <span class="meta-badge">📋 Part 6 리뷰</span>
+    <span class="meta-badge">📊 HRV루프</span>
+    <span class="meta-badge">🔄 디로드</span>
+    <span class="meta-badge">🎯 통합</span>
+  </div>
+</section>
+<section class="fade-up">
+  <div class="brain-box">
+    <div class="box-title">🧠 뇌과학 학습 전략 — 포모도로 25분 배분</div>
+    <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:14px;">전체 시스템을 조감도(bird's eye view)로 보는 것은 세부 정보의 위치와 관계를 이해하는 데 필수적입니다.</p>
+    <div class="time-table">
+      <span class="tt-time">0~5분</span><span class="tt-desc">개념 이해 — 핵심 구조 파악</span>
+      <span class="tt-time">5~18분</span><span class="tt-desc">핵심 내용 + 다이어그램 정독</span>
+      <span class="tt-time">18~23분</span><span class="tt-desc">실전 프로토콜 체크</span>
+      <span class="tt-time">23~25분</span><span class="tt-desc">퀴즈 3문제</span>
+    </div>
+  </div>
+</section>
+
+<h2 class="section-title fade-up">📋 Part 6 종합 리뷰 — 컨디션 관리 마스터</h2>
+<div class="card fade-up">
+  <div class="card-label">Review Map</div>
+  <h3>5일간 배운 컨디션 관리 요약</h3>
+  <table class="comparison-table">
+    <tr><th>Day</th><th>주제</th><th>핵심 도구</th><th>일일 실천</th></tr>
+    <tr><td class="highlight-num">32</td><td>HRV 활용법</td><td>RMSSD, 7일 이동평균</td><td>아침 HRV 측정 → 강도 결정</td></tr>
+    <tr><td class="highlight-num">33</td><td>면역 & 에너지</td><td>J-커브, 오픈 윈도우</td><td>비타민D·아연·수면으로 면역 부스트</td></tr>
+    <tr><td class="highlight-num">34</td><td>피로 & 오버트레이닝</td><td>피트니스-피로 모델, 4:1</td><td>총 부하 관리, 디로드 주기</td></tr>
+    <tr><td class="highlight-num">35</td><td>출장·시차·계절</td><td>Zeitgeber, SCN 리셋</td><td>햇빛 > 멜라토닌 > 식사 > 운동</td></tr>
+    <tr><td class="highlight-num">36</td><td>Part 6 리뷰</td><td>통합 의사결정</td><td>매일 컨디션 기반 자동 조절</td></tr>
+  </table>
+</div>
+<div class="card fade-up">
+  <div class="card-label">Decision Tree</div>
+  <h3>매일 아침 의사결정 흐름</h3>
+  <p>기상 → HRV 측정 → 오늘의 강도 결정 → 실행. 이것이 컨디션 관리의 전부입니다:</p>
+  <ul>
+    <li><strong>Step 1</strong> — 기상 직후 HRV 측정 (1~2분)</li>
+    <li><strong>Step 2</strong> — 7일 평균 대비 위치 확인 (🟢🟡🟠🔴)</li>
+    <li><strong>Step 3</strong> — 추가 체크: 수면 질, 근육통, 기분, 식욕</li>
+    <li><strong>Step 4</strong> — 오늘의 훈련 강도 결정 (또는 휴식)</li>
+    <li><strong>Step 5</strong> — 퇴근 후 에너지 로그 기록</li>
+  </ul>
+</div>
+<div class="card fade-up">
+  <div class="card-label">Part 1~6 Integration</div>
+  <h3>여기까지 배운 에너지 OS 전체 지도</h3>
+  <ul>
+    <li><strong>Part 1</strong> 에너지 시스템 — ATP, 미토콘드리아, 일주기 리듬</li>
+    <li><strong>Part 2</strong> 수면 — 아키텍처, 크로노타입, 환경</li>
+    <li><strong>Part 3</strong> 영양 — 매크로, 마이크로, 타이밍</li>
+    <li><strong>Part 4</strong> 웨이트 — 근비대, 복합운동, 주기화</li>
+    <li><strong>Part 5</strong> 러닝 — VO2max, Zone, 폼, 병행</li>
+    <li><strong>Part 6</strong> 컨디션 — HRV, 면역, 피로, 환경</li>
+    <li><strong>남은 Part 7~9</strong> — 루틴·멘탈·최적화로 완성</li>
+  </ul>
+</div>
+
+
+<div class="svg-section fade-up">
+  <div class="svg-title">Daily Condition Management — Decision Flow</div>
+  <svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;">
+    <rect width="800" height="320" fill="#12151C" rx="8"/>
+    <!-- Flow chart -->
+    <g transform="translate(40,30)">
+      <!-- Step 1: Wake -->
+      <rect x="0" y="40" width="120" height="50" rx="8" fill="rgba(138,106,191,0.15)" stroke="#8A6ABF" stroke-width="1.5"/>
+      <text x="60" y="60" fill="#8A6ABF" font-size="10" font-family="JetBrains Mono" text-anchor="middle" font-weight="700">기상</text>
+      <text x="60" y="78" fill="#D8D3C8" font-size="9" font-family="Noto Sans KR" text-anchor="middle">HRV 측정</text>
+      <!-- Arrow -->
+      <line x1="120" y1="65" x2="160" y2="65" stroke="#252A38" stroke-width="1.5"/>
+      <polygon points="160,65 153,60 153,70" fill="#252A38"/>
+      <!-- Step 2: Compare -->
+      <rect x="160" y="40" width="120" height="50" rx="8" fill="rgba(201,168,76,0.15)" stroke="#C9A84C" stroke-width="1.5"/>
+      <text x="220" y="60" fill="#C9A84C" font-size="10" font-family="JetBrains Mono" text-anchor="middle" font-weight="700">7일 평균 비교</text>
+      <text x="220" y="78" fill="#D8D3C8" font-size="9" font-family="Noto Sans KR" text-anchor="middle">오늘/평균 = ?</text>
+      <!-- Branch arrows -->
+      <line x1="280" y1="50" x2="340" y2="25" stroke="#4ABF8A" stroke-width="1.5"/>
+      <line x1="280" y1="65" x2="340" y2="65" stroke="#C9A84C" stroke-width="1.5"/>
+      <line x1="280" y1="80" x2="340" y2="105" stroke="#BF6A4A" stroke-width="1.5"/>
+      <line x1="280" y1="85" x2="340" y2="145" stroke="#BF4A4A" stroke-width="1.5"/>
+      <!-- Green: GO -->
+      <rect x="340" y="5" width="140" height="40" rx="6" fill="rgba(74,191,138,0.15)" stroke="#4ABF8A"/>
+      <text x="410" y="22" fill="#4ABF8A" font-size="10" font-family="JetBrains Mono" text-anchor="middle" font-weight="700">🟢 +10% 이상</text>
+      <text x="410" y="37" fill="#D8D3C8" font-size="9" font-family="Noto Sans KR" text-anchor="middle">고강도 OK</text>
+      <!-- Yellow: Normal -->
+      <rect x="340" y="50" width="140" height="40" rx="6" fill="rgba(201,168,76,0.15)" stroke="#C9A84C"/>
+      <text x="410" y="67" fill="#C9A84C" font-size="10" font-family="JetBrains Mono" text-anchor="middle" font-weight="700">🟡 ±10%</text>
+      <text x="410" y="82" fill="#D8D3C8" font-size="9" font-family="Noto Sans KR" text-anchor="middle">계획대로</text>
+      <!-- Orange: Easy -->
+      <rect x="340" y="95" width="140" height="40" rx="6" fill="rgba(191,106,74,0.15)" stroke="#BF6A4A"/>
+      <text x="410" y="112" fill="#BF6A4A" font-size="10" font-family="JetBrains Mono" text-anchor="middle" font-weight="700">🟠 -10~20%</text>
+      <text x="410" y="127" fill="#D8D3C8" font-size="9" font-family="Noto Sans KR" text-anchor="middle">Zone 2만</text>
+      <!-- Red: Rest -->
+      <rect x="340" y="140" width="140" height="40" rx="6" fill="rgba(191,74,74,0.15)" stroke="#BF4A4A"/>
+      <text x="410" y="157" fill="#BF4A4A" font-size="10" font-family="JetBrains Mono" text-anchor="middle" font-weight="700">🔴 -20% 이상</text>
+      <text x="410" y="172" fill="#D8D3C8" font-size="9" font-family="Noto Sans KR" text-anchor="middle">완전 휴식</text>
+      <!-- Execute arrows -->
+      <line x1="480" y1="25" x2="540" y2="65" stroke="#252A38" stroke-width="1"/>
+      <line x1="480" y1="70" x2="540" y2="70" stroke="#252A38" stroke-width="1"/>
+      <line x1="480" y1="115" x2="540" y2="80" stroke="#252A38" stroke-width="1"/>
+      <line x1="480" y1="160" x2="540" y2="85" stroke="#252A38" stroke-width="1"/>
+      <!-- Execute -->
+      <rect x="540" y="45" width="120" height="50" rx="8" fill="rgba(74,158,191,0.15)" stroke="#4A9EBF" stroke-width="1.5"/>
+      <text x="600" y="65" fill="#4A9EBF" font-size="10" font-family="JetBrains Mono" text-anchor="middle" font-weight="700">실행</text>
+      <text x="600" y="83" fill="#D8D3C8" font-size="9" font-family="Noto Sans KR" text-anchor="middle">훈련 or 휴식</text>
+      <!-- Log -->
+      <line x1="600" y1="95" x2="600" y2="120" stroke="#252A38" stroke-width="1.5"/>
+      <rect x="540" y="120" width="120" height="40" rx="8" fill="rgba(201,168,76,0.1)" stroke="#C9A84C"/>
+      <text x="600" y="140" fill="#C9A84C" font-size="10" font-family="JetBrains Mono" text-anchor="middle" font-weight="700">에너지 로그</text>
+      <text x="600" y="154" fill="#7A7A8A" font-size="8" font-family="Noto Sans KR" text-anchor="middle">저녁 기록</text>
+    </g>
+    <!-- Bottom summary -->
+    <rect x="60" y="230" width="680" height="60" rx="8" fill="rgba(74,158,191,0.06)" stroke="#4A9EBF"/>
+    <text x="400" y="252" fill="#4A9EBF" font-size="12" font-family="Cormorant Garamond" text-anchor="middle" font-weight="700">컨디션 관리 = 측정 → 비교 → 결정 → 실행 → 기록 → 반복</text>
+    <text x="400" y="275" fill="#7A7A8A" font-size="10" font-family="Noto Sans KR" text-anchor="middle">매일 2분 투자로 과훈련 방지 + 에너지 최적화 + 장기 퍼포먼스 향상</text>
+  </svg>
+</div>
+
+<h2 class="section-title fade-up">⚡ 실전 프로토콜 — "컨디션 셀프 모니터링"</h2>
+
+<div class="protocol-grid fade-up">
+  <div class="protocol-card">
+    <div class="p-time">오늘 미션</div>
+    <h4>Part 6 통합 실천</h4>
+    <div class="check-item"><input type="checkbox"><span>아침 HRV 측정 루틴 시작</span></div>
+    <div class="check-item"><input type="checkbox"><span>비타민D + 아연 보충 시작</span></div>
+    <div class="check-item"><input type="checkbox"><span>4:1 디로드 달력에 표시</span></div>
+    <div class="check-item"><input type="checkbox"><span>에너지 로그 1주일 연속 기록</span></div>
+  </div>
+  <div class="protocol-card">
+    <div class="p-time">주간 체크</div>
+    <h4>컨디션 대시보드</h4>
+    <div class="check-item"><input type="checkbox"><span>HRV 7일 추세 확인</span></div>
+    <div class="check-item"><input type="checkbox"><span>수면 시간·품질 평균 확인</span></div>
+    <div class="check-item"><input type="checkbox"><span>고강도 횟수 카운트 (≤3회?)</span></div>
+    <div class="check-item"><input type="checkbox"><span>이번 주 에너지 패턴 분석</span></div>
+  </div>
+  <div class="protocol-card">
+    <div class="p-time">Part 7 예고</div>
+    <h4>루틴 관리로 넘어가기</h4>
+    <div class="check-item"><input type="checkbox"><span>현재 아침 루틴 타임라인 기록</span></div>
+    <div class="check-item"><input type="checkbox"><span>현재 저녁 루틴 타임라인 기록</span></div>
+    <div class="check-item"><input type="checkbox"><span>에너지 높은 시간대 파악</span></div>
+    <div class="check-item"><input type="checkbox"><span>Part 1~6 핵심 3줄 요약 정리</span></div>
+  </div>
+</div>
+
+<div class="energy-log fade-up">
+  <h3>📊 오늘의 에너지 로그 — Day 36</h3>
+  <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:16px;">매일 같은 시간에 기록 → 패턴 발견 → 에너지 레버 최적화</p>
+  <div class="log-row"><label>아침 에너지 (1~10):</label><input type="range" id="lm" min="1" max="10" value="5" oninput="document.getElementById('vm').textContent=this.value"><span class="range-val" id="vm">5</span></div>
+  <div class="log-row"><label>운동 퍼포먼스 (1~10):</label><input type="range" id="lw" min="1" max="10" value="5" oninput="document.getElementById('vw').textContent=this.value"><span class="range-val" id="vw">5</span></div>
+  <div class="log-row"><label>수면 시간 (h):</label><input type="number" id="ls" min="0" max="12" step="0.5" value="7" style="width:70px;"></div>
+  <div class="log-row"><label>수면 품질 (1~10):</label><input type="range" id="lq" min="1" max="10" value="5" oninput="document.getElementById('vq').textContent=this.value"><span class="range-val" id="vq">5</span></div>
+  <div class="log-row"><label>HRV (ms):</label><input type="number" id="lh" min="0" max="200" placeholder="—" style="width:70px;"></div>
+  <button class="log-save-btn" onclick="saveLog()">💾 저장</button>
+  <div class="log-status" id="logSt"></div>
+</div>
+<h2 class="section-title fade-up">🧩 복습 퀴즈</h2>
+<div class="quiz-section fade-up">
+  <div class="quiz-card" id="quiz1">
+    <div class="q-num">Question 01</div>
+    <div class="q-text">매일 아침 컨디션 관리의 첫 번째 단계는?</div>
+    <div class="q-options">
+      <div class="q-opt" onclick="checkQuiz(1, this, false)">A. 커피 마시기</div>
+      <div class="q-opt" onclick="checkQuiz(1, this, false)">B. 운동복 입기</div>
+      <div class="q-opt" onclick="checkQuiz(1, this, true)">C. HRV 측정</div>
+      <div class="q-opt" onclick="checkQuiz(1, this, false)">D. 체중 재기</div>
+    </div>
+    <div class="q-feedback" id="fb1"></div>
+  </div>
+  <div class="quiz-card" id="quiz2">
+    <div class="q-num">Question 02</div>
+    <div class="q-text">피트니스-피로 모델에서 디로드의 역할은?</div>
+    <div class="q-options">
+      <div class="q-opt" onclick="checkQuiz(2, this, false)">A. 피트니스를 높이는 것</div>
+      <div class="q-opt" onclick="checkQuiz(2, this, true)">B. 피로를 빼서 피트니스만 남기는 것</div>
+      <div class="q-opt" onclick="checkQuiz(2, this, false)">C. 완전히 처음부터 다시 시작</div>
+      <div class="q-opt" onclick="checkQuiz(2, this, false)">D. 근손실을 유도하는 것</div>
+    </div>
+    <div class="q-feedback" id="fb2"></div>
+  </div>
+  <div class="quiz-card" id="quiz3">
+    <div class="q-num">Question 03</div>
+    <div class="q-text">Part 6 전체를 관통하는 핵심 메시지는?</div>
+    <div class="q-options">
+      <div class="q-opt" onclick="checkQuiz(3, this, false)">A. 항상 최대 강도로 훈련해야 한다</div>
+      <div class="q-opt" onclick="checkQuiz(3, this, true)">B. 측정 → 비교 → 결정 → 실행 → 기록의 반복</div>
+      <div class="q-opt" onclick="checkQuiz(3, this, false)">C. 감으로 운동하는 것이 최고</div>
+      <div class="q-opt" onclick="checkQuiz(3, this, false)">D. 운동은 적을수록 좋다</div>
+    </div>
+    <div class="q-feedback" id="fb3"></div>
+  </div></div>
+<div class="spaced-rep fade-up">
+  <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);">🔁 간격 반복 — Day 36</h3>
+  <div class="sr-grid">
+    <div class="sr-item today"><div class="sr-day">D+0</div><div class="sr-label">오늘</div></div>
+    <div class="sr-item"><div class="sr-day">D+1</div><div class="sr-label">내일</div></div>
+    <div class="sr-item"><div class="sr-day">D+3</div><div class="sr-label">3일후</div></div>
+    <div class="sr-item"><div class="sr-day">D+7</div><div class="sr-label">1주후</div></div>
+    <div class="sr-item"><div class="sr-day">D+14</div><div class="sr-label">2주후</div></div>
+  </div>
+</div>
+<div class="next-preview fade-up">
+  <div class="np-label">NEXT → DAY 37</div>
+  <div class="np-title">아침 루틴 설계</div>
+  <div class="np-desc">기상 후 90분 — 하루 에너지를 결정하는 골든 타임</div>
+</div>
+</div>
+<script>
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')})},{threshold:0.1});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+const quizFeedback = {
+  1: { correct: `정답! 기상 직후 HRV 측정이 첫 단계입니다. 이것으로 오늘의 훈련 강도를 과학적으로 결정합니다.`, wrong: `HRV 측정이 첫 단계입니다. 기상 직후 1~2분 측정으로 오늘의 신체 상태를 객관적으로 파악합니다.` },
+  2: { correct: `맞습니다! 디로드는 피로(반감기 15일)를 빠르게 빼면서 피트니스(반감기 45일)는 유지하여, 순수 퍼포먼스를 높입니다.`, wrong: `디로드는 피로를 빠르게 빼는 것입니다. 피로의 반감기(15일)가 피트니스(45일)보다 짧아 디로드 후 퍼포먼스가 상승합니다.` },
+  3: { correct: `정답! 데이터 기반 의사결정 루프입니다. 매일 2분 투자(HRV+로그)로 장기적 최적화를 이룹니다.`, wrong: `핵심은 데이터 기반 루프입니다: 측정 → 비교 → 결정 → 실행 → 기록을 매일 반복합니다.` },
+};
+function checkQuiz(n,el,ok){const c=document.getElementById('quiz'+n);if(c.dataset.a)return;c.dataset.a='1';const os=c.querySelectorAll('.q-opt'),fb=document.getElementById('fb'+n);os.forEach(o=>{o.style.pointerEvents='none';o.style.opacity='0.6';});if(ok){el.classList.add('correct');el.style.opacity='1';fb.style.color='var(--green)';fb.textContent=quizFeedback[n].correct;}else{el.classList.add('wrong');el.style.opacity='1';os.forEach(o=>{if(o.getAttribute('onclick').includes('true')){o.classList.add('correct');o.style.opacity='1';}});fb.style.color='var(--red)';fb.textContent=quizFeedback[n].wrong;}}
+function saveLog(){const d={day:36,date:new Date().toISOString().slice(0,10),m:document.getElementById('lm').value,w:document.getElementById('lw').value,s:document.getElementById('ls').value,q:document.getElementById('lq').value,h:document.getElementById('lh').value||null};let l=JSON.parse(localStorage.getItem('ys-energy-logs')||'[]');l=l.filter(x=>x.date!==d.date||x.day!==d.day);l.push(d);localStorage.setItem('ys-energy-logs',JSON.stringify(l));document.getElementById('logSt').textContent='✅ 저장! ('+d.date+')';setTimeout(()=>document.getElementById('logSt').textContent='',3e3);}
+</script>
+
+<script>
+
+// ── Interactive SVG Tooltip & Focus System ──
+(function(){
+  const diagrams = document.querySelectorAll('.diagram-box');
+  diagrams.forEach(box => {
+    let tooltip = box.querySelector('.svg-tooltip');
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.className = 'svg-tooltip';
+      box.style.position = 'relative';
+      box.appendChild(tooltip);
+    }
+    const hotspots = box.querySelectorAll('.svg-hotspot');
+    hotspots.forEach(hs => {
+      hs.addEventListener('mouseenter', e => {
+        const t = hs.dataset.tipTitle || '';
+        const v = hs.dataset.tipValue || '';
+        const d = hs.dataset.tipDesc || '';
+        tooltip.innerHTML = (t ? '<div class="tip-title">'+t+'</div>' : '') +
+          (v ? '<div class="tip-value">'+v+'</div>' : '') +
+          (d ? '<div class="tip-desc">'+d+'</div>' : '');
+        const rect = hs.getBoundingClientRect();
+        const boxRect = box.getBoundingClientRect();
+        tooltip.style.left = (rect.left - boxRect.left + rect.width/2 - 130) + 'px';
+        tooltip.style.top = (rect.top - boxRect.top - tooltip.offsetHeight - 10) + 'px';
+        tooltip.classList.add('visible');
+      });
+      hs.addEventListener('mouseleave', () => {
+        tooltip.classList.remove('visible');
+      });
+      // Touch fallback for tooltips
+      hs.addEventListener('touchstart', function(ev) {
+        ev.stopPropagation();
+        var t = hs.dataset.tipTitle || '';
+        var v = hs.dataset.tipValue || '';
+        var d = hs.dataset.tipDesc || '';
+        tooltip.innerHTML = (t ? '<div class="tip-title">'+t+'</div>' : '') +
+          (v ? '<div class="tip-value">'+v+'</div>' : '') +
+          (d ? '<div class="tip-desc">'+d+'</div>' : '');
+        var rect = hs.getBoundingClientRect();
+        var boxRect = box.getBoundingClientRect();
+        tooltip.style.left = Math.max(0, (rect.left - boxRect.left + rect.width/2 - 130)) + 'px';
+        tooltip.style.top = Math.max(0, (rect.top - boxRect.top - tooltip.offsetHeight - 10)) + 'px';
+        tooltip.classList.add('visible');
+        setTimeout(function(){ tooltip.classList.remove('visible'); }, 3000);
+      }, {passive: true});
+
+      hs.addEventListener('click', () => {
+        const wasActive = hs.classList.contains('focused');
+        box.querySelectorAll('.svg-hotspot').forEach(h => h.classList.remove('focused'));
+        const panel = box.querySelector('.detail-panel');
+        if (wasActive) {
+          box.classList.remove('svg-focus-active');
+          if(panel) panel.classList.remove('active');
+        } else {
+          hs.classList.add('focused');
+          box.classList.add('svg-focus-active');
+          if(panel && hs.dataset.detail){
+            panel.innerHTML = '<span class="close-btn" onclick="this.parentElement.classList.remove(\'active\');this.closest(\'.diagram-box\').classList.remove(\'svg-focus-active\');this.closest(\'.diagram-box\').querySelectorAll(\'.svg-hotspot\').forEach(h=>h.classList.remove(\'focused\'))">✕</span>' + hs.dataset.detail;
+            panel.classList.add('active');
+          }
+        }
+      });
+    });
+  });
+})();
+
+</script>
+<script>
+// ── Swipe Navigation ──
+(function(){
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const threshold = 80;
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, {passive: true});
+
+  document.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) < threshold) return;
+
+    const links = document.querySelectorAll('.mobile-nav a, .nav-links a');
+    if (diff > 0) {
+      // Swipe left → next day
+      const next = Array.from(links).find(a => a.textContent.includes('→') || a.textContent.includes('Day'));
+      if (next && next.href && next.textContent.includes('→')) next.click();
+    } else {
+      // Swipe right → prev day
+      const prev = Array.from(links).find(a => a.textContent.includes('←'));
+      if (prev && prev.href) prev.click();
+    }
+  }, {passive: true});
+})();
+// ── Service Worker Registration ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body></html>

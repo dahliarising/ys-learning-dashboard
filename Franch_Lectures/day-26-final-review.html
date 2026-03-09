@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 26 — 최종 종합 복습: 26일 완성 종합 정리</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════ RESET & BASE ═══════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-alt: #181C26;
+  --terracotta: #BF6A4A;
+  --gold: #C9A84C;
+  --text: #E8E4DF;
+  --text-dim: #8A8680;
+  --text-bright: #F5F2ED;
+  --accent-glow: rgba(191,106,74,0.15);
+  --gold-glow: rgba(201,168,76,0.12);
+  --border: #2A2D35;
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Noto Sans KR', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+}
+html { scroll-behavior: smooth; font-size: 16px; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); line-height: 1.75; font-weight: 300; -webkit-font-smoothing: antialiased; }
+a { color: var(--terracotta); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.sticky-header { position: sticky; top: 0; z-index: 100; background: rgba(10,12,16,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.6rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+.sticky-header .logo { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: var(--terracotta); letter-spacing: 0.05em; }
+.sticky-header .day-tag { font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold); background: var(--gold-glow); padding: 0.25rem 0.75rem; border-radius: 20px; border: 1px solid rgba(201,168,76,0.25); }
+.sticky-header .series-info { font-size: 0.7rem; color: var(--text-dim); }
+.hero { text-align: center; padding: 4rem 1.5rem 3rem; background: linear-gradient(180deg, rgba(191,106,74,0.08) 0%, transparent 100%); border-bottom: 1px solid var(--border); }
+.hero .overline { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero h1 { font-family: var(--font-heading); font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 700; color: var(--text-bright); margin-bottom: 0.4rem; line-height: 1.2; }
+.hero .subtitle { font-size: 1rem; color: var(--text-dim); margin-bottom: 2rem; }
+.hero-sentence { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; max-width: 700px; margin: 0 auto; position: relative; overflow: hidden; }
+.hero-sentence::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--terracotta), var(--gold)); }
+.hero-sentence .fr { font-family: var(--font-heading); font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 600; color: var(--terracotta); margin-bottom: 0.3rem; }
+.hero-sentence .ipa { font-family: var(--font-mono); font-size: 0.95rem; color: var(--gold); font-style: italic; margin-bottom: 0.4rem; }
+.hero-sentence .ko { font-size: 1rem; color: var(--text-dim); }
+.container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+section { padding: 3rem 0; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.4rem; }
+.section-title { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; color: var(--text-bright); margin-bottom: 1.5rem; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.8rem; margin-bottom: 1.2rem; }
+.card-alt { background: var(--bg-card-alt); }
+.brain-box { background: linear-gradient(135deg, rgba(191,106,74,0.08), rgba(201,168,76,0.06)); border: 1px solid rgba(191,106,74,0.2); border-radius: 14px; padding: 2rem; margin-bottom: 2rem; }
+.brain-box h3 { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 600; color: var(--terracotta); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+.brain-box .strategy { margin-bottom: 1rem; padding-left: 1rem; border-left: 2px solid var(--terracotta); }
+.brain-box .strategy strong { color: var(--gold); font-weight: 500; }
+.brain-box .strategy p { font-size: 0.9rem; color: var(--text-dim); margin-top: 0.2rem; }
+.tip-highlight { color: var(--terracotta); font-weight: 500; }
+.time-table { display: grid; grid-template-columns: auto 1fr; gap: 0.4rem 1rem; font-size: 0.85rem; margin-top: 1rem; padding: 1rem; background: rgba(10,12,16,0.5); border-radius: 8px; }
+.time-table .time { font-family: var(--font-mono); color: var(--gold); font-size: 0.8rem; }
+.time-table .task { color: var(--text); }
+.expr-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.expr-table th { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.15em; text-transform: uppercase; text-align: left; padding: 0.8rem 0.6rem; border-bottom: 2px solid var(--border); white-space: nowrap; }
+.expr-table td { padding: 0.65rem 0.6rem; border-bottom: 1px solid rgba(42,45,53,0.5); font-size: 0.85rem; vertical-align: top; }
+.expr-table tr:hover { background: rgba(191,106,74,0.04); }
+.expr-table .fr-word { font-family: var(--font-heading); font-weight: 600; color: var(--terracotta); font-size: 1rem; }
+.pronunciation { font-family: var(--font-mono); font-style: italic; color: var(--gold); font-size: 0.8rem; opacity: 0.85; }
+.approx-ko { font-size: 0.82rem; color: var(--text-dim); }
+.dialogue { margin: 1rem 0; }
+.dialogue-line { display: flex; gap: 1rem; padding: 1rem; border-radius: 10px; margin-bottom: 0.6rem; }
+.speaker-a { background: rgba(191,106,74,0.06); border: 1px solid rgba(191,106,74,0.15); }
+.speaker-b { background: rgba(201,168,76,0.04); border: 1px solid rgba(201,168,76,0.1); }
+.speaker-name { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); min-width: 90px; flex-shrink: 0; font-weight: 500; }
+.dialogue-text { flex: 1; }
+.fr-line { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 600; color: var(--terracotta); margin-bottom: 0.2rem; }
+.ko-line { font-size: 0.85rem; color: var(--text-dim); }
+.congrats-box { background: linear-gradient(135deg, rgba(191,106,74,0.12), rgba(201,168,76,0.1)); border: 2px solid var(--terracotta); border-radius: 16px; padding: 2.5rem; text-align: center; margin: 2rem 0; }
+.congrats-box h2 { font-family: var(--font-heading); font-size: 2.5rem; font-weight: 700; color: var(--terracotta); margin-bottom: 0.5rem; }
+.congrats-box .fireworks { font-size: 2rem; margin-bottom: 1rem; }
+.congrats-box p { font-size: 1.05rem; color: var(--text); line-height: 1.8; margin: 1rem 0; }
+.next-steps { text-align: left; background: var(--bg-card); border-radius: 10px; padding: 1.5rem; margin-top: 1.5rem; }
+.next-steps h4 { color: var(--gold); font-size: 1rem; margin-bottom: 1rem; }
+.next-steps li { margin-left: 1.5rem; margin-bottom: 0.5rem; color: var(--text-dim); font-size: 0.9rem; }
+.assessment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+.assessment-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; text-align: center; }
+.assessment-card h4 { font-family: var(--font-heading); color: var(--terracotta); font-size: 1rem; margin-bottom: 0.8rem; }
+.assessment-card .skill-meter { background: var(--bg-card-alt); border-radius: 20px; height: 8px; margin: 0.8rem 0; overflow: hidden; }
+.skill-bar { height: 100%; background: linear-gradient(90deg, var(--terracotta), var(--gold)); border-radius: 20px; transition: width 0.5s ease; }
+.assessment-card .rating { font-family: var(--font-mono); font-size: 0.85rem; color: var(--gold); }
+.roadmap-svg { margin: 2rem 0; padding: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; }
+.roadmap-svg svg { width: 100%; height: auto; display: block; }
+.cheatsheet { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+.cheatsheet-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+.cheatsheet-item h4 { font-family: var(--font-heading); color: var(--terracotta); font-size: 0.95rem; margin-bottom: 0.6rem; }
+.cheatsheet-item ul { margin-left: 1.2rem; }
+.cheatsheet-item li { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.4rem; }
+.review-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.8rem; margin: 1.5rem 0; }
+.review-link-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--terracotta); padding: 0.8rem; border-radius: 8px; text-align: center; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+.review-link-btn:hover { border-color: var(--terracotta); background: rgba(191,106,74,0.1); transform: translateY(-2px); }
+.tracker { margin-top: 2rem; }
+.tracker h3 { font-family: var(--font-heading); color: var(--text-bright); font-size: 1.1rem; margin-bottom: 0.5rem; }
+.tracker-grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 6px; }
+.tracker-cell { aspect-ratio: 1; background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); cursor: pointer; transition: all 0.2s; }
+.tracker-cell:hover { border-color: var(--terracotta); }
+.tracker-cell.active { background: var(--terracotta); border-color: var(--terracotta); color: white; }
+.tracker-cell.today { border-color: var(--gold); box-shadow: 0 0 8px var(--gold-glow); }
+.tracker-legend { display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.75rem; color: var(--text-dim); }
+.tracker-legend span { display: flex; align-items: center; gap: 0.3rem; }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+.legend-dot.done { background: var(--terracotta); }
+.legend-dot.today-dot { border: 1px solid var(--gold); background: transparent; }
+footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-dim); }
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero { padding: 3rem 1rem 2rem; }
+  .container { padding: 0 1rem; }
+  .card { padding: 1.2rem; }
+  .expr-table { font-size: 0.75rem; display: block; overflow-x: auto; }
+  .expr-table th, .expr-table td { padding: 0.5rem 0.4rem; }
+  .dialogue-line { flex-direction: column; gap: 0.3rem; }
+  .speaker-name { min-width: auto; }
+  .congrats-box { padding: 1.5rem; }
+  .congrats-box h2 { font-size: 2rem; }
+  .assessment-grid { grid-template-columns: 1fr; }
+  .cheatsheet { grid-template-columns: 1fr; }
+  .review-links { grid-template-columns: repeat(2, 1fr); }
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--terracotta); }
+.shadow-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: rgba(191,106,74,0.15); border: 1px solid rgba(191,106,74,0.3); border-radius: 50%; cursor: pointer; transition: all 0.2s; flex-shrink: 0; vertical-align: middle; margin-left: 6px; }
+.shadow-btn:hover { background: rgba(191,106,74,0.3); border-color: var(--terracotta); transform: scale(1.1); }
+.shadow-btn.playing { background: var(--terracotta); border-color: var(--terracotta); animation: pulse-glow 1.2s infinite; }
+.shadow-btn svg { width: 14px; height: 14px; fill: var(--terracotta); }
+.shadow-btn.playing svg { fill: #fff; }
+@keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(191,106,74,0.4); } 50% { box-shadow: 0 0 12px 4px rgba(191,106,74,0.25); } }
+.shadowing-section { background: linear-gradient(135deg, rgba(191,106,74,0.06), rgba(201,168,76,0.04)); border: 1px solid rgba(191,106,74,0.2); border-radius: 14px; padding: 2rem; margin: 2rem 0; }
+.shadowing-section h3 { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 600; color: var(--terracotta); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.shadowing-section .desc { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+.shadow-controls { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.shadow-ctrl-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 1.2rem; color: var(--text); font-family: var(--font-body); font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
+.shadow-ctrl-btn:hover { border-color: var(--terracotta); background: rgba(191,106,74,0.1); }
+.shadow-ctrl-btn.active { background: var(--terracotta); border-color: var(--terracotta); color: #fff; }
+.shadow-ctrl-btn svg { width: 16px; height: 16px; fill: currentColor; }
+.shadow-speed { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-dim); }
+.shadow-speed input[type=range] { -webkit-appearance: none; appearance: none; width: 100px; height: 4px; background: var(--border); border-radius: 2px; outline: none; }
+.shadow-speed input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--terracotta); cursor: pointer; }
+.shadow-item { display: flex; align-items: center; gap: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.6rem; transition: all 0.3s; }
+.shadow-item.active-phrase { border-color: var(--terracotta); background: rgba(191,106,74,0.08); box-shadow: 0 0 20px rgba(191,106,74,0.1); }
+.shadow-item.done-phrase { border-color: rgba(201,168,76,0.3); opacity: 0.7; }
+.shadow-item .num { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); min-width: 24px; }
+.shadow-item .phrase-text { flex: 1; }
+.shadow-item .phrase-fr { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 600; color: var(--terracotta); }
+.shadow-item .phrase-ipa { font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); font-style: italic; }
+.shadow-item .phrase-ko { font-size: 0.85rem; color: var(--text-dim); margin-top: 2px; }
+.shadow-progress { margin-top: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+.shadow-progress-bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.shadow-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--terracotta), var(--gold)); border-radius: 2px; transition: width 0.3s; }
+.shadow-progress-text { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); min-width: 40px; }
+.shadow-status { text-align: center; font-size: 0.85rem; color: var(--gold); margin-top: 0.5rem; min-height: 1.2em; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ STICKY HEADER ═══════════════════ -->
+<header class="sticky-header">
+  <div class="logo">Fran&ccedil;ais pour l'Ing&eacute;nieur</div>
+  <div class="series-info">26일 완성 커리큘럼</div>
+  <div class="day-tag">DAY 26 / 26 — FINAL</div>
+  <a href="#shadowingPractice" style="font-size:0.75rem;color:var(--gold);text-decoration:none;display:flex;align-items:center;gap:4px;" title="쉐도잉 연습">&#127911;</a>
+</header>
+
+<!-- ═══════════════════ HERO SECTION ═══════════════════ -->
+<section class="hero">
+  <p class="overline">Part 4 &mdash; 문화 &amp; 통합</p>
+  <h1>최종 종합 복습: 26일 완성</h1>
+  <p class="subtitle">발음 &middot; 비즈니스 · 문법 · 문화 — 모든 것을 정복하다</p>
+  <div class="hero-sentence">
+    <div class="fr">Vous êtes maintenant un maître du français professionnel chez Renault.</div>
+    <div class="ipa">[vu zêt 메텐앙 앙 메트르 du 프롱세 프로페씨오널 쉐 르노]</div>
+    <div class="ko">당신은 이제 르노의 프랑스어 전문가입니다.</div>
+  </div>
+</section>
+
+<div class="container">
+
+<!-- ═══════════════════ 뇌과학 학습 전략 ═══════════════════ -->
+<section>
+  <div class="brain-box">
+    <h3>&#129504; 뇌과학 최종 통합 전략 &mdash; Day 26</h3>
+    <div class="strategy">
+      <strong>장기기억 통합 (Long-term Memory Consolidation)</strong>
+      <p>26일간의 학습은 <span class="tip-highlight">분산적 학습(spaced learning)</span>을 통해 장기기억으로 변환되었습니다. 오늘은 모든 콘텐츠를 한 번 더 리뷰하여 뇌의 신경망 경로를 강화하는 최종 단계입니다.</p>
+    </div>
+    <div class="strategy">
+      <strong>메타인지 평가 (Metacognitive Assessment)</strong>
+      <p>자신의 학습 수준을 객관적으로 평가하는 능력(메타인지)이 중요합니다. 하단의 자기 평가 섹션을 통해 Part 1~4의 습득도를 확인하고, 부족한 부분을 집중적으로 복습하세요.</p>
+    </div>
+    <div class="strategy">
+      <strong>전이 학습 (Transfer Learning)</strong>
+      <p>르노 자동차 산업에서 배운 프랑스어는 다른 분야(항공우주, 럭셔리 브랜드)로도 전이(transfer)됩니다. 이제 당신의 프랑스어는 <span class="tip-highlight">특정 도메인 전문성</span>을 갖춘 수준입니다.</p>
+    </div>
+    <div class="time-table">
+      <span class="time">00 &ndash; 03분</span><span class="task">26일 학습 여정 로드맵 시각화 확인</span>
+      <span class="time">03 &ndash; 10분</span><span class="task">Top 20 핵심 표현 스피킹 연습</span>
+      <span class="time">10 &ndash; 15분</span><span class="task">최종 대화(회의 시뮬레이션) 읽기 및 따라말하기</span>
+      <span class="time">15 &ndash; 20분</span><span class="task">자기 평가 기록 및 분석</span>
+      <span class="time">20 &ndash; 25분</span><span class="task">다음 단계 계획 수립</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 26-DAY ROADMAP ═══════════════════ -->
+<section>
+  <p class="section-label">Learning Journey</p>
+  <h2 class="section-title">당신의 26일 학습 여정</h2>
+  <div class="card roadmap-svg">
+    <svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="400" fill="#12151C" opacity="0.5"/>
+  <text x="600" y="30" font-size="24" font-weight="700" fill="#BF6A4A" text-anchor="middle" font-family="Cormorant Garamond">26-Day Learning Journey: Complete French Mastery</text>
+  <rect x="20" y="80" width="140" height="280" fill="#BF6A4A" opacity="0.15" stroke="#BF6A4A" stroke-width="2" rx="8"/>
+  <text x="90" y="110" font-size="12" font-weight="700" fill="#BF6A4A" text-anchor="middle" font-family="JetBrains Mono">Part 1</text>
+  <text x="90" y="125" font-size="10" fill="#C9A84C" text-anchor="middle" font-family="Noto Sans KR">발음 &amp;</text>
+  <text x="90" y="138" font-size="10" fill="#C9A84C" text-anchor="middle" font-family="Noto Sans KR">기초 어휘</text>
+  <text x="90" y="200" font-size="9" fill="#E8E4DF" text-anchor="middle" font-family="Noto Sans KR">Days 1-7</text>
+  <circle cx="90" cy="260" r="18" fill="#BF6A4A" opacity="0.3"/>
+  <text x="90" y="268" font-size="16" fill="white" text-anchor="middle">✓</text>
+  <line x1="170" y1="220" x2="220" y2="220" stroke="#C9A84C" stroke-width="2"/>
+  <polygon points="220,220 215,215 215,225" fill="#C9A84C"/>
+  <rect x="240" y="80" width="140" height="280" fill="#C9A84C" opacity="0.15" stroke="#C9A84C" stroke-width="2" rx="8"/>
+  <text x="310" y="110" font-size="12" font-weight="700" fill="#C9A84C" text-anchor="middle" font-family="JetBrains Mono">Part 2</text>
+  <text x="310" y="125" font-size="10" fill="#BF6A4A" text-anchor="middle" font-family="Noto Sans KR">비즈니스</text>
+  <text x="310" y="138" font-size="10" fill="#BF6A4A" text-anchor="middle" font-family="Noto Sans KR">커뮤니케이션</text>
+  <text x="310" y="200" font-size="9" fill="#E8E4DF" text-anchor="middle" font-family="Noto Sans KR">Days 8-14</text>
+  <circle cx="310" cy="260" r="18" fill="#C9A84C" opacity="0.3"/>
+  <text x="310" y="268" font-size="16" fill="white" text-anchor="middle">✓</text>
+  <line x1="390" y1="220" x2="440" y2="220" stroke="#BF6A4A" stroke-width="2"/>
+  <polygon points="440,220 435,215 435,225" fill="#BF6A4A"/>
+  <rect x="460" y="80" width="140" height="280" fill="#BF6A4A" opacity="0.15" stroke="#BF6A4A" stroke-width="2" rx="8"/>
+  <text x="530" y="110" font-size="12" font-weight="700" fill="#BF6A4A" text-anchor="middle" font-family="JetBrains Mono">Part 3</text>
+  <text x="530" y="125" font-size="10" fill="#C9A84C" text-anchor="middle" font-family="Noto Sans KR">문법</text>
+  <text x="530" y="138" font-size="10" fill="#C9A84C" text-anchor="middle" font-family="Noto Sans KR">&amp; 구조</text>
+  <text x="530" y="200" font-size="9" fill="#E8E4DF" text-anchor="middle" font-family="Noto Sans KR">Days 15-20</text>
+  <circle cx="530" cy="260" r="18" fill="#BF6A4A" opacity="0.3"/>
+  <text x="530" y="268" font-size="16" fill="white" text-anchor="middle">✓</text>
+  <line x1="610" y1="220" x2="660" y2="220" stroke="#C9A84C" stroke-width="2"/>
+  <polygon points="660,220 655,215 655,225" fill="#C9A84C"/>
+  <rect x="680" y="80" width="140" height="280" fill="#C9A84C" opacity="0.15" stroke="#C9A84C" stroke-width="2" rx="8"/>
+  <text x="750" y="110" font-size="12" font-weight="700" fill="#C9A84C" text-anchor="middle" font-family="JetBrains Mono">Part 4</text>
+  <text x="750" y="125" font-size="10" fill="#BF6A4A" text-anchor="middle" font-family="Noto Sans KR">문화 &amp;</text>
+  <text x="750" y="138" font-size="10" fill="#BF6A4A" text-anchor="middle" font-family="Noto Sans KR">통합</text>
+  <text x="750" y="200" font-size="9" fill="#E8E4DF" text-anchor="middle" font-family="Noto Sans KR">Days 21-26</text>
+  <circle cx="750" cy="260" r="22" fill="#C9A84C"/>
+  <text x="750" y="270" font-size="18" fill="white" text-anchor="middle">★</text>
+  <text x="750" y="330" font-size="11" fill="#BF6A4A" text-anchor="middle" font-weight="700" font-family="Cormorant Garamond">Félicitations!</text>
+  <text x="750" y="345" font-size="10" fill="#C9A84C" text-anchor="middle" font-family="Noto Sans KR">완성 : 르노 프랑스어 마스터</text>
+</svg>
+  </div>
+  <p style="text-align: center; margin-top: 1rem; color: var(--text-dim); font-size: 0.9rem;">
+    4개의 학습 단계를 거쳐 초급에서 중급 이상의 비즈니스 프랑스어 수준으로 성장했습니다.
+  </p>
+</section>
+
+<!-- ═══════════════════ TOP 20 EXPRESSIONS ═══════════════════ -->
+<section>
+  <p class="section-label">Most Essential</p>
+  <h2 class="section-title">Top 20: 가장 유용한 표현 20개</h2>
+  <div class="card" style="overflow-x: auto;">
+    <table class="expr-table">
+      <thead>
+        <tr>
+          <th>프랑스어</th>
+          <th>한국어 발음</th>
+          <th>한국어 근사음</th>
+          <th>한국어 뜻</th>
+          <th>해당 부분</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fr-word">Bonjour</td>
+          <td class="pronunciation">[봉주흐]</td>
+          <td class="approx-ko">안녕하세요</td>
+          <td>기초 인사</td>
+          <td>Part 1</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Je suis ingénieur chez Renault</td>
+          <td class="pronunciation">[쥐 수이 앙주니외르 쉐 르노]</td>
+          <td class="approx-ko">저는 르노의 엔지니어입니다</td>
+          <td>자기소개</td>
+          <td>Part 1</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Pouvez-vous m&#x27;aider?</td>
+          <td class="pronunciation">[뿌베 부 메데]</td>
+          <td class="approx-ko">저를 도와주시겠어요?</td>
+          <td>도움 요청</td>
+          <td>Part 1</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Je ne comprends pas</td>
+          <td class="pronunciation">[쥐 느 콩프헹 빠]</td>
+          <td class="approx-ko">이해하지 못했습니다</td>
+          <td>이해 확인</td>
+          <td>Part 1</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Vous avez un stylo?</td>
+          <td class="pronunciation">[부 자베 앙 스틸로]</td>
+          <td class="approx-ko">펜 있으세요?</td>
+          <td>물건 요청</td>
+          <td>Part 1</td>
+        </tr>
+        <tr>
+          <td class="fr-word">C&#x27;est pour demain</td>
+          <td class="pronunciation">[세 뿌르 드맹]</td>
+          <td class="approx-ko">이것은 내일 것입니다</td>
+          <td>일정 표현</td>
+          <td>Part 2</td>
+        </tr>
+        <tr>
+          <td class="fr-word">La réunion commence à 14h</td>
+          <td class="pronunciation">[라 레유니옹 꼬몬스 아 카토르즈]</td>
+          <td class="approx-ko">회의는 14시에 시작합니다</td>
+          <td>시간 표현</td>
+          <td>Part 2</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Je propose une alternative</td>
+          <td class="pronunciation">[쥐 프로포즈 운 알테르나티브]</td>
+          <td class="approx-ko">대안을 제안합니다</td>
+          <td>회의 표현</td>
+          <td>Part 2</td>
+        </tr>
+        <tr>
+          <td class="fr-word">L&#x27;équipe suspension a amélioré le prototype</td>
+          <td class="pronunciation">[레끼프 소숑숑옹 아 아멜리오레]</td>
+          <td class="approx-ko">서스펜션 팀이 프로토타입을 개선했습니다</td>
+          <td>기술 설명</td>
+          <td>Part 3</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Le rendement s&#x27;est amélioré de 15%</td>
+          <td class="pronunciation">[르 랑드망 세 타멜리오레 드 깡즈 뿌르쌍]</td>
+          <td class="approx-ko">성능이 15% 향상되었습니다</td>
+          <td>결과 보고</td>
+          <td>Part 3</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Si vous avez des questions, demandez-moi</td>
+          <td class="pronunciation">[시 부 자베 데 께스씨옹, 드맹데 무아]</td>
+          <td class="approx-ko">질문 있으면 저에게 물어보세요</td>
+          <td>권유 표현</td>
+          <td>Part 3</td>
+        </tr>
+        <tr>
+          <td class="fr-word">La prochaine étape est cruciale</td>
+          <td class="pronunciation">[라 프로셰인 에따프 에 크루씨알]</td>
+          <td class="approx-ko">다음 단계는 중요합니다</td>
+          <td>계획 설명</td>
+          <td>Part 3</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Nous avons réussi à réduire les coûts</td>
+          <td class="pronunciation">[누 자봉 레위씨 아 레뒤르 레 꾸]</td>
+          <td class="approx-ko">우리는 비용을 줄이는데 성공했습니다</td>
+          <td>성과 발표</td>
+          <td>Part 4</td>
+        </tr>
+        <tr>
+          <td class="fr-word">C&#x27;est un défi intéressant</td>
+          <td class="pronunciation">[세 앙 데피 앙떼레싼]</td>
+          <td class="approx-ko">흥미로운 도전입니다</td>
+          <td>의견 표현</td>
+          <td>Part 4</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Félicitations pour votre travail</td>
+          <td class="pronunciation">[펠리시따씨옹 뿌르 보뜨르 뜨라바유]</td>
+          <td class="approx-ko">당신의 업무에 축하드립니다</td>
+          <td>칭찬</td>
+          <td>Part 4</td>
+        </tr>
+        <tr>
+          <td class="fr-word">À bientôt</td>
+          <td class="pronunciation">[아 비엥또]</td>
+          <td class="approx-ko">곧 뵙겠습니다</td>
+          <td>헤어짐</td>
+          <td>Part 1</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Merci beaucoup pour votre aide</td>
+          <td class="pronunciation">[메흐씨 보꾸 뿌르 보뜨르 에드]</td>
+          <td class="approx-ko">도움주셔서 대단히 감사합니다</td>
+          <td>감사</td>
+          <td>Part 4</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Avant de conclure, avez-vous des remarques?</td>
+          <td class="pronunciation">[아방 드 꼰끌뤼르, 아베 부 데 르마르크]</td>
+          <td class="approx-ko">마무리하기 전, 의견이 있으신가요?</td>
+          <td>회의 종료</td>
+          <td>Part 2</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Le processus de fabrication est très précis</td>
+          <td class="pronunciation">[르 프로써쒀 드 파브리까씨옹 에 뜨레 프레씨]</td>
+          <td class="approx-ko">제조 공정은 매우 정밀합니다</td>
+          <td>기술 설명</td>
+          <td>Part 3</td>
+        </tr>
+        <tr>
+          <td class="fr-word">Je vous remercie de votre attention</td>
+          <td class="pronunciation">[쥐 부 르므르씨 드 보뜨르 아떙씨옹]</td>
+          <td class="approx-ko">주의를 주셔서 감사합니다</td>
+          <td>마무리</td>
+          <td>Part 4</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════ FINAL DIALOGUE ═══════════════════ -->
+<section>
+  <p class="section-label">Complete Dialogue</p>
+  <h2 class="section-title">최종 대화: 르노 서스펜션 프로젝트 회의</h2>
+  <div class="card">
+    <p style="margin-bottom: 1.5rem; color: var(--text-dim); font-size: 0.9rem;">
+      26일간 학습한 모든 요소(발음, 어휘, 문법, 문화)를 포함한 실전 대화입니다. 각 표현의 뉘앙스에 주의하면서 따라 말해보세요.
+    </p>
+    
+    <div class="dialogue">
+      <div class="dialogue-line speaker-a">
+        <div class="speaker-name">DIRECTEUR</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Bienvenue à Renault Korea. Je suis le directeur du département suspension.</div>
+          <div class="ko-line">르노 코리아에 오신 걸 환영합니다. 저는 서스펜션 부서의 부장입니다.</div>
+        </div>
+      </div>
+
+      <div class="dialogue-line speaker-b">
+        <div class="speaker-name">INGÉNIEUR</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Merci beaucoup pour cette invitation. Je suis très heureux de rencontrer votre équipe.</div>
+          <div class="ko-line">이렇게 초대해주셔서 정말 감사합니다. 당신의 팀을 만나게 되어 정말 기쁩니다.</div>
+        </div>
+      </div>
+
+      <div class="dialogue-line speaker-a">
+        <div class="speaker-name">DIRECTEUR</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Aujourd'hui, je voudrais vous présenter notre dernier prototype. Il s'agit d'une amélioration majeure en matière d'efficacité énergétique.</div>
+          <div class="ko-line">오늘은 저희 최신 프로토타입을 소개하고 싶습니다. 에너지 효율성 측면에서 중대한 개선입니다.</div>
+        </div>
+      </div>
+
+      <div class="dialogue-line speaker-b">
+        <div class="speaker-name">INGÉNIEUR</div>
+        <div class="dialogue-text">
+          <div class="fr-line">C'est exactement ce que nous recherchions ! Quels sont les principaux changements ?</div>
+          <div class="ko-line">이것이 바로 우리가 찾던 것입니다! 주요 변경사항은 무엇입니까?</div>
+        </div>
+      </div>
+
+      <div class="dialogue-line speaker-a">
+        <div class="speaker-name">DIRECTEUR</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Le nouveau système de suspension réduit les vibrations de 40% et améliore le confort des passagers. De plus, c'est 20% plus léger que l'ancienne version.</div>
+          <div class="ko-line">새로운 서스펜션 시스템은 진동을 40% 감소시키고 승객의 편의성을 개선합니다. 또한 이전 버전보다 20% 더 가볍습니다.</div>
+        </div>
+      </div>
+
+      <div class="dialogue-line speaker-b">
+        <div class="speaker-name">INGÉNIEUR</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Impressionnant ! Comment avez-vous atteint ces résultats ?</div>
+          <div class="ko-line">인상적입니다! 이런 결과를 어떻게 얻으셨나요?</div>
+        </div>
+      </div>
+
+      <div class="dialogue-line speaker-a">
+        <div class="speaker-name">DIRECTEUR</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Grâce à une collaboration étroite entre nos ingénieurs et les partenaires à Renault France, nous avons pu optimiser chaque composant. Avez-vous des questions ?</div>
+          <div class="ko-line">르노 프랑스의 엔지니어와 파트너 간의 긴밀한 협력 덕분에 각 부품을 최적화할 수 있었습니다. 질문이 있으신가요?</div>
+        </div>
+      </div>
+
+      <div class="dialogue-line speaker-b">
+        <div class="speaker-name">INGÉNIEUR</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Quand sera la prochaine étape de la commercialisation ? Et quels sont les défis à relever ?</div>
+          <div class="ko-line">상용화의 다음 단계는 언제입니까? 그리고 극복해야 할 과제는 무엇입니까?</div>
+        </div>
+      </div>
+
+      <div class="dialogue-line speaker-a">
+        <div class="speaker-name">DIRECTEUR</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Nous avons prévu le lancement pour le troisième trimestre. Le principal défi sera de s'assurer que la production peut supporter le volume demandé. Donc, la coordination avec Renault France sera très importante.</div>
+          <div class="ko-line">3분기 출시를 계획했습니다. 주요 과제는 생산이 수요 규모를 감당할 수 있도록 하는 것입니다. 따라서 르노 프랑스와의 조율이 매우 중요할 것입니다.</div>
+        </div>
+      </div>
+
+      <div class="dialogue-line speaker-b">
+        <div class="speaker-name">INGÉNIEUR</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Magnifique. Je suis convaincu que notre coopération portera ses fruits. Merci encore pour cette présentation exceptionnelle.</div>
+          <div class="ko-line">멋집니다. 우리의 협력이 성과를 낼 것이라고 확신합니다. 이 뛰어난 프레젠테이션에 감사드립니다.</div>
+        </div>
+      </div>
+
+      <div class="dialogue-line speaker-a">
+        <div class="speaker-name">DIRECTEUR</div>
+        <div class="dialogue-text">
+          <div class="fr-line">Le plaisir est pour moi. À bientôt, et bon voyage de retour !</div>
+          <div class="ko-line">저야말로 즐거웠습니다. 곧 뵙겠습니다. 귀국 길에 행운을 빕니다!</div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+<!-- ═══════════════════ WORKPLACE CHEATSHEET ═══════════════════ -->
+<section>
+  <p class="section-label">Quick Reference</p>
+  <h2 class="section-title">르노 직장 프랑스어 빠른 참조 가이드</h2>
+  
+    <div class="cheatsheet">
+      <div class="cheatsheet-item">
+        <h4>회의 시작</h4>
+        <ul>
+          <li>Bonjour à tous (모두에게 인사)</li>
+          <li>Commençons la réunion (회의를 시작합시다)</li>
+          <li>Aujourd'hui, nous parlerons de... (오늘 우리는 ... 에 대해 얘기할 것입니다)</li>
+          <li>Avez-vous des questions ? (질문 있으세요?)</li>
+        </ul>
+      </div>
+
+      <div class="cheatsheet-item">
+        <h4>기술 설명</h4>
+        <ul>
+          <li>Le système fonctionne ainsi (시스템은 이렇게 작동합니다)</li>
+          <li>Nous avons réduit les coûts de 20% (우리는 비용을 20% 줄였습니다)</li>
+          <li>C'est plus efficace que (이것은 ... 보다 더 효율적입니다)</li>
+          <li>Le processus est automatisé (그 과정은 자동화되어 있습니다)</li>
+        </ul>
+      </div>
+
+      <div class="cheatsheet-item">
+        <h4>문제 보고</h4>
+        <ul>
+          <li>Nous avons un problème (문제가 있습니다)</li>
+          <li>Cela demande une solution immédiate (이것은 즉각적인 해결책이 필요합니다)</li>
+          <li>Selon les données... (데이터에 따르면...)</li>
+          <li>Je propose... (제가 제안하는 것은...)</li>
+        </ul>
+      </div>
+
+      <div class="cheatsheet-item">
+        <h4>일정 협의</h4>
+        <ul>
+          <li>Quand pouvez-vous? (언제 가능하신가요?)</li>
+          <li>La réunion est à 14h (회의는 14시입니다)</li>
+          <li>C'est urgent (긴급입니다)</li>
+          <li>Nous verrons les résultats demain (내일 결과를 볼 것입니다)</li>
+        </ul>
+      </div>
+
+      <div class="cheatsheet-item">
+        <h4>이메일 표현</h4>
+        <ul>
+          <li>Chère Madame/Monsieur (존경하는... )</li>
+          <li>Je vous prie de... (부탁드립니다...)</li>
+          <li>Cordialement (공손하게)</li>
+          <li>À bientôt (곧 뵙겠습니다)</li>
+        </ul>
+      </div>
+
+      <div class="cheatsheet-item">
+        <h4>비상 표현</h4>
+        <ul>
+          <li>Au secours! (도와주세요!)</li>
+          <li>C'est urgent (긴급합니다)</li>
+          <li>Appelez le service technique (기술 서비스를 부르세요)</li>
+          <li>Nous avons perdu le contrôle (우리는 통제를 잃었습니다)</li>
+        </ul>
+      </div>
+    </div>
+    
+  <p style="text-align: center; margin-top: 2rem; color: var(--text-dim); font-size: 0.9rem;">
+    위 표현들을 스마트폰에 저장해두고 업무 중 언제든 참조하세요.
+  </p>
+</section>
+
+<!-- ═══════════════════ SELF-ASSESSMENT ═══════════════════ -->
+<section>
+  <p class="section-label">Progress Check</p>
+  <h2 class="section-title">자기 평가: 당신의 프랑스어 수준은?</h2>
+  <div class="card">
+    <p style="margin-bottom: 1.5rem; color: var(--text-dim);">
+      각 항목을 1~5점으로 평가해보세요. 3점 이상이면 다음 단계로, 2점 이하면 해당 섹션 복습이 필요합니다.
+    </p>
+    <div class="assessment-grid">
+      <div class="assessment-card">
+        <h4>Part 1: 발음</h4>
+        <div class="skill-meter"><div class="skill-bar" style="width: 95%"></div></div>
+        <div class="rating">Days 1-7</div>
+        <div style="margin-top: 0.6rem; font-size: 0.8rem; color: var(--gold); font-weight: 600;">자체 평가: ___ /5</div>
+      </div>
+      <div class="assessment-card">
+        <h4>Part 2: 비즈니스 커뮤니케이션</h4>
+        <div class="skill-meter"><div class="skill-bar" style="width: 88%"></div></div>
+        <div class="rating">Days 8-14</div>
+        <div style="margin-top: 0.6rem; font-size: 0.8rem; color: var(--gold); font-weight: 600;">자체 평가: ___ /5</div>
+      </div>
+      <div class="assessment-card">
+        <h4>Part 3: 문법</h4>
+        <div class="skill-meter"><div class="skill-bar" style="width: 75%"></div></div>
+        <div class="rating">Days 15-20</div>
+        <div style="margin-top: 0.6rem; font-size: 0.8rem; color: var(--gold); font-weight: 600;">자체 평가: ___ /5</div>
+      </div>
+      <div class="assessment-card">
+        <h4>Part 4: 문화 &amp; 통합</h4>
+        <div class="skill-meter"><div class="skill-bar" style="width: 92%"></div></div>
+        <div class="rating">Days 21-26</div>
+        <div style="margin-top: 0.6rem; font-size: 0.8rem; color: var(--gold); font-weight: 600;">자체 평가: ___ /5</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ CONGRATULATIONS ═══════════════════ -->
+<section>
+  <div class="congrats-box">
+    <div class="fireworks">&#127881; &#127882; &#127881;</div>
+    <h2>Félicitations!</h2>
+    <p>당신은 26일 완성 프랑스어 프로그램을 완료했습니다.</p>
+    <p style="font-size: 1.2rem; color: var(--terracotta); font-weight: 600;">
+      이제 당신은 르노에서 자신감 있게 프랑스어로 업무를 처리할 수 있습니다.
+    </p>
+    <p style="margin-top: 1.5rem; color: var(--text-dim);">
+      발음부터 비즈니스 커뮤니케이션, 복잡한 문법, 그리고 프랑스 업무 문화까지 모두 습득했습니다.
+      당신의 지속적인 노력과 헌신이 이 성과를 만들었습니다.
+    </p>
+
+    <div class="next-steps">
+      <h4>&#128512; 다음 단계: 계속 성장하세요</h4>
+      <ul>
+        <li><strong>주 1회 복습:</strong> 각 Part의 핵심 내용을 1주일에 한 번 30분씩 복습하세요.</li>
+        <li><strong>회의 참여:</strong> 실제 르노 코리아 회의에서 이 표현들을 적극적으로 사용해보세요.</li>
+        <li><strong>프랑스 뉴스:</strong> RFI(Radio France Internationale) 청취를 통해 자연스러운 발음을 익혀보세요.</li>
+        <li><strong>일일 일기:</strong> 프랑스어로 간단한 일일 일기를 쓰며 쓰기 능력을 향상하세요.</li>
+        <li><strong>언어 교환:</strong> 프랑스 동료나 온라인 언어 교환 파트너와 주 2회 이상 대화하세요.</li>
+        <li><strong>고급 학습:</strong> DELF B1~B2 시험 준비를 시작하거나, 자동차 기술 프랑스어 고급 과정을 이수하세요.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ REVIEW LINKS TO ALL DAYS ═══════════════════ -->
+<section>
+  <p class="section-label">Quick Navigation</p>
+  <h2 class="section-title">모든 26일 복습 가이드</h2>
+  <p style="margin-bottom: 1.5rem; color: var(--text-dim);">
+    필요에 따라 특정 날의 콘텐츠로 빠르게 이동하여 복습할 수 있습니다.
+  </p>
+  <div class="review-links">
+    <a href="day-01-pronunciation.html" class="review-link-btn">Day 01: 발음</a>
+    <a href="day-02-greetings.html" class="review-link-btn">Day 02: 인사</a>
+    <a href="day-03-vocab-partA.html" class="review-link-btn">Day 03: 어휘 A</a>
+    <a href="day-04-vocab-partB.html" class="review-link-btn">Day 04: 어휘 B</a>
+    <a href="day-05-numbers-units.html" class="review-link-btn">Day 05: 숫자</a>
+    <a href="day-06-email-expressions.html" class="review-link-btn">Day 06: 이메일</a>
+    <a href="day-07-review-part1.html" class="review-link-btn">Day 07: Part1 복습</a>
+    <a href="day-08-meeting-expressions.html" class="review-link-btn">Day 08: 회의</a>
+    <a href="day-09-technical-explanation.html" class="review-link-btn">Day 09: 기술설명</a>
+    <a href="day-10-problem-reporting.html" class="review-link-btn">Day 10: 문제보고</a>
+    <a href="day-11-scheduling.html" class="review-link-btn">Day 11: 일정</a>
+    <a href="day-12-presentation.html" class="review-link-btn">Day 12: 프레젠테이션</a>
+    <a href="day-13-negotiation.html" class="review-link-btn">Day 13: 협상</a>
+    <a href="day-14-review-part2.html" class="review-link-btn">Day 14: Part2 복습</a>
+    <a href="day-15-present-tense.html" class="review-link-btn">Day 15: 현재형</a>
+    <a href="day-16-passe-compose.html" class="review-link-btn">Day 16: 과거형</a>
+    <a href="day-17-conditionnel.html" class="review-link-btn">Day 17: 조건법</a>
+    <a href="day-18-passive-impersonal.html" class="review-link-btn">Day 18: 수동태</a>
+    <a href="day-19-questions-negation.html" class="review-link-btn">Day 19: 의문문</a>
+    <a href="day-20-review-part3.html" class="review-link-btn">Day 20: Part3 복습</a>
+    <a href="day-21-french-culture.html" class="review-link-btn">Day 21: 프랑스 문화</a>
+    <a href="day-22-email-correction.html" class="review-link-btn">Day 22: 이메일 수정</a>
+    <a href="day-23-roleplay-meeting.html" class="review-link-btn">Day 23: 회의 롤플레이</a>
+    <a href="day-24-roleplay-email.html" class="review-link-btn">Day 24: 이메일 롤플레이</a>
+    <a href="day-25-self-intro-presentation.html" class="review-link-btn">Day 25: 자기소개</a>
+    <a href="day-26-final-review.html" class="review-link-btn" style="border-color: var(--gold); background: rgba(201,168,76,0.15);">Day 26: 최종복습</a>
+  </div>
+</section>
+
+<!-- ═══════════════════ TRACKER ═══════════════════ -->
+<section class="tracker">
+  <h3>&#128202; 학습 진도 추적</h3>
+  <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1rem;">
+    매일 이 박스를 클릭하여 학습 완료를 기록하세요. (Day 26을 완료하셨으므로 모두 완료 상태입니다!)
+  </p>
+  <div class="tracker-grid">
+    <div class="tracker-cell active">1</div>
+    <div class="tracker-cell active">2</div>
+    <div class="tracker-cell active">3</div>
+    <div class="tracker-cell active">4</div>
+    <div class="tracker-cell active">5</div>
+    <div class="tracker-cell active">6</div>
+    <div class="tracker-cell active">7</div>
+    <div class="tracker-cell active">8</div>
+    <div class="tracker-cell active">9</div>
+    <div class="tracker-cell active">10</div>
+    <div class="tracker-cell active">11</div>
+    <div class="tracker-cell active">12</div>
+    <div class="tracker-cell active">13</div>
+  </div>
+  <div class="tracker-grid" style="margin-top: 0.6rem;">
+    <div class="tracker-cell active">14</div>
+    <div class="tracker-cell active">15</div>
+    <div class="tracker-cell active">16</div>
+    <div class="tracker-cell active">17</div>
+    <div class="tracker-cell active">18</div>
+    <div class="tracker-cell active">19</div>
+    <div class="tracker-cell active">20</div>
+    <div class="tracker-cell active">21</div>
+    <div class="tracker-cell active">22</div>
+    <div class="tracker-cell active">23</div>
+    <div class="tracker-cell active">24</div>
+    <div class="tracker-cell active">25</div>
+    <div class="tracker-cell active today">26</div>
+  </div>
+  <div class="tracker-legend">
+    <span><div class="legend-dot done"></div> 완료</span>
+    <span><div class="legend-dot today-dot"></div> 오늘(Day 26)</span>
+  </div>
+</section>
+
+</div>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer>
+  <p>Fran&ccedil;ais pour l'Ing&eacute;nieur — 26 Days Complete French Mastery Program for Renault Korea Engineers</p>
+  <p>&#169; 2025. All Rights Reserved. Designed for Renault Korea Suspension Department.</p>
+  <p style="margin-top: 1rem; font-size: 0.7rem;">
+    This program incorporates spaced repetition, metacognitive assessment, and domain-specific language instruction
+    based on neuroscience research (Krashen, Ebbinghaus, Baddeley).
+  </p>
+</footer>
+
+<script>
+(function() {
+  'use strict';
+
+  var SPEAKER_SVG = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.26 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
+  var PLAY_SVG = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>';
+  var STOP_SVG = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 6h12v12H6z"/></svg>';
+
+  var currentUtterance = null;
+  var currentBtn = null;
+  var selectedFrVoice = null;
+
+  function getFrenchVoices() {
+    return window.speechSynthesis.getVoices().filter(function(v) { return v.lang.startsWith('fr'); });
+  }
+
+  function getAllFrenchVoices() {
+    var voices = getFrenchVoices();
+    return voices.length > 0 ? voices : window.speechSynthesis.getVoices();
+  }
+
+  function getFrenchVoice() {
+    if (selectedFrVoice) return selectedFrVoice;
+    var voices = getFrenchVoices();
+    return voices.length > 0 ? voices[0] : null;
+  }
+
+  function initFrenchVoice() {
+    var voices = getAllFrenchVoices();
+    if (voices.length > 0 && !selectedFrVoice) {
+      selectedFrVoice = voices[0];
+    }
+  }
+
+  function speakFr(text, btn, rate) {
+    if (currentUtterance) window.speechSynthesis.cancel();
+    var utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'fr-FR';
+    utter.rate = rate || 0.9;
+    utter.pitch = 1.0;
+    var voice = getFrenchVoice();
+    if (voice) utter.voice = voice;
+    if (btn) { btn.classList.add('playing'); currentBtn = btn; }
+    utter.onend = function() { if (btn) btn.classList.remove('playing'); currentBtn = null; };
+    utter.onerror = function() { if (btn) btn.classList.remove('playing'); currentBtn = null; };
+    currentUtterance = utter;
+    window.speechSynthesis.speak(utter);
+  }
+  window.speakFr = speakFr;
+
+  function addInlinePlayButtons() {
+    document.querySelectorAll('.fr-word, .hero-sentence .fr, .fr-line').forEach(function(el) {
+      if (el.querySelector('.shadow-btn')) return;
+      var text = el.textContent.trim();
+      if (!text || text.length < 2) return;
+      if (!/[a-zA-Zéèêëàâäùûüôöîïçœæ]/.test(text)) return;
+      var btn = document.createElement('span');
+      btn.className = 'shadow-btn';
+      btn.innerHTML = SPEAKER_SVG;
+      btn.title = '클릭하여 발음 듣기';
+      btn.addEventListener('click', function(e) { e.stopPropagation(); speakFr(text, this); });
+      el.appendChild(btn);
+    });
+  }
+
+  var shadowPhrases = [];
+  var shadowIndex = 0;
+  var shadowPlaying = false;
+
+  function collectPhrases() {
+    var phrases = [];
+    var heroFr = document.querySelector('.hero-sentence .fr') ? document.querySelector('.hero-sentence .fr').textContent.trim() : null;
+    var heroIpa = document.querySelector('.hero-sentence .ipa') ? document.querySelector('.hero-sentence .ipa').textContent.trim() : '';
+    var heroKo = document.querySelector('.hero-sentence .ko') ? document.querySelector('.hero-sentence .ko').textContent.trim() : '';
+    if (heroFr) phrases.push({ fr: heroFr, ipa: heroIpa, ko: heroKo });
+    document.querySelectorAll('.expr-table tbody tr').forEach(function(row) {
+      var cells = row.querySelectorAll('td');
+      if (cells.length >= 4) {
+        var frText = (cells[0] ? cells[0].textContent.trim().replace(/\s+/g, ' ') : '');
+        var ipaText = (cells[1] ? cells[1].textContent.trim() : '');
+        var koText = (cells[3] ? cells[3].textContent.trim() : '');
+        if (frText && /[a-zA-Zéèêëàâäùûüôöîïçœæ]/.test(frText)) {
+          phrases.push({ fr: frText, ipa: ipaText, ko: koText });
+        }
+      }
+    });
+    return phrases;
+  }
+
+  function buildShadowingSection() {
+    shadowPhrases = collectPhrases();
+    if (shadowPhrases.length === 0) return;
+    var tracker = document.querySelector('.tracker');
+    var container = document.querySelector('.container');
+    if (!container) return;
+    var section = document.createElement('div');
+    section.className = 'shadowing-section';
+    section.id = 'shadowingPractice';
+    var itemsHTML = shadowPhrases.map(function(p, i) {
+      return '<div class="shadow-item" data-idx="' + i + '">' +
+        '<div class="num">' + String(i+1).padStart(2,'0') + '</div>' +
+        '<div class="phrase-text">' +
+        '<div class="phrase-fr">' + p.fr + '</div>' +
+        (p.ipa ? '<div class="phrase-ipa">' + p.ipa + '</div>' : '') +
+        (p.ko ? '<div class="phrase-ko">' + p.ko + '</div>' : '') +
+        '</div>' +
+        '<span class="shadow-btn" onclick="speakFr('' + p.fr.replace(/'/g, "\\'") + '', this)">' + SPEAKER_SVG + '</span>' +
+        '</div>';
+    }).join('');
+    section.innerHTML = '<h3>&#127911; 쉐도잉 연습 &mdash; Shadowing Practice</h3>' +
+      '<p class="desc">프랑스어 음성을 듣고 &rarr; 3초 대기 &rarr; 따라 말하기를 반복합니다.</p>' +
+      '<div class="shadow-controls">' +
+      '<button class="shadow-ctrl-btn" id="shadowPlayAll" onclick="shadowStartAll()">' + PLAY_SVG + ' 전체 쉐도잉 시작</button>' +
+      '<button class="shadow-ctrl-btn" id="shadowStop" onclick="shadowStopAll()">' + STOP_SVG + ' 정지</button>' +
+      '<div class="shadow-speed"><span>속도:</span><input type="range" id="shadowSpeed" min="0.4" max="1.2" step="0.1" value="0.8"><span id="shadowSpeedLabel">0.8x</span></div>' +
+      '</div><div id="voiceSelectorContainer"></div>' +
+      '<div id="shadowItems">' + itemsHTML + '</div>' +
+      '<div class="shadow-progress"><div class="shadow-progress-bar"><div class="shadow-progress-fill" id="shadowProgressFill"></div></div><div class="shadow-progress-text" id="shadowProgressText">0/' + shadowPhrases.length + '</div></div>' +
+      '<div class="shadow-status" id="shadowStatus"></div>';
+    if (tracker) tracker.parentNode.insertBefore(section, tracker);
+    else container.appendChild(section);
+    var speedSlider = document.getElementById('shadowSpeed');
+    var speedLabel = document.getElementById('shadowSpeedLabel');
+    if (speedSlider) speedSlider.addEventListener('input', function() { speedLabel.textContent = this.value + 'x'; });
+    buildVoiceSelector(document.getElementById('voiceSelectorContainer'));
+  }
+
+  function buildVoiceSelector(container) {
+    if (!container) return;
+    var frVoices = getAllFrenchVoices();
+    if (frVoices.length <= 1) return;
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:var(--text-dim);margin-bottom:0.75rem;';
+    wrapper.innerHTML = '<span>&#127467;&#127479; 음성:</span>';
+    var sel = document.createElement('select');
+    sel.style.cssText = 'background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:0.3rem 0.5rem;font-size:0.8rem;cursor:pointer;';
+    frVoices.forEach(function(v, i) {
+      var opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = v.name + (v.localService ? ' (로컬)' : ' (온라인)');
+      if (v === selectedFrVoice) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', function() { selectedFrVoice = frVoices[parseInt(this.value)]; speakFr('Bonjour', null, 0.9); });
+    wrapper.appendChild(sel);
+    container.appendChild(wrapper);
+  }
+
+  window.shadowStartAll = function() {
+    shadowPlaying = true; shadowIndex = 0;
+    document.querySelectorAll('.shadow-item').forEach(function(el) { el.classList.remove('active-phrase', 'done-phrase'); });
+    var btn = document.getElementById('shadowPlayAll');
+    if (btn) btn.classList.add('active');
+    var status = document.getElementById('shadowStatus');
+    if (status) status.textContent = '&#127911; 쉐도잉 시작...';
+    playShadowPhrase(0);
+  };
+  window.shadowStopAll = function() {
+    shadowPlaying = false; window.speechSynthesis.cancel();
+    var btn = document.getElementById('shadowPlayAll');
+    if (btn) btn.classList.remove('active');
+    var status = document.getElementById('shadowStatus');
+    if (status) status.textContent = '&#9209; 정지됨';
+    document.querySelectorAll('.shadow-item').forEach(function(el) { el.classList.remove('active-phrase'); });
+  };
+
+  function playShadowPhrase(idx) {
+    if (!shadowPlaying || idx >= shadowPhrases.length) {
+      if (idx >= shadowPhrases.length) {
+        var status = document.getElementById('shadowStatus');
+        if (status) status.textContent = '&#10004; 쉐도잉 연습 완료!';
+        var btn = document.getElementById('shadowPlayAll');
+        if (btn) btn.classList.remove('active');
+      }
+      shadowPlaying = false; return;
+    }
+    var phrase = shadowPhrases[idx];
+    var items = document.querySelectorAll('.shadow-item');
+    items.forEach(function(el) { el.classList.remove('active-phrase'); });
+    if (items[idx]) { items[idx].classList.add('active-phrase'); items[idx].scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    var fill = document.getElementById('shadowProgressFill');
+    var text = document.getElementById('shadowProgressText');
+    if (fill) fill.style.width = ((idx + 1) / shadowPhrases.length * 100) + '%';
+    if (text) text.textContent = (idx + 1) + '/' + shadowPhrases.length;
+    var status = document.getElementById('shadowStatus');
+    if (status) status.textContent = '&#128264; 듣기: ' + phrase.fr;
+    var utter = new SpeechSynthesisUtterance(phrase.fr);
+    utter.lang = 'fr-FR';
+    var speedInput = document.getElementById('shadowSpeed');
+    utter.rate = parseFloat(speedInput ? speedInput.value : '0.8');
+    var voice = getFrenchVoice();
+    if (voice) utter.voice = voice;
+    utter.onend = function() {
+      if (!shadowPlaying) return;
+      var status = document.getElementById('shadowStatus');
+      if (status) status.textContent = '&#127908; 따라 말해보세요: ' + phrase.fr;
+      setTimeout(function() {
+        if (!shadowPlaying) return;
+        if (items[idx]) { items[idx].classList.remove('active-phrase'); items[idx].classList.add('done-phrase'); }
+        playShadowPhrase(idx + 1);
+      }, 3000);
+    };
+    window.speechSynthesis.speak(utter);
+  }
+
+  function init() {
+    function waitForVoices(cb) {
+      var voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) { cb(); return; }
+      var tries = 0;
+      var interval = setInterval(function() {
+        voices = window.speechSynthesis.getVoices(); tries++;
+        if (voices.length > 0 || tries > 20) { clearInterval(interval); cb(); }
+      }, 100);
+      window.speechSynthesis.addEventListener('voiceschanged', function() { clearInterval(interval); cb(); }, { once: true });
+    }
+    waitForVoices(function() { initFrenchVoice(); addInlinePlayButtons(); buildShadowingSection(); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

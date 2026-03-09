@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 10 | 재무제표 읽기 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #9A9890;
+  --text-dim: #5A584F;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 10 / 23</span>
+    <span class="header-title">재무제표 읽기</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 2 · 주식 투자 심화</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 2 — 주식 투자 심화</div>
+  <h1 class="hero-day">Day 10</h1>
+  <h2 class="hero-subtitle">재무제표 읽기</h2>
+  <p class="hero-quote">"재무제표는 기업의 신체검사다.<br>숫자는 거짓말을 하지 않는다."</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 2: 08~14</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:43.5%"></div></div>
+    <div class="progress-label"><span>Day 10</span><span>10 / 23 완료 (43.5%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 숫자 체계와 논리적 추론</h3>
+    <p>좌뇌의 시각피질과 전전두엽은 구조화된 숫자 정보 처리에 특화되어 있습니다. 재무제표의 세 가지 표(손익, 재무상태, 현금흐름)의 논리적 관계를 이해하면 기업의 실제 건강도가 명확해집니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">0–6분</td><td>재무제표 3가지 표 구조</td><td>개념 카드</td></tr>
+<tr><td class="time-col">6–13분</td><td>삼성전자 2023년 실제 데이터 분석</td><td>데이터 테이블</td></tr>
+<tr><td class="time-col">13–19분</td><td>현금흐름 분석: 이익 vs 현금</td><td>수식 풀이</td></tr>
+<tr><td class="time-col">19–23분</td><td>내 투자 기업의 건강도 체크리스트</td><td>자기 적용</td></tr>
+<tr><td class="time-col">23–25분</td><td>복습 퀴즈</td><td>능동적 회상</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">재무제표 읽기</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">재무제표 3가지 표의 논리적 흐름</div>
+      <div class="card-body"><p>기업의 재무상황은 세 개의 표로 완전히 설명됩니다. 각 표는 다른 각도에서 기업의 건강도를 보여줍니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">손익계산서 (Income Statement)</div>
+<div class="formula-line">  = 일정 기간(분기/연도)의 수입과 지출</div>
+<div class="formula-line">  수입(Revenue) - 지출(Expense) = 순이익(Net Income)</div>
+<div class="formula-comment">// 기업이 "얼마나 벌었는가"를 측정</div>
+<br>
+<div class="formula-highlight">재무상태표 (Balance Sheet)</div>
+<div class="formula-line">  = 특정 시점(분기말/연도말)의 자산, 부채, 자본</div>
+<div class="formula-line">  자산(Asset) = 부채(Liability) + 자본(Equity)</div>
+<div class="formula-comment">// 기업의 "현재 자산 상태"를 스냅샷으로 표시</div>
+<br>
+<div class="formula-highlight">현금흐름표 (Cash Flow Statement)</div>
+<div class="formula-line">  = 현금의 실제 움직임 (회계와 다름!)</div>
+<div class="formula-line">  영업CF + 투자CF + 금융CF = 현금 순변화</div>
+<div class="formula-comment">// "실제로 현금이 남았는가"를 측정</div>
+<div class="formula-comment">// 중요: 이익이 많아도 현금이 부족할 수 있음!</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">삼성전자 2023년 재무분석</div>
+      <div class="card-body"><p>삼성전자의 실제 재무제표 데이터(2023년, IFRS 기준)입니다. 메모리 칩 시장 불황이 반영되어 있습니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th colspan="3" style="text-align:center;border-bottom:2px solid var(--gold);">손익계산서 (2023년)</th></tr>
+<tr><th>항목</th><th>금액 (조원)</th><th>전년대비</th></tr></thead>
+<tbody>
+<tr><td>매출액 (Revenue)</td><td style="color:var(--text-primary)">74.0</td><td style="color:var(--red)">-18%</td></tr>
+<tr><td>영업이익 (Operating Income)</td><td style="color:var(--text-primary)">6.5</td><td style="color:var(--red)">-88% 급락!</td></tr>
+<tr><td>영업이익율</td><td style="color:var(--gold)">8.8%</td><td>-</td></tr>
+<tr><td>순이익 (Net Income)</td><td style="color:var(--text-primary)">4.8</td><td style="color:var(--red)">-94%</td></tr>
+<tr class="highlight-row"><td>EPS (주당순이익)</td><td style="color:var(--gold)">2,935원</td><td>-93%</td></tr>
+</tbody>
+</table>
+</div>
+<div class="data-table-wrap" style="margin-top:1.5rem;">
+<table class="data-table">
+<thead><tr><th colspan="2" style="text-align:center;border-bottom:2px solid var(--gold);">재무상태표 (2023년말)</th></tr>
+<tr><th>항목</th><th>금액 (조원)</th></tr></thead>
+<tbody>
+<tr><td><strong>총 자산 (Total Assets)</strong></td><td style="color:var(--text-primary)">402.3</td></tr>
+<tr style="border-bottom:1px solid rgba(42,45,54,0.5);"><td>  ├─ 현금 및 현금성자산</td><td>37.2</td></tr>
+<tr style="border-bottom:1px solid rgba(42,45,54,0.5);"><td>  ├─ 단기투자증권</td><td>12.5</td></tr>
+<tr style="border-bottom:1px solid rgba(42,45,54,0.5);"><td>  ├─ 고정자산 (공장, 장비)</td><td>172.1</td></tr>
+<tr><td><strong>총 부채 (Total Liabilities)</strong></td><td style="color:var(--red)">152.4</td></tr>
+<tr style="border-bottom:1px solid rgba(42,45,54,0.5);"><td>  ├─ 단기차입금</td><td>18.5</td></tr>
+<tr style="border-bottom:1px solid rgba(42,45,54,0.5);"><td>  └─ 장기차입금</td><td>25.3</td></tr>
+<tr class="highlight-row"><td><strong>자본금 (Shareholders' Equity)</strong></td><td style="color:var(--gold)">249.9</td></tr>
+</tbody>
+</table>
+</div>
+<p style="font-size:0.78rem;color:var(--text-secondary);margin-top:1rem;"><strong>분석:</strong> 부채비율 = 부채/자본 = 152.4/249.9 = <span style="color:var(--gold);">61%</span> (건강한 수준). 다만 영업이익 급락으로 부채 상환 능력 악화 중.</p></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">현금흐름 분석: 이익과 현금의 괴리</div>
+      <div class="card-body"><p>회계상 '이익'과 실제 '현금'은 다릅니다. 현금흐름이 음수면 아무리 이익을 내도 위험합니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">삼성전자 2023년 현금흐름:</div>
+<div class="formula-line">  <span class="formula-blue">영업현금흐름</span> (Operating CF)</div>
+<div class="formula-line">    = 순이익(4.8조) - 감가상각(12조) + 기타조정</div>
+<div class="formula-line">    = <span class="formula-highlight">+18.5조원</span> (양호)</div>
+<br>
+<div class="formula-line">  <span class="formula-blue">투자현금흐름</span> (Investing CF)</div>
+<div class="formula-line">    = -공장 신축비 -12조, -장비 구입비 -8조</div>
+<div class="formula-line">    = <span class="formula-highlight">-28.3조원</span> (과도한 투자)</div>
+<br>
+<div class="formula-line">  <span class="formula-blue">금융현금흐름</span> (Financing CF)</div>
+<div class="formula-line">    = 배당금 지급 -8.5조 + 차입금 증가 +3.2조</div>
+<div class="formula-line">    = <span class="formula-highlight">-5.3조원</span></div>
+<br>
+<div class="formula-comment">// 순 현금 흐름 = +18.5 - 28.3 - 5.3 = <span class="formula-highlight">-15.1조원</span></div>
+<div class="formula-comment">// 즉, 2023년 삼성은 보유 현금을 15조 소소비 (미래 수익성 회복 베팅)</div>
+</div>
+<p style="font-size:0.78rem;color:var(--text-secondary);margin-top:1rem;"><strong>의미:</strong> 영업이익이 엄청 줄었지만(4.8조) 감가상각 등의 비현금 비용 때문에 실제 현금흐름은 양호(18.5조). 따라서 단기적 현금 위기는 없으나, 투자비 과다(28조) + 배당금(8조)으로 현금을 소진 중입니다.</p></div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  <div class="chart-container">
+    <div class="chart-title">삼성전자 수익성 추이 (2019~2023) & 메모리칩 가격 상관관계</div>
+    <svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+      <!-- 배경 그리드 -->
+      <defs>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(42,45,54,0.2)" stroke-width="0.5"/>
+        </pattern>
+      </defs>
+      <rect width="800" height="350" fill="url(#grid)"/>
+
+      <!-- Y축 레이블 (영업이익율) -->
+      <text x="20" y="30" fill="#9A9890" font-family="JetBrains Mono" font-size="9">25%</text>
+      <text x="20" y="85" fill="#9A9890" font-family="JetBrains Mono" font-size="9">20%</text>
+      <text x="20" y="140" fill="#9A9890" font-family="JetBrains Mono" font-size="9">15%</text>
+      <text x="20" y="195" fill="#9A9890" font-family="JetBrains Mono" font-size="9">10%</text>
+      <text x="20" y="250" fill="#9A9890" font-family="JetBrains Mono" font-size="9">5%</text>
+      <text x="20" y="305" fill="#9A9890" font-family="JetBrains Mono" font-size="9">0%</text>
+
+      <!-- X축 -->
+      <line x1="60" y1="300" x2="750" y2="300" stroke="var(--border)" stroke-width="1"/>
+
+      <!-- X축 레이블 (연도) -->
+      <text x="100" y="325" text-anchor="middle" fill="#9A9890" font-family="JetBrains Mono" font-size="10">2019</text>
+      <text x="200" y="325" text-anchor="middle" fill="#9A9890" font-family="JetBrains Mono" font-size="10">2020</text>
+      <text x="300" y="325" text-anchor="middle" fill="#9A9890" font-family="JetBrains Mono" font-size="10">2021</text>
+      <text x="400" y="325" text-anchor="middle" fill="#9A9890" font-family="JetBrains Mono" font-size="10">2022</text>
+      <text x="500" y="325" text-anchor="middle" fill="#9A9890" font-family="JetBrains Mono" font-size="10">2023</text>
+
+      <!-- 삼성 영업이익율 라인 차트 -->
+      <polyline points="100,120 200,100 300,80 400,140 500,235"
+                 fill="none" stroke="#C9A84C" stroke-width="3"/>
+
+      <!-- 데이터 포인트 -->
+      <circle cx="100" cy="120" r="5" fill="#C9A84C"/>
+      <text x="100" y="105" text-anchor="middle" fill="#C9A84C" font-family="JetBrains Mono" font-size="10">17%</text>
+
+      <circle cx="200" cy="100" r="5" fill="#C9A84C"/>
+      <text x="200" y="85" text-anchor="middle" fill="#C9A84C" font-family="JetBrains Mono" font-size="10">20%</text>
+
+      <circle cx="300" cy="80" r="5" fill="#C9A84C"/>
+      <text x="300" y="65" text-anchor="middle" fill="#C9A84C" font-family="JetBrains Mono" font-size="10">21%</text>
+
+      <circle cx="400" cy="140" r="5" fill="#C9A84C"/>
+      <text x="400" y="125" text-anchor="middle" fill="#C9A84C" font-family="JetBrains Mono" font-size="10">15%</text>
+
+      <circle cx="500" cy="235" r="5" fill="#BF4A4A"/>
+      <text x="500" y="220" text-anchor="middle" fill="#BF4A4A" font-family="JetBrains Mono" font-size="10" font-weight="600">8.8%</text>
+
+      <!-- 메모리칩 DRAM 가격 지수 (우측 축) -->
+      <text x="750" y="30" text-anchor="end" fill="#4A9EBF" font-family="JetBrains Mono" font-size="9">100</text>
+      <text x="750" y="85" text-anchor="end" fill="#4A9EBF" font-family="JetBrains Mono" font-size="9">80</text>
+      <text x="750" y="140" text-anchor="end" fill="#4A9EBF" font-family="JetBrains Mono" font-size="9">60</text>
+      <text x="750" y="195" text-anchor="end" fill="#4A9EBF" font-family="JetBrains Mono" font-size="9">40</text>
+      <text x="750" y="250" text-anchor="end" fill="#4A9EBF" font-family="JetBrains Mono" font-size="9">20</text>
+
+      <!-- DRAM 가격지수 라인 -->
+      <polyline points="100,80 200,60 300,50 400,130 500,270"
+                 fill="none" stroke="#4A9EBF" stroke-width="3" stroke-dasharray="5,5"/>
+
+      <circle cx="100" cy="80" r="4" fill="#4A9EBF"/>
+      <circle cx="200" cy="60" r="4" fill="#4A9EBF"/>
+      <circle cx="300" cy="50" r="4" fill="#4A9EBF"/>
+      <circle cx="400" cy="130" r="4" fill="#4A9EBF"/>
+      <circle cx="500" cy="270" r="4" fill="#4A9EBF"/>
+
+      <!-- 범례 -->
+      <g transform="translate(60, 30)">
+        <line x1="0" y1="0" x2="20" y2="0" stroke="#C9A84C" stroke-width="2"/>
+        <text x="30" y="4" fill="#C9A84C" font-family="Noto Sans KR" font-size="10">삼성 영업이익율</text>
+
+        <line x1="220" y1="0" x2="240" y2="0" stroke="#4A9EBF" stroke-width="2" stroke-dasharray="3,3"/>
+        <text x="250" y="4" fill="#4A9EBF" font-family="Noto Sans KR" font-size="10">DRAM 가격지수</text>
+      </g>
+
+      <!-- 설명 -->
+      <text x="400" y="330" text-anchor="middle" fill="#9A9890" font-family="Noto Sans KR" font-size="9" font-style="italic">메모리칩 가격이 떨어지면서 2023년 수익성 극악화</text>
+    </svg>
+  </div>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  <details class="deep-dive">
+    <summary>감가상각이 현금흐름을 늘리는 이유</summary>
+    <div class="deep-dive-content">
+      <p><strong>감가상각의 역설:</strong> 회계상 '비용'이지만, 실제 현금은 나가지 않습니다. 따라서 순이익에 다시 더해서 계산합니다.</p>
+      <div class="formula-block">
+        <div class="formula-highlight">예시: 공장 건설</div>
+        <div class="formula-line">  Year 0: 공장 짓기 → 현금 100억 지출</div>
+        <div class="formula-line">  Year 1~10: 감가상각 10억/년 × 10년</div>
+        <br>
+        <div class="formula-highlight">회계상 이익:</div>
+        <div class="formula-line">  = 수입 - 감가상각 - 기타지출</div>
+        <div class="formula-line">  = 150 - 10 - 20 = <span class="formula-highlight">120억</span> (이익)</div>
+        <br>
+        <div class="formula-highlight">실제 현금흐름:</div>
+        <div class="formula-line">  = 수입 - (감가상각 제외 지출)</div>
+        <div class="formula-line">  = 150 - 20 = <span class="formula-highlight">130억</span> (현금)</div>
+        <div class="formula-comment">// 감가상각 10억은 "종이상의 비용" → 현금은 나가지 않음</div>
+      </div>
+      <p style="margin-top:1rem;"><strong>삼성의 경우:</strong> 2023년 순이익 4.8조인데 감가상각 12조를 더하면 영업현금흐름이 18.5조가 됩니다. 따라서 "순이익이 4조인데 어떻게 산다고?" → 답: 감가상각 덕분.</p>
+      <p style="margin-top:0.8rem;"><strong>투자자 관점:</strong> 현금흐름이 좋은 기업을 찾으세요. 이익만 크면 함정일 수 있습니다.</p>
+    </div>
+  </details>
+  <details class="deep-dive">
+    <summary>부채비율(Debt-to-Equity) 건강 기준선</summary>
+    <div class="deep-dive-content">
+      <p><strong>부채비율 = 부채 ÷ 자본금</strong></p>
+      <p>삼성 2023: 152.4조 ÷ 249.9조 = <span style="color:var(--gold);font-weight:600;">61%</span></p>
+      <div class="formula-block">
+        <div class="formula-highlight">업종별 건강한 부채비율:</div>
+        <div class="formula-line">  제조업 (반도체, 자동차): 50~80%</div>
+        <div class="formula-line">  금융업: 200~300% (정상범위)</div>
+        <div class="formula-line">  유틸리티 (전력, 가스): 60~100%</div>
+        <br>
+        <div class="formula-highlight">해석:</div>
+        <div class="formula-line">  부채비율 50% 이하 → 매우 건전</div>
+        <div class="formula-line">  부채비율 50~100% → 보통 (정상)</div>
+        <div class="formula-line">  부채비율 100% 이상 → 위험 신호</div>
+      </div>
+      <p style="margin-top:1rem;"><strong>삼성은 61%로 건강한 수준이지만,</strong> 2023년처럼 이익이 급락하면 부채 상환 능력이 악화됩니다. 따라서 부채비율도 중요하지만 <span style="color:var(--gold);">이자 보상 능력(Interest Coverage Ratio)</span>도 봐야 합니다.</p>
+    </div>
+  </details>
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  <div class="sim-box">
+    <h3>📑 내 투자기업 재무분석 체크리스트</h3>
+    <ul class="checklist">
+      <li><strong>영업이익 추이:</strong> 최근 3년 영업이익이 증가하고 있는가? 삼성처럼 급락하지는 않는가?</li>
+      <li><strong>영업이익율:</strong> 동종업계 평균보다 높은가? (반도체 10~15%, 제조업 평균 8~10%)</li>
+      <li><strong>부채비율:</strong> 50~100% 범위 내인가? 100%를 넘으면 위험신호</li>
+      <li><strong>영업현금흐름:</strong> 순이익이 아닌 "영업현금흐름"이 지속적으로 양수인가?</li>
+      <li><strong>현금 소진율:</strong> (투자CF + 금융CF) 크기가 영업CF 크기의 50% 이하인가?</li>
+      <li><strong>배당금:</strong> 배당금 지급이 현금흐름 범위 내에서 이루어지고 있는가?</li>
+    </ul>
+    <div style="background:var(--blue-dim);padding:1rem;border-radius:6px;margin-top:1.2rem;">
+      <p style="font-size:0.85rem;color:var(--text-primary);margin-bottom:0.5rem;"><strong>⭐ 핵심 요점:</strong></p>
+      <p style="font-size:0.82rem;color:var(--text-secondary);">1. "순이익"만 보지 말고 "영업현금흐름"을 봐야 함</p>
+      <p style="font-size:0.82rem;color:var(--text-secondary);">2. 부채비율 + 영업현금흐름 = 기업의 진짜 건강도</p>
+      <p style="font-size:0.82rem;color:var(--text-secondary);">3. 빠르게 성장하는 기업이라도 현금이 음수면 위험</p>
+    </div>
+  </div>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    <div class="bias-name">회계 지표 맹신 (Accounting Naivety)</div>
+    <p><span class="neuro-tag">뇌과학</span> 인간의 뇌는 "이익"이라는 단어에 긍정 신호를 받습니다. 특히 큰 숫자를 보면 충동적으로 반응합니다. 하지만 현금흐름이 음수면 아무리 이익이 크면 함정입니다.</p>
+    <p><span class="engineer-tag">엔지니어링</span> <strong>데이터 검증:</strong> 재무제표를 읽을 때 순이익, 영업이익, 영업현금흐름 세 개를 항상 함께 봅시다. 삼성처럼 순이익 4.8조지만 영업CF 18.5조인 경우, 혹은 그 반대 경우도 있습니다. 수치 간 불일치는 숨은 위험신호입니다.</p>
+    <p><strong style="color:var(--gold);">대응:</strong> "좋은 이익이다"라는 판단을 하기 전에 "이 이익이 실제 현금으로 들어왔는가?"를 확인하세요. 특히 빠르게 성장하는 스타트업이나 신생 산업(반도체) 기업일수록 이익과 현금의 괴리가 큽니다.</p>
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 재무제표 중 '특정 시점'의 자산·부채·자본을 나타내는 표는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 손익계산서</li>
+<li onclick="checkAnswer(this,'q1',true)">② 재무상태표 (Balance Sheet)</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 현금흐름표</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 주식보상 계산서</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>손익계산서는 일정 기간(분기/연도), 현금흐름표도 기간을 나타냅니다. 반대로 재무상태표는 '연도말' 같은 특정 시점의 스냅샷입니다.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 삼성 2023년 순이익 4.8조인데 영업현금흐름이 18.5조인 이유는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 회계 오류</li>
+<li onclick="checkAnswer(this,'q2',true)">② 감가상각 등 비현금 비용을 더했기 때문</li>
+<li onclick="checkAnswer(this,'q2',false)">③ 과장된 수치</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 배당금 때문</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ②</strong><br>감가상각, 대손충당금 등은 '회계상 비용'이지만 실제 현금은 나가지 않습니다. 따라서 순이익에 이들을 다시 더하면 더 큰 영업현금흐름이 나옵니다.</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 10</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 17일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 19일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 23일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">03월 30일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 15일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day09_semiconductor_analysis.html">← Day 09</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 10 / 23</span>
+  <a class="nav-btn" href="day11_technical_analysis.html">Day 11 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

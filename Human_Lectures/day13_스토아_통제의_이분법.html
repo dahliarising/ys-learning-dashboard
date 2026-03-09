@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 13 — 스토아 통제의 이분법 — 인간 탐구</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #0A0C10; --bg-card: #12151C; --bg-card-hover: #181C26;
+  --purple: #8A6ABF; --purple-dim: #6B4FA0; --purple-glow: rgba(138,106,191,0.15);
+  --gold: #C9A84C; --gold-dim: #A8893A; --gold-glow: rgba(201,168,76,0.12);
+  --text: #E8E4DF; --text-dim: #9B9590; --text-muted: #6B6560;
+  --accent-green: #6BBF8A; --accent-red: #BF6B6B;
+  --border: rgba(138,106,191,0.12);
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Noto Sans KR', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-weight: 300; line-height: 1.75; font-size: 16px; overflow-x: hidden; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--purple), var(--gold)); border-radius: 3px; }
+
+.sticky-header { position: sticky; top: 0; z-index: 100; background: rgba(10,12,16,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-logo { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 700; color: var(--gold); letter-spacing: 0.08em; }
+.header-divider { width: 1px; height: 18px; background: var(--text-muted); opacity: 0.4; }
+.header-title { font-size: 0.85rem; color: var(--text-dim); font-weight: 400; }
+.header-day { font-family: var(--font-mono); font-size: 0.78rem; color: var(--purple); background: var(--purple-glow); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(138,106,191,0.2); }
+.container { max-width: 820px; margin: 0 auto; padding: 0 24px 80px; }
+
+/* Hero */
+.hero { padding: 60px 0 48px; text-align: center; position: relative; }
+.hero::before { content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, var(--purple-glow) 0%, transparent 70%); pointer-events: none; }
+.hero-part-label { font-family: var(--font-mono); font-size: 0.72rem; color: var(--purple-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px; }
+.hero-day { font-family: var(--font-serif); font-size: 0.95rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 20px; }
+.hero-question { font-family: var(--font-serif); font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 600; color: var(--text); line-height: 1.4; max-width: 640px; margin: 0 auto 28px; font-style: italic; }
+.hero-question em { color: var(--gold); font-style: normal; }
+.keyword-badges { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 36px; }
+.badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 5px 14px; border-radius: 20px; letter-spacing: 0.04em; }
+.badge--purple { background: var(--purple-glow); border: 1px solid rgba(138,106,191,0.25); color: var(--purple); }
+.badge--gold { background: var(--gold-glow); border: 1px solid rgba(201,168,76,0.25); color: var(--gold); }
+.badge--green { background: rgba(107,191,138,0.1); border: 1px solid rgba(107,191,138,0.25); color: var(--accent-green); }
+.hero-meta { display: flex; align-items: center; justify-content: center; gap: 28px; flex-wrap: wrap; }
+.gauge-container { position: relative; width: 80px; height: 80px; }
+.gauge-container svg { transform: rotate(-90deg); }
+.gauge-bg { fill: none; stroke: #1E2230; stroke-width: 5; }
+.gauge-fill { fill: none; stroke: var(--purple); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 220; stroke-dashoffset: 220; transition: stroke-dashoffset 1.5s ease; }
+.gauge-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); text-align: center; line-height: 1.2; }
+.gauge-text strong { display: block; font-size: 1rem; color: var(--purple); }
+.meta-badges { display: flex; flex-direction: column; gap: 8px; }
+.meta-badge { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--text-dim); }
+.meta-badge-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+.meta-badge-icon--time { background: rgba(138,106,191,0.12); }
+.meta-badge-icon--diff { background: rgba(201,168,76,0.12); }
+.meta-badge-icon--type { background: rgba(107,191,138,0.12); }
+
+/* FadeUp */
+.fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+
+/* Sections */
+.section { margin-top: 56px; }
+.section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.section-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+.section-icon--brain { background: var(--purple-glow); border: 1px solid rgba(138,106,191,0.2); }
+.section-icon--concept { background: var(--gold-glow); border: 1px solid rgba(201,168,76,0.2); }
+.section-icon--practice { background: rgba(107,191,138,0.12); border: 1px solid rgba(107,191,138,0.2); }
+.section-icon--reflect { background: rgba(138,106,191,0.08); border: 1px solid rgba(138,106,191,0.15); }
+.section-icon--quiz { background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.15); }
+.section-title { font-family: var(--font-serif); font-size: 1.3rem; font-weight: 600; color: var(--text); }
+.section-subtitle { font-size: 0.78rem; color: var(--text-muted); font-family: var(--font-mono); }
+
+/* Strategy Box */
+.strategy-box { background: linear-gradient(135deg, rgba(138,106,191,0.06), rgba(201,168,76,0.04)); border: 1px solid var(--border); border-radius: 16px; padding: 28px; }
+.strategy-tip { font-size: 0.88rem; color: var(--text-dim); margin-bottom: 20px; line-height: 1.7; }
+.strategy-tip strong { color: var(--purple); font-weight: 500; }
+
+/* Time Table */
+.time-table { width: 100%; border-collapse: collapse; }
+.time-table th { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); text-align: left; padding: 6px 12px; border-bottom: 1px solid var(--border); letter-spacing: 0.08em; text-transform: uppercase; }
+.time-table td { font-size: 0.82rem; color: var(--text-dim); padding: 10px 12px; border-bottom: 1px solid rgba(138,106,191,0.06); }
+.time-table td:first-child { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; width: 80px; }
+.time-table tr:last-child td { border-bottom: none; }
+
+/* Concept Cards */
+.concept-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 20px; transition: border-color 0.3s; }
+.concept-card:hover { border-color: rgba(138,106,191,0.25); }
+.concept-card-num { font-family: var(--font-mono); font-size: 0.68rem; color: var(--purple-dim); letter-spacing: 0.12em; margin-bottom: 8px; }
+.concept-card-title { font-family: var(--font-serif); font-size: 1.25rem; font-weight: 700; color: var(--gold); margin-bottom: 6px; }
+.concept-card-en { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); margin-bottom: 16px; }
+.concept-card-body { font-size: 0.9rem; color: var(--text-dim); line-height: 1.8; }
+.concept-card-body p { margin-bottom: 12px; }
+.concept-card-body strong { color: var(--text); font-weight: 500; }
+.concept-highlight { background: var(--purple-glow); padding: 2px 8px; border-radius: 4px; color: var(--purple); font-family: var(--font-mono); font-size: 0.82rem; }
+.concept-example { margin-top: 16px; padding: 16px 20px; background: rgba(201,168,76,0.04); border-left: 3px solid var(--gold-dim); border-radius: 0 10px 10px 0; font-size: 0.85rem; color: var(--text-dim); }
+.concept-example-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 6px; }
+
+/* Engineer Metaphor */
+.engineer-box { background: linear-gradient(135deg, rgba(107,191,138,0.06), rgba(201,168,76,0.04)); border: 1px solid rgba(107,191,138,0.2); border-radius: 16px; padding: 28px; margin-top: 20px; }
+.engineer-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-green); letter-spacing: 0.12em; margin-bottom: 10px; }
+.engineer-title { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; color: var(--accent-green); margin-bottom: 12px; }
+.engineer-body { font-size: 0.85rem; color: var(--text-dim); line-height: 1.8; }
+.engineer-body strong { color: var(--accent-green); font-weight: 500; }
+
+/* Children Box */
+.children-box { background: linear-gradient(135deg, rgba(201,168,76,0.06), rgba(138,106,191,0.04)); border: 1px solid rgba(201,168,76,0.2); border-radius: 16px; padding: 28px; margin-top: 20px; }
+.children-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold); letter-spacing: 0.12em; margin-bottom: 10px; }
+.children-title { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; color: var(--gold); margin-bottom: 12px; }
+.children-body { font-size: 0.85rem; color: var(--text-dim); line-height: 1.8; }
+.children-body strong { color: var(--gold); font-weight: 500; }
+
+/* Fi Analysis */
+.fi-box { background: linear-gradient(135deg, rgba(138,106,191,0.08), rgba(10,12,16,0.9)); border: 1px solid rgba(138,106,191,0.25); border-radius: 16px; padding: 28px; margin-top: 20px; }
+.fi-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--purple); letter-spacing: 0.12em; margin-bottom: 10px; }
+.fi-title { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; color: var(--purple); margin-bottom: 12px; }
+.fi-body { font-size: 0.85rem; color: var(--text-dim); line-height: 1.8; }
+.fi-body strong { color: var(--purple); font-weight: 500; }
+
+/* Deep Dive */
+.deep-dive { margin-top: 16px; }
+.deep-dive summary { font-family: var(--font-mono); font-size: 0.78rem; color: var(--purple); cursor: pointer; padding: 8px 0; list-style: none; display: flex; align-items: center; gap: 8px; user-select: none; }
+.deep-dive summary::before { content: '▸'; display: inline-block; transition: transform 0.2s; }
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive-content { padding: 16px 20px; background: rgba(138,106,191,0.04); border-radius: 10px; font-size: 0.82rem; color: var(--text-dim); line-height: 1.75; margin-top: 8px; }
+.deep-dive-content strong { color: var(--purple); font-weight: 500; }
+
+/* SVG */
+.diagram-wrapper { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 32px 24px; text-align: center; overflow-x: auto; }
+.diagram-wrapper svg { max-width: 100%; height: auto; }
+.diagram-caption { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin-top: 16px; letter-spacing: 0.04em; }
+@keyframes pulseNode { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+@keyframes drawLine { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
+.pulse-node { animation: pulseNode 2.5s ease-in-out infinite; }
+.draw-line { stroke-dasharray: 200; animation: drawLine 1.5s ease forwards; }
+
+/* Practice Grid */
+.practice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+.practice-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; transition: transform 0.2s, border-color 0.3s; }
+.practice-card:hover { transform: translateY(-2px); border-color: rgba(107,191,138,0.3); }
+.practice-time { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; }
+.practice-time--morning { color: var(--gold); }
+.practice-time--evening { color: var(--purple); }
+.practice-time--ongoing { color: var(--accent-green); }
+.practice-title { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 10px; margin-top: 8px; }
+.practice-body { font-size: 0.82rem; color: var(--text-dim); line-height: 1.7; }
+.checklist { list-style: none; margin-top: 12px; }
+.checklist li { font-size: 0.82rem; color: var(--text-dim); padding: 6px 0; display: flex; align-items: flex-start; gap: 8px; }
+.checklist li::before { content: '☐'; color: var(--purple-dim); font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+
+/* Reflection */
+.reflection-box { background: linear-gradient(135deg, rgba(138,106,191,0.05), rgba(10,12,16,0.8)); border: 1px solid var(--border); border-radius: 16px; padding: 32px; }
+.philosopher { display: flex; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.philosopher:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.philosopher-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--purple-glow); border: 1px solid rgba(138,106,191,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+.philosopher-name { font-family: var(--font-serif); font-size: 1rem; font-weight: 600; color: var(--gold); margin-bottom: 4px; }
+.philosopher-text { font-size: 0.85rem; color: var(--text-dim); line-height: 1.7; font-style: italic; }
+.night-question { margin-top: 24px; padding: 20px 24px; background: rgba(201,168,76,0.05); border: 1px solid rgba(201,168,76,0.12); border-radius: 12px; text-align: center; }
+.night-question-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold-dim); letter-spacing: 0.12em; margin-bottom: 8px; }
+.night-question-text { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; color: var(--text); font-style: italic; line-height: 1.5; }
+
+/* Quiz */
+.quiz-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 16px; }
+.quiz-num { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 10px; }
+.quiz-question { font-size: 0.95rem; color: var(--text); font-weight: 400; margin-bottom: 16px; line-height: 1.6; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-option { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: rgba(138,106,191,0.04); border: 1px solid rgba(138,106,191,0.08); border-radius: 10px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; color: var(--text-dim); }
+.quiz-option:hover { background: rgba(138,106,191,0.08); border-color: rgba(138,106,191,0.2); }
+.quiz-option.correct { background: rgba(107,191,138,0.1); border-color: rgba(107,191,138,0.3); color: var(--accent-green); }
+.quiz-option.wrong { background: rgba(191,107,107,0.1); border-color: rgba(191,107,107,0.3); color: var(--accent-red); }
+.quiz-option-marker { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--text-muted); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.68rem; flex-shrink: 0; transition: all 0.2s; }
+.quiz-explanation { display: none; margin-top: 14px; padding: 14px 18px; background: rgba(107,191,138,0.05); border-radius: 10px; font-size: 0.82rem; color: var(--text-dim); line-height: 1.7; }
+.quiz-explanation.show { display: block; }
+
+/* Spaced Repetition */
+.spaced-tracker { margin-top: 24px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+.spaced-tracker-title { font-family: var(--font-mono); font-size: 0.72rem; color: var(--purple); letter-spacing: 0.1em; margin-bottom: 16px; }
+.spaced-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; font-size: 0.8rem; color: var(--text-dim); }
+.spaced-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--text-muted); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.spaced-dot.checked { background: var(--purple); border-color: var(--purple); }
+.spaced-dot.checked::after { content: '✓'; font-size: 0.6rem; color: #fff; }
+.spaced-label { font-family: var(--font-mono); font-size: 0.72rem; color: var(--gold-dim); width: 50px; }
+
+/* Footer */
+.footer { text-align: center; padding: 40px 0 20px; border-top: 1px solid var(--border); margin-top: 60px; }
+.footer-text { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.06em; }
+.footer-nav { margin-top: 16px; display: flex; justify-content: center; gap: 20px; }
+.footer-nav a { font-family: var(--font-mono); font-size: 0.72rem; color: var(--purple-dim); text-decoration: none; transition: color 0.2s; }
+.footer-nav a:hover { color: var(--purple); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sticky-header { padding: 10px 16px; }
+  .container { padding: 0 16px 60px; }
+  .hero { padding: 40px 0 32px; }
+  .concept-card, .strategy-box, .reflection-box, .engineer-box, .children-box, .fi-box { padding: 20px; }
+  .practice-grid { grid-template-columns: 1fr; }
+  .hero-meta { flex-direction: column; gap: 16px; }
+  .philosopher { flex-direction: column; gap: 12px; }
+}
+@media (max-width: 480px) {
+  body { font-size: 15px; }
+  .hero-question { font-size: 1.4rem; }
+  .concept-card-title { font-size: 1.1rem; }
+  .section-title { font-size: 1.15rem; }
+}
+  </style>
+</head>
+<body>
+  <div class="sticky-header">
+    <div class="header-left">
+      <div class="header-logo">HE</div>
+      <div class="header-divider"></div>
+      <div class="header-title">인간 탐구</div>
+    </div>
+    <div class="header-day">Day 13 · Part 3</div>
+  </div>
+
+  <div class="container">
+    <!-- HERO -->
+    <section class="hero fade-up">
+      <div class="hero-part-label">Part 3 — 철학적 삶의 프레임</div>
+      <div class="hero-day">Day 13 of 22</div>
+      <h1 class="hero-question">통제할 수 있는 것에만 집중하면<br><em>신경계가 안정된다</em><br>— 에픽테토스의 <em>프로하이레시스</em></h1>
+      <div class="keyword-badges">
+        <span class="badge badge--purple">통제 이분법</span>
+        <span class="badge badge--gold">프로하이레시스</span>
+        <span class="badge badge--green">dlPFC 활성화</span>
+        <span class="badge badge--purple">코르티솔 조절</span>
+      </div>
+      <div class="hero-meta">
+        <div class="gauge-container">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle class="gauge-bg" cx="40" cy="40" r="35"/>
+            <circle class="gauge-fill" id="progressGauge" data-day="13" cx="40" cy="40" r="35"/>
+          </svg>
+          <div class="gauge-text"><strong>13</strong>/22</div>
+        </div>
+        <div class="meta-badges">
+          <div class="meta-badge"><div class="meta-badge-icon meta-badge-icon--time">⏱</div> 25분 포모도로</div>
+          <div class="meta-badge"><div class="meta-badge-icon meta-badge-icon--diff">◆</div> 심화 — 철학 + 신경과학</div>
+          <div class="meta-badge"><div class="meta-badge-icon meta-badge-icon--type">📖</div> 스토아 실천 철학</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STRATEGY -->
+    <section class="section fade-up">
+      <div class="strategy-box">
+        <div class="section-header">
+          <div class="section-icon section-icon--brain">🧠</div>
+          <div><div class="section-title">학습 전략</div>
+          <div class="section-subtitle">Part 3 — 철학적 사고 훈련</div></div>
+        </div>
+        <p class="strategy-tip">Part 1-2에서 배운 <strong>뇌과학(HPA축, dlPFC, 편도체)</strong>이 오늘부터 <strong>철학적 프레임</strong>과 만납니다. 에픽테토스의 핵심 개념 <strong>프로하이레시스(προαίρεσις)</strong> — "도덕적 선택 의지"는 현대 신경과학의 <strong>dlPFC-vmPFC 실행 기능</strong>과 정확히 대응합니다. 오늘 서스펜션 엔지니어의 눈으로 보면, 이것은 <strong>제어 가능 입력과 외란을 구분하는 것</strong>입니다.</p>
+        <table class="time-table">
+          <thead><tr><th>시간</th><th>활동</th><th>메모</th></tr></thead>
+          <tbody>
+            <tr><td>0–3분</td><td>히어로 질문 + 현재 걱정 회상</td><td>통제 밖 걱정 인식하기</td></tr>
+            <tr><td>3–10분</td><td>개념 1·2 정독</td><td>프로하이레시스 + 신경과학 연결</td></tr>
+            <tr><td>10–17분</td><td>개념 3 + SVG + 엔지니어 은유</td><td>제어시스템 관점으로 이해</td></tr>
+            <tr><td>17–22분</td><td>실전 연습 3가지 + 아이 시나리오</td><td>06:30 아침 / 21:30 저녁 루틴</td></tr>
+            <tr><td>22–25분</td><td>퀴즈 3문항 + 철학적 성찰</td><td>프로하이레시스 내면화</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CONCEPT 01 -->
+    <section class="section fade-up">
+      <div class="section-header">
+        <div class="section-icon section-icon--concept">💡</div>
+        <div><div class="section-title">핵심 개념</div>
+        <div class="section-subtitle">3 concepts · 철학 + 신경과학 통합</div></div>
+      </div>
+
+      <div class="concept-card">
+        <div class="concept-card-num">CONCEPT 01</div>
+        <div class="concept-card-title">에픽테토스의 프로하이레시스 — 도덕적 선택 의지</div>
+        <div class="concept-card-en">Epictetus — Prohairesis (προαίρεσις): The Faculty of Moral Choice</div>
+        <div class="concept-card-body">
+          <p>기원후 55~135년, 노예 출신 스토아 철학자 에픽테토스는 <strong>『담론(Discourses)』</strong>과 <strong>『엥케이리디온(Enchiridion/Ἐγχειρίδιον)』</strong>에서 인간 자유의 핵심을 <span class="concept-highlight">프로하이레시스(προαίρεσις)</span>라고 명명했습니다. 이것은 단순한 "선택"이 아니라, <strong>외부 사건에 대한 판단과 반응을 결정하는 도덕적 의지의 능력</strong>입니다.</p>
+          <p><strong>에픽테토스의 근본 구분 (Discourses I.1):</strong></p>
+          <p><strong>에프' 헤민(ἐφ' ἡμῖν) — "우리에게 달린 것":</strong> 판단(κρίσις), 충동(ὁρμή), 욕구(ὄρεξις), 혐오(ἔκκλισις). 이 모든 것은 프로하이레시스의 영역이며, <strong>궁극적으로 당신의 선택</strong>입니다.</p>
+          <p><strong>우크 에프' 헤민(οὐκ ἐφ' ἡμῖν) — "우리에게 달리지 않은 것":</strong> 신체, 재산, 평판, 관직, 타인의 행동. 이것들은 외부(ἐκτός)이며 당신의 프로하이레시스 밖입니다.</p>
+          <p>에픽테토스의 핵심 통찰: <strong>"우리를 괴롭히는 것은 사건(πράγματα) 자체가 아니라, 사건에 대한 우리의 독그마(δόγματα, 판단)이다"</strong> (Enchiridion 5). 그리고 그 판단은 프로하이레시스의 영역 — 즉 당신의 것입니다.</p>
+        </div>
+        <div class="concept-example">
+          <div class="concept-example-label">💼 2027 이사/이직 상황에 적용</div>
+          <p style="margin-top:8px; font-size:0.85rem; color:var(--text-dim); line-height:1.7;"><strong>에프' 헤민(내게 달린 것):</strong> ① 이사 결정에 대한 나의 판단 형성 ② 정보 수집의 성실함 ③ 가족과의 대화 태도 ④ "이것은 도전이다"라는 재해석. <strong>우크 에프' 헤민(내게 달리지 않은 것):</strong> ① 새 지역 연구소 이전 결정 ② 부동산 시세 변동 ③ 아이들의 적응 결과 ④ 와이프 회사의 인근 지역 위치. 에픽테토스: "첫 번째 목록에만 에너지를 쏟아라. 두 번째 목록은 <strong>노력하되 결과에 집착하지 마라</strong>."</p>
+        </div>
+        <details class="deep-dive">
+          <summary>Deep Dive — 에픽테토스의 생애와 프로하이레시스</summary>
+          <div class="deep-dive-content">
+            <p>에픽테토스는 프리기아(현재 터키) 출신 노예였습니다. 전설에 따르면 주인이 그의 다리를 비틀었을 때 "부러질 것이다"라고 경고했고, 실제로 부러지자 "그래, 부러졌지"라고만 했다고 합니다. 이 일화가 보여주는 것: <strong>신체(다리)는 우크 에프' 헤민이지만, 그 사건에 대한 판단과 반응은 에프' 헤민</strong>이라는 것.</p>
+            <p><strong>프로하이레시스</strong>는 아리스토텔레스가 『니코마코스 윤리학』에서 처음 사용한 용어이지만, 에픽테토스가 스토아 철학의 중심으로 재정립했습니다. 현대 학자 A.A. Long은 이를 "자기 결정의 도덕적 성격(moral character of self-determination)"이라고 해석합니다 (Long, 2002, <em>Epictetus: A Stoic and Socratic Guide to Life</em>).</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- CONCEPT 02 -->
+      <div class="concept-card fade-up">
+        <div class="concept-card-num">CONCEPT 02</div>
+        <div class="concept-card-title">통제감의 신경과학 — vmPFC와 코르티솔</div>
+        <div class="concept-card-en">Neuroscience of Perceived Control — vmPFC, dlPFC & Cortisol</div>
+        <div class="concept-card-body">
+          <p>Day 02에서 배운 HPA축과 코르티솔을 다시 상기합니다. 스트레스의 본질은 <strong>"통제 불가능하다고 지각된 상황의 불확실성"</strong>입니다.</p>
+          <p><strong>핵심 연구 1 — Dickerson & Kemeny (2004):</strong> 208개 스트레스 연구 메타분석. 코르티솔 반응을 가장 강력하게 유발하는 조건은 <strong>"사회적 평가 위협 + 통제 불가능성(uncontrollability)"</strong>의 조합입니다. 통제감이 있는 스트레스는 코르티솔을 덜 올립니다 (<em>Psychological Bulletin</em>, 130(3), 355-391).</p>
+          <p><strong>핵심 연구 2 — Maier & Seligman (2016):</strong> 학습된 무기력의 업데이트. 쥐의 <strong>vmPFC(복내측 전전두엽)</strong>가 "이 상황은 통제 가능하다"는 신호를 보내면 편도체와 등쪽솔기핵(dorsal raphe nucleus)의 스트레스 반응이 억제됩니다. <strong>무기력은 디폴트이고, 통제감의 학습이 vmPFC를 통해 이루어진다</strong>는 것 (<em>Biological Psychiatry</em>, 80(7), 534-540).</p>
+          <p><strong>에픽테토스의 이분법이 신경계에 미치는 과정:</strong></p>
+          <p>① "이것은 내 통제 안인가 밖인가?" 질문 → ② <strong>dlPFC 활성화</strong> (이성적 분류 작업) → ③ 통제 가능 영역 식별 → ④ <strong>vmPFC에서 "통제 가능" 신호</strong> → ⑤ 편도체 억제, HPA축 하향 조절 → ⑥ 코르티솔 감소, 신경계 안정.</p>
+        </div>
+        <div class="concept-example">
+          <div class="concept-example-label">🧬 신경생리 비교 — 이분법 적용 전 vs 후</div>
+          <p style="margin-top:8px; font-size:0.85rem; color:var(--text-dim); line-height:1.7;"><strong>적용 전:</strong> "이사, 아이 적응, 부동산 가격, 와이프 통근…" 모든 것을 동시에 걱정 → 편도체가 "전부 위협" 처리 → HPA축 만성 활성 → 수면 장애, 소화 문제, 감정 과민. <strong>적용 후:</strong> "아이 적응 결과는 내 통제 밖. 하지만 긍정적 환경 조성은 내 통제 안이다" → vmPFC "일부는 통제 가능" 신호 → 편도체 부분 억제 → 코르티솔 정상화 → 수면 개선, 건설적 행동 가능.</p>
+        </div>
+        <details class="deep-dive">
+          <summary>Deep Dive — CBT의 스토아 뿌리</summary>
+          <div class="deep-dive-content">
+            <p>Aaron Beck(인지치료)과 Albert Ellis(REBT)는 명시적으로 스토아 철학에서 영감을 받았습니다. Ellis의 A-B-C 모델: <strong>A(Activating Event)</strong> → <strong>B(Belief/판단)</strong> → <strong>C(Consequence/결과)</strong>. 에픽테토스의 Enchiridion 5를 현대화한 것입니다. "사건(A)이 당신을 괴롭히는 게 아니라 판단(B)이 괴롭힌다." 판단(B)은 프로하이레시스의 영역 — 즉 <strong>당신이 바꿀 수 있는 것</strong>입니다.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- CONCEPT 03 -->
+      <div class="concept-card fade-up">
+        <div class="concept-card-num">CONCEPT 03</div>
+        <div class="concept-card-title">현대적 스토아 실천 — 프리메디타티오 & 저녁 성찰</div>
+        <div class="concept-card-en">Premeditatio Malorum & Evening Reflection — Daily Stoic Practice</div>
+        <div class="concept-card-body">
+          <p>스토아 철학자들은 <strong>매일의 수행(ἄσκησις, askēsis)</strong>을 강조했습니다. 세네카는 <strong>『루킬리우스에게 보내는 편지(Epistulae Morales)』</strong> 제83편에서 자신의 하루 성찰 루틴을 상세히 기록했습니다.</p>
+          <p><strong>① 아침 프리메디타티오 말로룸(Premeditatio Malorum)</strong></p>
+          <p>아침에 5분간 "오늘 어떤 어려운 상황이 올 수 있을까?"를 의도적으로 시뮬레이션합니다. 세네카: "미리 생각해 둔 타격은 더 가볍게 맞는다" (Epistulae 76.34). 신경과학적으로, 이것은 <strong>인지적 예방접종(cognitive inoculation)</strong>입니다 — 부정적 시나리오에 사전 노출하면 실제 발생 시 편도체 반응이 감소합니다 (habituation/탈감작, Grupe & Nitschke, 2013, <em>Nature Reviews Neuroscience</em>).</p>
+          <p><strong>② 저녁 성찰(Examinatio)</strong></p>
+          <p>세네카의 루틴 (Epistulae 83, De Ira III.36): 잠들기 전 하루를 검토합니다. "나는 통제 가능한 것에 집중했나? 통제 밖의 것을 통제하려 하지 않았나? 내 판단은 프로하이레시스에 부합했나?" 신경과학적으로 이것은 Day 05의 메타인지 일지와 동일한 메커니즘 — <strong>affect labeling(감정 명명)</strong>으로 편도체 활성을 감소시킵니다 (Lieberman et al., 2007).</p>
+          <p><strong>③ 일상의 디코토미 체크인</strong></p>
+          <p>불안이나 분노가 올라올 때마다: "이것은 에프' 헤민인가, 우크 에프' 헤민인가?" 이 질문 자체가 <strong>dlPFC를 활성화</strong>시키고 편도체의 자동 반응을 중단시킵니다. 에픽테토스 (Discourses II.18): "첫 번째 인상(φαντασία)에 끌려가지 마라. 잠깐, 나를 시험해 보자(ἐπίσχες, ἄφες με δοκιμάσαι σε)."</p>
+        </div>
+
+        <!-- ENGINEER METAPHOR -->
+        <div class="engineer-box">
+          <div class="engineer-label">🔧 SUSPENSION ENGINEER'S INSIGHT</div>
+          <div class="engineer-title">제어시스템 관점: 조종 입력 vs 외란</div>
+          <div class="engineer-body">
+            <p>당신이 매일 하는 서스펜션 설계가 바로 에픽테토스입니다:</p>
+            <p><strong>조종 가능 입력(Controllable Inputs) = 에프' 헤민:</strong> 스프링 상수(K), 감쇠 계수(C), 부시 강성, 지오메트리 세팅. 이것은 당신이 직접 설계하고 튜닝할 수 있습니다.</p>
+            <p><strong>외란(Disturbance) = 우크 에프' 헤민:</strong> 노면 프로파일(벨기 블록, 포트홀), 횡풍, 적재 하중 변화, 온도. 이것들은 당신의 통제 밖입니다.</p>
+            <p><strong>서스펜션 엔지니어의 지혜:</strong> 도로를 바꿀 수는 없지만(우크 에프' 헤민), 도로에 대한 <strong>차량의 응답(response)</strong>을 최적화할 수 있습니다(에프' 헤민). 이것이 정확히 에픽테토스가 말한 것 — <strong>사건을 바꿀 수 없지만, 사건에 대한 나의 반응을 최적화</strong>할 수 있다. 당신의 직업이 곧 스토아 철학의 실천입니다.</p>
+          </div>
+        </div>
+
+        <!-- CHILDREN -->
+        <div class="children-box">
+          <div class="children-label">👨‍👧‍👦 아이들 시나리오</div>
+          <div class="children-title">6세 · 3세와 통제의 이분법</div>
+          <div class="children-body">
+            <p><strong>6세 첫째:</strong> "아빠, 비 와서 놀이터 못 가!" 이때 당신의 스토아 코칭: "비는 우리가 어떻게 할 수 없지?(우크 에프' 헤민) 그런데 집에서 뭘 할지는 우리가 정할 수 있어(에프' 헤민). 뭘 하고 싶어?" <strong>6세는 이 구분을 배울 수 있는 나이</strong>입니다 — PFC가 발달하기 시작하며 원인-결과 사고가 가능해집니다.</p>
+            <p><strong>3세 둘째:</strong> 장난감이 고장 났을 때 바닥에 드러누워 울음. 이것은 정상입니다 — 3세의 PFC는 아직 미성숙하여 "통제 가능/불가능" 구분이 불가능합니다 (Casey et al., 2008). 당신의 역할: <strong>공감(Day 08 전방 인슐라) 먼저</strong>, "속상하지? 고장 나서 속상하구나" → 감정이 가라앉은 후 → "아빠가 같이 고쳐볼까?" 통제 가능한 행동을 <strong>보여주는</strong> 것이 3세를 위한 스토아 교육입니다.</p>
+          </div>
+        </div>
+
+        <!-- Fi ANALYSIS -->
+        <div class="fi-box">
+          <div class="fi-label">🔮 INFP Fi 분석</div>
+          <div class="fi-title">Fi가 모든 것을 "내 책임"으로 흡수할 때</div>
+          <div class="fi-body">
+            <p>INFP의 <strong>Fi(내향 감정)</strong>는 외부 사건을 내면의 가치 체계로 깊이 흡수합니다. 문제는 Fi가 "아이들의 적응", "아내의 불편함", "부동산 손실"까지 <strong>전부 자신의 도덕적 책임</strong>으로 느낀다는 것입니다. 이것은 에픽테토스가 경고한 정확한 오류 — 우크 에프' 헤민을 에프' 헤민으로 착각하는 것.</p>
+            <p><strong>Fi-Te 균형 도구로서의 이분법:</strong> Fi가 "이것이 중요하다(가치)"를 감지하면, <strong>Te(외향 사고)</strong>가 "이 중에서 실제로 행동 가능한 것은?"을 분류합니다. 이 Fi→Te 흐름이 에픽테토스의 이분법 그 자체입니다. 당신의 <strong>ACC(전방 대상 피질)</strong>가 Fi의 가치 충돌을 감지하면, 이분법 질문이 dlPFC를 활성화시켜 <strong>건설적 Te 행동</strong>으로 전환시킵니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SVG DIAGRAM -->
+    <section class="section fade-up">
+      <div class="section-header">
+        <div class="section-icon section-icon--brain">📊</div>
+        <div><div class="section-title">시각화 다이어그램</div>
+        <div class="section-subtitle">에픽테토스의 이분법 + 신경계 연결</div></div>
+      </div>
+      <div class="diagram-wrapper">
+        <svg viewBox="0 0 760 520" xmlns="http://www.w3.org/2000/svg" style="font-family:'Noto Sans KR',sans-serif;">
+          <defs>
+            <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#8A6ABF"/></marker>
+            <marker id="arrG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6BBF8A"/></marker>
+            <marker id="arrR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#BF6B6B"/></marker>
+          </defs>
+          <rect width="760" height="520" fill="#0A0C10" rx="12"/>
+
+          <!-- Title -->
+          <text x="380" y="30" text-anchor="middle" fill="#8A6ABF" font-size="13" font-weight="600">에픽테토스의 프로하이레시스(προαίρεσις) — 통제의 이분법 + 신경과학</text>
+
+          <!-- LEFT: 에프' 헤민 (Controllable) -->
+          <rect x="30" y="55" width="320" height="200" rx="12" fill="rgba(107,191,138,0.06)" stroke="#6BBF8A" stroke-width="1.5"/>
+          <text x="190" y="78" text-anchor="middle" fill="#6BBF8A" font-size="11" font-weight="700">ἐφ' ἡμῖν — 에프' 헤민</text>
+          <text x="190" y="93" text-anchor="middle" fill="#9B9590" font-size="8">우리에게 달린 것 (Controllable)</text>
+
+          <rect x="50" y="108" width="130" height="32" rx="6" fill="#1A1E2A" stroke="#6BBF8A" stroke-width="1" class="pulse-node"/>
+          <text x="115" y="128" text-anchor="middle" fill="#6BBF8A" font-size="9">판단 (κρίσις)</text>
+          <rect x="200" y="108" width="130" height="32" rx="6" fill="#1A1E2A" stroke="#6BBF8A" stroke-width="1" class="pulse-node"/>
+          <text x="265" y="128" text-anchor="middle" fill="#6BBF8A" font-size="9">행동 (ὁρμή)</text>
+          <rect x="50" y="152" width="130" height="32" rx="6" fill="#1A1E2A" stroke="#6BBF8A" stroke-width="1"/>
+          <text x="115" y="172" text-anchor="middle" fill="#6BBF8A" font-size="9">욕구 (ὄρεξις)</text>
+          <rect x="200" y="152" width="130" height="32" rx="6" fill="#1A1E2A" stroke="#6BBF8A" stroke-width="1"/>
+          <text x="265" y="172" text-anchor="middle" fill="#6BBF8A" font-size="9">의지 (προαίρεσις)</text>
+
+          <!-- 엔지니어 예시 -->
+          <rect x="50" y="198" width="280" height="44" rx="6" fill="rgba(107,191,138,0.04)" stroke="rgba(107,191,138,0.15)" stroke-width="1"/>
+          <text x="60" y="215" fill="#6BBF8A" font-size="7" font-weight="600">🔧 서스펜션 엔지니어 예시</text>
+          <text x="60" y="232" fill="#9B9590" font-size="7">K(스프링), C(댐퍼), 지오메트리 = 내가 튜닝 가능</text>
+
+          <!-- RIGHT: 우크 에프' 헤민 (Uncontrollable) -->
+          <rect x="410" y="55" width="320" height="200" rx="12" fill="rgba(191,107,107,0.06)" stroke="#BF6B6B" stroke-width="1.5" stroke-dasharray="5,5"/>
+          <text x="570" y="78" text-anchor="middle" fill="#BF6B6B" font-size="11" font-weight="700">οὐκ ἐφ' ἡμῖν — 우크 에프' 헤민</text>
+          <text x="570" y="93" text-anchor="middle" fill="#9B9590" font-size="8">우리에게 달리지 않은 것 (Uncontrollable)</text>
+
+          <rect x="430" y="108" width="130" height="32" rx="6" fill="#1A1E2A" stroke="#BF6B6B" stroke-width="1"/>
+          <text x="495" y="128" text-anchor="middle" fill="#BF6B6B" font-size="9">타인의 행동</text>
+          <rect x="580" y="108" width="130" height="32" rx="6" fill="#1A1E2A" stroke="#BF6B6B" stroke-width="1"/>
+          <text x="645" y="128" text-anchor="middle" fill="#BF6B6B" font-size="9">외부 사건</text>
+          <rect x="430" y="152" width="130" height="32" rx="6" fill="#1A1E2A" stroke="#BF6B6B" stroke-width="1"/>
+          <text x="495" y="172" text-anchor="middle" fill="#BF6B6B" font-size="9">평판 · 지위</text>
+          <rect x="580" y="152" width="130" height="32" rx="6" fill="#1A1E2A" stroke="#BF6B6B" stroke-width="1"/>
+          <text x="645" y="172" text-anchor="middle" fill="#BF6B6B" font-size="9">재산 · 신체</text>
+
+          <rect x="430" y="198" width="280" height="44" rx="6" fill="rgba(191,107,107,0.04)" stroke="rgba(191,107,107,0.15)" stroke-width="1"/>
+          <text x="440" y="215" fill="#BF6B6B" font-size="7" font-weight="600">🔧 서스펜션 엔지니어 예시</text>
+          <text x="440" y="232" fill="#9B9590" font-size="7">노면(벨기블록), 횡풍, 온도 = 내가 바꿀 수 없음</text>
+
+          <!-- CENTER: 신경과학 프로세스 -->
+          <rect x="180" y="280" width="400" height="220" rx="12" fill="rgba(138,106,191,0.05)" stroke="#8A6ABF" stroke-width="1"/>
+          <text x="380" y="302" text-anchor="middle" fill="#8A6ABF" font-size="10" font-weight="600">신경과학 프로세스</text>
+
+          <!-- 노드들 -->
+          <rect x="210" y="318" width="150" height="30" rx="6" fill="#1A1E2A" stroke="#8A6ABF" stroke-width="1"/>
+          <text x="285" y="337" text-anchor="middle" fill="#8A6ABF" font-size="8" font-weight="500">"이것은 내 통제 안/밖인가?"</text>
+
+          <rect x="420" y="318" width="130" height="30" rx="6" fill="#1A1E2A" stroke="#8A6ABF" stroke-width="1" class="pulse-node"/>
+          <text x="485" y="337" text-anchor="middle" fill="#8A6ABF" font-size="8">dlPFC 활성화</text>
+
+          <rect x="210" y="365" width="130" height="30" rx="6" fill="#1A1E2A" stroke="#6BBF8A" stroke-width="1"/>
+          <text x="275" y="384" text-anchor="middle" fill="#6BBF8A" font-size="8">vmPFC "통제 가능" 신호</text>
+
+          <rect x="420" y="365" width="130" height="30" rx="6" fill="#1A1E2A" stroke="#BF6B6B" stroke-width="1"/>
+          <text x="485" y="384" text-anchor="middle" fill="#BF6B6B" font-size="8">편도체 억제</text>
+
+          <rect x="270" y="415" width="220" height="35" rx="8" fill="rgba(201,168,76,0.1)" stroke="#C9A84C" stroke-width="1.5" class="pulse-node"/>
+          <text x="380" y="432" text-anchor="middle" fill="#C9A84C" font-size="9" font-weight="600">코르티솔 감소 → 신경계 안정</text>
+          <text x="380" y="444" text-anchor="middle" fill="#9B9590" font-size="7">Dickerson &amp; Kemeny, 2004; Maier &amp; Seligman, 2016</text>
+
+          <!-- 화살표들 -->
+          <line x1="360" y1="333" x2="418" y2="333" stroke="#8A6ABF" stroke-width="1.5" marker-end="url(#arr)" class="draw-line"/>
+          <line x1="285" y1="348" x2="275" y2="363" stroke="#6BBF8A" stroke-width="1.5" marker-end="url(#arrG)" class="draw-line"/>
+          <line x1="485" y1="348" x2="485" y2="363" stroke="#BF6B6B" stroke-width="1.5" marker-end="url(#arrR)" class="draw-line"/>
+          <line x1="340" y1="395" x2="355" y2="413" stroke="#C9A84C" stroke-width="1.5" marker-end="url(#arr)" class="draw-line"/>
+          <line x1="420" y1="395" x2="405" y2="413" stroke="#C9A84C" stroke-width="1.5" marker-end="url(#arr)" class="draw-line"/>
+
+          <!-- 연결: 이분법 → 질문 -->
+          <line x1="190" y1="255" x2="240" y2="318" stroke="#6BBF8A" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrG)"/>
+          <line x1="570" y1="255" x2="520" y2="318" stroke="#BF6B6B" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrR)"/>
+
+          <!-- 범례 -->
+          <rect x="210" y="468" width="8" height="8" rx="2" fill="#6BBF8A"/>
+          <text x="224" y="476" fill="#9B9590" font-size="7">통제 가능 (행동 초점)</text>
+          <rect x="340" y="468" width="8" height="8" rx="2" fill="#BF6B6B"/>
+          <text x="354" y="476" fill="#9B9590" font-size="7">통제 불가능 (수용 초점)</text>
+          <rect x="470" y="468" width="8" height="8" rx="2" fill="#C9A84C"/>
+          <text x="484" y="476" fill="#9B9590" font-size="7">신경계 안정 결과</text>
+        </svg>
+      </div>
+      <div class="diagram-caption">Fig 1. 에픽테토스의 이분법 → dlPFC/vmPFC 활성화 → 코르티솔 감소 경로</div>
+    </section>
+
+    <!-- PRACTICE -->
+    <section class="section fade-up">
+      <div class="section-header">
+        <div class="section-icon section-icon--practice">⚡</div>
+        <div><div class="section-title">실전 연습</div>
+        <div class="section-subtitle">3 practices · 아침 · 수시 · 저녁</div></div>
+      </div>
+      <div class="practice-grid">
+        <div class="practice-card">
+          <div class="practice-time practice-time--morning">06:30 · 5분</div>
+          <h4 class="practice-title">프리메디타티오 말로룸</h4>
+          <div class="practice-body">일어난 직후, 커피 마시며:</div>
+          <ul class="checklist">
+            <li>"오늘 어떤 어려운 상황이 올 수 있을까?" 3가지 시뮬레이션</li>
+            <li>각 상황: 에프' 헤민 / 우크 에프' 헤민 분류</li>
+            <li>"나는 에프' 헤민에 이렇게 대응할 것이다" 의도 설정</li>
+            <li>예: "오후 설계 리뷰에서 반려될 수도. 내 통제: 데이터 기반 설명. 통제 밖: 팀장의 최종 결정."</li>
+          </ul>
+        </div>
+        <div class="practice-card">
+          <div class="practice-time practice-time--ongoing">수시 · 30초</div>
+          <h4 class="practice-title">디코토미 체크인</h4>
+          <div class="practice-body">불안·분노가 올라올 때마다:</div>
+          <ul class="checklist">
+            <li>"ἐπίσχες — 잠깐." (에픽테토스의 멈춤 명령)</li>
+            <li>"이것은 에프' 헤민인가, 우크 에프' 헤민인가?"</li>
+            <li>에프' 헤민이면 → "그럼 내가 할 수 있는 구체적 행동은?" → Te 활성화</li>
+            <li>우크 에프' 헤민이면 → "이것은 노면이다. 내 설계가 아니라 외란이다" → 수용</li>
+          </ul>
+        </div>
+        <div class="practice-card">
+          <div class="practice-time practice-time--evening">21:30 · 5분</div>
+          <h4 class="practice-title">저녁 성찰 (Examinatio)</h4>
+          <div class="practice-body">잠들기 전 일지 또는 머릿속 검토:</div>
+          <ul class="checklist">
+            <li>"오늘 에프' 헤민에 충분히 집중했나?"</li>
+            <li>"우크 에프' 헤민을 통제하려 에너지 낭비하지 않았나?"</li>
+            <li>"내 프로하이레시스(판단·의지)는 어떠했나?"</li>
+            <li>판단 없이 관찰만. 내일의 프리메디타티오에 반영.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- REFLECTION -->
+    <section class="section fade-up">
+      <div class="section-header">
+        <div class="section-icon section-icon--reflect">🌙</div>
+        <div><div class="section-title">철학적 성찰</div>
+        <div class="section-subtitle">2 philosophers · 스토아 전통</div></div>
+      </div>
+      <div class="reflection-box">
+        <div class="philosopher">
+          <div class="philosopher-avatar">🏛</div>
+          <div>
+            <div class="philosopher-name">에픽테토스 (Epictetus, 55~135 CE)</div>
+            <div class="philosopher-text">『엥케이리디온(Ἐγχειρίδιον)』 — "손에 들 수 있는 것"이라는 뜻의 스토아 핸드북. 첫 문장: "사물 가운데 어떤 것은 우리에게 달려 있고(ἐφ' ἡμῖν), 어떤 것은 우리에게 달려 있지 않다(οὐκ ἐφ' ἡμῖν)." 노예 출신으로 자유를 얻은 에픽테토스에게 이 구분은 이론이 아니라 생존 전략이었습니다. 2027년의 당신에게도 마찬가지입니다 — 새 지역 이전이라는 외란 속에서, 당신의 프로하이레시스(판단의 자유)는 온전히 당신의 것입니다.</div>
+          </div>
+        </div>
+        <div class="philosopher">
+          <div class="philosopher-avatar">📜</div>
+          <div>
+            <div class="philosopher-name">세네카 (Seneca, 4 BCE~65 CE)</div>
+            <div class="philosopher-text">『루킬리우스에게 보내는 도덕 편지(Epistulae Morales ad Lucilium)』 — 124편의 철학적 편지. 세네카는 로마 제국의 재무장관이자 네로의 스승이었으며, 매일 저녁 성찰을 실천했습니다. 『신의 섭리에 관하여(De Providentia)』에서: "고난은 우리를 시험하는 것이 아니라 훈련시키는 것이다." 서스펜션이 거친 노면에서 더 좋은 승차감을 찾듯, 당신의 프로하이레시스는 어려운 상황에서 더 단련됩니다.</div>
+          </div>
+        </div>
+        <div class="night-question">
+          <div class="night-question-label">밤 성찰 질문</div>
+          <div class="night-question-text">지금 가장 많이 걱정하는 것을 떠올려 보세요.<br>그것의 어느 부분이 ἐφ' ἡμῖν이고, 어느 부분이 οὐκ ἐφ' ἡμῖν인가요?<br>그 구분을 명확히 하는 순간, 당신의 dlPFC가 활성화됩니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section class="section fade-up">
+      <div class="section-header">
+        <div class="section-icon section-icon--quiz">✏️</div>
+        <div><div class="section-title">자가 점검 퀴즈</div>
+        <div class="section-subtitle">3 questions · 이해도 확인</div></div>
+      </div>
+
+      <div class="quiz-card" id="quiz1">
+        <div class="quiz-num">QUIZ 01</div>
+        <div class="quiz-question">에픽테토스의 프로하이레시스(προαίρεσις)가 현대 신경과학에서 가장 밀접하게 대응하는 뇌 영역과 기능은?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" data-correct="false"><div class="quiz-option-marker">A</div><div>편도체 — 위협 자동 감지</div></div>
+          <div class="quiz-option" data-correct="true"><div class="quiz-option-marker">B</div><div>dlPFC/vmPFC — 이성적 판단과 통제감 신호</div></div>
+          <div class="quiz-option" data-correct="false"><div class="quiz-option-marker">C</div><div>해마 — 기억 저장과 인출</div></div>
+          <div class="quiz-option" data-correct="false"><div class="quiz-option-marker">D</div><div>소뇌 — 운동 조절과 균형</div></div>
+        </div>
+        <div class="quiz-explanation" id="quiz1-exp"><strong>정답: B.</strong> 프로하이레시스 — 판단과 선택의 의지 — 는 dlPFC(이성적 분류)와 vmPFC(통제 가능성 신호)의 기능과 대응합니다. Maier & Seligman (2016)은 vmPFC가 "이 상황은 통제 가능하다"는 신호를 보내 편도체의 스트레스 반응을 억제한다는 것을 보여줬습니다.</div>
+      </div>
+
+      <div class="quiz-card" id="quiz2">
+        <div class="quiz-num">QUIZ 02</div>
+        <div class="quiz-question">Dickerson & Kemeny (2004) 메타분석에 따르면, 코르티솔 반응을 가장 강하게 유발하는 스트레스 조건의 조합은?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" data-correct="false"><div class="quiz-option-marker">A</div><div>신체적 위협 + 시간 압박</div></div>
+          <div class="quiz-option" data-correct="false"><div class="quiz-option-marker">B</div><div>새로운 환경 + 감각 과부하</div></div>
+          <div class="quiz-option" data-correct="true"><div class="quiz-option-marker">C</div><div>사회적 평가 위협 + 통제 불가능성</div></div>
+          <div class="quiz-option" data-correct="false"><div class="quiz-option-marker">D</div><div>수면 부족 + 영양 결핍</div></div>
+        </div>
+        <div class="quiz-explanation" id="quiz2-exp"><strong>정답: C.</strong> 208개 연구를 분석한 결과, <strong>사회적 평가 위협(social-evaluative threat)</strong>과 <strong>통제 불가능성(uncontrollability)</strong>이 결합될 때 코르티솔이 가장 크게 상승합니다. 이사/이직 결정은 정확히 이 조합 — 주변의 시선 + 결과 불확실성. 에픽테토스의 이분법은 "통제 불가능성" 요소를 인지적으로 분리하여 코르티솔 반응을 줄입니다.</div>
+      </div>
+
+      <div class="quiz-card" id="quiz3">
+        <div class="quiz-num">QUIZ 03</div>
+        <div class="quiz-question">서스펜션 엔지니어 관점에서, 에픽테토스의 "에프' 헤민 / 우크 에프' 헤민"은 제어시스템의 어떤 개념에 가장 가깝습니까?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" data-correct="false"><div class="quiz-option-marker">A</div><div>공진 주파수와 감쇠비</div></div>
+          <div class="quiz-option" data-correct="false"><div class="quiz-option-marker">B</div><div>전달함수의 극점과 영점</div></div>
+          <div class="quiz-option" data-correct="true"><div class="quiz-option-marker">C</div><div>조종 가능 입력(driver input)과 외란(disturbance)</div></div>
+          <div class="quiz-option" data-correct="false"><div class="quiz-option-marker">D</div><div>언더스티어와 오버스티어</div></div>
+        </div>
+        <div class="quiz-explanation" id="quiz3-exp"><strong>정답: C.</strong> 제어시스템에서 <strong>조종 가능 입력</strong>(조향, 가속, 제동)은 설계자/운전자가 직접 제어하는 것(에프' 헤민)이고, <strong>외란</strong>(노면, 횡풍, 온도)은 통제 불가능한 것(우크 에프' 헤민)입니다. 서스펜션 엔지니어의 역할은 외란에 대한 <strong>차량의 응답을 최적화</strong>하는 것 — 이것이 정확히 에픽테토스의 가르침입니다.</div>
+      </div>
+    </section>
+
+    <!-- SPACED REPETITION -->
+    <div class="spaced-tracker fade-up">
+      <div class="spaced-tracker-title">📅 SPACED REPETITION TRACKER</div>
+      <div class="spaced-row"><div class="spaced-dot" data-idx="0"></div><div class="spaced-label">D+1</div><div>내일 아침 프리메디타티오에서 이분법 1회 적용</div></div>
+      <div class="spaced-row"><div class="spaced-dot" data-idx="1"></div><div class="spaced-label">D+3</div><div>3일 후 직장에서 디코토미 체크인 3회 시도</div></div>
+      <div class="spaced-row"><div class="spaced-dot" data-idx="2"></div><div class="spaced-label">D+7</div><div>1주 후 이사/이직 상황 전체 이분법 분류 작성</div></div>
+      <div class="spaced-row"><div class="spaced-dot" data-idx="3"></div><div class="spaced-label">D+14</div><div>2주 후 프로하이레시스 개념 아이에게 설명 시도</div></div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer fade-up">
+      <div class="footer-text">인간 탐구 — 22일 신경과학·심리학·철학 시리즈</div>
+      <div class="footer-nav">
+        <a href="day12_통합_복습_1_2.html">◀ Day 12: 통합 복습 1·2</a>
+        <a href="index.html">목차</a>
+        <a href="day14_아우렐리우스_실천.html">Day 14: 아우렐리우스 실천 ▶</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+// === QUIZ (data-correct pattern) ===
+document.querySelectorAll('.quiz-card').forEach(function(card) {
+  card.querySelectorAll('.quiz-option').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      if (card.dataset.answered) return;
+      card.dataset.answered = 'true';
+      var isCorrect = opt.dataset.correct === 'true';
+      card.querySelectorAll('.quiz-option').forEach(function(o) { o.style.cursor = 'default'; });
+      if (isCorrect) {
+        opt.classList.add('correct');
+        opt.querySelector('.quiz-option-marker').textContent = '✓';
+      } else {
+        opt.classList.add('wrong');
+        opt.querySelector('.quiz-option-marker').textContent = '✗';
+        card.querySelectorAll('.quiz-option').forEach(function(o) {
+          if (o.dataset.correct === 'true') { o.classList.add('correct'); o.querySelector('.quiz-option-marker').textContent = '✓'; }
+        });
+      }
+      var expId = card.id + '-exp';
+      var exp = document.getElementById(expId);
+      if (exp) exp.classList.add('show');
+    });
+  });
+});
+
+// === GAUGE ANIMATION ===
+document.addEventListener('DOMContentLoaded', function() {
+  var gauge = document.getElementById('progressGauge');
+  if (gauge) {
+    var day = parseInt(gauge.dataset.day || '1');
+    var total = 22;
+    var circumference = 2 * Math.PI * 35;
+    gauge.style.strokeDasharray = circumference;
+    gauge.style.strokeDashoffset = circumference;
+    var offset = circumference * (1 - day / total);
+    setTimeout(function() { gauge.style.strokeDashoffset = offset; }, 300);
+  }
+});
+
+// === FADE-UP (IntersectionObserver) ===
+(function() {
+  var els = document.querySelectorAll('.fade-up');
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+      });
+    }, { threshold: 0.15 });
+    els.forEach(function(el) { obs.observe(el); });
+  } else {
+    els.forEach(function(el) { el.classList.add('visible'); });
+  }
+})();
+
+// === SPACED REPETITION (localStorage) ===
+(function() {
+  var KEY = 'ys-day13-spaced';
+  var saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+  var dots = document.querySelectorAll('.spaced-dot');
+  dots.forEach(function(dot) {
+    var idx = parseInt(dot.dataset.idx);
+    if (saved.indexOf(idx) !== -1) dot.classList.add('checked');
+    dot.addEventListener('click', function() {
+      dot.classList.toggle('checked');
+      var current = JSON.parse(localStorage.getItem(KEY) || '[]');
+      if (dot.classList.contains('checked')) {
+        if (current.indexOf(idx) === -1) current.push(idx);
+      } else {
+        current = current.filter(function(i) { return i !== idx; });
+      }
+      localStorage.setItem(KEY, JSON.stringify(current));
+    });
+  });
+})();
+  </script>
+</body>
+</html>

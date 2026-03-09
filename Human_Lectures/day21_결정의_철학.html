@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인간 탐구 | Day 21 — 결정의 철학</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #0A0C10; --bg-card: #12151C; --bg-card-hover: #181C26;
+  --purple: #8A6ABF; --purple-dim: #6B4FA0; --purple-glow: rgba(138,106,191,0.15);
+  --gold: #C9A84C; --gold-dim: #A8893A; --gold-glow: rgba(201,168,76,0.12);
+  --text: #E8E4DF; --text-dim: #9B9590; --text-muted: #6B6560;
+  --accent-green: #6BBF8A; --accent-red: #BF6B6B;
+  --border: rgba(138,106,191,0.12);
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Noto Sans KR', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-weight: 300; line-height: 1.75; font-size: 16px; overflow-x: hidden; }
+.sticky-header { position: sticky; top: 0; z-index: 100; background: rgba(10,12,16,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-logo { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 700; color: var(--gold); letter-spacing: 0.08em; }
+.header-divider { width: 1px; height: 18px; background: var(--text-muted); opacity: 0.4; }
+.header-title { font-size: 0.85rem; color: var(--text-dim); font-weight: 400; }
+.header-day { font-family: var(--font-mono); font-size: 0.78rem; color: var(--purple); background: var(--purple-glow); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(138,106,191,0.2); }
+.header-series { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
+.container { max-width: 900px; margin: 0 auto; padding: 0 24px 60px; }
+.hero { padding: 60px 0 40px; text-align: center; border-bottom: 1px solid var(--border); margin-bottom: 40px; }
+.hero-part-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 16px; }
+.hero-day { font-family: var(--font-serif); font-size: 0.95rem; color: var(--text-muted); font-weight: 300; margin-bottom: 12px; }
+.hero-question { font-family: var(--font-serif); font-size: 2.2rem; font-weight: 600; color: var(--text); margin-bottom: 24px; line-height: 1.4; }
+.hero-question em { color: var(--purple); font-style: italic; }
+.keyword-badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+.badge { font-family: var(--font-mono); font-size: 0.68rem; padding: 6px 14px; border-radius: 20px; letter-spacing: 0.05em; }
+.badge--purple { background: var(--purple-glow); color: var(--purple); border: 1px solid rgba(138,106,191,0.2); }
+.badge--gold { background: var(--gold-glow); color: var(--gold); border: 1px solid rgba(201,168,76,0.2); }
+.badge--green { background: rgba(107,191,138,0.12); color: var(--accent-green); border: 1px solid rgba(107,191,138,0.2); }
+.hero-meta { display: flex; align-items: center; justify-content: center; gap: 32px; }
+.gauge-container { text-align: center; }
+.gauge-container svg circle { fill: none; }
+.gauge-container .gauge-bg { stroke: var(--border); stroke-width: 2; }
+.gauge-container .gauge-fill { stroke: var(--purple); stroke-width: 2; stroke-dasharray: 219.8; stroke-dashoffset: 219.8; transition: stroke-dashoffset 1s ease; stroke-linecap: round; }
+.gauge-text { font-family: var(--font-mono); font-size: 0.8rem; color: var(--purple); margin-top: 8px; }
+.meta-badges { display: flex; gap: 16px; flex-direction: column; }
+.meta-badge { display: flex; align-items: center; gap: 10px; font-size: 0.82rem; color: var(--text-dim); }
+.meta-badge-icon { font-size: 1.2rem; }
+.section { margin-bottom: 48px; }
+.section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.section-icon { font-size: 1.8rem; }
+.section-title { font-family: var(--font-serif); font-size: 1.4rem; font-weight: 600; color: var(--text); }
+.section-subtitle { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.08em; margin-top: 2px; }
+.strategy-box { background: linear-gradient(135deg, rgba(138,106,191,0.04), rgba(10,12,16,0.5)); border: 1px solid var(--border); border-radius: 16px; padding: 28px; }
+.strategy-tip { font-size: 0.92rem; color: var(--text); line-height: 1.8; margin-bottom: 20px; }
+.strategy-tip strong { color: var(--gold); }
+.time-table { width: 100%; margin-top: 16px; border-collapse: collapse; font-size: 0.82rem; }
+.time-table thead { border-bottom: 2px solid var(--purple-dim); }
+.time-table th { text-align: left; padding: 12px 0; color: var(--purple); font-weight: 500; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.05em; }
+.time-table td { padding: 10px 0; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+.time-table tr:last-child td { border-bottom: none; }
+.concept-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 20px; transition: transform 0.2s, border-color 0.3s; }
+.concept-card:hover { transform: translateY(-2px); border-color: rgba(138,106,191,0.2); }
+.concept-card-num { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 10px; }
+.concept-card-title { font-family: var(--font-serif); font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.concept-card-en { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.06em; margin-bottom: 16px; }
+.concept-card-body { font-size: 0.9rem; color: var(--text-dim); line-height: 1.8; }
+.concept-card-body p { margin-bottom: 12px; }
+.concept-card-body strong { color: var(--text); font-weight: 500; }
+.concept-highlight { background: var(--purple-glow); padding: 2px 8px; border-radius: 4px; color: var(--purple); font-family: var(--font-mono); font-size: 0.82rem; }
+.concept-example { margin-top: 16px; padding: 16px 20px; background: rgba(201,168,76,0.04); border-left: 3px solid var(--gold-dim); border-radius: 0 10px 10px 0; font-size: 0.85rem; color: var(--text-dim); }
+.concept-example-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 6px; }
+.deep-dive { margin-top: 16px; }
+.deep-dive summary { font-family: var(--font-mono); font-size: 0.78rem; color: var(--purple); cursor: pointer; padding: 8px 0; list-style: none; display: flex; align-items: center; gap: 8px; user-select: none; }
+.deep-dive summary::before { content: '▸'; display: inline-block; transition: transform 0.2s; }
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive-content { padding: 16px 20px; background: rgba(138,106,191,0.04); border-radius: 10px; font-size: 0.82rem; color: var(--text-dim); line-height: 1.75; margin-top: 8px; }
+.deep-dive-content strong { color: var(--purple); font-weight: 500; }
+.diagram-wrapper { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 32px 24px; text-align: center; overflow-x: auto; }
+.diagram-wrapper svg { max-width: 100%; height: auto; }
+.diagram-caption { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin-top: 16px; letter-spacing: 0.04em; }
+.practice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+.practice-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; transition: transform 0.2s, border-color 0.3s; }
+.practice-card:hover { transform: translateY(-2px); border-color: rgba(107,191,138,0.3); }
+.practice-time { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; margin-bottom: 8px; }
+.practice-time--30s { color: var(--accent-green); }
+.practice-time--5m { color: var(--gold); }
+.practice-time--day { color: var(--purple); }
+.practice-title { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+.practice-body { font-size: 0.82rem; color: var(--text-dim); line-height: 1.7; }
+.checklist { list-style: none; margin-top: 12px; }
+.checklist li { font-size: 0.82rem; color: var(--text-dim); padding: 6px 0; display: flex; align-items: flex-start; gap: 8px; }
+.checklist li::before { content: '☐'; color: var(--purple-dim); font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+.reflection-box { background: linear-gradient(135deg, rgba(138,106,191,0.05), rgba(10,12,16,0.8)); border: 1px solid var(--border); border-radius: 16px; padding: 32px; }
+.philosopher { display: flex; gap: 16px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.philosopher:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.philosopher-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--purple-glow); border: 1px solid rgba(138,106,191,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+.philosopher-name { font-family: var(--font-serif); font-size: 1rem; font-weight: 600; color: var(--gold); margin-bottom: 4px; }
+.philosopher-text { font-size: 0.85rem; color: var(--text-dim); line-height: 1.7; font-style: italic; }
+.night-question { margin-top: 24px; padding: 20px 24px; background: rgba(201,168,76,0.05); border: 1px solid rgba(201,168,76,0.12); border-radius: 12px; text-align: center; }
+.night-question-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold-dim); letter-spacing: 0.12em; margin-bottom: 8px; }
+.night-question-text { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; color: var(--text); font-style: italic; line-height: 1.5; }
+.quiz-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 16px; }
+.quiz-num { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 10px; }
+.quiz-question { font-size: 0.95rem; color: var(--text); font-weight: 400; margin-bottom: 16px; line-height: 1.6; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-option { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: rgba(138,106,191,0.04); border: 1px solid rgba(138,106,191,0.08); border-radius: 10px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; color: var(--text-dim); }
+.quiz-option:hover { background: rgba(138,106,191,0.08); border-color: rgba(138,106,191,0.2); }
+.quiz-option.correct { background: rgba(107,191,138,0.1); border-color: rgba(107,191,138,0.3); color: var(--accent-green); }
+.quiz-option.wrong { background: rgba(191,107,107,0.1); border-color: rgba(191,107,107,0.3); color: var(--accent-red); }
+.quiz-option-marker { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--text-muted); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.68rem; flex-shrink: 0; transition: all 0.2s; }
+.quiz-explanation { display: none; margin-top: 14px; padding: 14px 18px; background: rgba(107,191,138,0.05); border-radius: 10px; font-size: 0.82rem; color: var(--text-dim); line-height: 1.7; }
+.quiz-explanation.show { display: block; }
+.spaced-tracker { margin-top: 24px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+.spaced-tracker-title { font-family: var(--font-mono); font-size: 0.72rem; color: var(--purple); letter-spacing: 0.1em; margin-bottom: 16px; }
+.spaced-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; font-size: 0.8rem; color: var(--text-dim); }
+.spaced-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--text-muted); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.spaced-dot.checked { background: var(--purple); border-color: var(--purple); }
+.spaced-dot.checked::after { content: '✓'; font-size: 0.6rem; color: #fff; }
+.spaced-label { font-family: var(--font-mono); font-size: 0.72rem; color: var(--gold-dim); width: 50px; }
+.footer { text-align: center; padding: 40px 0 20px; border-top: 1px solid var(--border); margin-top: 60px; }
+.footer-text { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.06em; }
+.footer-nav { margin-top: 16px; display: flex; justify-content: center; gap: 20px; }
+.footer-nav a { font-family: var(--font-mono); font-size: 0.72rem; color: var(--purple-dim); text-decoration: none; transition: color 0.2s; }
+.footer-nav a:hover { color: var(--purple); }
+@media (max-width: 600px) { .sticky-header { padding: 10px 16px; } .container { padding: 0 16px 60px; } .hero { padding: 40px 0 32px; } .concept-card, .strategy-box, .reflection-box { padding: 20px; } .practice-grid { grid-template-columns: 1fr; } .hero-meta { flex-direction: column; gap: 16px; } }
+</style>
+</head>
+<body>
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-logo">HE</span>
+    <span class="header-divider"></span>
+    <span class="header-title">인간 탐구</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span class="header-day">DAY 21 / 22</span>
+    <span class="header-series">이 시리즈 예상 총 Day: 22일</span>
+  </div>
+</header>
+<div class="container">
+<section class="hero">
+  <div class="hero-part-label">PART 4 — 나만의 삶의 철학 구축</div>
+  <div class="hero-day">— Day 21 —</div>
+  <h1 class="hero-question">큰 결정 앞에서, 당신은 <em>무엇을 기준으로 선택하는가?</em></h1>
+  <div class="keyword-badges">
+    <span class="badge badge--purple">System 1 vs 2</span>
+    <span class="badge badge--gold">Bezos 후회최소화</span>
+    <span class="badge badge--purple">결정 피로</span>
+  </div>
+  <div class="hero-meta">
+    <div class="gauge-container">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <circle class="gauge-bg" cx="40" cy="40" r="35"/>
+        <circle class="gauge-fill" cx="40" cy="40" r="35" id="progressGauge" data-day="21"/>
+      </svg>
+      <div class="gauge-text"><strong>21</strong>/22</div>
+    </div>
+    <div class="meta-badges">
+      <div class="meta-badge"><div class="meta-badge-icon meta-badge-icon--time">⏱</div><span>25분 · 포모도로 1세션</span></div>
+      <div class="meta-badge"><div class="meta-badge-icon meta-badge-icon--diff">◆</div><span>난이도: 고급</span></div>
+      <div class="meta-badge"><div class="meta-badge-icon meta-badge-icon--type">🧠</div><span>유형: 행동경제학+의사결정 과학</span></div>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="section-header"><div class="section-icon section-icon--brain">🎯</div>
+    <div><div class="section-title">학습 전략</div><div class="section-subtitle">LEARNING STRATEGY FOR DAY 21</div></div>
+  </div>
+  <div class="strategy-box">
+    <div class="strategy-tip">의사결정은 두 가지 시스템으로 이루어집니다. <strong>System 1</strong>은 빠르고 직관적이지만 편견이 있고, <strong>System 2</strong>는 느리고 분석적이지만 피곤합니다(Kahneman). 유럽 이사 같은 인생 결정에서는 두 시스템을 적절히 섞어야 합니다. 또한 결정 피로(Decision Fatigue)를 줄이려면, "의사결정 구조"를 설계해야 합니다.</div>
+    <table class="time-table"><thead><tr><th>시간</th><th>활동</th><th>목표</th></tr></thead><tbody><tr><td>0–3분</td><td>의사결정의 두 시스템 개요</td><td>Kahneman의 틀: 직관 vs 분석</td></tr><tr><td>3–10분</td><td>개념 1·2 정독</td><td>System 1/2 + 후회최소화 프레임</td></tr><tr><td>10–16분</td><td>개념 3 + SVG 매트릭스</td><td>결정 유형별 전략 및 피로 관리</td></tr><tr><td>16–21분</td><td>이사 결정에 80세 테스트</td><td>역가적 vs 비역가적 결정 분석</td></tr><tr><td>21–25분</td><td>퀴즈 + 선언</td><td>결정 루틴 설계 및 실전 적용</td></tr></tbody></table>
+  </div>
+</section>
+<section class="section">
+  <div class="section-header"><div class="section-icon section-icon--concept">💡</div>
+    <div><div class="section-title">핵심 개념</div><div class="section-subtitle">CORE CONCEPTS</div></div>
+  </div>
+  <div class="concept-card">
+    <div class="concept-card-num">CONCEPT 1</div>
+    <div class="concept-card-title">의사결정의 이중 시스템</div>
+    <div class="concept-card-en">Dual System Decision-Making</div>
+    <div class="concept-card-body">
+      <p>노벨상 수상자 Daniel Kahneman은 의사결정을 두 가지 시스템으로 설명합니다:</p>
+<p><strong>System 1 (빠르고 직관적)</strong>:</p>
+<ul style="color:var(--text-dim);margin:8px 0 8px 20px;font-size:0.9rem;">
+  <li>자동, 빠르고 노력이 거의 없음 (unconscious)</li>
+  <li>신경 기반: 편도체, 기저핵(basal ganglia)의 습관 회로</li>
+  <li>장점: 위험에 빠르게 반응 ("불이 났다"), 일상의 낮은 스케일 결정</li>
+  <li>약점: 편견(bias)에 쉽게 빠짐, 장기적 결과를 고려하지 않음</li>
+</ul>
+<p><strong>System 2 (느리고 분석적)</strong>:</p>
+<ul style="color:var(--text-dim);margin:8px 0 8px 20px;font-size:0.9rem;">
+  <li>의식적, 노력이 필요, 포도당 의존</li>
+  <li>신경 기반: PFC(전전두엽), 특히 dlPFC(배외측 전전두엽)의 작업 기억</li>
+  <li>장점: 복잡한 정보를 종합, 미래 결과 고려, 논리적 일관성 유지</li>
+  <li>약점: 에너지 소비 많음, 과신(overconfidence) 위험</li>
+</ul>
+<p><strong>이사/이직 같은 인생 결정에서의 혼합 전략</strong>: 먼저 System 1의 직관을 무시하지 마세요 ("이 결정이 맞는 것 같아"의 감각). 동시에 System 2로 분석하세요 (재정, 아이들의 교육, 경력). 두 시스템이 같은 답을 가리킬 때가 가장 강한 결정입니다.</p>
+      <div class="concept-example">
+        <div class="concept-example-label">🧠 System 1 vs System 2의 실제 갈등</div>
+        <p><strong>System 1 (직관)</strong>: "유럽은 새로운 시작이고 흥미로워. 경력도 좋고. 가보고 싶다."</p>
+<p><strong>System 2 (분석)</strong>: "6세 아이는 학교 전환 비용이 크고, 아내의 경력도 끊어질 가능성 있고, 첫 2년은 적응이 힘들 것 같다."</p>
+<p><strong>문제</strong>: 두 시스템이 다른 답을 줍니다.</p>
+<p><strong>해결</strong>: "흥미로움"(System 1)을 인정하면서, "실제로 나의 핵심 가치(양육 + 성장)를 지원하는 구조인가"를 System 2로 깊이 분석합니다.</p>
+      </div>
+      <details class="deep-dive">
+        <summary>신경 기반과 포도당: 왜 저녁 결정은 피해야 하는가</summary>
+        <div class="deep-dive-content"><strong>인지 제어의 생물학</strong>: System 2(PFC의 dlPFC)는 포도당에 극도로 의존합니다. 하루를 지나면서 피로를 느끼는 것처럼, PFC도 포도당이 고갈되면 기능이 떨어집니다. 따라서 중요한 결정은 아침(포도당 충분)에 하거나, 적어도 충분한 수면과 영양 상태에서 해야 합니다.
+
+<strong>System 1의 감정 편향</strong>: System 1은 감정이 작동하는 기제입니다. 편도체가 "위험"을 감지하면 과장된 신호를 보냅니다. 반대로 "보상"을 감지하면 과도한 흥분을 만듭니다. 예를 들어, 유럽 이사를 고려할 때 System 1은 "새로운 나라, 새 회사 = 흥미로움"에 과도하게 반응할 수 있습니다. 이 감정은 타당하지만, 그것이 이성적 결정은 아닙니다.</div>
+      </details>
+    </div>
+  </div>
+<div class="concept-card">
+    <div class="concept-card-num">CONCEPT 2</div>
+    <div class="concept-card-title">후회 최소화 프레임워크</div>
+    <div class="concept-card-en">Regret Minimization Framework</div>
+    <div class="concept-card-body">
+      <p>Amazon의 창립자 Jeff Bezos가 1994년 월스트릿에서 사직할 때 사용한 의사결정 방법이 있습니다: <strong>"80세의 내가 이 선택을 후회하겠는가?"</strong></p>
+<p>이 프레임워크는 단순하지만 강력합니다:</p>
+<ol style="color:var(--text-dim);margin:8px 0 8px 20px;font-size:0.9rem;">
+  <li><strong>장기적 관점 (Long-term perspective)</strong>: 지금 상황(경제적 안정 vs 새로운 기회)이 아닌, 80세 때 당신의 삶 전체를 봅니다</li>
+  <li><strong>정체성 기반 결정 (Identity-based)</strong>: "돈을 더 벌까"가 아니라 "나는 어떤 사람이 되고 싶은가"를 묻습니다</li>
+  <li><strong>역가적(reversible) vs 비역가적(irreversible) 결정 구분</strong>: 역가능한 결정("유럽을 2년 시험해보고, 안 맞으면 한국으로 돌아온다")과 비역가능한 결정("이 시점에서 경력을 완전히 방향 전환한다")은 다릅니다</li>
+</ol>
+<p><strong>Renault Korea 엔지니어의 이사 결정에 적용하면</strong>:</p>
+<ul style="color:var(--text-dim);margin:8px 0 8px 20px;font-size:0.9rem;">
+  <li>"80세의 나는 무엇을 하고 있을까? 아이들과 손주들과 함께?"</li>
+  <li>"그 시점에 나는 "기술적으로 성장했던 엔지니어"로 기억되고 싶을까, 아니면 "아이들과 가까웠던 아버지"로 기억되고 싶을까?"</li>
+  <li>"이 이사는 그 둘을 모두 만족시키는가? 아니면 하나를 위해 다른 하나를 포기해야 하는가?"</li>
+</ul>
+      <div class="concept-example">
+        <div class="concept-example-label">👴 80세 테스트 적용</div>
+        <p><strong>단기 관점 (System 1)</strong>: "유럽 이사는 경력이 좋고, 급여도 높고, 흥미롭다."</p>
+<p><strong>80세 테스트</strong>:</p>
+<ul style="color:var(--text-dim);margin:4px 0 8px 16px;font-size:0.85rem;">
+  <li>80세: "아, 그때 유럽을 가서 기술을 배웠구나. 후회하나?"</li>
+  <li>"아이들이 6세, 3세였을 때인데... 그때를 놓쳤네."</li>
+  <li>"내가 정말 후회하는 건, 그 시간 낭비가 아니라, 아이들과 함께했어야 할 시간을 일에 소모한 것이다."</li>
+</ul>
+<p><strong>역가적 결정으로 재설계</strong>: "3년 동안 시도해보고, 그 후 판단한다"로 전환 → 후회의 비용이 낮아짐</p>
+      </div>
+      <details class="deep-dive">
+        <summary>Bezos의 후회 최소화: 기술적 성장 vs 인생의 의미</summary>
+        <div class="deep-dive-content"><strong>왜 후회 최소화인가</strong>: Bezos가 월스트릿에서 최고 연봉을 받고 있었을 때, 인터넷이 성장하고 있다는 것을 알았습니다. 합리적으로는 "안정적인 직업을 유지하는 것"이 옳았지만, 80세 때를 생각했을 때 "시도하지 않은 것"을 더 후회할 것 같았습니다. 그래서 결정했습니다. 이 프레임은 단순한 게임이 아니라, 당신의 가장 깊은 가치가 무엇인지를 묻는 것입니다.
+
+<strong>역가능성의 중요성</strong>: 모든 결정이 비역가적이지는 않습니다. 유럽 이사도 "5년 계약이 아니라, 2년 파일럿으로 시작한다"면 역가능해집니다. 이렇게 하면 System 1의 두려움("못 적응하면 경력이 끊긴다")이 줄어들고, 더 자유롭게 시도할 수 있습니다.</div>
+      </details>
+    </div>
+  </div>
+<div class="concept-card">
+    <div class="concept-card-num">CONCEPT 3</div>
+    <div class="concept-card-title">결정 피로와 의사결정 구조</div>
+    <div class="concept-card-en">Decision Fatigue & Architecture</div>
+    <div class="concept-card-body">
+      <p>하루에 우리는 수천 개의 결정을 합니다. "뭘 입을까", "커피 마실까", "이메일 답장할까"—이들의 누적이 <strong>결정 피로(Decision Fatigue)</strong>를 만듭니다.</p>
+<p><strong>결정 피로의 신경과학</strong>:</p>
+<ul style="color:var(--text-dim);margin:8px 0 8px 20px;font-size:0.9rem;">
+  <li>PFC의 포도당 고갈: 각 선택은 포도당을 사용합니다</li>
+  <li>선택 과부하 (Choice Overload): 옵션이 많을수록 의사결정이 어렵고, 결정 후 만족도가 낮습니다(Schwartz의 "선택의 역설")</li>
+  <li>피로 누적: 저녁으로 갈수록 의사결정 능력이 떨어집니다 (법원 판사의 판결 연구: 오전 70% 무죄판정 → 오후 10%)</li>
+</ul>
+<p><strong>해결책: 의사결정 구조 설계 (Decision Architecture)</strong></p>
+<ol style="color:var(--text-dim);margin:8px 0 8px 20px;font-size:0.9rem;">
+  <li><strong>자동화할 결정</strong>: "아침은 검은색 옷", "오늘의 포모도로는 신경과학 학습"—이런 것들을 미리 정하면 PFC를 아낍니다</li>
+  <li><strong>집중할 결정</strong>: "이사 여부", "아내 경력 지원 방식"처럼 중요한 결정에만 System 2를 씁니다</li>
+  <li><strong>후천적 선택지 제한</strong>: "유럽은 2년 계약이다" 같은 제약을 미리 정하면, 매일 "계속할까 나갈까"를 고민하지 않아도 됩니다</li>
+</ol>
+<p><strong>당신의 의사결정 루틴</strong>: 아침(포도당 충분) → 중요한 결정 | 오후 → 일상적 업무 | 저녁 → 휴식, 의식적 결정 금지</p>
+      <div class="concept-example">
+        <div class="concept-example-label">⏰ 의사결정 루틴 설계</div>
+        <p><strong>자동화된 결정 (Decision Fatigue 감소)</strong>:</p>
+<ul style="color:var(--text-dim);margin:4px 0 8px 16px;font-size:0.85rem;">
+  <li>아침 루틴: 6시 기상, 요가, 커피 → 선택 없음</li>
+  <li>업무 시간: 9-12시 집중 업무, 12-1시 점심, 1-5시 회의 → 구조화</li>
+  <li>저녁: 아이 시간 → 자동 우선순위</li>
+</ul>
+<p><strong>집중할 결정 (System 2 사용)</strong>:</p>
+<ul style="color:var(--text-dim);margin:4px 0 8px 16px;font-size:0.85rem;">
+  <li>주 1회 "Big Question" 시간: 화요일 아침 8-9시</li>
+  <li>"유럽 이사를 할 것인가?" → 80세 테스트 + 가족 가치 적용 → 결정</li>
+  <li>한 번 결정하면, 매일 "할까 말까" 고민하지 않음</li>
+</ul>
+      </div>
+      <details class="deep-dive">
+        <summary>James Clear의 원자적 습관과 의사결정 구조</summary>
+        <div class="deep-dive-content"><strong>결정 자동화와 습관 형성의 연결</strong>: James Clear의 "Atomic Habits"은 의사결정 피로를 줄이는 가장 실용적 방법입니다. 반복되는 선택을 의식적 결정이 아닌 자동 습관으로 전환하면, PFC의 에너지를 중요한 결정에 남길 수 있습니다. 예를 들어, "아침에 뭘 입을까"를 매일 고민하지 않으면, "이사를 할까"라는 큰 결정에 더 집중할 수 있습니다.
+
+<strong>의사결정 위계의 설계</strong>: Renault Korea의 엔지니어로서, 당신이 이미 System Engineering(시스템 엔지니어링)의 원리를 알고 있습니다. 복잡한 시스템을 관리하려면 명확한 우선순위와 구조가 필요합니다. 당신의 인생도 마찬가지입니다. "양육 > 성장 > 안정" 같은 가치 우선순위를 정하면, 매일의 작은 결정(이 프로젝트를 할까?)부터 인생의 큰 결정(이사를 할까?)까지 모두 같은 원칙으로 판단할 수 있습니다.</div>
+      </details>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="section-header"><div class="section-icon section-icon--brain">📊</div>
+    <div><div class="section-title">결정의 철학 다이어그램</div><div class="section-subtitle">PHILOSOPHY OF DECISION-MAKING DIAGRAM</div></div>
+  </div>
+  <div class="diagram-wrapper">
+    <svg width="760" height="480" viewBox="0 0 760 480" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="grad21_s1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#BF6B6B;stop-opacity:0.4" />
+          <stop offset="100%" style="stop-color:#BF6B6B;stop-opacity:0.1" />
+        </linearGradient>
+        <linearGradient id="grad21_s2" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#8A6ABF;stop-opacity:0.4" />
+          <stop offset="100%" style="stop-color:#8A6ABF;stop-opacity:0.1" />
+        </linearGradient>
+      </defs>
+      <rect width="760" height="480" fill="#1A1E2A"/>
+      <g stroke="#9B9590" stroke-width="0.8" stroke-dasharray="2,2" opacity="0.2">
+        <line x1="0" y1="240" x2="760" y2="240"/>
+        <line x1="380" y1="0" x2="380" y2="480"/>
+      </g>
+      
+      <!-- Left: System 1 -->
+      <rect x="30" y="40" width="330" height="180" fill="url(#grad21_s1)" stroke="#BF6B6B" stroke-width="2.5" rx="12"/>
+      <text x="50" y="65" font-size="14" font-weight="bold" fill="#BF6B6B" font-family="monospace">SYSTEM 1</text>
+      <text x="50" y="82" font-size="9" fill="#9B9590" font-family="monospace">Fast • Intuitive • Automatic</text>
+      
+      <text x="50" y="105" font-size="9" font-weight="600" fill="#E8E4DF" font-family="monospace">Neural Basis:</text>
+      <text x="50" y="120" font-size="8" fill="#9B9590" font-family="monospace">Amygdala, Basal Ganglia (habits)</text>
+      
+      <text x="50" y="145" font-size="9" font-weight="600" fill="#E8E4DF" font-family="monospace">Strength:</text>
+      <text x="50" y="160" font-size="8" fill="#9B9590" font-family="monospace">Fast threat detection, daily choices</text>
+      
+      <text x="50" y="185" font-size="9" font-weight="600" fill="#E8E4DF" font-family="monospace">Weakness:</text>
+      <text x="50" y="200" font-size="8" fill="#9B9590" font-family="monospace">Bias, emotional, ignores long-term</text>
+      
+      <!-- Right: System 2 -->
+      <rect x="400" y="40" width="330" height="180" fill="url(#grad21_s2)" stroke="#8A6ABF" stroke-width="2.5" rx="12"/>
+      <text x="420" y="65" font-size="14" font-weight="bold" fill="#8A6ABF" font-family="monospace">SYSTEM 2</text>
+      <text x="420" y="82" font-size="9" fill="#9B9590" font-family="monospace">Slow • Deliberate • Effortful</text>
+      
+      <text x="420" y="105" font-size="9" font-weight="600" fill="#E8E4DF" font-family="monospace">Neural Basis:</text>
+      <text x="420" y="120" font-size="8" fill="#9B9590" font-family="monospace">PFC (dlPFC working memory)</text>
+      
+      <text x="420" y="145" font-size="9" font-weight="600" fill="#E8E4DF" font-family="monospace">Strength:</text>
+      <text x="420" y="160" font-size="8" fill="#9B9590" font-family="monospace">Logical, considers future, complex</text>
+      
+      <text x="420" y="185" font-size="9" font-weight="600" fill="#E8E4DF" font-family="monospace">Weakness:</text>
+      <text x="420" y="200" font-size="8" fill="#9B9590" font-family="monospace">Energy intensive, overconfidence</text>
+      
+      <!-- Center merger arrow -->
+      <path d="M 360 130 L 400 130" stroke="#C9A84C" stroke-width="3" fill="none" marker-end="url(#arrowGold21)"/>
+      <text x="380" y="125" font-size="9" font-weight="bold" fill="#C9A84C" text-anchor="middle" font-family="monospace">MERGE</text>
+      
+      <!-- Bottom: Decision Types -->
+      <text x="50" y="260" font-size="13" font-weight="bold" fill="#C9A84C" font-family="monospace">DECISION MATRIX BY TYPE</text>
+      
+      <!-- Daily decisions -->
+      <rect x="40" y="280" width="220" height="80" fill="none" stroke="#6BBF8A" stroke-width="2" stroke-dasharray="3,2" rx="8"/>
+      <text x="150" y="305" font-size="10" font-weight="bold" fill="#6BBF8A" text-anchor="middle" font-family="monospace">Daily Decisions</text>
+      <text x="150" y="322" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">What to wear, email replies</text>
+      <text x="150" y="337" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">✓ Use System 1 (fast)</text>
+      <text x="150" y="349" font-size="8" fill="#6BBF8A" text-anchor="middle" font-family="monospace">Automate: reduce fatigue</text>
+      
+      <!-- Major life decisions -->
+      <rect x="500" y="280" width="220" height="80" fill="none" stroke="#C9A84C" stroke-width="2.5" rx="8"/>
+      <text x="610" y="305" font-size="10" font-weight="bold" fill="#C9A84C" text-anchor="middle" font-family="monospace">Major Life Decisions</text>
+      <text x="610" y="322" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">Relocation, career, family</text>
+      <text x="610" y="337" font-size="8" fill="#9B9590" text-anchor="middle" font-family="monospace">✓ Use System 2 + intuition</text>
+      <text x="610" y="349" font-size="8" fill="#C9A84C" text-anchor="middle" font-family="monospace">80yo Test: minimize regret</text>
+      
+      <!-- Bottom section: Fatigue over time -->
+      <text x="50" y="395" font-size="11" font-weight="bold" fill="#BF6B6B" font-family="monospace">DECISION FATIGUE CURVE</text>
+      
+      <!-- X-axis -->
+      <line x1="100" y1="430" x2="680" y2="430" stroke="#9B9590" stroke-width="1.5"/>
+      <text x="100" y="450" font-size="8" fill="#9B9590" font-family="monospace">Morning</text>
+      <text x="390" y="450" font-size="8" fill="#9B9590" font-family="monospace">Afternoon</text>
+      <text x="650" y="450" font-size="8" fill="#9B9590" font-family="monospace">Evening</text>
+      
+      <!-- Y-axis -->
+      <line x1="100" y1="430" x2="100" y2="350" stroke="#9B9590" stroke-width="1.5"/>
+      <text x="90" y="440" font-size="7" fill="#9B9590" text-anchor="end" font-family="monospace">Low</text>
+      <text x="90" y="355" font-size="7" fill="#9B9590" text-anchor="end" font-family="monospace">High</text>
+      
+      <!-- Fatigue curve -->
+      <path d="M 100 370 Q 240 360 390 385 Q 540 410 680 420" stroke="#BF6B6B" stroke-width="2.5" fill="none"/>
+      <circle cx="100" cy="370" r="4" fill="#6BBF8A"/>
+      <circle cx="680" cy="420" r="4" fill="#BF6B6B"/>
+      
+      <!-- Annotations -->
+      <text x="110" y="355" font-size="8" fill="#6BBF8A" font-family="monospace">Good decisions</text>
+      <text x="590" y="435" font-size="8" fill="#BF6B6B" font-family="monospace">Poor decisions</text>
+      
+      <!-- Arrow marker -->
+      <defs>
+        <marker id="arrowGold21" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L0,6 L9,3 z" fill="#C9A84C"/>
+        </marker>
+      </defs>
+    </svg>
+    <div class="diagram-caption">의사결정 시스템의 구조 — System 1 vs System 2 비교 | 결정 유형별 전략 | 하루 중 의사결정 능력 곡선 (아침 최고 → 저녁 피로)</div>
+  </div>
+</section>
+<section class="section">
+  <div class="section-header"><div class="section-icon section-icon--practice">⚡</div>
+    <div><div class="section-title">오늘 당장 할 수 있는 것</div><div class="section-subtitle">PRACTICAL APPLICATION GUIDE</div></div>
+  </div>
+  <div class="practice-grid"><div class="practice-card">
+      <div class="practice-time practice-time--30s">30초</div>
+      <div class="practice-title">System 1 vs 2 감지</div>
+      <div class="practice-body">현재 당신의 결정 기분을 점검하세요. "직관적으로 느껴지는가?" 아니면 "신중하게 분석해야 하는가?"</div>
+      <ul class="checklist">        <li>당신의 이사 결정: 지금 System 1인가 2인가?</li>
+        <li>어느 시스템이 더 신뢰할 수 있을까?</li>
+        <li>둘이 다른 답을 주는가?</li></ul>
+    </div>
+<div class="practice-card">
+      <div class="practice-time practice-time--5m">5분</div>
+      <div class="practice-title">80세 테스트 실행</div>
+      <div class="practice-body">오늘의 큰 결정(이사 여부)에 대해, 80세의 당신이라면 무엇을 후회할까를 깊이 생각합니다.</div>
+      <ul class="checklist">        <li>지금 선택: A(유럽 이사) vs B(한국 유지)</li>
+        <li>80세: 어느 쪽을 더 후회하겠는가?</li>
+        <li>후회를 최소화하려면: 역가적 구조(2년 파일럿)가 필요한가?</li></ul>
+    </div>
+<div class="practice-card">
+      <div class="practice-time practice-time--day">1일</div>
+      <div class="practice-title">의사결정 루틴 설계</div>
+      <div class="practice-body">일주일 단위로 "자동화할 결정"과 "집중할 결정"을 구분하는 루틴을 만듭니다.</div>
+      <ul class="checklist">        <li>아침 포도당 충분한 시간에 큰 결정을 하도록 스케줄링</li>
+        <li>일상적 선택은 미리 정해놓기 (자동화)</li>
+        <li>저녁에는 의식적 결정하지 않기</li></ul>
+    </div></div>
+</section>
+<section class="section">
+  <div class="section-header"><div class="section-icon section-icon--reflect">🔮</div>
+    <div><div class="section-title">철학적 성찰</div><div class="section-subtitle">PHILOSOPHICAL REFLECTION</div></div>
+  </div>
+  <div class="reflection-box">
+    <div class="philosopher">
+      <div class="philosopher-avatar">📊</div>
+      <div><div class="philosopher-name">Daniel Kahneman (1934-)</div>
+      <div class="philosopher-text">노벨상 수상 행동경제학자. "의사결정은 감정(System 1)과 논리(System 2)의 혼합이며, 둘이 항상 같은 답을 주지는 않는다. 중요한 결정일수록 System 2를 의도적으로 활성화해야 한다"고 강조합니다.</div></div>
+    </div>
+<div class="philosopher">
+      <div class="philosopher-avatar">🚀</div>
+      <div><div class="philosopher-name">Jeff Bezos (1964-)</div>
+      <div class="philosopher-text">Amazon 창립자. 1994년 월스트릿을 그만두고 온라인 서점을 시작할 때, "80세의 나는 이 결정을 후회할까?"라는 질문으로 의사를 결정했습니다. 이제 그 질문은 "후회 최소화 프레임워크"라 불리며, 개인의 큰 결정에도 널리 사용됩니다.</div></div>
+    </div>
+    <div class="night-question">
+      <div class="night-question-label">🌙 오늘 자기 전에 물을 질문</div>
+      <div class="night-question-text">당신이 지금 해야 할 선택에서, System 1의 직관과 System 2의 분석이 같은 답을 주는가? 다르다면, 어느 것을 더 신뢰할 것인가?</div>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="section-header"><div class="section-icon section-icon--quiz">✏️</div>
+    <div><div class="section-title">복습 퀴즈</div><div class="section-subtitle">RETRIEVAL PRACTICE</div></div>
+  </div>
+  <div class="quiz-card" id="q21_1">
+    <div class="quiz-num">QUIZ 1 / 2</div>
+    <div class="quiz-question">결정 피로(Decision Fatigue)의 신경 기반은?</div>
+    <div class="quiz-options">      <div class="quiz-option" onclick="checkAnswer(this,'q21_1',false)">
+        <div class="quiz-option-marker">A</div><span>편도체의 포도당 고갈</span></div>
+      <div class="quiz-option" onclick="checkAnswer(this,'q21_1',true)">
+        <div class="quiz-option-marker">B</div><span>PFC의 포도당 고갈로 인한 의사결정 능력 저하</span></div>
+      <div class="quiz-option" onclick="checkAnswer(this,'q21_1',false)">
+        <div class="quiz-option-marker">C</div><span>해마의 피로</span></div>
+      <div class="quiz-option" onclick="checkAnswer(this,'q21_1',false)">
+        <div class="quiz-option-marker">D</div><span>뇌의 전체적 글리코겐 부족</span></div>
+</div>
+    <div class="quiz-explanation" id="q21_1-exp"><strong>정답: B</strong> — System 2 의사결정(PFC 사용)은 포도당을 매우 많이 소비합니다. 하루를 지나면서 포도당이 고갈되면, PFC 기능이 떨어져 판단력이 흐려집니다. 따라서 중요한 결정은 아침에 해야 합니다.</div>
+  </div>
+<div class="quiz-card" id="q21_2">
+    <div class="quiz-num">QUIZ 2 / 2</div>
+    <div class="quiz-question">80세 테스트에서 가장 중요한 것은?</div>
+    <div class="quiz-options">      <div class="quiz-option" onclick="checkAnswer(this,'q21_2',false)">
+        <div class="quiz-option-marker">A</div><span>더 많은 돈을 버는 것이 80세에도 중요한지 확인</span></div>
+      <div class="quiz-option" onclick="checkAnswer(this,'q21_2',true)">
+        <div class="quiz-option-marker">B</div><span>장기적 관점에서 당신이 진정으로 원하는 인생이 무엇인지 발견</span></div>
+      <div class="quiz-option" onclick="checkAnswer(this,'q21_2',false)">
+        <div class="quiz-option-marker">C</div><span>80세까지 살 수 있을지 예측하기</span></div>
+      <div class="quiz-option" onclick="checkAnswer(this,'q21_2',false)">
+        <div class="quiz-option-marker">D</div><span>노후 자금 계획하기</span></div>
+</div>
+    <div class="quiz-explanation" id="q21_2-exp"><strong>정답: B</strong> — 80세 테스트는 재정 계획이 아니라 철학적 질문입니다. "이 선택을 80세 때 후회할까?"는 당신의 가장 깊은 가치를 드러냅니다. 이사를 후회할까, 아니면 시도하지 않은 것을 후회할까?</div>
+  </div>
+  <div class="spaced-tracker">
+    <div class="spaced-tracker-title">📅 간격 반복 트래커 — DAY 21</div>
+    <div class="spaced-row"><div class="spaced-dot" onclick="this.classList.toggle('checked')"></div><span class="spaced-label">D+0</span><span>오늘 학습 완료</span></div>
+    <div class="spaced-row"><div class="spaced-dot" onclick="this.classList.toggle('checked')"></div><span class="spaced-label">D+1</span><span>내일 — 퀴즈 다시 풀기 (30초)</span></div>
+    <div class="spaced-row"><div class="spaced-dot" onclick="this.classList.toggle('checked')"></div><span class="spaced-label">D+3</span><span>3일 후 — 핵심 개념을 백지에 적기</span></div>
+    <div class="spaced-row"><div class="spaced-dot" onclick="this.classList.toggle('checked')"></div><span class="spaced-label">D+7</span><span>7일 후 — 누군가에게 설명하기</span></div>
+    <div class="spaced-row"><div class="spaced-dot" onclick="this.classList.toggle('checked')"></div><span class="spaced-label">D+14</span><span>14일 후 — 실전 적용 패턴 점검</span></div>
+  </div>
+</section>
+</div>
+<footer class="footer"><div class="container">
+  <div class="footer-text">인간 탐구 시리즈 — 총 22일 과정 · Day 21 of 22</div>
+  <div class="footer-nav">
+    <a href="day20_정체성과_역할_통합.html">◀ Day 20: 정체성과 역할 통합</a>
+    <a href="day22_나만의_감정관리_시스템.html">Day 22: 나만의 감정관리 시스템 ▶</a>
+  </div>
+</div></footer>
+<script>
+function checkAnswer(el, quizId, isCorrect) {
+  var card = document.getElementById(quizId);
+  if (card.dataset.answered) return;
+  card.dataset.answered = 'true';
+  var options = card.querySelectorAll('.quiz-option');
+  options.forEach(function(opt) { opt.style.cursor = 'default'; });
+  if (isCorrect) { el.classList.add('correct'); el.querySelector('.quiz-option-marker').textContent = '✓'; }
+  else { el.classList.add('wrong'); el.querySelector('.quiz-option-marker').textContent = '✗'; }
+  document.getElementById(quizId + '-exp').classList.add('show');
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var gauge = document.getElementById('progressGauge');
+  if (gauge) {
+    var day = parseInt(gauge.dataset.day || '1');
+    var total = 22;
+    var circumference = 2 * Math.PI * 35;
+    var offset = circumference * (1 - day / total);
+    setTimeout(function() { gauge.style.strokeDashoffset = offset; }, 300);
+  }
+});
+</script>
+</body>
+</html>
