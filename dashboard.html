@@ -5,1520 +5,976 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="학습멘토">
+<meta name="apple-mobile-web-app-title" content="修練">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
-<meta name="theme-color" content="#c9a84c">
-<title>학습 멘토 — 뇌과학 기반 학습 시스템</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0a0a0a">
+<title>修練 — 학습 수련</title>
 <style>
-:root {
-  --bg: #0a0b0f; --surface: #13151c; --surface2: #1a1d27; --surface3: #222633;
-  --border: #2a2f40; --gold: #c9a84c; --gold-light: #e8c96a; --blue: #4a9ebf;
-  --green: #4abf8a; --purple: #8a6abf; --orange: #bf8a4a; --red: #bf4a4a;
-  --pink: #bf4a8a; --cyan: #4abfbf; --text: #d8d3c8; --text-dim: #6a6a7a;
-  --text-bright: #f0ebe0; --radius: 12px;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&display=swap');
+
+:root{
+  --ink:#0a0a0a;--paper:#f0e6d3;--paper-dark:#d4c4a8;--vermillion:#c23b22;
+  --rust:#8b4513;--ash:#3a3a3a;--smoke:#6b6b6b;--mist:#9a9a8a;
+  --deep:#111;--surface:#1a1a18;--surface2:#222220;--border:#333330;
+  --r:8px;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-weight:400;line-height:1.7;-webkit-font-smoothing:antialiased;padding-top:var(--safe-top);padding-bottom:var(--safe-bottom);overflow-x:hidden}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-a{color:inherit;text-decoration:none}
-button{font-family:inherit;cursor:pointer}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);color:var(--paper-dark);
+  font-family:'Noto Serif KR',serif;font-weight:400;line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  padding-top:var(--st);padding-bottom:var(--sb);overflow-x:hidden;
+}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--ash);border-radius:2px}
+a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;border:none;background:none}
 
-/* ═══ HERO ═══ */
-.hero{text-align:center;padding:40px 20px 24px;background:linear-gradient(180deg,#13151c 0%,var(--bg) 100%);border-bottom:1px solid var(--border)}
-.hero h1{font-size:1.6rem;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
-.hero .sub{color:var(--text-dim);font-size:0.78rem}
-.hero .date-display{color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:0.8rem;margin-top:6px}
+/* ═══ INK SPLASH OVERLAY ═══ */
+#inkOverlay{
+  position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;
+  pointer-events:none;display:none;
+}
+#inkOverlay.active{display:block}
+#inkOverlay svg{width:100%;height:100%}
 
-/* ═══ CONTAINER ═══ */
-.container{max-width:1400px;margin:0 auto;padding:16px 16px 100px}
+/* ═══ SLASH ANIMATION ═══ */
+@keyframes slashIn{
+  0%{clip-path:inset(0 100% 0 0);opacity:1}
+  40%{clip-path:inset(0 0 0 0);opacity:1}
+  100%{clip-path:inset(0 0 0 0);opacity:0}
+}
+@keyframes inkDrop{
+  0%{transform:scale(0);opacity:0.9}
+  50%{transform:scale(1.2);opacity:0.6}
+  100%{transform:scale(2);opacity:0}
+}
+@keyframes brushStroke{
+  0%{width:0;opacity:1}
+  60%{width:100%;opacity:0.8}
+  100%{width:100%;opacity:0}
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes breathe{
+  0%,100%{opacity:0.4}50%{opacity:0.8}
+}
+@keyframes strikeThrough{
+  0%{width:0}
+  100%{width:100%}
+}
 
-/* ═══ TABS — 모바일 스크롤 ═══ */
-.tab-bar{display:flex;gap:3px;padding:3px;background:var(--surface);border-radius:var(--radius);margin-bottom:20px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.tab-bar::-webkit-scrollbar{display:none}
-.tab-btn{padding:9px 14px;border:none;background:transparent;color:var(--text-dim);font-size:0.78rem;font-weight:500;border-radius:8px;white-space:nowrap;transition:all 0.2s;flex-shrink:0}
-.tab-btn:hover{color:var(--text);background:var(--surface2)}
-.tab-btn.active{color:var(--bg);background:var(--gold);font-weight:700}
-.tab-panel{display:none}.tab-panel.active{display:block}
+.slash-line{
+  position:fixed;top:50%;left:0;height:3px;
+  background:linear-gradient(90deg,transparent,var(--vermillion),var(--paper),var(--vermillion),transparent);
+  z-index:9998;animation:brushStroke 0.8s ease-out forwards;
+  pointer-events:none;
+}
+.ink-circle{
+  position:fixed;width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle,var(--vermillion) 0%,transparent 70%);
+  z-index:9997;pointer-events:none;
+  animation:inkDrop 1s ease-out forwards;
+}
 
-/* ═══ GRID ═══ */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+/* ═══ HEADER ═══ */
+.hdr{
+  text-align:center;padding:40px 20px 20px;position:relative;
+  border-bottom:1px solid var(--border);
+}
+.hdr::after{
+  content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
+  width:60px;height:3px;background:var(--vermillion);
+}
+.hdr h1{
+  font-size:2.4rem;font-weight:900;color:var(--paper);
+  letter-spacing:8px;margin-bottom:2px;
+}
+.hdr .sub{color:var(--mist);font-size:0.72rem;letter-spacing:3px}
+.hdr .dt{color:var(--smoke);font-family:monospace;font-size:0.7rem;margin-top:8px;letter-spacing:1px}
 
-/* ═══ CARDS ═══ */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:border-color 0.2s}
-.card:hover{border-color:var(--gold)}
-.card-title{font-size:0.95rem;font-weight:700;color:var(--text-bright);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+/* ═══ QUOTE ═══ */
+.quote-bar{
+  text-align:center;padding:12px 20px;font-size:0.72rem;
+  color:var(--mist);font-style:italic;letter-spacing:1px;
+  border-bottom:1px solid rgba(51,51,48,0.5);
+}
 
-/* ═══ STATS ═══ */
-.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 8px;text-align:center}
-.stat-num{font-size:1.5rem;font-weight:900;font-family:'JetBrains Mono',monospace}
-.stat-label{font-size:0.65rem;color:var(--text-dim);margin-top:2px}
+/* ═══ NAV ═══ */
+.nav{
+  display:flex;gap:0;margin:0 16px;position:sticky;top:0;z-index:90;
+  background:var(--ink);border-bottom:1px solid var(--border);
+}
+.nav button{
+  flex:1;padding:12px 0;color:var(--smoke);
+  font-size:0.75rem;font-weight:400;letter-spacing:2px;
+  transition:all 0.3s;position:relative;
+}
+.nav button:hover{color:var(--paper-dark)}
+.nav button.on{color:var(--paper);font-weight:700}
+.nav button.on::after{
+  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:20px;height:2px;background:var(--vermillion);
+}
 
-/* ═══ PROGRESS ═══ */
-.progress-wrap{background:var(--surface2);border-radius:6px;height:7px;overflow:hidden;margin:6px 0}
-.progress-fill{height:100%;border-radius:6px;transition:width 0.5s ease}
+.wrap{max-width:800px;margin:0 auto;padding:20px 16px 100px}
+.pnl{display:none}.pnl.on{display:block;animation:fadeUp 0.4s ease-out}
 
-/* ═══ COURSE CARD ═══ */
-.course-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all 0.2s}
-.course-card:hover{border-color:var(--gold);transform:translateY(-1px)}
-.course-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.course-name{font-weight:700;font-size:0.9rem}
-.course-badge{font-size:0.65rem;padding:2px 8px;border-radius:20px;font-weight:700}
-.course-meta{display:flex;gap:12px;font-size:0.75rem;color:var(--text-dim);margin-top:6px}
-
-/* ═══ LESSON LIST ═══ */
-.lesson-list{display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:10px;max-height:60vh;overflow-y:auto}
-.lesson-list.open{display:block}
-.lesson-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:0.82rem;transition:background 0.15s}
-.lesson-item:hover{background:var(--surface2)}
-.chk{width:22px;height:22px;border:2px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
-.chk.done{background:var(--green);border-color:var(--green);color:var(--bg)}
-.lesson-item .link{flex:1;color:var(--text)}
-.lesson-item .link:hover{color:var(--gold)}
-.badge{font-size:0.6rem;padding:2px 7px;border-radius:10px;font-weight:500;flex-shrink:0}
-.badge.review{background:var(--purple);color:#fff}
-.badge.next{background:var(--blue);color:#fff}
-
-/* ═══ PLAN ═══ */
-.plan-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-size:0.82rem;flex-wrap:wrap}
-.plan-item .type{font-size:0.6rem;padding:2px 8px;border-radius:10px;font-weight:700;flex-shrink:0}
-.plan-item .type.new{background:var(--blue);color:#fff}
-.plan-item .type.review{background:var(--purple);color:#fff}
-.plan-item .type.active{background:var(--orange);color:#fff}
-.plan-item a{color:var(--text);flex:1;min-width:0}
-.plan-item a:hover{color:var(--gold)}
-.course-tag{font-size:0.6rem;padding:2px 6px;border-radius:4px;background:var(--surface3);color:var(--text-dim);flex-shrink:0}
-.btn-sm{border:1px solid;background:transparent;padding:4px 10px;border-radius:5px;font-size:0.68rem;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+/* ═══ STAT STONES ═══ */
+.stones{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.stone{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:20px 14px;text-align:center;position:relative;overflow:hidden;
+}
+.stone::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--vermillion),transparent);
+  opacity:0.5;
+}
+.stone .n{font-size:2rem;font-weight:900;color:var(--paper);letter-spacing:2px}
+.stone .l{font-size:0.65rem;color:var(--mist);margin-top:4px;letter-spacing:2px}
 
 /* ═══ SECTION ═══ */
-.section-title{font-size:1rem;font-weight:900;color:var(--text-bright);margin:24px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:6px}
-
-/* ═══ REVIEW QUEUE ═══ */
-.rq-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;flex-wrap:wrap}
-.urgency-bar{width:5px;height:32px;border-radius:3px;flex-shrink:0}
-.urgency-bar.overdue{background:var(--red)}
-.urgency-bar.today{background:var(--orange)}
-.urgency-bar.upcoming{background:var(--green)}
-.rq-info{flex:1;min-width:0}
-.rq-title{font-size:0.82rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rq-meta{font-size:0.68rem;color:var(--text-dim)}
-
-/* ═══ NEURO TIPS ═══ */
-.tip-card{background:linear-gradient(135deg,var(--surface2),var(--surface));border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
-.tip-card .tip-title{font-size:0.88rem;font-weight:700;color:var(--gold-light);margin-bottom:6px}
-.tip-card .tip-body{font-size:0.8rem;color:var(--text-dim);line-height:1.7}
-.tip-card .tip-body strong{color:var(--text)}
-
-/* ═══ HEATMAP ═══ */
-.heatmap{display:flex;gap:3px;flex-wrap:wrap;margin-top:10px}
-.hm-cell{width:13px;height:13px;border-radius:3px;background:var(--surface2)}
-.hm-cell.l1{background:#1a3a2a}.hm-cell.l2{background:#2a5a3a}.hm-cell.l3{background:#3a7a4a}.hm-cell.l4{background:var(--green)}
-
-/* ═══════════════════════════════════════════════
-   POMODORO TIMER
-   ═══════════════════════════════════════════════ */
-.timer-wrap{position:relative;margin-bottom:20px}
-.timer-card{background:linear-gradient(135deg,#151820,#1a1e2a);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center}
-.timer-ring-wrap{position:relative;width:200px;height:200px;margin:0 auto 16px}
-.timer-ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg)}
-.timer-ring-bg{fill:none;stroke:var(--surface2);stroke-width:8}
-.timer-ring-fg{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1s linear}
-.timer-display{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
-.timer-time{font-family:'JetBrains Mono',monospace;font-size:2.8rem;font-weight:500;color:var(--text-bright)}
-.timer-phase{font-size:0.75rem;color:var(--text-dim);margin-top:2px}
-.timer-controls{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
-.timer-btn{padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-size:0.85rem;font-weight:500;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
-.timer-btn:hover{border-color:var(--gold)}
-.timer-btn.primary{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700}
-.timer-btn.danger{border-color:var(--red);color:var(--red)}
-.timer-mode-bar{display:flex;gap:4px;justify-content:center;margin-bottom:16px}
-.timer-mode-btn{padding:6px 14px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text-dim);font-size:0.75rem;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
-.timer-mode-btn.active{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700}
-.timer-session-info{display:flex;gap:16px;justify-content:center;margin-top:16px;font-size:0.75rem;color:var(--text-dim)}
-.timer-session-info span{display:flex;align-items:center;gap:4px}
-
-/* 타이머 연결 강의 선택 */
-.timer-link-bar{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:14px;flex-wrap:wrap}
-.timer-link-bar select{padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-family:inherit;font-size:0.78rem;max-width:220px}
-
-/* ═══ STUDY LOG ═══ */
-.log-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:4px;font-size:0.78rem}
-.log-duration{font-family:'JetBrains Mono',monospace;font-weight:500;color:var(--gold);flex-shrink:0}
-.log-course{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.log-time{color:var(--text-dim);font-size:0.7rem;flex-shrink:0}
-
-/* ═══ SETTINGS ═══ */
-.setting-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap}
-.setting-label{font-size:0.82rem;flex:1}
-.setting-btn{padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-family:inherit;font-size:0.78rem;-webkit-tap-highlight-color:transparent}
-.setting-btn:hover{border-color:var(--gold)}
-.setting-btn.danger{border-color:var(--red);color:var(--red)}
-.setting-btn.danger:hover{background:var(--red);color:#fff}
-
-/* ═══════════════════════════════════════════════
-   MOBILE RESPONSIVE
-   ═══════════════════════════════════════════════ */
-@media(max-width:1024px){
-  .grid-2,.grid-3{grid-template-columns:1fr}
-  .stats-row{grid-template-columns:repeat(3,1fr)}
+.sect{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:18px;margin-bottom:14px;position:relative;
 }
-@media(max-width:600px){
-  .hero{padding:28px 16px 18px}
-  .hero h1{font-size:1.3rem}
-  .container{padding:12px 12px 120px}
-  .stats-row{grid-template-columns:repeat(2,1fr);gap:8px}
-  .stat-num{font-size:1.2rem}
-  .stat-label{font-size:0.6rem}
-  .stat-card{padding:10px 6px}
-  .tab-btn{padding:8px 12px;font-size:0.72rem}
-  .timer-ring-wrap{width:170px;height:170px}
-  .timer-time{font-size:2.2rem}
-  .timer-btn{padding:8px 18px;font-size:0.8rem}
-  .plan-item{padding:8px 10px;font-size:0.78rem}
-  .course-card{padding:14px}
-  .course-name{font-size:0.85rem}
-  .lesson-item{font-size:0.78rem;padding:7px 8px}
-  .section-title{font-size:0.9rem;margin:20px 0 10px}
-  .tip-card{padding:14px}
-  .tip-card .tip-title{font-size:0.82rem}
-  .tip-card .tip-body{font-size:0.75rem}
+.sect h3{
+  font-size:0.8rem;font-weight:700;color:var(--paper);
+  margin-bottom:12px;letter-spacing:2px;display:flex;align-items:center;gap:8px;
 }
-@media(max-width:380px){
-  .stats-row{grid-template-columns:1fr 1fr}
-  .timer-ring-wrap{width:150px;height:150px}
-  .timer-time{font-size:1.9rem}
-  .timer-controls{gap:6px}
-  .timer-btn{padding:7px 14px;font-size:0.75rem}
+.sect h3::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,var(--border),transparent);
 }
 
-/* ═══ 하단 플로팅 타이머 (축소시) ═══ */
-.floating-timer{position:fixed;bottom:20px;right:20px;background:var(--surface);border:2px solid var(--gold);border-radius:50px;padding:8px 16px;display:none;align-items:center;gap:8px;z-index:1000;box-shadow:0 4px 20px rgba(0,0,0,0.5);-webkit-tap-highlight-color:transparent;cursor:pointer}
-.floating-timer.visible{display:flex}
-.floating-timer .ft-time{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:500;color:var(--gold)}
-.floating-timer .ft-dot{width:8px;height:8px;border-radius:50%;animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+/* ═══ FEED ═══ */
+.feed-item{
+  display:flex;align-items:center;gap:12px;padding:12px;
+  border-radius:6px;margin-bottom:6px;cursor:pointer;
+  transition:all 0.2s;border-left:2px solid transparent;
+}
+.feed-item:hover{background:var(--surface2);border-left-color:var(--vermillion)}
+.feed-item:active{transform:scale(0.98)}
+.feed-icon{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;
+  background:rgba(194,59,34,0.08);border:1px solid rgba(194,59,34,0.15);
+}
+.feed-info{flex:1;min-width:0}
+.feed-info .t{font-size:0.78rem;font-weight:700;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feed-info .s{font-size:0.62rem;color:var(--smoke);letter-spacing:1px;margin-top:1px}
+.badge{
+  font-size:0.58rem;padding:3px 8px;border-radius:2px;
+  font-weight:700;flex-shrink:0;letter-spacing:1px;
+}
+.badge.new{background:rgba(194,59,34,0.12);color:var(--vermillion)}
+.badge.rev{background:rgba(139,69,19,0.12);color:var(--rust)}
 
-/* ═══ Vibration for timer end (visual feedback) ═══ */
-@keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-4px)}20%,40%,60%,80%{transform:translateX(4px)}}
-.shake{animation:shake 0.5s ease-in-out}
+/* ═══ COURSES ═══ */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.ccard{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px;cursor:pointer;
+  transition:all 0.3s;position:relative;overflow:hidden;
+}
+.ccard:hover{border-color:var(--vermillion);transform:translateY(-2px)}
+.ccard::before{
+  content:'';position:absolute;top:0;right:0;width:40px;height:40px;
+  background:radial-gradient(circle at top right,rgba(194,59,34,0.06),transparent);
+}
+.ccard .icon{font-size:1.6rem;margin-bottom:8px}
+.ccard .nm{font-size:0.82rem;font-weight:700;color:var(--paper);letter-spacing:1px;margin-bottom:6px}
+.ccard .prog{height:2px;background:var(--ash);border-radius:1px;overflow:hidden;margin-bottom:6px}
+.ccard .prog .bar{height:100%;border-radius:1px;background:var(--vermillion);transition:width 0.4s}
+.ccard .cnt{font-size:0.62rem;color:var(--smoke);letter-spacing:1px}
 
-/* ═══════════════════════════════════════════════
-   WEEKLY REPORT
-   ═══════════════════════════════════════════════ */
-.report-hero{background:linear-gradient(135deg,#151820,#1c1630);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;margin-bottom:20px;position:relative;overflow:hidden}
-.report-hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(201,168,76,0.03) 0%,transparent 70%);pointer-events:none}
-.report-period{font-size:0.75rem;color:var(--text-dim);margin-bottom:6px}
-.report-grade{font-size:3rem;font-weight:900;margin:8px 0}
-.report-grade-label{font-size:0.85rem;font-weight:700;margin-bottom:4px}
-.report-summary{font-size:0.78rem;color:var(--text-dim);line-height:1.7}
+/* Lesson list */
+.llist{max-height:65vh;overflow-y:auto;padding-right:4px}
+.ll-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-radius:4px;margin-bottom:2px;cursor:pointer;
+  transition:0.15s;font-size:0.78rem;border-left:2px solid transparent;
+}
+.ll-item:hover{background:var(--surface2);border-left-color:var(--vermillion)}
+.ll-item .num{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.6rem;font-weight:900;flex-shrink:0;
+}
+.ll-item.done .num{background:rgba(194,59,34,0.15);color:var(--vermillion)}
+.ll-item.undone .num{background:var(--surface2);color:var(--smoke)}
+.ll-item .lt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--paper-dark)}
+.ll-item.done .lt{color:var(--smoke)}
+.ll-item .ld{font-size:0.6rem;color:var(--smoke)}
+.back-btn{display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:var(--smoke);padding:8px 0;margin-bottom:12px;cursor:pointer;letter-spacing:1px}
+.back-btn:hover{color:var(--paper)}
 
-.report-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
-.report-kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 10px;text-align:center}
-.report-kpi .kpi-val{font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:900}
-.report-kpi .kpi-label{font-size:0.65rem;color:var(--text-dim);margin-top:2px}
-.report-kpi .kpi-delta{font-size:0.68rem;margin-top:4px;font-weight:500}
-.kpi-up{color:var(--green)}.kpi-down{color:var(--red)}.kpi-same{color:var(--text-dim)}
-
-.report-section{margin-bottom:20px}
-.report-section-title{font-size:0.9rem;font-weight:700;color:var(--text-bright);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-
-.balance-bar{display:flex;height:28px;border-radius:6px;overflow:hidden;margin-bottom:8px}
-.balance-seg{display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:var(--bg);min-width:20px;transition:width 0.5s ease}
-
-.balance-detail{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:0.78rem}
-.balance-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.balance-name{flex:1;min-width:0}
-.balance-actual{font-family:'JetBrains Mono',monospace;font-weight:500;width:50px;text-align:right}
-.balance-ideal{font-size:0.68rem;color:var(--text-dim);width:50px;text-align:right}
-.balance-verdict{font-size:0.68rem;width:40px;text-align:center;font-weight:700}
-
-.insight-card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 var(--radius) var(--radius) 0;padding:14px;margin-bottom:8px}
-.insight-card .insight-icon{font-size:1.1rem;margin-right:6px}
-.insight-card .insight-text{font-size:0.8rem;line-height:1.7}
-.insight-card .insight-text strong{color:var(--text-bright)}
-
-.pattern-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px}
-.pattern-cell{width:100%;padding-bottom:100%;position:relative;border-radius:4px;font-size:0.55rem;font-weight:500}
-.pattern-cell>span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
-.pattern-label{font-size:0.6rem;color:var(--text-dim);text-align:center}
-
-.sr-compliance{display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:8px}
-.sr-ring{position:relative;width:50px;height:50px;flex-shrink:0}
-.sr-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.sr-ring-bg{fill:none;stroke:var(--surface2);stroke-width:5}
-.sr-ring-fg{fill:none;stroke-width:5;stroke-linecap:round}
-.sr-ring-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:700}
-.sr-info{flex:1;font-size:0.78rem}
-.sr-info .sr-title{font-weight:700;margin-bottom:2px}
-.sr-info .sr-detail{color:var(--text-dim);font-size:0.72rem}
-
-.week-nav{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px}
-.week-nav button{padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:0.78rem;-webkit-tap-highlight-color:transparent}
-.week-nav button:hover{border-color:var(--gold)}
-.week-nav .week-label{font-size:0.82rem;font-weight:500;min-width:160px;text-align:center}
-
-@media(max-width:600px){
-  .report-kpi-row{grid-template-columns:repeat(2,1fr)}
-  .report-grade{font-size:2.4rem}
+/* ═══ TIMER ═══ */
+.timer-display{text-align:center;padding:40px 0 20px}
+.timer-display .time{
+  font-size:3.6rem;font-weight:900;color:var(--paper);
+  letter-spacing:6px;font-family:monospace;
+}
+.timer-display .phase{font-size:0.75rem;color:var(--vermillion);margin-top:6px;letter-spacing:3px}
+.timer-btns{display:flex;justify-content:center;gap:12px;margin-top:20px}
+.timer-btns button{
+  padding:12px 30px;border-radius:4px;font-size:0.8rem;
+  font-weight:700;letter-spacing:2px;transition:0.2s;
+}
+.tbtn-start{background:var(--vermillion);color:var(--paper)}
+.tbtn-start:hover{background:#a83020}
+.tbtn-stop{background:var(--surface2);color:var(--paper-dark);border:1px solid var(--border)}
+.tbtn-stop:hover{background:var(--ash)}
+.timer-cfg{display:flex;justify-content:center;gap:20px;margin-top:16px}
+.timer-cfg label{font-size:0.68rem;color:var(--smoke);letter-spacing:1px}
+.timer-cfg input{
+  width:48px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:4px;color:var(--paper);padding:4px 6px;font-size:0.75rem;text-align:center;
+  font-family:monospace;
 }
 
-/* ═══ PWA INSTALL BANNER ═══ */
-.pwa-banner{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#1a1d27,#151820);border-top:2px solid var(--gold);padding:14px 16px;display:none;align-items:center;gap:12px;z-index:2000;padding-bottom:calc(14px + var(--safe-bottom))}
-.pwa-banner.show{display:flex}
-.pwa-banner .pwa-icon{width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0}
-.pwa-banner .pwa-icon img{width:100%;height:100%}
-.pwa-banner .pwa-info{flex:1;min-width:0}
-.pwa-banner .pwa-info .pwa-title{font-size:0.85rem;font-weight:700;color:var(--text-bright)}
-.pwa-banner .pwa-info .pwa-desc{font-size:0.7rem;color:var(--text-dim);margin-top:2px}
-.pwa-install-btn{padding:8px 16px;background:var(--gold);color:var(--bg);border:none;border-radius:8px;font-size:0.78rem;font-weight:700;white-space:nowrap;-webkit-tap-highlight-color:transparent}
-.pwa-dismiss{padding:6px;background:none;border:none;color:var(--text-dim);font-size:1.2rem;line-height:1;-webkit-tap-highlight-color:transparent}
-.pwa-ios-guide{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin:12px 16px;font-size:0.78rem;line-height:1.8}
-.pwa-ios-guide.show{display:block}
-.pwa-ios-guide .step{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.pwa-ios-guide .step-num{width:22px;height:22px;border-radius:50%;background:var(--gold);color:var(--bg);font-size:0.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.offline-badge{display:none;position:fixed;top:var(--safe-top);left:50%;transform:translateX(-50%);background:var(--red);color:#fff;padding:4px 12px;border-radius:0 0 8px 8px;font-size:0.7rem;font-weight:500;z-index:3000}
-.offline-badge.show{display:block}
+/* Log */
+.log-tbl{width:100%;font-size:0.7rem;border-collapse:collapse}
+.log-tbl th{text-align:left;color:var(--smoke);font-weight:400;padding:8px;border-bottom:1px solid var(--border);letter-spacing:1px;font-size:0.62rem}
+.log-tbl td{padding:8px;border-bottom:1px solid rgba(51,51,48,0.3);color:var(--paper-dark)}
+
+/* Chart */
+.chart-bar{display:flex;align-items:flex-end;gap:6px;height:80px;margin-top:10px}
+.chart-bar .cb{flex:1;background:var(--vermillion);border-radius:2px 2px 0 0;min-height:2px;transition:height 0.4s;opacity:0.7}
+.chart-bar .cb:hover{opacity:1}
+.chart-labels{display:flex;gap:6px;margin-top:6px}
+.chart-labels span{flex:1;text-align:center;font-size:0.55rem;color:var(--smoke)}
+
+/* Heatmap */
+.heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px}
+.hm-cell{aspect-ratio:1;border-radius:2px}
+.hm-label{font-size:0.5rem;color:var(--smoke);text-align:center;padding:2px 0}
+
+/* Tip */
+.tip-box{
+  background:linear-gradient(135deg,rgba(194,59,34,0.04),rgba(139,69,19,0.04));
+  border:1px solid rgba(194,59,34,0.12);border-radius:var(--r);
+  padding:16px;margin-bottom:14px;
+}
+.tip-box .tip-title{font-size:0.7rem;color:var(--vermillion);font-weight:700;margin-bottom:6px;letter-spacing:2px}
+.tip-box .tip-text{font-size:0.7rem;color:var(--paper-dark);line-height:1.8}
+
+/* Settings */
+.set-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(51,51,48,0.3)}
+.set-row .sl{font-size:0.78rem;color:var(--paper-dark)}.set-row .sr{font-size:0.7rem;color:var(--smoke)}
+.set-btn{
+  padding:10px 16px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:4px;font-size:0.72rem;color:var(--paper-dark);margin-top:8px;
+  transition:0.2s;letter-spacing:1px;
+}
+.set-btn:hover{background:var(--ash)}
+.set-btn.danger{color:var(--vermillion);border-color:rgba(194,59,34,0.3)}
+
+/* Float timer */
+.float-timer{
+  position:fixed;bottom:80px;right:16px;background:var(--surface);
+  border:1px solid var(--vermillion);border-radius:4px;
+  padding:8px 16px;font-family:monospace;font-size:0.85rem;
+  color:var(--vermillion);z-index:100;display:none;cursor:pointer;
+  box-shadow:0 4px 24px rgba(194,59,34,0.2);letter-spacing:2px;
+}
+.float-timer.show{display:block}
+
+/* Empty state */
+.empty-state{text-align:center;padding:40px 20px;color:var(--smoke);font-size:0.78rem;letter-spacing:1px}
+
+@media(max-width:480px){.wrap{padding:16px 12px 100px}.stones{grid-template-columns:1fr 1fr}.cgrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<!-- Offline indicator -->
-<div class="offline-badge" id="offlineBadge">📡 오프라인 모드</div>
+<div class="hdr">
+  <h1>修 練</h1>
+  <div class="sub">하루의 수련이 내일의 무기가 된다</div>
+  <div class="dt" id="dateDisp"></div>
+</div>
+<div class="quote-bar" id="quoteBar"></div>
 
-<!-- PWA Install Banner -->
-<div class="pwa-banner" id="pwaBanner">
-  <div class="pwa-icon"><img src="icons/icon-192.png" alt="학습"></div>
-  <div class="pwa-info">
-    <div class="pwa-title">홈 화면에 추가</div>
-    <div class="pwa-desc">앱처럼 빠르게 열고, 오프라인에서도 사용</div>
-  </div>
-  <button class="pwa-install-btn" id="pwaInstallBtn" onclick="installPWA()">설치</button>
-  <button class="pwa-dismiss" onclick="dismissPWA()">✕</button>
+<div class="nav" id="nav">
+  <button class="on" data-tab="home">道場</button>
+  <button data-tab="course">修行</button>
+  <button data-tab="timer">集中</button>
+  <button data-tab="more">記錄</button>
 </div>
 
-<!-- iOS/iPadOS Safari Guide -->
-<div class="pwa-ios-guide" id="serverGuide">
-  <div style="font-weight:700;margin-bottom:8px;color:var(--gold)">📱 iPad/iPhone에서 접속하기</div>
-  <div style="color:var(--text-dim);font-size:0.75rem;margin-bottom:8px">파일을 직접 열면 기능이 제한됩니다. 아래 방법으로 접속하세요:</div>
-  <div style="font-weight:600;margin:8px 0 4px;color:var(--blue)">방법: Mac에서 서버 실행</div>
-  <div class="step"><span class="step-num">1</span>Lectures 폴더의 <b>start_server.command</b> 더블클릭</div>
-  <div class="step"><span class="step-num">2</span>터미널에 표시된 IP 주소 확인</div>
-  <div class="step"><span class="step-num">3</span>iPad/iPhone Safari에서 해당 주소 입력</div>
-  <div class="step"><span class="step-num">4</span>공유(⬆️) → "홈 화면에 추가"로 앱 설치</div>
-  <div style="margin-top:8px;padding:8px;background:var(--surface);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--gold)">http://[Mac IP]:8080/dashboard.html</div>
-  <div style="margin-top:6px;color:var(--text-dim);font-size:0.7rem">* Mac과 iPad/iPhone이 같은 WiFi에 연결되어 있어야 합니다</div>
-  <div style="color:var(--text-dim);font-size:0.7rem">* Mac이 켜져 있는 동안만 접속 가능합니다</div>
-  <button class="setting-btn" onclick="document.getElementById('serverGuide').classList.remove('show')" style="width:100%;margin-top:8px">확인</button>
+<div class="wrap">
+<!-- ═══ HOME ═══ -->
+<div class="pnl on" id="p-home">
+  <div class="stones">
+    <div class="stone"><div class="n" id="streakN">0</div><div class="l">連續 修練日</div></div>
+    <div class="stone"><div class="n" id="todayMin">0</div><div class="l">今日 修練(分)</div></div>
+  </div>
+  <div class="sect">
+    <h3>今日의 修練</h3>
+    <div id="feedList"></div>
+    <div id="feedEmpty" class="empty-state" style="display:none">
+      一日の修練、完了。<br>明日また剣を握れ。
+    </div>
+  </div>
+  <div class="sect" id="reviewCard" style="display:none">
+    <h3>復習 — 間隔反復</h3>
+    <div id="reviewList"></div>
+  </div>
 </div>
 
-<div class="pwa-ios-guide" id="iosGuide">
-  <div style="font-weight:700;margin-bottom:8px;color:var(--gold)">📱 홈 화면에 추가하기</div>
-  <div class="step"><span class="step-num">1</span>Safari 상단/하단의 공유 버튼 <span style="font-size:1.1rem">⬆️</span> 탭</div>
-  <div class="step"><span class="step-num">2</span>아래로 스크롤 → "홈 화면에 추가" 선택</div>
-  <div class="step"><span class="step-num">3</span>"추가" 탭 → 완료!</div>
-  <div style="margin-top:8px;color:var(--text-dim);font-size:0.72rem">* iPad: 상단 주소창 옆 공유 아이콘(⬆️)을 탭하세요</div>
-  <div style="color:var(--text-dim);font-size:0.72rem">홈 화면에서 앱처럼 전체화면으로 열립니다</div>
-  <button class="setting-btn" onclick="document.getElementById('iosGuide').classList.remove('show')" style="width:100%;margin-top:8px">확인</button>
-</div>
-
-<div class="hero">
-  <h1>학습 멘토 시스템</h1>
-  <div class="sub">뇌과학 기반 · 간격반복 · 인터리빙 · 능동회상 · 울트라디안 리듬</div>
-  <div class="date-display" id="dateDisplay"></div>
-</div>
-
-<div class="container">
-  <div class="tab-bar">
-    <button class="tab-btn active" data-tab="overview">📊 오늘</button>
-    <button class="tab-btn" data-tab="timer">⏱️ 타이머</button>
-    <button class="tab-btn" data-tab="courses">📚 강좌</button>
-    <button class="tab-btn" data-tab="review">🔄 복습</button>
-    <button class="tab-btn" data-tab="neuro">🧠 과학</button>
-    <button class="tab-btn" data-tab="stats">📈 통계</button>
-    <button class="tab-btn" data-tab="report">📋 리포트</button>
-    <button class="tab-btn" data-tab="settings">⚙️ 설정</button>
-  </div>
-
-  <!-- ═══ TAB: OVERVIEW ═══ -->
-  <div class="tab-panel active" id="tab-overview">
-    <div class="stats-row" id="statsRow"></div>
-    <div class="grid-2">
-      <div>
-        <div class="section-title">🎯 오늘의 학습 플랜</div>
-        <div id="todayPlan"></div>
-        <button class="setting-btn" onclick="generateTodayPlan()" style="width:100%;padding:10px;margin-top:12px">🔄 플랜 새로 생성</button>
-      </div>
-      <div>
-        <div class="section-title">🔥 학습 스트릭</div>
-        <div class="card" style="margin-bottom:14px">
-          <div style="text-align:center">
-            <div class="stat-num" style="color:var(--orange)" id="streakNum">0</div>
-            <div class="stat-label">연속 학습일</div>
-          </div>
-          <div class="heatmap" id="heatmap"></div>
-        </div>
-        <div class="section-title">⏱️ 오늘 학습 시간</div>
-        <div class="card" style="margin-bottom:14px">
-          <div style="text-align:center">
-            <div class="stat-num" style="color:var(--cyan)" id="todayStudyTime">0:00</div>
-            <div class="stat-label">총 집중 시간</div>
-          </div>
-          <div id="todayLogPreview" style="margin-top:10px;max-height:150px;overflow-y:auto"></div>
-        </div>
-        <div class="section-title">💡 오늘의 뇌과학 팁</div>
-        <div id="dailyTip"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ TAB: TIMER ═══ -->
-  <div class="tab-panel" id="tab-timer">
-    <div class="timer-wrap">
-      <div class="timer-card">
-        <div class="timer-mode-bar">
-          <button class="timer-mode-btn active" data-mode="focus" onclick="setTimerMode('focus')">🎯 집중 25분</button>
-          <button class="timer-mode-btn" data-mode="short" onclick="setTimerMode('short')">☕ 휴식 5분</button>
-          <button class="timer-mode-btn" data-mode="long" onclick="setTimerMode('long')">🌊 긴휴식 15분</button>
-          <button class="timer-mode-btn" data-mode="ultra" onclick="setTimerMode('ultra')">🧬 울트라디안 50분</button>
-        </div>
-        <div class="timer-ring-wrap">
-          <svg viewBox="0 0 200 200">
-            <circle class="timer-ring-bg" cx="100" cy="100" r="88"/>
-            <circle class="timer-ring-fg" id="timerRing" cx="100" cy="100" r="88"
-              stroke="var(--gold)" stroke-dasharray="553" stroke-dashoffset="0"/>
-          </svg>
-          <div class="timer-display">
-            <div class="timer-time" id="timerDisplay">25:00</div>
-            <div class="timer-phase" id="timerPhase">집중 모드</div>
-          </div>
-        </div>
-        <div class="timer-controls">
-          <button class="timer-btn primary" id="timerStartBtn" onclick="toggleTimer()">▶ 시작</button>
-          <button class="timer-btn" onclick="resetTimer()">↺ 리셋</button>
-          <button class="timer-btn" id="skipBtn" onclick="skipPhase()" style="display:none">⏭ 스킵</button>
-        </div>
-        <div class="timer-link-bar">
-          <span style="font-size:0.75rem;color:var(--text-dim)">연결 강의:</span>
-          <select id="timerCourseSelect" onchange="updateTimerLessonSelect()"></select>
-          <select id="timerLessonSelect"></select>
-        </div>
-        <div class="timer-session-info">
-          <span>🍅 <span id="pomodoroCount">0</span> 세션</span>
-          <span>⏱️ <span id="totalFocusTime">0분</span> 집중</span>
-          <span>🔋 <span id="ultrCount">0</span> 울트라디안</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-title">📋 오늘의 학습 로그</div>
-    <div id="studyLog"></div>
-    <div id="noLog" style="text-align:center;padding:30px;color:var(--text-dim);display:none">
-      타이머를 사용하면 학습 기록이 자동으로 남습니다
-    </div>
-
-    <div class="section-title" style="margin-top:24px">📊 이번 주 집중 시간</div>
-    <div class="card">
-      <div id="weeklyChart" style="display:flex;align-items:flex-end;gap:6px;height:120px;padding:10px 0"></div>
-      <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text-dim);margin-top:6px" id="weeklyLabels"></div>
-    </div>
-  </div>
-
-  <!-- ═══ TAB: COURSES ═══ -->
-  <div class="tab-panel" id="tab-courses">
-    <div class="grid-2" id="courseGrid"></div>
-  </div>
-
-  <!-- ═══ TAB: REVIEW ═══ -->
-  <div class="tab-panel" id="tab-review">
-    <div class="section-title">🔄 간격반복 복습 큐</div>
-    <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:12px">에빙하우스 망각곡선 — 1→3→7→14→30→60일 자동 스케줄링</p>
-    <div id="reviewQueue"></div>
-    <div id="noReview" style="display:none;text-align:center;padding:30px;color:var(--text-dim)">복습할 강의가 없습니다. 강의를 완료하면 자동 추가됩니다.</div>
-  </div>
-
-  <!-- ═══ TAB: NEURO ═══ -->
-  <div class="tab-panel" id="tab-neuro">
-    <div class="section-title">🧠 뇌과학 기반 학습 전략</div>
-    <div id="neuroTips"></div>
-  </div>
-
-  <!-- ═══ TAB: STATS ═══ -->
-  <div class="tab-panel" id="tab-stats">
-    <div class="section-title">📈 과목별 진도</div>
-    <div class="grid-3" id="courseStats"></div>
-    <div class="section-title" style="margin-top:24px">📅 90일 학습 히트맵</div>
-    <div class="card">
-      <div class="heatmap" id="fullHeatmap" style="gap:3px"></div>
-      <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:8px;font-size:0.65rem;color:var(--text-dim)">
-        <span>적음</span>
-        <div style="width:10px;height:10px;border-radius:2px;background:var(--surface2)"></div>
-        <div style="width:10px;height:10px;border-radius:2px;background:#1a3a2a"></div>
-        <div style="width:10px;height:10px;border-radius:2px;background:#2a5a3a"></div>
-        <div style="width:10px;height:10px;border-radius:2px;background:#3a7a4a"></div>
-        <div style="width:10px;height:10px;border-radius:2px;background:var(--green)"></div>
-        <span>많음</span>
-      </div>
-    </div>
-    <div class="section-title" style="margin-top:24px">⏱️ 과목별 누적 학습 시간</div>
-    <div class="card" id="courseTimeStats"></div>
-  </div>
-
-  <!-- ═══ TAB: REPORT ═══ -->
-  <div class="tab-panel" id="tab-report">
-    <div class="week-nav">
-      <button onclick="changeReportWeek(-1)">← 이전</button>
-      <span class="week-label" id="reportWeekLabel"></span>
-      <button onclick="changeReportWeek(1)">다음 →</button>
-    </div>
-    <div id="reportHero"></div>
-    <div class="report-kpi-row" id="reportKPI"></div>
-    <div class="report-section">
-      <div class="report-section-title">⚖️ 과목별 시간 밸런스</div>
-      <div id="balanceBar"></div>
-      <div id="balanceDetail"></div>
-    </div>
-    <div class="report-section">
-      <div class="report-section-title">🔄 간격반복 준수율</div>
-      <div id="srCompliance"></div>
-    </div>
-    <div class="report-section">
-      <div class="report-section-title">🕐 시간대별 학습 패턴</div>
-      <div class="card" style="padding:14px">
-        <div class="pattern-grid" id="timePattern"></div>
-        <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:var(--text-dim);margin-top:4px">
-          <span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span><span>일</span>
-        </div>
-      </div>
-    </div>
-    <div class="report-section">
-      <div class="report-section-title">💡 AI 인사이트 & 권고</div>
-      <div id="aiInsights"></div>
-    </div>
-    <div style="text-align:center;margin-top:16px">
-      <button class="setting-btn" onclick="exportReport()" style="padding:10px 24px">📥 리포트 이미지 저장 (텍스트)</button>
-    </div>
-  </div>
-
-  <!-- ═══ TAB: SETTINGS ═══ -->
-  <div class="tab-panel" id="tab-settings">
-    <div class="section-title">⚙️ 설정</div>
-    <div class="card">
-      <div class="setting-row">
-        <span class="setting-label">하루 신규 학습 목표</span>
-        <select id="dailyGoal" class="setting-btn" onchange="saveSetting('dailyGoal',this.value)">
-          <option value="2">2개</option><option value="3" selected>3개</option><option value="4">4개</option><option value="5">5개</option>
-        </select>
-      </div>
-      <div class="setting-row">
-        <span class="setting-label">하루 복습 목표</span>
-        <select id="reviewGoal" class="setting-btn" onchange="saveSetting('reviewGoal',this.value)">
-          <option value="2">2개</option><option value="3" selected>3개</option><option value="5">5개</option>
-        </select>
-      </div>
-      <div class="setting-row">
-        <span class="setting-label">포모도로 집중 시간(분)</span>
-        <select id="focusDuration" class="setting-btn" onchange="saveSetting('focusDuration',this.value);resetTimer()">
-          <option value="25" selected>25분</option><option value="30">30분</option><option value="45">45분</option><option value="50">50분</option>
-        </select>
-      </div>
-      <div class="setting-row">
-        <span class="setting-label">짧은 휴식(분)</span>
-        <select id="shortBreak" class="setting-btn" onchange="saveSetting('shortBreak',this.value)">
-          <option value="5" selected>5분</option><option value="10">10분</option>
-        </select>
-      </div>
-      <div class="setting-row">
-        <span class="setting-label">긴 휴식(분)</span>
-        <select id="longBreak" class="setting-btn" onchange="saveSetting('longBreak',this.value)">
-          <option value="15" selected>15분</option><option value="20">20분</option><option value="30">30분</option>
-        </select>
-      </div>
-      <div class="setting-row">
-        <span class="setting-label">타이머 알림음</span>
-        <select id="alarmType" class="setting-btn" onchange="saveSetting('alarmType',this.value)">
-          <option value="bell">🔔 벨</option><option value="chime">🎵 차임</option><option value="none">🔇 무음</option>
-        </select>
-      </div>
-      <div class="setting-row">
-        <span class="setting-label">홈 화면에 추가 (앱 설치)</span>
-        <button class="setting-btn" onclick="showInstallGuide()">📲 설치 가이드</button>
-      </div>
-      <div class="setting-row">
-        <span class="setting-label">iPad/iPhone 접속 방법</span>
-        <button class="setting-btn" onclick="showServerGuide()">📱 서버 접속 안내</button>
-      </div>
-      <div class="setting-row">
-        <span class="setting-label">데이터 내보내기</span>
-        <button class="setting-btn" onclick="exportData()">📥 JSON</button>
-      </div>
-      <div class="setting-row">
-        <span class="setting-label">전체 초기화</span>
-        <button class="setting-btn danger" onclick="resetAll()">🗑️ 초기화</button>
-      </div>
+<!-- ═══ COURSES ═══ -->
+<div class="pnl" id="p-course">
+  <div id="courseGrid" class="cgrid"></div>
+  <div id="courseDetail" style="display:none">
+    <div class="back-btn" id="backBtn">← 修行 目錄</div>
+    <div class="sect">
+      <h3 id="detailTitle"></h3>
+      <div class="llist" id="lessonList"></div>
     </div>
   </div>
 </div>
 
-<!-- Floating Timer -->
-<div class="floating-timer" id="floatingTimer" onclick="switchTab('timer')">
-  <div class="ft-dot" id="ftDot" style="background:var(--gold)"></div>
-  <div class="ft-time" id="ftTime">25:00</div>
+<!-- ═══ TIMER ═══ -->
+<div class="pnl" id="p-timer">
+  <div class="sect">
+    <div class="timer-display">
+      <div class="time" id="timerDisp">25:00</div>
+      <div class="phase" id="phaseDisp">集中 準備</div>
+    </div>
+    <div class="timer-btns">
+      <button class="tbtn-start" id="timerStart">始</button>
+      <button class="tbtn-stop" id="timerReset">初</button>
+    </div>
+    <div class="timer-cfg">
+      <label>集中 <input type="number" id="cfgWork" value="25" min="1" max="90">分</label>
+      <label>休息 <input type="number" id="cfgBreak" value="5" min="1" max="30">分</label>
+    </div>
+  </div>
+  <div class="sect">
+    <h3>週間 修練量</h3>
+    <div class="chart-bar" id="weekChart"></div>
+    <div class="chart-labels" id="weekLabels"></div>
+  </div>
+  <div class="sect">
+    <h3>修練 記錄</h3>
+    <table class="log-tbl">
+      <thead><tr><th>日時</th><th>修行</th><th>時間</th></tr></thead>
+      <tbody id="logBody"></tbody>
+    </table>
+  </div>
 </div>
+
+<!-- ═══ MORE ═══ -->
+<div class="pnl" id="p-more">
+  <div id="tipBox" class="tip-box">
+    <div class="tip-title">腦科學 修練法</div>
+    <div class="tip-text" id="tipText"></div>
+  </div>
+  <div class="sect">
+    <h3>修練 熱圖 (30日)</h3>
+    <div class="heatmap" id="heatmap"></div>
+  </div>
+  <div class="sect">
+    <h3>全體 進行</h3>
+    <div id="allProgress"></div>
+  </div>
+  <div class="sect">
+    <h3>設定</h3>
+    <div class="set-row"><span class="sl">資料 版本</span><span class="sr">v3</span></div>
+    <div class="set-row"><span class="sl">總 修練 記錄</span><span class="sr" id="totalLogs">0件</span></div>
+    <button class="set-btn" id="exportBtn">搬出 — 데이터 내보내기</button>
+    <button class="set-btn" id="importBtn">搬入 — 데이터 가져오기</button>
+    <input type="file" id="importFile" accept=".json" style="display:none">
+    <button class="set-btn danger" id="resetBtn">初期化 — 데이터 초기화</button>
+  </div>
+</div>
+</div>
+
+<div class="float-timer" id="floatTimer"></div>
 
 <script>
-// Global error handler for debugging on iPad
-window.onerror=function(msg,url,line,col,err){
-  console.error('JS Error:',msg,'at line',line);
-  // Show error as small badge for debugging (remove in production)
-  var errEl=document.getElementById('debugError');
-  if(!errEl){errEl=document.createElement('div');errEl.id='debugError';errEl.style.cssText='position:fixed;bottom:60px;left:10px;right:10px;background:#300;color:#f88;padding:8px;border-radius:8px;font-size:11px;z-index:9999;max-height:100px;overflow:auto;display:none';document.body.appendChild(errEl)}
-  errEl.style.display='block';
-  errEl.innerHTML+='L'+line+': '+msg+'<br>';
-};
-
-// ═══ file:// protocol warning for iOS ═══
-(function(){
-  if(window.location.protocol==='file:'){
-    var isTouch='ontouchstart' in window||navigator.maxTouchPoints>0;
-    if(isTouch){
-      setTimeout(function(){
-        var sg=document.getElementById('serverGuide');
-        if(sg)sg.classList.add('show');
-      },1500);
-    }
-  }
-})();
-
-// ═══════════════════════════════════════════
-// COURSE DATA
-// ═══════════════════════════════════════════
-const COURSES=[
-{id:'vehicle',name:'차량동역학',icon:'🚗',color:'#4a9ebf',desc:'진동학·MBS·디지털트윈',folder:'VehicleDynamics_Lectures',lessons:[
-{day:1,file:'Day01_운동방정식유도.html',title:'운동방정식 유도'},{day:2,file:'Day02_비감쇠자유진동.html',title:'비감쇠 자유진동'},{day:3,file:'Day03_감쇠비정의.html',title:'감쇠비 정의'},{day:4,file:'Day04_부족감쇠자유진동.html',title:'부족감쇠 자유진동'},{day:5,file:'Day05_강제조화진동.html',title:'강제 조화진동'},{day:6,file:'Day06_위상각유도.html',title:'위상각 유도'},{day:7,file:'Day07_공진조건분석.html',title:'공진조건 분석'},{day:8,file:'Day08_쿼터카모델.html',title:'쿼터카 모델'},{day:9,file:'Day09_쿼터카고유진동수.html',title:'쿼터카 고유진동수'},{day:10,file:'Day10_하프카모델.html',title:'하프카 모델'},{day:11,file:'Day11_하프카모드해석.html',title:'하프카 모드해석'},{day:12,file:'Day12_전달함수유도.html',title:'전달함수 유도'},{day:13,file:'Day13_전달률방진설계.html',title:'전달률 방진설계'},{day:14,file:'Day14_노면스펙트럼승차감.html',title:'노면스펙트럼 승차감'},{day:15,file:'Day15_Part2복습.html',title:'Part2 복습',isReview:true},{day:16,file:'Day16_스프링특성.html',title:'스프링 특성'},{day:17,file:'Day17_댐퍼모델.html',title:'댐퍼 모델'},{day:18,file:'Day18_부싱복소강성.html',title:'부싱 복소강성'},{day:19,file:'Day19_타이어수직동특성.html',title:'타이어 수직동특성'},{day:20,file:'Day20_TireHop.html',title:'Tire Hop'},{day:21,file:'Day21_승차감트레이드오프.html',title:'승차감 트레이드오프'},{day:22,file:'Day22_Part3복습.html',title:'Part3 복습',isReview:true},{day:23,file:'Day23_푸리에변환.html',title:'푸리에 변환'},{day:24,file:'Day24_PSD정의.html',title:'PSD 정의'},{day:25,file:'Day25_FRF측정.html',title:'FRF 측정'},{day:26,file:'Day26_고유치문제.html',title:'고유치 문제'},{day:27,file:'Day27_모드중첩법.html',title:'모드중첩법'},{day:28,file:'Day28_Part4복습.html',title:'Part4 복습',isReview:true},{day:29,file:'Day29_수식Simpack매핑.html',title:'수식-Simpack 매핑'},{day:30,file:'Day30_QuarterCar구현.html',title:'QuarterCar 구현'},{day:31,file:'Day31_FRF상관성.html',title:'FRF 상관성'},{day:32,file:'Day32_CoSimulation.html',title:'Co-Simulation'},{day:33,file:'Day33_디지털트윈완성.html',title:'디지털트윈 완성'}]},
-{id:'energy',name:'에너지 OS',icon:'💪',color:'#4abf8a',desc:'수면·영양·웨이트·러닝·루틴',folder:'Energy_Lectures',lessons:[
-{day:1,file:'day01_energy_systems.html',title:'인체 에너지 시스템'},{day:2,file:'day02_mitochondria.html',title:'미토콘드리아'},{day:3,file:'day03_hormones.html',title:'호르몬'},{day:4,file:'day04_autonomic.html',title:'자율신경계'},{day:5,file:'day05_review.html',title:'Part1 복습',isReview:true},{day:6,file:'day06_sleep_architecture.html',title:'수면 구조'},{day:7,file:'day07_sleep_hormones.html',title:'수면 호르몬'},{day:8,file:'day08_sleep_environment.html',title:'수면 환경'},{day:9,file:'day09_sleep_debt.html',title:'수면 부채'},{day:10,file:'day10_sleep_tracking.html',title:'수면 트래킹'},{day:11,file:'day11_nutrition_basics.html',title:'영양 기초'},{day:12,file:'day12_protein.html',title:'단백질'},{day:13,file:'day13_carbs.html',title:'탄수화물'},{day:14,file:'day14_fats_micros.html',title:'지방·미량영양소'},{day:15,file:'day15_hydration_caffeine.html',title:'수분·카페인'},{day:16,file:'day16_meal_timing.html',title:'식사 타이밍'},{day:17,file:'day17_nutrition_review.html',title:'영양 복습',isReview:true},{day:18,file:'day18_hypertrophy_science.html',title:'근비대 과학'},{day:19,file:'day19_big_three.html',title:'Big Three'},{day:20,file:'day20_upper_body.html',title:'상체 운동'},{day:21,file:'day21_lower_core.html',title:'하체·코어'},{day:22,file:'day22_periodization.html',title:'주기화'},{day:23,file:'day23_injury_mobility.html',title:'부상예방·모빌리티'},{day:24,file:'day24_recovery.html',title:'회복'},{day:25,file:'day25_weight_review.html',title:'웨이트 복습',isReview:true},{day:26,file:'day26_vo2max_lactate.html',title:'VO2max·젖산역치'},{day:27,file:'day27_running_form.html',title:'러닝 폼'},{day:28,file:'day28_interval_training.html',title:'인터벌'},{day:29,file:'day29_zone_training.html',title:'존 트레이닝'},{day:30,file:'day30_concurrent_training.html',title:'동시성 훈련'},{day:31,file:'day31_running_review.html',title:'러닝 복습',isReview:true},{day:32,file:'day32_hrv.html',title:'HRV'},{day:33,file:'day33_immune_energy.html',title:'면역·에너지'},{day:34,file:'day34_fatigue_overtraining.html',title:'피로·오버트레이닝'},{day:35,file:'day35_travel_seasonal.html',title:'여행·시즌별'},{day:36,file:'day36_condition_review.html',title:'컨디션 복습',isReview:true},{day:37,file:'day37_morning_routine.html',title:'모닝 루틴'},{day:38,file:'day38_evening_routine.html',title:'이브닝 루틴'},{day:39,file:'day39_weekend_routine.html',title:'주말 루틴'},{day:40,file:'day40_routine_review.html',title:'루틴 복습',isReview:true},{day:41,file:'day41_stress_neuroscience.html',title:'스트레스 뇌과학'},{day:42,file:'day42_meditation_breathwork.html',title:'명상·호흡'},{day:43,file:'day43_flow_state.html',title:'플로우 상태'},{day:44,file:'day44_emotional_regulation.html',title:'감정 조절'},{day:45,file:'day45_mental_review.html',title:'멘탈 복습',isReview:true},{day:46,file:'day46_biohacking_tech.html',title:'바이오해킹'},{day:47,file:'day47_supplementation.html',title:'보충제'},{day:48,file:'day48_social_energy.html',title:'소셜 에너지'},{day:49,file:'day49_digital_detox.html',title:'디지털 디톡스'},{day:50,file:'day50_final_integration.html',title:'최종 통합'}]},
-{id:'human',name:'감정관리·철학',icon:'🧠',color:'#8a6abf',desc:'뇌과학·스토아·불교·실존주의',folder:'Human_Lectures',lessons:[
-{day:1,file:'day01_감정이란_무엇인가.html',title:'감정이란 무엇인가'},{day:2,file:'day02_스트레스_호르몬_회로.html',title:'스트레스 호르몬'},{day:3,file:'day03_INFP_감정처리_패턴.html',title:'INFP 감정처리'},{day:4,file:'day04_인지적_재평가.html',title:'인지적 재평가'},{day:5,file:'day05_메타인지_훈련.html',title:'메타인지 훈련'},{day:6,file:'day06_감정조절_실전_직장.html',title:'감정조절 실전'},{day:7,file:'day07_신뢰의_신경과학.html',title:'신뢰의 신경과학'},{day:8,file:'day08_공감의_두_종류.html',title:'공감의 두 종류'},{day:9,file:'day09_어서티브_커뮤니케이션.html',title:'어서티브 소통'},{day:10,file:'day10_갈등의_신경과학.html',title:'갈등의 신경과학'},{day:11,file:'day11_피드백_주고받기.html',title:'피드백'},{day:12,file:'day12_통합_복습_1_2.html',title:'Part1-2 복습',isReview:true},{day:13,file:'day13_스토아_통제의_이분법.html',title:'스토아 통제의 이분법'},{day:14,file:'day14_마르쿠스_아우렐리우스.html',title:'아우렐리우스'},{day:15,file:'day15_불교적_무상관.html',title:'불교적 무상관'},{day:16,file:'day16_프랭클_의미치료.html',title:'프랭클 의미치료'},{day:17,file:'day17_흐름_상태.html',title:'Flow 상태'},{day:18,file:'day18_철학_프레임_통합.html',title:'철학 통합 복습',isReview:true},{day:19,file:'day19_가치관_명료화.html',title:'가치관 명료화'},{day:20,file:'day20_정체성과_역할_통합.html',title:'정체성·역할'},{day:21,file:'day21_결정의_철학.html',title:'결정의 철학'},{day:22,file:'day22_나만의_감정관리_시스템.html',title:'나만의 감정관리'}]},
-{id:'parenting',name:'육아·가족',icon:'👨‍👩‍👧‍👦',color:'#bf8a4a',desc:'뇌발달·형제·부부·아빠루틴',folder:'Parenting_Lectures',lessons:[
-{day:1,file:'day01_brain_development.html',title:'뇌 발달'},{day:2,file:'day02_attachment_theory.html',title:'애착 이론'},{day:3,file:'day03_dad_play_neuroscience.html',title:'아빠 놀이 뇌과학'},{day:4,file:'day04_self_regulation.html',title:'자기 조절력'},{day:5,file:'day05_cognitive_development_6y.html',title:'6세 인지발달'},{day:6,file:'day06_language_explosion_3y.html',title:'3세 언어폭발'},{day:7,file:'day07_part1_review.html',title:'Part1 복습',isReview:true},{day:8,file:'day08_sibling_jealousy.html',title:'형제간 질투'},{day:9,file:'day09_fairness_equity.html',title:'공정성·형평성'},{day:10,file:'day10_sibling_cooperation.html',title:'형제 협력'},{day:11,file:'day11_one_on_one_time.html',title:'일대일 시간'},{day:12,file:'day12_part2_review.html',title:'Part2 복습',isReview:true},{day:13,file:'day13_parenting_stress.html',title:'양육 스트레스'},{day:14,file:'day14_gottman_marriage_science.html',title:'가트맨 결혼과학'},{day:15,file:'day15_dual_income_communication.html',title:'맞벌이 소통'},{day:16,file:'day16_coparenting_alignment.html',title:'공동양육'},{day:17,file:'day17_part3_review.html',title:'Part3 복습',isReview:true},{day:18,file:'day18_focused_play_design.html',title:'집중 놀이'},{day:19,file:'day19_bedtime_routine.html',title:'취침 루틴'},{day:20,file:'day20_emotion_coaching.html',title:'감정 코칭'},{day:21,file:'day21_dad_routine_system.html',title:'아빠 루틴'}]},
-{id:'economics',name:'재무·투자',icon:'💰',color:'#c9a84c',desc:'재무목표·주식·부동산·세금',folder:'Economics_Lectures',lessons:[
-{day:1,file:'day01_financial_goal_setting.html',title:'재무 목표'},{day:2,file:'day02_compound_interest.html',title:'복리'},{day:3,file:'day03_asset_pipeline.html',title:'자산 파이프라인'},{day:4,file:'day04_mortgage_optimization.html',title:'대출 최적화'},{day:5,file:'day05_risk_assessment.html',title:'리스크 평가'},{day:6,file:'day06_behavioral_finance.html',title:'행동 재무학'},{day:7,file:'day07_part1_review.html',title:'Part1 복습',isReview:true},{day:8,file:'day08_valuation_basics.html',title:'밸류에이션'},{day:9,file:'day09_semiconductor_analysis.html',title:'반도체 분석'},{day:10,file:'day10_financial_statements.html',title:'재무제표'},{day:11,file:'day11_technical_analysis.html',title:'기술적 분석'},{day:12,file:'day12_timing_principles.html',title:'타이밍 원칙'},{day:13,file:'day13_kospi_discount.html',title:'코리아 디스카운트'},{day:14,file:'day14_part2_review.html',title:'Part2 복습',isReview:true},{day:15,file:'day15_real_estate_cycle.html',title:'부동산 사이클'},{day:16,file:'day16_house_swap_simulation.html',title:'이사 시뮬레이션'},{day:17,file:'day17_rebalancing.html',title:'리밸런싱'},{day:18,file:'day18_global_diversification.html',title:'글로벌 분산투자'},{day:19,file:'day19_part3_review.html',title:'Part3 복습',isReview:true},{day:20,file:'day20_tax_optimization.html',title:'세금 최적화'},{day:21,file:'day21_financial_income_tax.html',title:'금융소득세'},{day:22,file:'day22_financial_automation.html',title:'금융 자동화'},{day:23,file:'day23_final_roadmap.html',title:'최종 로드맵'}]},
-{id:'french',name:'비즈니스 프랑스어',icon:'🇫🇷',color:'#bf4a8a',desc:'발음·비즈니스표현·문법·롤플레이',folder:'Franch_Lectures',lessons:[
-{day:1,file:'day-01-pronunciation.html',title:'발음'},{day:2,file:'day-02-greetings.html',title:'인사'},{day:3,file:'day-03-vocab-partA.html',title:'어휘A'},{day:4,file:'day-04-vocab-partB.html',title:'어휘B'},{day:5,file:'day-05-numbers-units.html',title:'숫자·단위'},{day:6,file:'day-06-email-expressions.html',title:'이메일'},{day:7,file:'day-07-review-part1.html',title:'Part1 복습',isReview:true},{day:8,file:'day-08-meeting-expressions.html',title:'회의 표현'},{day:9,file:'day-09-technical-explanation.html',title:'기술 설명'},{day:10,file:'day-10-problem-reporting.html',title:'문제 보고'},{day:11,file:'day-11-scheduling.html',title:'스케줄링'},{day:12,file:'day-12-presentation.html',title:'프레젠테이션'},{day:13,file:'day-13-negotiation.html',title:'협상'},{day:14,file:'day-14-review-part2.html',title:'Part2 복습',isReview:true},{day:15,file:'day-15-present-tense.html',title:'현재시제'},{day:16,file:'day-16-passe-compose.html',title:'과거시제'},{day:17,file:'day-17-conditionnel.html',title:'조건법'},{day:18,file:'day-18-passive-impersonal.html',title:'수동태'},{day:19,file:'day-19-questions-negation.html',title:'의문문·부정문'},{day:20,file:'day-20-review-part3.html',title:'Part3 복습',isReview:true},{day:21,file:'day-21-french-culture.html',title:'프랑스 문화'},{day:22,file:'day-22-email-correction.html',title:'이메일 교정'},{day:23,file:'day-23-roleplay-meeting.html',title:'롤플레이 회의'},{day:24,file:'day-24-roleplay-email.html',title:'롤플레이 이메일'},{day:25,file:'day-25-self-intro-presentation.html',title:'자기소개'},{day:26,file:'day-26-final-review.html',title:'최종 복습',isReview:true}]}
+/* ═══ COURSE DATA ═══ */
+const C=[
+  {id:'vd',name:'車輛動力學',icon:'⚔',color:'#c23b22',
+   folder:'VehicleDynamics_Lectures',lessons:[
+    {d:1,f:'Day01_운동방정식유도.html',t:'운동방정식 유도'},
+    {d:2,f:'Day02_비감쇠자유진동.html',t:'비감쇠 자유진동'},
+    {d:3,f:'Day03_감쇠비정의.html',t:'감쇠비 정의'},
+    {d:4,f:'Day04_부족감쇠자유진동.html',t:'부족감쇠 자유진동'},
+    {d:5,f:'Day05_강제조화진동.html',t:'강제조화 진동'},
+    {d:6,f:'Day06_위상각유도.html',t:'위상각 유도'},
+    {d:7,f:'Day07_공진조건분석.html',t:'공진조건 분석'},
+    {d:8,f:'Day08_쿼터카모델.html',t:'쿼터카 모델'},
+    {d:9,f:'Day09_쿼터카고유진동수.html',t:'쿼터카 고유진동수'},
+    {d:10,f:'Day10_하프카모델.html',t:'하프카 모델'},
+    {d:11,f:'Day11_하프카모드해석.html',t:'하프카 모드해석'},
+    {d:12,f:'Day12_전달함수유도.html',t:'전달함수 유도'},
+    {d:13,f:'Day13_전달률방진설계.html',t:'전달률 방진설계'},
+    {d:14,f:'Day14_노면스펙트럼승차감.html',t:'노면스펙트럼 승차감'},
+    {d:15,f:'Day15_Part2복습.html',t:'Part2 복습'},
+    {d:16,f:'Day16_스프링특성.html',t:'스프링 특성'},
+    {d:17,f:'Day17_댐퍼모델.html',t:'댐퍼 모델'},
+    {d:18,f:'Day18_부싱복소강성.html',t:'부싱 복소강성'},
+    {d:19,f:'Day19_타이어수직동특성.html',t:'타이어 수직동특성'},
+    {d:20,f:'Day20_TireHop.html',t:'Tire Hop'},
+    {d:21,f:'Day21_승차감트레이드오프.html',t:'승차감 트레이드오프'},
+    {d:22,f:'Day22_Part3복습.html',t:'Part3 복습'},
+    {d:23,f:'Day23_푸리에변환.html',t:'푸리에 변환'},
+    {d:24,f:'Day24_PSD정의.html',t:'PSD 정의'},
+    {d:25,f:'Day25_FRF측정.html',t:'FRF 측정'},
+    {d:26,f:'Day26_고유치문제.html',t:'고유치 문제'},
+    {d:27,f:'Day27_모드중첩법.html',t:'모드중첩법'},
+    {d:28,f:'Day28_Part4복습.html',t:'Part4 복습'},
+    {d:29,f:'Day29_수식Simpack매핑.html',t:'수식-Simpack 매핑'},
+    {d:30,f:'Day30_QuarterCar구현.html',t:'QuarterCar 구현'},
+    {d:31,f:'Day31_FRF상관성.html',t:'FRF 상관성'},
+    {d:32,f:'Day32_CoSimulation.html',t:'Co-Simulation'},
+    {d:33,f:'Day33_디지털트윈완성.html',t:'디지털트윈 완성'},
+    {d:34,f:'Day34_서스펜션기구학기초.html',t:'서스펜션 기구학 기초'},
+    {d:35,f:'Day35_캠버기하학.html',t:'캠버 기하학'},
+    {d:36,f:'Day36_토기하학.html',t:'토 기하학'},
+    {d:37,f:'Day37_킹핀기하학.html',t:'킹핀 기하학'},
+    {d:38,f:'Day38_롤센터안티지오메트리.html',t:'롤센터 안티지오메트리'},
+    {d:39,f:'Day39_순간중심롤스티어.html',t:'순간중심 롤스티어'},
+    {d:40,f:'Day40_KC시뮬레이션통합.html',t:'KC 시뮬레이션 통합'},
+    {d:41,f:'Day41_애커만기하학.html',t:'애커만 기하학'},
+    {d:42,f:'Day42_랙피니언역학.html',t:'랙피니언 역학'},
+    {d:43,f:'Day43_전동파워스티어링.html',t:'전동 파워스티어링'},
+    {d:44,f:'Day44_코너링포스슬립각.html',t:'코너링포스 슬립각'},
+    {d:45,f:'Day45_언더오버스티어.html',t:'언더/오버스티어'},
+    {d:46,f:'Day46_요응답전달함수.html',t:'요응답 전달함수'},
+    {d:47,f:'Day47_디스크브레이크열역학.html',t:'디스크브레이크 열역학'},
+    {d:48,f:'Day48_유압제동시스템.html',t:'유압 제동시스템'},
+    {d:49,f:'Day49_제동력배분하중이동.html',t:'제동력배분 하중이동'},
+    {d:50,f:'Day50_ABS_ESC제어.html',t:'ABS/ESC 제어'},
+    {d:51,f:'Day51_회생제동시스템.html',t:'회생제동 시스템'},
+    {d:52,f:'Day52_통합브레이크시스템.html',t:'통합 브레이크 시스템'}
+  ]},
+  {id:'en',name:'氣力管理',icon:'⚡',color:'#4a8b5c',
+   folder:'Energy_Lectures',lessons:[
+    {d:1,f:'day01_energy_systems.html',t:'에너지 시스템'},
+    {d:2,f:'day02_mitochondria.html',t:'미토콘드리아'},
+    {d:3,f:'day03_hormones.html',t:'호르몬'},
+    {d:4,f:'day04_autonomic.html',t:'자율신경계'},
+    {d:5,f:'day05_review.html',t:'Part1 복습'},
+    {d:6,f:'day06_sleep_architecture.html',t:'수면 구조'},
+    {d:7,f:'day07_sleep_hormones.html',t:'수면 호르몬'},
+    {d:8,f:'day08_sleep_environment.html',t:'수면 환경'},
+    {d:9,f:'day09_sleep_debt.html',t:'수면 부채'},
+    {d:10,f:'day10_sleep_tracking.html',t:'수면 추적'},
+    {d:11,f:'day11_nutrition_basics.html',t:'영양 기초'},
+    {d:12,f:'day12_protein.html',t:'단백질'},
+    {d:13,f:'day13_carbs.html',t:'탄수화물'},
+    {d:14,f:'day14_fats_micros.html',t:'지방·미량영양소'},
+    {d:15,f:'day15_hydration_caffeine.html',t:'수분·카페인'},
+    {d:16,f:'day16_meal_timing.html',t:'식사 타이밍'},
+    {d:17,f:'day17_nutrition_review.html',t:'영양 복습'},
+    {d:18,f:'day18_hypertrophy_science.html',t:'근비대 과학'},
+    {d:19,f:'day19_big_three.html',t:'빅3 운동'},
+    {d:20,f:'day20_upper_body.html',t:'상체 운동'},
+    {d:21,f:'day21_lower_core.html',t:'하체·코어'},
+    {d:22,f:'day22_periodization.html',t:'주기화'},
+    {d:23,f:'day23_injury_mobility.html',t:'부상·모빌리티'},
+    {d:24,f:'day24_recovery.html',t:'회복'},
+    {d:25,f:'day25_weight_review.html',t:'웨이트 복습'},
+    {d:26,f:'day26_vo2max_lactate.html',t:'VO2max·젖산'},
+    {d:27,f:'day27_running_form.html',t:'러닝 폼'},
+    {d:28,f:'day28_interval_training.html',t:'인터벌 트레이닝'},
+    {d:29,f:'day29_zone_training.html',t:'존 트레이닝'},
+    {d:30,f:'day30_concurrent_training.html',t:'동시 트레이닝'},
+    {d:31,f:'day31_running_review.html',t:'러닝 복습'},
+    {d:32,f:'day32_hrv.html',t:'HRV'},
+    {d:33,f:'day33_immune_energy.html',t:'면역·에너지'},
+    {d:34,f:'day34_fatigue_overtraining.html',t:'피로·과훈련'},
+    {d:35,f:'day35_travel_seasonal.html',t:'여행·시즌'},
+    {d:36,f:'day36_condition_review.html',t:'컨디션 복습'},
+    {d:37,f:'day37_morning_routine.html',t:'아침 루틴'},
+    {d:38,f:'day38_evening_routine.html',t:'저녁 루틴'},
+    {d:39,f:'day39_weekend_routine.html',t:'주말 루틴'},
+    {d:40,f:'day40_routine_review.html',t:'루틴 복습'},
+    {d:41,f:'day41_stress_neuroscience.html',t:'스트레스 신경과학'},
+    {d:42,f:'day42_meditation_breathwork.html',t:'명상·호흡'},
+    {d:43,f:'day43_flow_state.html',t:'몰입 상태'},
+    {d:44,f:'day44_emotional_regulation.html',t:'감정 조절'},
+    {d:45,f:'day45_mental_review.html',t:'멘탈 복습'},
+    {d:46,f:'day46_biohacking_tech.html',t:'바이오해킹'},
+    {d:47,f:'day47_supplementation.html',t:'보충제'},
+    {d:48,f:'day48_social_energy.html',t:'사회적 에너지'},
+    {d:49,f:'day49_digital_detox.html',t:'디지털 디톡스'},
+    {d:50,f:'day50_final_integration.html',t:'최종 통합'}
+  ]},
+  {id:'hu',name:'人間學',icon:'🧠',color:'#8a6abf',
+   folder:'Human_Lectures',lessons:[
+    {d:1,f:'day01_감정이란_무엇인가.html',t:'감정이란 무엇인가'},
+    {d:2,f:'day02_스트레스_호르몬_회로.html',t:'스트레스 호르몬 회로'},
+    {d:3,f:'day03_INFP_감정처리_패턴.html',t:'INFP 감정처리 패턴'},
+    {d:4,f:'day04_인지적_재평가.html',t:'인지적 재평가'},
+    {d:5,f:'day05_메타인지_훈련.html',t:'메타인지 훈련'},
+    {d:6,f:'day06_감정조절_실전_직장.html',t:'감정조절 실전 직장'},
+    {d:7,f:'day07_신뢰의_신경과학.html',t:'신뢰의 신경과학'},
+    {d:8,f:'day08_공감의_두_종류.html',t:'공감의 두 종류'},
+    {d:9,f:'day09_어서티브_커뮤니케이션.html',t:'어서티브 커뮤니케이션'},
+    {d:10,f:'day10_갈등의_신경과학.html',t:'갈등의 신경과학'},
+    {d:11,f:'day11_피드백_주고받기.html',t:'피드백 주고받기'},
+    {d:12,f:'day12_통합복습_Part1_2.html',t:'통합복습 Part1-2'},
+    {d:13,f:'day13_스토아_통제의_이분법.html',t:'스토아 통제의 이분법'},
+    {d:14,f:'day14_아우렐리우스_실천.html',t:'아우렐리우스 실천'},
+    {d:15,f:'day15_불교적_무상관.html',t:'불교적 무상관'},
+    {d:16,f:'day16_프랭클_의미치료.html',t:'프랭클 의미치료'},
+    {d:17,f:'day17_흐름_상태.html',t:'흐름 상태'},
+    {d:18,f:'day18_철학_프레임_통합.html',t:'철학 프레임 통합'},
+    {d:19,f:'day19_가치관_명료화.html',t:'가치관 명료화'},
+    {d:20,f:'day20_정체성과_역할_통합.html',t:'정체성과 역할 통합'},
+    {d:21,f:'day21_결정의_철학.html',t:'결정의 철학'},
+    {d:22,f:'day22_나만의_감정관리_시스템.html',t:'나만의 감정관리 시스템'}
+  ]},
+  {id:'fr',name:'佛蘭西語',icon:'🇫🇷',color:'#bf8a4a',
+   folder:'Franch_Lectures',lessons:[
+    {d:1,f:'day-01-pronunciation.html',t:'발음'},
+    {d:2,f:'day-02-greetings.html',t:'인사'},
+    {d:3,f:'day-03-vocab-partA.html',t:'어휘 A'},
+    {d:4,f:'day-04-vocab-partB.html',t:'어휘 B'},
+    {d:5,f:'day-05-numbers-units.html',t:'숫자·단위'},
+    {d:6,f:'day-06-email-expressions.html',t:'이메일 표현'},
+    {d:7,f:'day-07-review-part1.html',t:'Part1 복습'},
+    {d:8,f:'day-08-meeting-expressions.html',t:'회의 표현'},
+    {d:9,f:'day-09-technical-explanation.html',t:'기술 설명'},
+    {d:10,f:'day-10-problem-reporting.html',t:'문제 보고'},
+    {d:11,f:'day-11-scheduling.html',t:'일정 조율'},
+    {d:12,f:'day-12-presentation.html',t:'프레젠테이션'},
+    {d:13,f:'day-13-negotiation.html',t:'협상'},
+    {d:14,f:'day-14-review-part2.html',t:'Part2 복습'},
+    {d:15,f:'day-15-present-tense.html',t:'현재시제'},
+    {d:16,f:'day-16-passe-compose.html',t:'복합과거'},
+    {d:17,f:'day-17-conditionnel.html',t:'조건법'},
+    {d:18,f:'day-18-passive-impersonal.html',t:'수동·비인칭'},
+    {d:19,f:'day-19-questions-negation.html',t:'의문·부정'},
+    {d:20,f:'day-20-review-part3.html',t:'Part3 복습'},
+    {d:21,f:'day-21-french-culture.html',t:'프랑스 문화'},
+    {d:22,f:'day-22-email-correction.html',t:'이메일 교정'},
+    {d:23,f:'day-23-roleplay-meeting.html',t:'롤플레이 회의'},
+    {d:24,f:'day-24-roleplay-email.html',t:'롤플레이 이메일'},
+    {d:25,f:'day-25-self-intro-presentation.html',t:'자기소개 PT'},
+    {d:26,f:'day-26-final-review.html',t:'최종 복습'}
+  ]},
+  {id:'pa',name:'育兒·父學',icon:'👶',color:'#4abfbf',
+   folder:'Parenting_Lectures',lessons:[
+    {d:1,f:'day01_brain_development.html',t:'뇌 발달'},
+    {d:2,f:'day02_attachment_theory.html',t:'애착 이론'},
+    {d:3,f:'day03_dad_play_neuroscience.html',t:'아빠 놀이 신경과학'},
+    {d:4,f:'day04_self_regulation.html',t:'자기 조절'},
+    {d:5,f:'day05_cognitive_development.html',t:'인지 발달'},
+    {d:6,f:'day06_language_explosion.html',t:'언어 폭발'},
+    {d:7,f:'day07_part1_review.html',t:'Part1 복습'},
+    {d:8,f:'day08_sibling_jealousy.html',t:'형제 질투'},
+    {d:9,f:'day09_fairness_equity.html',t:'공정·형평'},
+    {d:10,f:'day10_sibling_cooperation.html',t:'형제 협력'},
+    {d:11,f:'day11_one_on_one_time.html',t:'1:1 시간'},
+    {d:12,f:'day12_part2_review.html',t:'Part2 복습'},
+    {d:13,f:'day13_parenting_stress.html',t:'양육 스트레스'},
+    {d:14,f:'day14_gottman_marriage_science.html',t:'가트만 부부과학'},
+    {d:15,f:'day15_dual_income_communication.html',t:'맞벌이 소통'},
+    {d:16,f:'day16_coparenting_alignment.html',t:'공동양육 정렬'},
+    {d:17,f:'day17_part3_review.html',t:'Part3 복습'},
+    {d:18,f:'day18_focused_play_design.html',t:'집중놀이 설계'},
+    {d:19,f:'day19_bedtime_routine.html',t:'취침 루틴'},
+    {d:20,f:'day20_emotion_coaching.html',t:'감정 코칭'},
+    {d:21,f:'day21_dad_routine_system.html',t:'아빠 루틴 시스템'}
+  ]},
+  {id:'ec',name:'財テク',icon:'💰',color:'#c9a84c',
+   folder:'Economics_Lectures',lessons:[
+    {d:1,f:'day01_financial_goal_setting.html',t:'재무 목표 설정'},
+    {d:2,f:'day02_compound_interest.html',t:'복리의 힘'},
+    {d:3,f:'day03_asset_pipeline.html',t:'자산 파이프라인'},
+    {d:4,f:'day04_mortgage_optimization.html',t:'대출 최적화'},
+    {d:5,f:'day05_risk_assessment.html',t:'리스크 평가'},
+    {d:6,f:'day06_behavioral_finance.html',t:'행동재무학'},
+    {d:7,f:'day07_part1_review.html',t:'Part1 복습'},
+    {d:8,f:'day08_valuation_basics.html',t:'밸류에이션 기초'},
+    {d:9,f:'day09_semiconductor_analysis.html',t:'반도체 분석'},
+    {d:10,f:'day10_financial_statements.html',t:'재무제표'},
+    {d:11,f:'day11_technical_analysis.html',t:'기술적 분석'},
+    {d:12,f:'day12_timing_principles.html',t:'타이밍 원칙'},
+    {d:13,f:'day13_kospi_discount.html',t:'KOSPI 디스카운트'},
+    {d:14,f:'day14_part2_review.html',t:'Part2 복습'},
+    {d:15,f:'day15_real_estate_cycle.html',t:'부동산 사이클'},
+    {d:16,f:'day16_house_swap_simulation.html',t:'갈아타기 시뮬레이션'},
+    {d:17,f:'day17_rebalancing.html',t:'리밸런싱'},
+    {d:18,f:'day18_global_diversification.html',t:'글로벌 분산투자'},
+    {d:19,f:'day19_part3_review.html',t:'Part3 복습'},
+    {d:20,f:'day20_tax_optimization.html',t:'절세 전략'},
+    {d:21,f:'day21_financial_income_tax.html',t:'금융소득세'},
+    {d:22,f:'day22_financial_automation.html',t:'재무 자동화'},
+    {d:23,f:'day23_final_roadmap.html',t:'최종 로드맵'}
+  ]}
 ];
-const SR_INTERVALS=[1,3,7,14,30,60];
-const NEURO_TIPS=[
-{title:'🔄 간격 반복 (Spaced Repetition)',body:'에빙하우스 <strong>망각곡선</strong>: 24시간 내 70% 망각. 1→3→7→14→30일 간격 복습으로 <strong>장기기억 전환율 90%↑</strong>. 해마→대뇌피질 기억 공고화.'},
-{title:'🔀 인터리빙 (Interleaving)',body:'다른 과목을 <strong>번갈아 학습</strong>하면 장기 파지율 43%↑. 전전두엽이 능동적으로 분류·비교하면서 <strong>깊은 인코딩</strong> 발생.'},
-{title:'🧪 능동 회상 (Active Recall)',body:'재독보다 <strong>스스로 떠올리기</strong>가 기억 강도 2-3배↑ (<strong>Testing Effect</strong>). 학습 후 눈 감고 핵심 3가지 회상하기.'},
-{title:'🏗️ 정교화 (Elaboration)',body:'새 정보를 <strong>기존 지식과 연결</strong>하면 시냅스 강화. "내 업무 어디와 연결되지?" 자문. <strong>스키마</strong>가 풍부할수록 학습 가속.'},
-{title:'😴 수면 기억 공고화',body:'<strong>서파수면(SWS)</strong>에서 해마→대뇌피질 기억 전이. 학습 후 <strong>7시간+ 수면</strong> 필수. 20분 낮잠도 선언적 기억 34%↑.'},
-{title:'🎯 울트라디안 리듬',body:'뇌 집중력 <strong>90분 주기</strong> 변동 (울트라디안 리듬). 포모도로 25+5 또는 50+10 사이클 활용. 휴식 중 <strong>디퓨즈 모드</strong>에서 무의식적 문제해결.'},
-{title:'🧬 BDNF와 운동',body:'유산소 운동 → BDNF 200%↑ → <strong>해마 신경세포 생성</strong> 촉진. 학습 전 20분 걷기만으로 기억력 20%↑.'},
-{title:'📝 이중 부호화',body:'<strong>언어+시각</strong> 함께 사용 → 인출 경로 2배. 수식 배울 때 그래프 그리기, 개념 배울 때 다이어그램 만들기.'},
-{title:'🎭 편도체 태깅',body:'<strong>감정적 각성</strong>시 편도체가 "중요" 태그 → 장기기억 전환 극적 증가. "아이들에게 어떤 도움이 될까?" 감정적 동기 연결.'},
-{title:'🌊 디퓨즈 모드',body:'어려운 문제 → 산책/샤워/명상으로 <strong>확산 모드</strong> 전환 → <strong>Default Mode Network</strong> 활성화 → 창의적 해결.'}
+
+/* ═══ MUSASHI QUOTES ═══ */
+const QUOTES=[
+  '千日の稽古を鍛とし、万日の稽古を練とす — 宮本武蔵',
+  '我、事において後悔せず — 宮本武蔵',
+  '道においては死をいとわず思うなり — 宮本武蔵',
+  '心、常に道を離れず — 宮本武蔵',
+  '万理一空 — 宮本武蔵',
+  '身を捨てても名利は捨てず — 宮本武蔵',
+  '構えあって構えなし — 宮本武蔵',
+  '鍛は千日、練は万日 — 五輪書',
+  '一つの道を極めれば万の道に通ず — 宮本武蔵',
+  '敵を知り、己を知る — 兵法の心得'
 ];
 
-// ═══ STATE ═══
-function getState(){try{return JSON.parse(localStorage.getItem('learn_data_v3'))||{}}catch(e){return{}}}
-function saveState(s){localStorage.setItem('learn_data_v3',JSON.stringify(s))}
-function getLK(cid,day){return`${cid}_d${day}`}
-function today(){return new Date().toISOString().slice(0,10)}
-function addDays(ds,n){const d=new Date(ds);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
-function saveSetting(k,v){const s=getState();if(!s.settings)s.settings={};s.settings[k]=v;saveState(s)}
-function getSetting(k,d){const s=getState();return(s.settings&&s.settings[k])||d}
-function isCompleted(cid,day){const s=getState();return s.lessons&&s.lessons[getLK(cid,day)]}
-
-function markComplete(cid,day){
-  const s=getState();if(!s.lessons)s.lessons={};
-  const k=getLK(cid,day),now=today();
-  if(!s.lessons[k]){s.lessons[k]={completed:now,reviews:[],nextReview:null,srIndex:0};s.lessons[k].nextReview=addDays(now,SR_INTERVALS[0])}
-  if(!s.studyDays)s.studyDays={};s.studyDays[now]=(s.studyDays[now]||0)+1;
-  saveState(s);renderAll();
+/* ═══ STATE ═══ */
+const SK='learn_data_v3';
+const INTERVALS=[1,3,7,14,30,60];
+function gs(){try{return JSON.parse(localStorage.getItem(SK))||{}}catch(e){return{}}}
+function ss(s){localStorage.setItem(SK,JSON.stringify(s))}
+function getProgress(cid){const s=gs();return(s[cid]||{}).done||[]}
+function markDone(cid,day){
+  const s=gs(),cd=s[cid]||{done:[],reviews:{}};
+  if(!cd.done.includes(day)){cd.done.push(day);cd.done.sort((a,b)=>a-b)}
+  const today=todayStr();
+  cd.reviews[day]={stage:0,next:addDays(today,INTERVALS[0]),last:today};
+  s[cid]=cd;ss(s);
 }
-function markReviewed(cid,day){
-  const s=getState();if(!s.lessons)return;const k=getLK(cid,day),rec=s.lessons[k];if(!rec)return;
-  const now=today();rec.reviews.push(now);rec.srIndex=Math.min(rec.srIndex+1,SR_INTERVALS.length-1);rec.nextReview=addDays(now,SR_INTERVALS[rec.srIndex]);
-  if(!s.studyDays)s.studyDays={};s.studyDays[now]=(s.studyDays[now]||0)+1;
-  saveState(s);renderAll();
+function getReviews(cid){const s=gs();return(s[cid]||{}).reviews||{}}
+function advanceReview(cid,day){
+  const s=gs(),cd=s[cid]||{done:[],reviews:{}};
+  const r=cd.reviews[day];if(!r)return;
+  const ns=Math.min(r.stage+1,INTERVALS.length-1);
+  r.stage=ns;r.last=todayStr();r.next=addDays(todayStr(),INTERVALS[ns]);
+  s[cid]=cd;ss(s);
 }
-function unmarkComplete(cid,day){const s=getState();if(!s.lessons)return;delete s.lessons[getLK(cid,day)];saveState(s);renderAll()}
-
-// ═══════════════════════════════════════════
-// POMODORO TIMER
-// ═══════════════════════════════════════════
-let timerInterval=null, timerSeconds=0, timerTotal=0, timerRunning=false;
-let currentMode='focus', pomodoroCount=0, totalFocusSec=0, ultrCount=0;
-let timerStartedAt=null;
-const CIRC=2*Math.PI*88;
-const MODES={focus:{label:'집중 모드',color:'var(--gold)'},short:{label:'짧은 휴식',color:'var(--green)'},long:{label:'긴 휴식',color:'var(--cyan)'},ultra:{label:'울트라디안 집중',color:'var(--purple)'}};
-
-function getModeDuration(mode){
-  if(mode==='focus')return parseInt(getSetting('focusDuration','25'))*60;
-  if(mode==='short')return parseInt(getSetting('shortBreak','5'))*60;
-  if(mode==='long')return parseInt(getSetting('longBreak','15'))*60;
-  if(mode==='ultra')return 50*60;
-  return 25*60;
-}
-
-function setTimerMode(mode){
-  if(timerRunning)return;
-  currentMode=mode;
-  document.querySelectorAll('.timer-mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
-  timerTotal=getModeDuration(mode);timerSeconds=timerTotal;
-  updateTimerUI();
-}
-
-function toggleTimer(){
-  if(timerRunning){pauseTimer()}else{startTimer()}
-}
-
-function startTimer(){
-  if(timerRunning)return;
-  timerRunning=true;timerStartedAt=Date.now();
-  document.getElementById('timerStartBtn').innerHTML='⏸ 일시정지';
-  document.getElementById('skipBtn').style.display='inline-block';
-  showFloatingTimer(true);
-  timerInterval=setInterval(()=>{
-    timerSeconds--;
-    if(timerSeconds<=0){onTimerEnd();return}
-    updateTimerUI();
-  },1000);
-}
-
-function pauseTimer(){
-  timerRunning=false;clearInterval(timerInterval);
-  document.getElementById('timerStartBtn').innerHTML='▶ 계속';
-  if(currentMode==='focus'||currentMode==='ultra'){
-    const elapsed=timerTotal-timerSeconds;
-    if(elapsed>=60)logStudyTime(elapsed);
+function addLog(cid,mins){const s=gs(),logs=s._logs||[];logs.push({date:todayStr(),cid,mins,ts:Date.now()});s._logs=logs;ss(s)}
+function getLogs(){return(gs()._logs||[])}
+function todayMins(){return getLogs().filter(l=>l.date===todayStr()).reduce((a,l)=>a+l.mins,0)}
+function calcStreak(){
+  const logs=getLogs(),dates=[...new Set(logs.map(l=>l.date))].sort().reverse();
+  if(!dates.length)return 0;
+  let streak=0,d=new Date();
+  for(let i=0;i<400;i++){
+    const ds=fmt(d);
+    if(dates.includes(ds)){streak++;d.setDate(d.getDate()-1)}
+    else if(i===0){d.setDate(d.getDate()-1)}
+    else break;
   }
+  return streak;
+}
+function todayStr(){return fmt(new Date())}
+function fmt(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function addDays(ds,n){const d=new Date(ds);d.setDate(d.getDate()+n);return fmt(d)}
+function dayNames(){return['日','月','火','水','木','金','土']}
+
+/* ═══ SLASH ANIMATION ═══ */
+function triggerSlash(){
+  // Horizontal ink slash
+  const line=document.createElement('div');
+  line.className='slash-line';
+  document.body.appendChild(line);
+  setTimeout(()=>line.remove(),900);
+
+  // Ink circle at center
+  const circle=document.createElement('div');
+  circle.className='ink-circle';
+  circle.style.left=(window.innerWidth/2-60)+'px';
+  circle.style.top=(window.innerHeight/2-60)+'px';
+  document.body.appendChild(circle);
+  setTimeout(()=>circle.remove(),1100);
 }
 
-function resetTimer(){
-  pauseTimer();timerSeconds=getModeDuration(currentMode);timerTotal=timerSeconds;
-  document.getElementById('timerStartBtn').innerHTML='▶ 시작';
-  document.getElementById('skipBtn').style.display='none';
-  showFloatingTimer(false);updateTimerUI();
+/* ═══ TABS ═══ */
+const nav=document.getElementById('nav');
+nav.addEventListener('click',e=>{
+  const btn=e.target.closest('button[data-tab]');if(!btn)return;
+  nav.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+  document.getElementById('p-'+btn.dataset.tab).classList.add('on');
+});
+
+/* ═══ DATE + QUOTE ═══ */
+function showDate(){
+  const d=new Date(),dn=dayNames();
+  document.getElementById('dateDisp').textContent=`${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} (${dn[d.getDay()]})`;
+  document.getElementById('quoteBar').textContent=QUOTES[d.getDate()%QUOTES.length];
+}
+showDate();
+
+/* ═══ HOME ═══ */
+function renderHome(){
+  document.getElementById('streakN').textContent=calcStreak();
+  document.getElementById('todayMin').textContent=todayMins();
+  renderFeed();renderReviewQueue();
 }
 
-function skipPhase(){onTimerEnd()}
-
-function onTimerEnd(){
-  clearInterval(timerInterval);timerRunning=false;
-  const wasFocus=currentMode==='focus'||currentMode==='ultra';
-  if(wasFocus){
-    logStudyTime(timerTotal);
-    pomodoroCount++;totalFocusSec+=timerTotal;
-    if(currentMode==='ultra')ultrCount++;
-    // Auto-switch to break
-    if(pomodoroCount%4===0){setTimerMode('long')}else{setTimerMode('short')}
-  }else{
-    setTimerMode('focus');
-  }
-  playAlarm();
-  updateSessionInfo();
-  document.getElementById('timerStartBtn').innerHTML='▶ 시작';
-  document.getElementById('skipBtn').style.display='none';
-  document.querySelector('.timer-card').classList.add('shake');
-  setTimeout(()=>document.querySelector('.timer-card').classList.remove('shake'),600);
-}
-
-function updateTimerUI(){
-  const m=Math.floor(timerSeconds/60),s=timerSeconds%60;
-  const display=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  document.getElementById('timerDisplay').textContent=display;
-  document.getElementById('timerPhase').textContent=MODES[currentMode].label;
-  const ring=document.getElementById('timerRing');
-  const progress=(timerTotal-timerSeconds)/timerTotal;
-  ring.style.strokeDashoffset=CIRC*(1-progress);
-  ring.style.stroke=MODES[currentMode].color;
-  // Floating timer
-  document.getElementById('ftTime').textContent=display;
-  document.getElementById('ftDot').style.background=MODES[currentMode].color;
-}
-
-function showFloatingTimer(show){
-  const ft=document.getElementById('floatingTimer');
-  const isTimerTab=document.getElementById('tab-timer').classList.contains('active');
-  ft.classList.toggle('visible',show&&!isTimerTab);
-}
-
-function updateSessionInfo(){
-  document.getElementById('pomodoroCount').textContent=pomodoroCount;
-  document.getElementById('totalFocusTime').textContent=Math.round(totalFocusSec/60)+'분';
-  document.getElementById('ultrCount').textContent=ultrCount;
-}
-
-// ═══ STUDY TIME LOG ═══
-function logStudyTime(seconds){
-  const s=getState();if(!s.studyLog)s.studyLog=[];
-  const courseSelect=document.getElementById('timerCourseSelect');
-  const lessonSelect=document.getElementById('timerLessonSelect');
-  const courseId=courseSelect.value||'';
-  const lessonDay=lessonSelect.value||'';
-  const course=COURSES.find(c=>c.id===courseId);
-  const lesson=course?course.lessons.find(l=>l.day==lessonDay):null;
-  s.studyLog.push({
-    date:today(),
-    time:new Date().toTimeString().slice(0,5),
-    seconds,
-    courseId,
-    lessonDay:lessonDay?parseInt(lessonDay):null,
-    courseName:course?course.name:'',
-    lessonTitle:lesson?lesson.title:''
+function renderFeed(){
+  const list=document.getElementById('feedList');
+  const empty=document.getElementById('feedEmpty');
+  list.textContent='';
+  const today=todayStr();const items=[];
+  C.forEach(c=>{
+    const done=getProgress(c.id);
+    const next=c.lessons.find(l=>!done.includes(l.d));
+    if(next)items.push({type:'new',c,l:next});
   });
-  // Aggregate daily time per course
-  if(!s.dailyTime)s.dailyTime={};
-  const dk=today();
-  if(!s.dailyTime[dk])s.dailyTime[dk]={};
-  s.dailyTime[dk][courseId||'_none']=(s.dailyTime[dk][courseId||'_none']||0)+seconds;
-  s.dailyTime[dk]._total=(s.dailyTime[dk]._total||0)+seconds;
-  saveState(s);renderStudyLog();renderTodayStudyTime();
+  C.forEach(c=>{
+    const revs=getReviews(c.id);
+    Object.entries(revs).forEach(([day,r])=>{
+      if(r.next<=today){const l=c.lessons.find(x=>x.d===+day);if(l)items.push({type:'rev',c,l,r})}
+    });
+  });
+  if(!items.length){empty.style.display='block';return}
+  empty.style.display='none';
+  items.forEach((item,i)=>{
+    const row=document.createElement('div');
+    row.className='feed-item';
+    row.style.animation=`fadeUp 0.3s ease-out ${i*0.05}s both`;
+    row.addEventListener('click',()=>openLesson(item.c,item.l,item.type==='rev'));
+    const icon=document.createElement('div');icon.className='feed-icon';icon.textContent=item.c.icon;
+    const info=document.createElement('div');info.className='feed-info';
+    const t=document.createElement('div');t.className='t';t.textContent=`第${item.l.d}日 — ${item.l.t}`;
+    const s=document.createElement('div');s.className='s';s.textContent=item.c.name;
+    info.appendChild(t);info.appendChild(s);
+    const badge=document.createElement('span');
+    badge.className=item.type==='new'?'badge new':'badge rev';
+    badge.textContent=item.type==='new'?'新':'復';
+    row.appendChild(icon);row.appendChild(info);row.appendChild(badge);
+    list.appendChild(row);
+  });
 }
-
-function renderStudyLog(){
-  const s=getState();const logs=(s.studyLog||[]).filter(l=>l.date===today()).reverse();
-  const el=document.getElementById('studyLog');
-  const noEl=document.getElementById('noLog');
-  if(logs.length===0){el.innerHTML='';noEl.style.display='block';return}
-  noEl.style.display='none';
-  el.innerHTML=logs.map(l=>{
-    const m=Math.floor(l.seconds/60),sec=l.seconds%60;
-    const dur=m>0?`${m}분 ${sec}초`:`${sec}초`;
-    const course=COURSES.find(c=>c.id===l.courseId);
-    return`<div class="log-item">
-      <span class="log-duration">${dur}</span>
-      <span class="log-course">${course?course.icon+' ':''} ${l.courseName||'미지정'}${l.lessonTitle?' — '+l.lessonTitle:''}</span>
-      <span class="log-time">${l.time}</span>
-    </div>`;
-  }).join('');
-}
-
-function renderTodayStudyTime(){
-  const s=getState();const dt=s.dailyTime&&s.dailyTime[today()];
-  const total=dt?dt._total||0:0;
-  const h=Math.floor(total/3600),m=Math.floor((total%3600)/60);
-  document.getElementById('todayStudyTime').textContent=h>0?`${h}:${String(m).padStart(2,'0')}`:`${m}분`;
-  // Preview logs
-  const logs=(s.studyLog||[]).filter(l=>l.date===today()).reverse().slice(0,3);
-  const el=document.getElementById('todayLogPreview');
-  if(logs.length===0){el.innerHTML='<div style="font-size:0.72rem;color:var(--text-dim);text-align:center">타이머로 학습을 시작하세요</div>';return}
-  el.innerHTML=logs.map(l=>{
-    const m2=Math.floor(l.seconds/60);
-    return`<div style="font-size:0.72rem;color:var(--text-dim);padding:2px 0">⏱️ ${l.courseName||'미지정'} ${m2}분 (${l.time})</div>`;
-  }).join('');
-}
-
-function renderWeeklyChart(){
-  const s=getState();const dt=s.dailyTime||{};
-  let maxSec=1;const days=[];
-  for(let i=6;i>=0;i--){
-    const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().slice(0,10);
-    const total=dt[ds]?dt[ds]._total||0:0;
-    days.push({date:ds,total,label:['일','월','화','수','목','금','토'][d.getDay()]});
-    if(total>maxSec)maxSec=total;
-  }
-  const chart=document.getElementById('weeklyChart');
-  const labels=document.getElementById('weeklyLabels');
-  chart.innerHTML=days.map(d=>{
-    const pct=Math.max(d.total/maxSec*100,2);const m=Math.round(d.total/60);
-    const isToday=d.date===today();
-    return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
-      <span style="font-size:0.6rem;color:var(--text-dim)">${m>0?m+'분':''}</span>
-      <div style="width:100%;height:${pct}%;background:${isToday?'var(--gold)':'var(--surface3)'};border-radius:4px;min-height:4px;transition:height 0.3s"></div>
-    </div>`;
-  }).join('');
-  labels.innerHTML=days.map(d=>`<span>${d.label}</span>`).join('');
-}
-
-// ═══ TIMER SELECTS ═══
-function buildTimerSelects(){
-  const cs=document.getElementById('timerCourseSelect');
-  cs.innerHTML='<option value="">과목 선택</option>'+COURSES.map(c=>`<option value="${c.id}">${c.icon} ${c.name}</option>`).join('');
-  updateTimerLessonSelect();
-}
-function updateTimerLessonSelect(){
-  const cs=document.getElementById('timerCourseSelect');
-  const ls=document.getElementById('timerLessonSelect');
-  const course=COURSES.find(c=>c.id===cs.value);
-  if(!course){ls.innerHTML='<option value="">강의 선택</option>';return}
-  ls.innerHTML='<option value="">강의 선택</option>'+course.lessons.map(l=>`<option value="${l.day}">Day${l.day}: ${l.title}</option>`).join('');
-}
-
-// ═══ ALARM ═══
-function playAlarm(){
-  const type=getSetting('alarmType','bell');if(type==='none')return;
-  try{
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    const freq=type==='bell'?880:660;
-    for(let i=0;i<3;i++){
-      const osc=ctx.createOscillator();const gain=ctx.createGain();
-      osc.connect(gain);gain.connect(ctx.destination);
-      osc.type=type==='bell'?'sine':'triangle';osc.frequency.value=freq;
-      gain.gain.setValueAtTime(0.3,ctx.currentTime+i*0.3);
-      gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+i*0.3+0.25);
-      osc.start(ctx.currentTime+i*0.3);osc.stop(ctx.currentTime+i*0.3+0.3);
-    }
-  }catch(e){}
-  // Vibration
-  if(navigator.vibrate)navigator.vibrate([200,100,200,100,200]);
-}
-
-// ═══ COURSE TIME STATS ═══
-function renderCourseTimeStats(){
-  const s=getState();const dt=s.dailyTime||{};
-  const totals={};
-  for(const[date,dayData]of Object.entries(dt)){
-    for(const[cid,sec]of Object.entries(dayData)){
-      if(cid==='_total')continue;
-      totals[cid]=(totals[cid]||0)+sec;
-    }
-  }
-  const el=document.getElementById('courseTimeStats');
-  const grandTotal=Object.values(totals).reduce((a,b)=>a+b,0)||1;
-  el.innerHTML=COURSES.map(c=>{
-    const sec=totals[c.id]||0;const h=Math.floor(sec/3600);const m=Math.floor((sec%3600)/60);
-    const pct=Math.round(sec/grandTotal*100);
-    return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
-      <span style="font-size:0.8rem;width:120px">${c.icon} ${c.name}</span>
-      <div style="flex:1;background:var(--surface2);border-radius:4px;height:6px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${c.color};border-radius:4px"></div></div>
-      <span style="font-size:0.75rem;color:var(--text-dim);width:60px;text-align:right">${h>0?h+'시간 ':''}${m}분</span>
-    </div>`;
-  }).join('');
-}
-
-// ═══ RENDER FUNCTIONS (Same logic as before, compacted) ═══
-function renderStats(){
-  const s=getState(),lessons=s.lessons||{},total=COURSES.reduce((a,c)=>a+c.lessons.length,0),done=Object.keys(lessons).length;
-  const td=today(),due=Object.entries(lessons).filter(([k,v])=>v.nextReview&&v.nextReview<=td).length;
-  const tdDone=s.studyDays&&s.studyDays[td]||0;
-  document.getElementById('statsRow').innerHTML=`
-    <div class="stat-card"><div class="stat-num" style="color:var(--gold)">${done}</div><div class="stat-label">완료</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${total-done}</div><div class="stat-label">남은 강의</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--purple)">${due}</div><div class="stat-label">복습 대기</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--green)">${tdDone}</div><div class="stat-label">오늘 학습</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--orange)">${Math.round(done/total*100)}%</div><div class="stat-label">진도율</div></div>`;
-}
-
-function generateTodayPlan(){
-  const s=getState(),lessons=s.lessons||{},td=today();
-  const nGoal=parseInt(getSetting('dailyGoal','3')),rGoal=parseInt(getSetting('reviewGoal','3'));
-  let rItems=[];
-  for(const[k,rec]of Object.entries(lessons)){
-    if(rec.nextReview&&rec.nextReview<=td){
-      const[cid,dp]=k.split('_d');const co=COURSES.find(c=>c.id===cid);if(!co)continue;
-      const le=co.lessons.find(l=>l.day==dp);if(!le)continue;
-      rItems.push({course:co,lesson:le,urgency:rec.nextReview<td?'overdue':'today'});
-    }
-  }
-  rItems.sort((a,b)=>a.urgency==='overdue'?-1:1);rItems=rItems.slice(0,rGoal);
-  let nItems=[];const shuf=[...COURSES].sort(()=>Math.random()-0.5);
-  for(const co of shuf){if(nItems.length>=nGoal)break;const nl=co.lessons.find(l=>!isCompleted(co.id,l.day));if(nl)nItems.push({course:co,lesson:nl})}
-  let plan=[];let ni=0,ri=0;
-  while(ni<nItems.length||ri<rItems.length){
-    if(ni<nItems.length)plan.push({...nItems[ni],type:'new'});ni++;
-    if(ri<rItems.length)plan.push({...rItems[ri],type:'review'});ri++;
-  }
-  if(plan.length>2)plan.splice(Math.floor(plan.length/2),0,{type:'active',title:'🧪 능동 회상: 지금까지 배운 핵심 3가지를 눈감고 떠올려보세요'});
-  renderPlan(plan);
-  s.todayPlan={date:td,items:plan.map(p=>p.type==='active'?{type:'active'}:{courseId:p.course.id,day:p.lesson.day,type:p.type})};saveState(s);
-}
-
-function renderPlan(plan){
-  const el=document.getElementById('todayPlan');
-  if(!plan.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-dim)">모든 강의 완료! 🎉</div>';return}
-  el.innerHTML=plan.map(it=>{
-    if(it.type==='active')return`<div class="plan-item" style="border-left:3px solid var(--orange)"><span class="type active">회상</span><span style="flex:1">${it.title}</span></div>`;
-    const href=`${it.course.folder}/${it.lesson.file}`;
-    return`<div class="plan-item">
-      <span class="type ${it.type}">${it.type==='new'?'신규':'복습'}</span>
-      <a href="${href}" target="_blank">Day${it.lesson.day}: ${it.lesson.title}</a>
-      <span class="course-tag" style="border-left:2px solid ${it.course.color};padding-left:5px">${it.course.icon}</span>
-      <button class="btn-sm" style="border-color:${it.type==='new'?'var(--green)':'var(--purple)'};color:${it.type==='new'?'var(--green)':'var(--purple)'}" onclick="event.stopPropagation();${it.type==='new'?`markComplete('${it.course.id}',${it.lesson.day})`:`markReviewed('${it.course.id}',${it.lesson.day})`}">✓</button>
-    </div>`;
-  }).join('');
-}
-
-function renderCourses(){
-  document.getElementById('courseGrid').innerHTML=COURSES.map(c=>{
-    const done=c.lessons.filter(l=>isCompleted(c.id,l.day)).length,pct=Math.round(done/c.lessons.length*100);
-    return`<div class="course-card" onclick="toggleLessons('${c.id}')">
-      <div class="course-header"><span class="course-name">${c.icon} ${c.name}</span><span class="course-badge" style="background:${c.color}22;color:${c.color};border:1px solid ${c.color}44">${pct}%</span></div>
-      <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:6px">${c.desc}</div>
-      <div class="progress-wrap"><div class="progress-fill" style="width:${pct}%;background:${c.color}"></div></div>
-      <div class="course-meta"><span>${done}/${c.lessons.length}</span><span>${c.lessons.length-done}개 남음</span></div>
-      <div class="lesson-list" id="lessons-${c.id}">
-        ${c.lessons.map(l=>{
-          const comp=isCompleted(c.id,l.day),s2=getState(),k=getLK(c.id,l.day),rec=s2.lessons&&s2.lessons[k];
-          let bdg='';
-          if(comp&&rec&&rec.nextReview&&rec.nextReview<=today())bdg='<span class="badge review">복습</span>';
-          else if(!comp&&c.lessons.indexOf(l)===c.lessons.findIndex(ll=>!isCompleted(c.id,ll.day)))bdg='<span class="badge next">다음</span>';
-          return`<div class="lesson-item" onclick="event.stopPropagation()">
-            <div class="chk ${comp?'done':''}" onclick="event.stopPropagation();${comp?`unmarkComplete('${c.id}',${l.day})`:`markComplete('${c.id}',${l.day})`}">${comp?'✓':''}</div>
-            <a class="link" href="${c.folder}/${l.file}" target="_blank">Day${l.day}: ${l.title}${l.isReview?' 📝':''}</a>${bdg}
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-  }).join('');
-}
-function toggleLessons(id){document.getElementById('lessons-'+id).classList.toggle('open')}
 
 function renderReviewQueue(){
-  const s=getState(),lessons=s.lessons||{},td=today();let items=[];
-  for(const[k,rec]of Object.entries(lessons)){
-    if(!rec.nextReview)continue;const[cid,dp]=k.split('_d');const co=COURSES.find(c=>c.id===cid);if(!co)continue;
-    const le=co.lessons.find(l=>l.day==dp);if(!le)continue;
-    const diff=Math.round((new Date(rec.nextReview)-new Date(td))/864e5);
-    let urg='upcoming';if(diff<0)urg='overdue';else if(diff===0)urg='today';
-    if(diff<=7)items.push({course:co,lesson:le,rec,urgency:urg,diff,key:k});
-  }
-  items.sort((a,b)=>a.diff-b.diff);
-  const el=document.getElementById('reviewQueue'),noEl=document.getElementById('noReview');
-  if(!items.length){el.innerHTML='';noEl.style.display='block';return}
-  noEl.style.display='none';
-  el.innerHTML=items.map(it=>{
-    const lbl=it.urgency==='overdue'?`${Math.abs(it.diff)}일 지남`:it.urgency==='today'?'오늘':`${it.diff}일 후`;
-    return`<div class="rq-item">
-      <div class="urgency-bar ${it.urgency}"></div>
-      <div class="rq-info"><div class="rq-title">${it.course.icon} Day${it.lesson.day}: ${it.lesson.title}</div><div class="rq-meta">${lbl} · 복습${it.rec.reviews.length}회 · 간격${SR_INTERVALS[it.rec.srIndex]||'—'}일</div></div>
-      <a href="${it.course.folder}/${it.lesson.file}" target="_blank" style="color:var(--gold);font-size:0.78rem">📖</a>
-      <button class="btn-sm" style="border-color:var(--purple);color:var(--purple)" onclick="markReviewed('${it.course.id}',${it.lesson.day})">✓</button>
-    </div>`;
-  }).join('');
-}
-
-function renderNeuroTips(){document.getElementById('neuroTips').innerHTML=NEURO_TIPS.map(t=>`<div class="tip-card"><div class="tip-title">${t.title}</div><div class="tip-body">${t.body}</div></div>`).join('')}
-function renderDailyTip(){const i=new Date().getDate()%NEURO_TIPS.length,t=NEURO_TIPS[i];document.getElementById('dailyTip').innerHTML=`<div class="tip-card"><div class="tip-title">${t.title}</div><div class="tip-body">${t.body}</div></div>`}
-
-function renderStreak(){
-  const s=getState(),days=s.studyDays||{};let streak=0,d=new Date();
-  while(true){if(days[d.toISOString().slice(0,10)]){streak++;d.setDate(d.getDate()-1)}else break}
-  document.getElementById('streakNum').textContent=streak;
-  let hm='';for(let i=29;i>=0;i--){const dd=new Date();dd.setDate(dd.getDate()-i);const ds=dd.toISOString().slice(0,10),cnt=days[ds]||0;
-    let lvl='';if(cnt>=5)lvl='l4';else if(cnt>=3)lvl='l3';else if(cnt>=2)lvl='l2';else if(cnt>=1)lvl='l1';
-    hm+=`<div class="hm-cell ${lvl}" title="${ds}: ${cnt}건"></div>`}
-  document.getElementById('heatmap').innerHTML=hm;
-}
-
-function renderCourseStats(){
-  document.getElementById('courseStats').innerHTML=COURSES.map(c=>{
-    const done=c.lessons.filter(l=>isCompleted(c.id,l.day)).length,pct=Math.round(done/c.lessons.length*100);
-    return`<div class="card"><div class="card-title">${c.icon} ${c.name.split(' ')[0]}</div>
-      <div class="progress-wrap"><div class="progress-fill" style="width:${pct}%;background:${c.color}"></div></div>
-      <div style="font-size:0.75rem;color:var(--text-dim);margin-top:4px">${done}/${c.lessons.length} · ${pct}%</div></div>`;
-  }).join('');
-  const s=getState(),days=s.studyDays||{};let hm='';
-  for(let i=89;i>=0;i--){const dd=new Date();dd.setDate(dd.getDate()-i);const ds=dd.toISOString().slice(0,10),cnt=days[ds]||0;
-    let lvl='';if(cnt>=5)lvl='l4';else if(cnt>=3)lvl='l3';else if(cnt>=2)lvl='l2';else if(cnt>=1)lvl='l1';
-    hm+=`<div class="hm-cell ${lvl}" title="${ds}: ${cnt}건" style="width:11px;height:11px"></div>`}
-  document.getElementById('fullHeatmap').innerHTML=hm;
-  renderCourseTimeStats();
-}
-
-// ═══════════════════════════════════════════
-// WEEKLY REPORT ENGINE
-// ═══════════════════════════════════════════
-let reportWeekOffset=0;
-
-function changeReportWeek(delta){
-  reportWeekOffset+=delta;
-  if(reportWeekOffset>0)reportWeekOffset=0;
-  renderReport();
-}
-
-function getWeekRange(offset){
-  const now=new Date();
-  const day=now.getDay()||7; // Mon=1
-  const mon=new Date(now);mon.setDate(now.getDate()-day+1+offset*7);
-  const sun=new Date(mon);sun.setDate(mon.getDate()+6);
-  const dates=[];
-  for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);dates.push(d.toISOString().slice(0,10))}
-  return{start:dates[0],end:dates[6],dates,label:`${mon.getMonth()+1}/${mon.getDate()} — ${sun.getMonth()+1}/${sun.getDate()}`};
-}
-
-function getWeekData(week){
-  const s=getState();const dt=s.dailyTime||{};const logs=s.studyLog||[];const lessons=s.lessons||{};const studyDays=s.studyDays||{};
-  // Total study seconds this week
-  let totalSec=0;const courseSeconds={};const dailySec={};
-  week.dates.forEach(d=>{
-    const dd=dt[d]||{};
-    dailySec[d]=dd._total||0;
-    totalSec+=dd._total||0;
-    for(const[k,v]of Object.entries(dd)){
-      if(k==='_total')continue;
-      courseSeconds[k]=(courseSeconds[k]||0)+v;
-    }
-  });
-  // Sessions count
-  const weekLogs=logs.filter(l=>week.dates.includes(l.date));
-  const sessionCount=weekLogs.length;
-  // Active days
-  const activeDays=week.dates.filter(d=>(dailySec[d]||0)>0).length;
-  // Lessons completed this week
-  let completedThisWeek=0;
-  for(const[k,rec]of Object.entries(lessons)){
-    if(rec.completed&&week.dates.includes(rec.completed))completedThisWeek++;
-  }
-  // Reviews done this week
-  let reviewsDone=0,reviewsDue=0;
-  for(const[k,rec]of Object.entries(lessons)){
-    if(rec.reviews){reviewsDone+=rec.reviews.filter(r=>week.dates.includes(r)).length}
-    if(rec.nextReview&&week.dates.includes(rec.nextReview))reviewsDue++;
-  }
-  // Reviews that were due this week (check nextReview dates)
-  let reviewsExpected=0;
-  for(const[k,rec]of Object.entries(lessons)){
-    // Check each SR step - if any nextReview falls in this week
-    if(rec.completed){
-      let checkDate=rec.completed;
-      for(let si=0;si<rec.srIndex+1;si++){
-        const nxt=addDays(checkDate,SR_INTERVALS[si]);
-        if(week.dates.includes(nxt))reviewsExpected++;
-        if(rec.reviews[si])checkDate=rec.reviews[si];
+  const card=document.getElementById('reviewCard');
+  const list=document.getElementById('reviewList');
+  list.textContent='';const today=todayStr();let count=0;
+  C.forEach(c=>{
+    const revs=getReviews(c.id);
+    Object.entries(revs).forEach(([day,r])=>{
+      if(r.next<=today){
+        const l=c.lessons.find(x=>x.d===+day);if(!l)return;count++;
+        const row=document.createElement('div');row.className='feed-item';
+        row.addEventListener('click',()=>{advanceReview(c.id,+day);openLesson(c,l,true)});
+        const icon=document.createElement('div');icon.className='feed-icon';icon.textContent='🔄';
+        const info=document.createElement('div');info.className='feed-info';
+        const t=document.createElement('div');t.className='t';t.textContent=`${c.icon} 第${l.d}日 — ${l.t}`;
+        const s=document.createElement('div');s.className='s';s.textContent=`${c.name} · 段階 ${r.stage+1}/${INTERVALS.length}`;
+        info.appendChild(t);info.appendChild(s);
+        row.appendChild(icon);row.appendChild(info);list.appendChild(row);
       }
-    }
-  }
-  // Time pattern by hour for this week
-  const hourPattern={};
-  weekLogs.forEach(l=>{
-    if(l.time){const h=parseInt(l.time.split(':')[0]);hourPattern[h]=(hourPattern[h]||0)+l.seconds}
-  });
-  // Day-hour heatmap
-  const dayHourMap={};
-  weekLogs.forEach(l=>{
-    const dayIdx=week.dates.indexOf(l.date);
-    if(dayIdx<0)return;
-    const h=l.time?parseInt(l.time.split(':')[0]):12;
-    const key=`${dayIdx}_${h}`;
-    dayHourMap[key]=(dayHourMap[key]||0)+l.seconds;
-  });
-
-  return{totalSec,courseSeconds,dailySec,sessionCount,activeDays,completedThisWeek,reviewsDone,reviewsDue,reviewsExpected,weekLogs,hourPattern,dayHourMap};
-}
-
-function calcGrade(data){
-  let score=0;
-  // Active days (max 35pts)
-  score+=Math.min(data.activeDays/5,1)*35;
-  // Total time (target 5hrs/week, max 25pts)
-  score+=Math.min(data.totalSec/18000,1)*25;
-  // Course balance (max 20pts) - penalize if >60% on single course
-  const vals=Object.values(data.courseSeconds);const maxC=Math.max(...vals,1);const sumC=vals.reduce((a,b)=>a+b,0)||1;
-  const concentration=maxC/sumC;
-  score+=(1-Math.max(concentration-0.4,0)/0.6)*20;
-  // Review compliance (max 20pts)
-  const expected=Math.max(data.reviewsExpected,data.reviewsDue,1);
-  score+=Math.min(data.reviewsDone/expected,1)*20;
-
-  if(score>=90)return{grade:'S',label:'완벽한 한 주',color:'var(--gold)',emoji:'🏆'};
-  if(score>=75)return{grade:'A',label:'훌륭한 학습',color:'var(--green)',emoji:'🌟'};
-  if(score>=60)return{grade:'B',label:'꾸준한 진전',color:'var(--blue)',emoji:'👍'};
-  if(score>=40)return{grade:'C',label:'더 분발하자',color:'var(--orange)',emoji:'💪'};
-  return{grade:'D',label:'다음 주 화이팅',color:'var(--red)',emoji:'🔥'};
-}
-
-function renderReport(){
-  const week=getWeekRange(reportWeekOffset);
-  const prevWeek=getWeekRange(reportWeekOffset-1);
-  const data=getWeekData(week);
-  const prevData=getWeekData(prevWeek);
-  const grade=calcGrade(data);
-
-  document.getElementById('reportWeekLabel').textContent=week.label+(reportWeekOffset===0?' (이번 주)':'');
-
-  // Hero
-  document.getElementById('reportHero').innerHTML=`<div class="report-hero">
-    <div class="report-period">${week.start} ~ ${week.end}</div>
-    <div class="report-grade" style="color:${grade.color}">${grade.emoji} ${grade.grade}</div>
-    <div class="report-grade-label" style="color:${grade.color}">${grade.label}</div>
-    <div class="report-summary">${data.activeDays}일 학습 · ${Math.round(data.totalSec/60)}분 집중 · ${data.completedThisWeek}강의 완료 · ${data.reviewsDone}회 복습</div>
-  </div>`;
-
-  // KPI with delta
-  function delta(cur,prev,unit='',rev=false){
-    const d=cur-prev;
-    if(d===0)return`<div class="kpi-delta kpi-same">— 동일</div>`;
-    const cls=(d>0)!==(rev)?'kpi-up':'kpi-down';
-    return`<div class="kpi-delta ${cls}">${d>0?'▲':'▼'} ${Math.abs(d)}${unit} vs 지난주</div>`;
-  }
-  const totalMin=Math.round(data.totalSec/60);const prevMin=Math.round(prevData.totalSec/60);
-  const avgMin=data.activeDays>0?Math.round(totalMin/data.activeDays):0;
-  const prevAvg=prevData.activeDays>0?Math.round(prevMin/prevData.activeDays):0;
-
-  document.getElementById('reportKPI').innerHTML=`
-    <div class="report-kpi"><div class="kpi-val" style="color:var(--cyan)">${totalMin>=60?Math.floor(totalMin/60)+'h '+totalMin%60+'m':totalMin+'분'}</div><div class="kpi-label">총 학습 시간</div>${delta(totalMin,prevMin,'분')}</div>
-    <div class="report-kpi"><div class="kpi-val" style="color:var(--green)">${data.activeDays}/7</div><div class="kpi-label">학습 일수</div>${delta(data.activeDays,prevData.activeDays,'일')}</div>
-    <div class="report-kpi"><div class="kpi-val" style="color:var(--gold)">${data.completedThisWeek}</div><div class="kpi-label">신규 완료</div>${delta(data.completedThisWeek,prevData.completedThisWeek,'개')}</div>
-    <div class="report-kpi"><div class="kpi-val" style="color:var(--purple)">${data.sessionCount}</div><div class="kpi-label">세션 수</div>${delta(data.sessionCount,prevData.sessionCount,'회')}</div>`;
-
-  // Balance bar + detail
-  const idealWeight={vehicle:0.25,energy:0.20,human:0.15,parenting:0.15,economics:0.15,french:0.10};
-  const totalCourseTime=Object.values(data.courseSeconds).reduce((a,b)=>a+b,0)||1;
-  let balBarHtml='';let balDetailHtml='';
-
-  COURSES.forEach(c=>{
-    const actual=data.courseSeconds[c.id]||0;
-    const pctActual=Math.round(actual/totalCourseTime*100);
-    const pctIdeal=Math.round((idealWeight[c.id]||0.16)*100);
-    const diff=pctActual-pctIdeal;
-    let verdict='',vColor='var(--text-dim)';
-    if(actual===0){verdict='⚠️';vColor='var(--red)'}
-    else if(Math.abs(diff)<=5){verdict='✓';vColor='var(--green)'}
-    else if(diff>5){verdict='↑';vColor='var(--orange)'}
-    else{verdict='↓';vColor='var(--red)'}
-    const minA=Math.round(actual/60);
-
-    if(pctActual>0){balBarHtml+=`<div class="balance-seg" style="width:${Math.max(pctActual,3)}%;background:${c.color}">${pctActual>8?pctActual+'%':''}</div>`}
-    balDetailHtml+=`<div class="balance-detail">
-      <div class="balance-dot" style="background:${c.color}"></div>
-      <span class="balance-name">${c.icon} ${c.name}</span>
-      <span class="balance-actual">${minA}분</span>
-      <span class="balance-ideal">목표${pctIdeal}%</span>
-      <span class="balance-verdict" style="color:${vColor}">${verdict} ${pctActual}%</span>
-    </div>`;
-  });
-
-  document.getElementById('balanceBar').innerHTML=totalCourseTime>1?`<div class="balance-bar">${balBarHtml}</div>`:'<div style="text-align:center;color:var(--text-dim);font-size:0.78rem;padding:10px">학습 기록이 없습니다</div>';
-  document.getElementById('balanceDetail').innerHTML=balDetailHtml;
-
-  // SR Compliance
-  const totalDue=Math.max(data.reviewsDue+data.reviewsDone,1);
-  const compliance=Math.round(data.reviewsDone/totalDue*100);
-  const CIRC_SM=2*Math.PI*20;
-  const srColor=compliance>=80?'var(--green)':compliance>=50?'var(--orange)':'var(--red)';
-
-  // Overdue count
-  const s=getState();const lessons=s.lessons||{};
-  let overdueCount=0;
-  for(const[k,rec]of Object.entries(lessons)){
-    if(rec.nextReview&&rec.nextReview<week.start)overdueCount++;
-  }
-
-  document.getElementById('srCompliance').innerHTML=`
-    <div class="sr-compliance">
-      <div class="sr-ring">
-        <svg viewBox="0 0 50 50"><circle class="sr-ring-bg" cx="25" cy="25" r="20"/><circle class="sr-ring-fg" cx="25" cy="25" r="20" stroke="${srColor}" stroke-dasharray="${CIRC_SM}" stroke-dashoffset="${CIRC_SM*(1-compliance/100)}"/></svg>
-        <div class="sr-ring-val" style="color:${srColor}">${compliance}%</div>
-      </div>
-      <div class="sr-info">
-        <div class="sr-title">이번 주 복습 준수율</div>
-        <div class="sr-detail">완료 ${data.reviewsDone}건 / 예정 ${totalDue}건${overdueCount>0?` · <span style="color:var(--red)">미루기 ${overdueCount}건</span>`:''}</div>
-      </div>
-    </div>`;
-
-  // Time pattern heatmap (5 time slots × 7 days)
-  const slots=[{label:'아침(6-9)',range:[6,7,8]},{label:'오전(9-12)',range:[9,10,11]},{label:'오후(12-17)',range:[12,13,14,15,16]},{label:'저녁(17-21)',range:[17,18,19,20]},{label:'밤(21-24)',range:[21,22,23]}];
-  let maxHeat=1;
-  const heatData=[];
-  for(const slot of slots){
-    for(let d=0;d<7;d++){
-      let sec=0;
-      slot.range.forEach(h=>{sec+=(data.dayHourMap[`${d}_${h}`]||0)});
-      heatData.push({slot:slot.label,day:d,sec});
-      if(sec>maxHeat)maxHeat=sec;
-    }
-  }
-
-  let patternHtml='';
-  slots.forEach((slot,si)=>{
-    for(let d=0;d<7;d++){
-      const item=heatData[si*7+d];
-      const intensity=item.sec/maxHeat;
-      let bg='var(--surface2)';
-      if(intensity>0.7)bg='var(--gold)';
-      else if(intensity>0.4)bg='#5a4a20';
-      else if(intensity>0.1)bg='#2a2520';
-      else if(intensity>0)bg='#1a1a15';
-      const min=Math.round(item.sec/60);
-      patternHtml+=`<div class="pattern-cell" style="background:${bg}" title="${slot.label} ${['월','화','수','목','금','토','일'][d]}: ${min}분">${min>0?min:''}</div>`;
-    }
-  });
-  document.getElementById('timePattern').innerHTML=patternHtml+slots.map(sl=>`<div style="grid-column:1/-1;font-size:0.6rem;color:var(--text-dim);text-align:left;padding:0 2px">${sl.label}</div>`).join('');
-  // Rebuild: proper grid
-  const ptEl=document.getElementById('timePattern');
-  ptEl.style.gridTemplateColumns='repeat(7,1fr)';
-  let ptHtml='';
-  slots.forEach((slot,si)=>{
-    for(let d=0;d<7;d++){
-      const item=heatData[si*7+d];
-      const intensity=item.sec/maxHeat;
-      let bg='var(--surface2)';
-      if(intensity>0.7)bg='var(--gold)';
-      else if(intensity>0.4)bg='#5a4a20';
-      else if(intensity>0.1)bg='#2a2520';
-      else if(intensity>0)bg='#1a1a15';
-      const min=Math.round(item.sec/60);
-      ptHtml+='<div class="pattern-cell" style="background:'+bg+'" title="'+slot.label+' '+['월','화','수','목','금','토','일'][d]+': '+min+'분"><span>'+(min>0?min:'')+'</span></div>';
-    }
-  });
-  ptEl.innerHTML=ptHtml;
-  ptEl.style.gridTemplateRows=`repeat(${slots.length},1fr)`;
-
-  // AI Insights
-  const insights=generateInsights(data,prevData,week);
-  document.getElementById('aiInsights').innerHTML=insights.map(ins=>`<div class="insight-card" style="border-left-color:${ins.color||'var(--gold)'}"><span class="insight-icon">${ins.icon}</span><span class="insight-text">${ins.text}</span></div>`).join('');
-}
-
-function generateInsights(data,prev,week){
-  const insights=[];
-  const totalMin=Math.round(data.totalSec/60);
-  const prevMin=Math.round(prev.totalSec/60);
-
-  // 1. Total time trend
-  if(totalMin>prevMin*1.2&&prevMin>0){
-    insights.push({icon:'📈',text:`지난주 대비 <strong>${Math.round((totalMin/prevMin-1)*100)}% 증가</strong>! 학습 모멘텀이 올라가고 있습니다. 이 흐름을 유지하세요.`,color:'var(--green)'});
-  }else if(totalMin<prevMin*0.7&&prevMin>0){
-    insights.push({icon:'📉',text:`지난주 대비 학습 시간이 <strong>${Math.round((1-totalMin/prevMin)*100)}% 감소</strong>했습니다. 바쁜 한 주였나요? 짧은 세션이라도 유지하면 망각곡선을 이길 수 있습니다.`,color:'var(--red)'});
-  }
-
-  // 2. Consistency
-  if(data.activeDays>=6){
-    insights.push({icon:'🔥',text:`7일 중 <strong>${data.activeDays}일</strong> 학습! 뇌과학 연구에 따르면 이런 <strong>일관성</strong>이 간헐적 집중보다 장기기억에 2.5배 효과적입니다.`,color:'var(--green)'});
-  }else if(data.activeDays<=2&&totalMin>0){
-    insights.push({icon:'⚡',text:`${data.activeDays}일만 학습했습니다. <strong>에빙하우스 연구</strong>: 3일 공백이면 70% 망각. 매일 <strong>15분만이라도</strong> 복습하면 기억 유지율이 4배 높아집니다.`,color:'var(--orange)'});
-  }
-
-  // 3. Course balance
-  const courseVals=Object.entries(data.courseSeconds).filter(([k])=>k!=='_none');
-  const activeCourses=courseVals.filter(([,v])=>v>0).length;
-  if(activeCourses<=1&&totalMin>30){
-    insights.push({icon:'🔀',text:`한 과목에만 집중하셨습니다. <strong>인터리빙 효과</strong>: 2-3과목을 번갈아 공부하면 장기 파지율 <strong>43%↑</strong>. 내일은 다른 과목을 섞어보세요.`,color:'var(--purple)'});
-  }else if(activeCourses>=4){
-    insights.push({icon:'🎯',text:`<strong>${activeCourses}과목</strong>을 고루 학습! 인터리빙 학습의 좋은 예시입니다. 전전두엽이 분류·비교하며 <strong>깊은 인코딩</strong>을 만듭니다.`,color:'var(--green)'});
-  }
-
-  // 4. Neglected courses
-  const idealWeight={vehicle:0.25,energy:0.20,human:0.15,parenting:0.15,economics:0.15,french:0.10};
-  const totalCT=Object.values(data.courseSeconds).reduce((a,b)=>a+b,0)||1;
-  const neglected=COURSES.filter(c=>{
-    const actual=(data.courseSeconds[c.id]||0)/totalCT;
-    return actual<(idealWeight[c.id]||0.16)*0.3&&totalMin>30;
-  });
-  if(neglected.length>0){
-    insights.push({icon:'⚠️',text:`<strong>${neglected.map(c=>c.icon+c.name).join(', ')}</strong>에 시간 투자가 부족합니다. 다음 주 학습 플랜에서 이 과목의 비중을 높여보세요.`,color:'var(--orange)'});
-  }
-
-  // 5. Best study time
-  const hourEntries=Object.entries(data.hourPattern);
-  if(hourEntries.length>0){
-    hourEntries.sort((a,b)=>b[1]-a[1]);
-    const bestH=parseInt(hourEntries[0][0]);
-    const period=bestH<9?'아침':bestH<12?'오전':bestH<17?'오후':bestH<21?'저녁':'밤';
-    insights.push({icon:'🕐',text:`가장 집중을 많이 한 시간대: <strong>${period} ${bestH}시</strong>. 이 시간에 어려운 과목(차량동역학, 재무)을 배치하면 <strong>울트라디안 리듬</strong>과 시너지를 낼 수 있습니다.`,color:'var(--cyan)'});
-  }
-
-  // 6. Review compliance
-  const totalDue=Math.max(data.reviewsDue+data.reviewsDone,1);
-  const comp=data.reviewsDone/totalDue;
-  if(comp<0.5&&totalDue>2){
-    insights.push({icon:'🔄',text:`복습 준수율이 낮습니다 (<strong>${Math.round(comp*100)}%</strong>). 간격반복은 학습의 <strong>핵심 전략</strong>입니다. 신규 학습보다 밀린 복습을 먼저 처리하세요.`,color:'var(--red)'});
-  }
-
-  // 7. Avg session length
-  if(data.sessionCount>0){
-    const avgSession=Math.round(data.totalSec/data.sessionCount/60);
-    if(avgSession<15){
-      insights.push({icon:'⏱️',text:`평균 세션 <strong>${avgSession}분</strong>으로 짧습니다. 최소 <strong>25분 포모도로</strong> 사이클을 완주해야 깊은 학습이 시작됩니다.`,color:'var(--orange)'});
-    }else if(avgSession>=45){
-      insights.push({icon:'🧬',text:`평균 세션 <strong>${avgSession}분</strong> — 깊은 집중을 잘 유지하고 있습니다! 50분 후에는 반드시 <strong>10분 디퓨즈 모드</strong>를 가져가세요.`,color:'var(--green)'});
-    }
-  }
-
-  // 8. Weekend pattern
-  const weekendDays=[week.dates[5],week.dates[6]]; // Sat, Sun
-  const weekendSec=weekendDays.reduce((a,d)=>(data.dailySec[d]||0)+a,0);
-  const weekdaySec=data.totalSec-weekendSec;
-  if(weekendSec===0&&weekdaySec>0){
-    insights.push({icon:'🌿',text:`주말에 학습이 없었습니다. 주말 30분 가벼운 복습은 <strong>월요일 기억 인출 속도를 40%</strong> 높여줍니다.`,color:'var(--blue)'});
-  }
-
-  if(insights.length===0){
-    insights.push({icon:'📊',text:'아직 이 주의 학습 데이터가 부족합니다. 타이머를 사용해 학습을 기록하면 상세한 인사이트를 제공합니다.',color:'var(--text-dim)'});
-  }
-
-  return insights;
-}
-
-function exportReport(){
-  const week=getWeekRange(reportWeekOffset);
-  const data=getWeekData(week);
-  const grade=calcGrade(data);
-  const totalMin=Math.round(data.totalSec/60);
-  let text=`═══ 주간 학습 리포트 ═══\n기간: ${week.start} ~ ${week.end}\n등급: ${grade.grade} (${grade.label})\n\n`;
-  text+=`총 학습: ${totalMin}분 | 학습일: ${data.activeDays}/7 | 세션: ${data.sessionCount}회 | 신규완료: ${data.completedThisWeek}개\n\n`;
-  text+=`[과목별 시간]\n`;
-  COURSES.forEach(c=>{
-    const min=Math.round((data.courseSeconds[c.id]||0)/60);
-    text+=`  ${c.name}: ${min}분\n`;
-  });
-  text+=`\n[복습] 완료 ${data.reviewsDone}건\n`;
-  const insights=generateInsights(data,getWeekData(getWeekRange(reportWeekOffset-1)),week);
-  text+=`\n[인사이트]\n`;
-  insights.forEach(ins=>{text+=`  ${ins.icon} ${ins.text.replace(/<[^>]*>/g,'')}\n`});
-
-  const blob=new Blob([text],{type:'text/plain'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download=`WeeklyReport_${week.start}.txt`;a.click();
-}
-
-// ═══ TABS ═══
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>switchTab(btn.dataset.tab));
-});
-function switchTab(tab){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+tab));
-  // Show/hide floating timer
-  if(timerRunning){showFloatingTimer(tab!=='timer')}
-}
-
-// ═══ UTILS ═══
-function exportData(){const d=JSON.stringify(getState(),null,2);const b=new Blob([d],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='learn_data_'+today()+'.json';a.click()}
-function resetAll(){if(confirm('모든 학습 데이터를 초기화하시겠습니까?')){localStorage.removeItem('learn_data_v3');location.reload()}}
-
-// ═══ MIGRATE from v2 ═══
-(function(){
-  const v2=localStorage.getItem('learn_data_v2');
-  if(v2&&!localStorage.getItem('learn_data_v3')){localStorage.setItem('learn_data_v3',v2)}
-})();
-
-// ═══ INIT ═══
-function renderAll(){
-  document.getElementById('dateDisplay').textContent=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
-  try{renderStats()}catch(e){console.warn('renderStats error',e)}
-  try{renderCourses()}catch(e){console.warn('renderCourses error',e)}
-  try{renderReviewQueue()}catch(e){console.warn('renderReviewQueue error',e)}
-  try{renderNeuroTips()}catch(e){console.warn('renderNeuroTips error',e)}
-  try{renderDailyTip()}catch(e){console.warn('renderDailyTip error',e)}
-  try{renderStreak()}catch(e){console.warn('renderStreak error',e)}
-  try{renderCourseStats()}catch(e){console.warn('renderCourseStats error',e)}
-  try{renderStudyLog()}catch(e){console.warn('renderStudyLog error',e)}
-  try{renderTodayStudyTime()}catch(e){console.warn('renderTodayStudyTime error',e)}
-  try{renderWeeklyChart()}catch(e){console.warn('renderWeeklyChart error',e)}
-  try{buildTimerSelects()}catch(e){console.warn('buildTimerSelects error',e)}
-  try{updateSessionInfo()}catch(e){console.warn('updateSessionInfo error',e)}
-  try{renderReport()}catch(e){console.warn('renderReport error',e)}
-  // Settings
-  document.getElementById('dailyGoal').value=getSetting('dailyGoal','3');
-  document.getElementById('reviewGoal').value=getSetting('reviewGoal','3');
-  document.getElementById('focusDuration').value=getSetting('focusDuration','25');
-  document.getElementById('shortBreak').value=getSetting('shortBreak','5');
-  document.getElementById('longBreak').value=getSetting('longBreak','15');
-  document.getElementById('alarmType').value=getSetting('alarmType','bell');
-  // Today's plan
-  const s=getState();
-  if(!s.todayPlan||s.todayPlan.date!==today()){generateTodayPlan()}
-  else{
-    const plan=s.todayPlan.items.map(it=>{
-      if(it.type==='active')return{type:'active',title:'🧪 능동 회상: 핵심 3가지를 눈감고 떠올려보세요'};
-      const co=COURSES.find(c=>c.id===it.courseId),le=co?co.lessons.find(l=>l.day===it.day):null;
-      return co&&le?{course:co,lesson:le,type:it.type}:null;
-    }).filter(Boolean);
-    renderPlan(plan);
-  }
-  // Init timer display
-  timerTotal=getModeDuration(currentMode);timerSeconds=timerTotal;updateTimerUI();
-}
-renderAll();
-
-// ═══════════════════════════════════════════
-// PWA: Service Worker + Install Prompt
-// ═══════════════════════════════════════════
-let deferredPrompt=null;
-
-// Register Service Worker
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js').then(reg=>{
-      console.log('SW registered',reg.scope);
-    }).catch(err=>console.log('SW error',err));
-  });
-}
-
-// Online/Offline indicator
-window.addEventListener('online',()=>document.getElementById('offlineBadge').classList.remove('show'));
-window.addEventListener('offline',()=>document.getElementById('offlineBadge').classList.add('show'));
-if(!navigator.onLine)document.getElementById('offlineBadge').classList.add('show');
-
-// Chrome/Android install prompt
-window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault();
-  deferredPrompt=e;
-  // Don't show if dismissed recently
-  const dismissed=localStorage.getItem('pwa_dismissed');
-  if(dismissed&&Date.now()-parseInt(dismissed)<7*86400000)return;
-  // Don't show if already installed (standalone)
-  if(window.matchMedia('(display-mode: standalone)').matches)return;
-  document.getElementById('pwaBanner').classList.add('show');
-});
-
-function installPWA(){
-  if(deferredPrompt){
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(r=>{
-      document.getElementById('pwaBanner').classList.remove('show');
-      deferredPrompt=null;
     });
+  });
+  card.style.display=count?'block':'none';
+}
+
+function openLesson(c,l,isReview){
+  triggerSlash();
+  setTimeout(()=>{
+    window.open(`${c.folder}/${l.f}`,'_blank');
+    if(!isReview)markDone(c.id,l.d);
+    setTimeout(()=>{renderHome();renderCourses()},300);
+  },400);
+}
+
+/* ═══ COURSES ═══ */
+let currentCourse=null;
+function renderCourses(){
+  const grid=document.getElementById('courseGrid');
+  const detail=document.getElementById('courseDetail');
+  if(currentCourse){renderCourseDetail(currentCourse);return}
+  grid.style.display='';detail.style.display='none';grid.textContent='';
+  C.forEach(c=>{
+    const done=getProgress(c.id);const pct=Math.round(done.length/c.lessons.length*100);
+    const card=document.createElement('div');card.className='ccard';
+    card.addEventListener('click',()=>{currentCourse=c;renderCourses()});
+    const iconEl=document.createElement('div');iconEl.className='icon';iconEl.textContent=c.icon;
+    const nm=document.createElement('div');nm.className='nm';nm.textContent=c.name;
+    const prog=document.createElement('div');prog.className='prog';
+    const bar=document.createElement('div');bar.className='bar';bar.style.width=pct+'%';
+    prog.appendChild(bar);
+    const cnt=document.createElement('div');cnt.className='cnt';cnt.textContent=`${done.length}/${c.lessons.length} (${pct}%)`;
+    card.appendChild(iconEl);card.appendChild(nm);card.appendChild(prog);card.appendChild(cnt);
+    grid.appendChild(card);
+  });
+}
+
+function renderCourseDetail(c){
+  document.getElementById('courseGrid').style.display='none';
+  document.getElementById('courseDetail').style.display='';
+  document.getElementById('detailTitle').textContent=`${c.icon} ${c.name}`;
+  const list=document.getElementById('lessonList');list.textContent='';
+  const done=getProgress(c.id);
+  c.lessons.forEach(l=>{
+    const isDone=done.includes(l.d);
+    const row=document.createElement('div');row.className='ll-item '+(isDone?'done':'undone');
+    row.addEventListener('click',()=>openLesson(c,l,false));
+    const num=document.createElement('div');num.className='num';num.textContent=l.d;
+    const lt=document.createElement('div');lt.className='lt';lt.textContent=l.t;
+    const ld=document.createElement('div');ld.className='ld';ld.textContent=isDone?'了':'';
+    row.appendChild(num);row.appendChild(lt);row.appendChild(ld);list.appendChild(row);
+  });
+}
+document.getElementById('backBtn').addEventListener('click',()=>{currentCourse=null;renderCourses()});
+
+/* ═══ TIMER ═══ */
+let tmState='idle',tmSec=0,tmTotal=0,tmInterval=null,tmIsWork=true;
+const tmDisp=document.getElementById('timerDisp'),phDisp=document.getElementById('phaseDisp');
+const tmStart=document.getElementById('timerStart'),tmReset=document.getElementById('timerReset');
+const floatEl=document.getElementById('floatTimer');
+
+function fmtTime(s){const m=Math.floor(s/60),sc=s%60;return`${String(m).padStart(2,'0')}:${String(sc).padStart(2,'0')}`}
+function updateTimerDisplay(){
+  tmDisp.textContent=fmtTime(tmSec);
+  phDisp.textContent=tmIsWork?'集中 中':'休息 中';
+  if(tmState==='running'){floatEl.textContent=fmtTime(tmSec);floatEl.classList.add('show')}
+}
+
+tmStart.addEventListener('click',()=>{
+  if(tmState==='idle'){
+    const workMin=parseInt(document.getElementById('cfgWork').value)||25;
+    tmSec=workMin*60;tmTotal=tmSec;tmIsWork=true;tmState='running';
+    tmStart.textContent='止';tmInterval=setInterval(tick,1000);updateTimerDisplay();
+  } else if(tmState==='running'){
+    tmState='paused';tmStart.textContent='續';clearInterval(tmInterval);floatEl.classList.remove('show');
+  } else if(tmState==='paused'){
+    tmState='running';tmStart.textContent='止';tmInterval=setInterval(tick,1000);updateTimerDisplay();
   }
-}
-
-function showServerGuide(){
-  document.getElementById('serverGuide').classList.add('show');
-  document.getElementById('serverGuide').scrollIntoView({behavior:'smooth',block:'center'});
-}
-
-function dismissPWA(){
-  document.getElementById('pwaBanner').classList.remove('show');
-  localStorage.setItem('pwa_dismissed',Date.now().toString());
-}
-
-function showInstallGuide(){
-  // Check if Chrome/Android (has deferred prompt)
-  if(deferredPrompt){installPWA();return}
-  // Otherwise show iOS/iPadOS guide
-  document.getElementById('iosGuide').classList.add('show');
-  // Scroll to it
-  document.getElementById('iosGuide').scrollIntoView({behavior:'smooth',block:'center'});
-}
-
-// iOS/iPadOS Safari detection: show guide
-// iPadOS 13+ reports as "Macintosh" in userAgent, so we also check touch support
-(function(){
-  var ua=navigator.userAgent;
-  var isIOS=/iPad|iPhone|iPod/.test(ua)&&!window.MSStream;
-  // iPadOS 13+ detection: reports as Mac but has touch support
-  var isIPadOS=!isIOS&&/Macintosh/.test(ua)&&navigator.maxTouchPoints&&navigator.maxTouchPoints>1;
-  var isAppleMobile=isIOS||isIPadOS;
-  var isSafari=/Safari/.test(ua)&&!/CriOS|FxiOS|OPiOS|EdgiOS|Chrome/.test(ua);
-  var isStandalone=window.navigator.standalone||window.matchMedia('(display-mode: standalone)').matches;
-  if(isAppleMobile&&isSafari&&!isStandalone){
-    var dismissed=localStorage.getItem('ios_guide_dismissed');
-    if(!dismissed||Date.now()-parseInt(dismissed)>14*86400000){
-      setTimeout(function(){document.getElementById('iosGuide').classList.add('show')},2000);
-      document.getElementById('iosGuide').querySelector('button').addEventListener('click',function(){
-        localStorage.setItem('ios_guide_dismissed',Date.now().toString());
-      });
-    }
-  }
-})();
-
-// Track installed state
-window.addEventListener('appinstalled',()=>{
-  document.getElementById('pwaBanner').classList.remove('show');
-  console.log('PWA installed!');
 });
+tmReset.addEventListener('click',()=>{
+  clearInterval(tmInterval);tmState='idle';
+  const workMin=parseInt(document.getElementById('cfgWork').value)||25;
+  tmSec=workMin*60;tmDisp.textContent=fmtTime(tmSec);phDisp.textContent='集中 準備';
+  tmStart.textContent='始';floatEl.classList.remove('show');
+});
+
+function tick(){
+  if(tmSec>0){tmSec--;updateTimerDisplay();document.title=`${fmtTime(tmSec)} — 修練`;return}
+  clearInterval(tmInterval);
+  if(tmIsWork){
+    const worked=Math.round(tmTotal/60);addLog('_timer',worked);
+    triggerSlash();
+    try{new Notification('修練 完了',{body:`${worked}分の集中、お見事。`})}catch(e){}
+    tmIsWork=false;tmSec=(parseInt(document.getElementById('cfgBreak').value)||5)*60;
+    tmTotal=tmSec;tmInterval=setInterval(tick,1000);
+  } else {
+    try{new Notification('休息 終了',{body:'再び剣を握れ。'})}catch(e){}
+    tmState='idle';tmStart.textContent='始';
+    const workMin=parseInt(document.getElementById('cfgWork').value)||25;
+    tmSec=workMin*60;tmIsWork=true;tmDisp.textContent=fmtTime(tmSec);phDisp.textContent='集中 準備';
+    floatEl.classList.remove('show');
+  }
+  updateTimerDisplay();renderHome();
+}
+floatEl.addEventListener('click',()=>{nav.querySelector('[data-tab="timer"]').click()});
+
+/* ═══ WEEKLY CHART ═══ */
+function renderWeekChart(){
+  const chart=document.getElementById('weekChart'),labels=document.getElementById('weekLabels');
+  chart.textContent='';labels.textContent='';
+  const today=new Date(),dn=dayNames(),data=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(today);d.setDate(d.getDate()-i);const ds=fmt(d);
+    data.push({day:dn[d.getDay()],mins:getLogs().filter(l=>l.date===ds).reduce((a,l)=>a+l.mins,0)});
+  }
+  const max=Math.max(...data.map(d=>d.mins),1);
+  data.forEach(d=>{
+    const bar=document.createElement('div');bar.className='cb';
+    bar.style.height=Math.max(2,d.mins/max*100)+'%';if(d.mins)bar.title=d.mins+'分';
+    chart.appendChild(bar);
+    const lb=document.createElement('span');lb.textContent=d.day;labels.appendChild(lb);
+  });
+}
+
+/* ═══ LOG TABLE ═══ */
+function renderLogs(){
+  const body=document.getElementById('logBody');body.textContent='';
+  getLogs().slice(-15).reverse().forEach(l=>{
+    const tr=document.createElement('tr');
+    const td1=document.createElement('td');td1.textContent=l.date;
+    const td2=document.createElement('td');const c=C.find(x=>x.id===l.cid);
+    td2.textContent=c?c.name:(l.cid==='_timer'?'⏱ 集中':l.cid);
+    const td3=document.createElement('td');td3.textContent=l.mins+'分';
+    tr.appendChild(td1);tr.appendChild(td2);tr.appendChild(td3);body.appendChild(tr);
+  });
+  document.getElementById('totalLogs').textContent=getLogs().length+'件';
+}
+
+/* ═══ HEATMAP ═══ */
+function renderHeatmap(){
+  const hm=document.getElementById('heatmap');hm.textContent='';
+  dayNames().forEach(d=>{const lb=document.createElement('div');lb.className='hm-label';lb.textContent=d;hm.appendChild(lb)});
+  const today=new Date(),start=new Date(today);start.setDate(start.getDate()-29);start.setDate(start.getDate()-start.getDay());
+  const logs=getLogs(),dateMap={};logs.forEach(l=>{dateMap[l.date]=(dateMap[l.date]||0)+l.mins});
+  const maxMin=Math.max(...Object.values(dateMap),1);
+  for(let d=new Date(start);d<=today;d.setDate(d.getDate()+1)){
+    const ds=fmt(d),mins=dateMap[ds]||0;
+    const cell=document.createElement('div');cell.className='hm-cell';
+    cell.style.background=mins?`rgba(194,59,34,${Math.max(0.15,mins/maxMin)})`:'rgba(51,51,48,0.3)';
+    cell.title=`${ds}: ${mins}分`;hm.appendChild(cell);
+  }
+}
+
+/* ═══ ALL PROGRESS ═══ */
+function renderAllProgress(){
+  const el=document.getElementById('allProgress');el.textContent='';
+  C.forEach(c=>{
+    const done=getProgress(c.id),pct=Math.round(done.length/c.lessons.length*100);
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(51,51,48,0.3)';
+    const icon=document.createElement('span');icon.textContent=c.icon;icon.style.fontSize='1.1rem';
+    const name=document.createElement('span');name.textContent=c.name;
+    name.style.cssText='flex:1;font-size:0.78rem;font-weight:700;color:var(--paper-dark);letter-spacing:1px';
+    const pctEl=document.createElement('span');pctEl.textContent=pct+'%';
+    pctEl.style.cssText='font-size:0.75rem;color:var(--vermillion);font-weight:900;min-width:36px;text-align:right';
+    row.appendChild(icon);row.appendChild(name);row.appendChild(pctEl);el.appendChild(row);
+  });
+}
+
+/* ═══ NEURO TIP ═══ */
+const TIPS=[
+  '千日の鍛錬 — 분산학습: 여러 과목을 번갈아 공부하면 장기기억 전환율이 43% 증가한다.',
+  '武の心得 — 인출연습: 노트를 다시 읽는 것보다 떠올려 보는 연습이 기억에 2배 효과적이다.',
+  '夢中の修行 — 수면 중 기억 강화: 학습 후 충분한 수면이 해마→대뇌피질 기억 전이를 활성화한다.',
+  '氣の流れ — 울트라디안 리듬: 90분 집중 → 20분 휴식이 뇌의 자연 집중 사이클과 일치한다.',
+  '技の連結 — 정교화: 새 정보를 기존 지식과 연결하면 기억 강도가 3배 강해진다.',
+  '試の効果 — 시험효과: 학습 직후 자가 테스트가 단순 복습보다 기억 유지율 50% 높다.',
+  '忘却の曲線 — 에빙하우스: 1일 후 67% 망각하지만 간격복습 시 90% 이상 유지 가능하다.',
+  '體の鍛錬 — 운동+학습: 중강도 유산소 직후 학습 시 BDNF 분비로 해마 신경생성이 촉진된다.',
+  '筆の力 — 손필기가 타이핑보다 개념 이해와 기억에 유의미하게 효과적이다.',
+  '靜の力 — 학습 전 5분 명상으로 전전두엽 활성화, 집중력과 작업기억 용량이 증가한다.'
+];
+function showTip(){document.getElementById('tipText').textContent=TIPS[new Date().getDate()%TIPS.length]}
+
+/* ═══ SETTINGS ═══ */
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify(gs(),null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='suryon_backup_'+todayStr()+'.json';a.click();URL.revokeObjectURL(a.href);
+});
+document.getElementById('importBtn').addEventListener('click',()=>{document.getElementById('importFile').click()});
+document.getElementById('importFile').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{try{ss(JSON.parse(ev.target.result));location.reload()}catch(err){alert('파일 형식 오류')}};
+  reader.readAsText(f);
+});
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  if(confirm('모든 수련 데이터가 삭제됩니다. 계속?')){localStorage.removeItem(SK);location.reload()}
+});
+
+/* ═══ INIT ═══ */
+function init(){renderHome();renderCourses();renderWeekChart();renderLogs();renderHeatmap();renderAllProgress();showTip();
+  if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();
+}
+init();
+nav.addEventListener('click',()=>setTimeout(()=>{renderHome();renderWeekChart();renderLogs();renderHeatmap();renderAllProgress()},50));
+
+/* ═══ PWA ═══ */
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 </script>
 </body>
 </html>

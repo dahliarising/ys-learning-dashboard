@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 34: 서스펜션 기구학 기초</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+:root{--bg:#0A0C10;--surface:#12151C;--surface2:#1A1E28;--border:#252A38;--gold:#C9A84C;--gold-light:#E8C96A;--blue:#4A9EBF;--green:#4ABF8A;--purple:#8A6ABF;--orange:#BF6A4A;--text:#D8D3C8;--text-dim:#7A7A8A;--text-bright:#F0EBE0}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-weight:300;line-height:1.8;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+.sticky-header{position:sticky;top:0;z-index:100;background:rgba(10,12,16,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 0}
+.header-inner{max-width:960px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
+.header-brand{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:16px;color:var(--gold)}
+.header-progress-wrap{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-dim)}
+.header-progress-bar{width:120px;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
+.header-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px}
+.container{max-width:960px;margin:0 auto;padding:0 16px 60px}
+.series-info{text-align:center;padding:16px 0 0;font-size:13px;color:var(--text-dim);letter-spacing:.5px}
+.hero{text-align:center;padding:60px 0 48px;animation:fadeUp .8s ease both}
+.hero-day{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px}
+.hero-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:42px;color:var(--text-bright);line-height:1.2;margin-bottom:6px}
+.hero-title-en{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:20px;color:var(--text-dim);margin-bottom:32px}
+
+.gauge-wrap{display:flex;justify-content:center;margin-bottom:28px}
+.gauge-svg{width:100px;height:100px}
+.gauge-bg{fill:none;stroke:var(--surface2);stroke-width:6}
+.gauge-fill{fill:none;stroke:var(--gold);stroke-width:6;stroke-linecap:round;stroke-dasharray:251;transition:stroke-dashoffset 1s ease}
+.gauge-text{font-family:'JetBrains Mono',monospace;font-size:16px;fill:var(--gold-light);text-anchor:middle}
+.gauge-label{font-size:9px;fill:var(--text-dim);text-anchor:middle}
+.meta-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.meta-badge{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:13px;color:var(--text-dim)}
+.meta-badge span{color:var(--text-bright);font-weight:400}
+.section{margin-top:56px;padding:28px 0 16px;break-inside:avoid;animation:fadeUp .6s ease both}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.section-title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:28px;color:var(--text-bright);margin-bottom:20px}
+.brain-box{background:linear-gradient(135deg,rgba(138,106,191,.1),rgba(138,106,191,.04));border:1px solid rgba(138,106,191,.3);border-radius:16px;padding:28px 32px}
+.brain-box h3{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--purple);margin-bottom:16px}
+.brain-box p,.brain-box li{font-size:14px;color:var(--text);margin-bottom:8px}
+.brain-box ul{padding-left:20px}
+.brain-box li::marker{color:var(--purple)}
+.time-split{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.time-block{background:rgba(138,106,191,.08);border:1px solid rgba(138,106,191,.2);border-radius:8px;padding:10px;text-align:center;font-size:12px}
+.time-block .t-range{color:var(--purple);font-weight:700;font-size:13px;display:block;margin-bottom:2px}
+.time-block .t-desc{color:var(--text-dim)}
+.intuition-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 32px}
+.intuition-card p{font-size:15px;margin-bottom:12px}
+.highlight{color:var(--gold-light);font-weight:400}
+.deriv-card{background:var(--surface);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;padding:24px 28px;margin-bottom:20px}
+.deriv-step-num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+
+.deriv-explain{font-size:14px;color:var(--text)}
+.deriv-explain .label{color:var(--blue);font-weight:400}
+.deriv-explain p{margin-bottom:8px}
+.arrow-connector{text-align:center;color:var(--gold);font-size:24px;margin:-8px 0 12px;opacity:.5}
+.checkpoint{background:rgba(74,191,138,.08);border:1px solid rgba(74,191,138,.25);border-radius:10px;padding:14px 20px;margin:24px 0;font-size:14px;color:var(--green)}
+.checkpoint strong{color:var(--green);font-weight:700}
+.param-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table.param-table{width:100%;border-collapse:collapse;font-size:13px}
+table.param-table th{background:var(--surface2);color:var(--gold);font-family:'JetBrains Mono',monospace;font-weight:500;padding:12px 14px;text-align:left;border-bottom:1px solid var(--border);font-size:11px;letter-spacing:1px;text-transform:uppercase}
+table.param-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+table.param-table tr:last-child td{border-bottom:none}
+.sym{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:15px}
+.vehicle-example{background:linear-gradient(135deg,rgba(74,158,191,.08),rgba(74,158,191,.02));border:1px solid rgba(74,158,191,.25);border-radius:12px;padding:20px 24px;margin-top:20px}
+.vehicle-example h4{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:17px;color:var(--blue);margin-bottom:12px}
+.vehicle-example p{font-size:13px;margin-bottom:6px}
+.vehicle-example .calc{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:13px;background:#0D1017;padding:6px 12px;border-radius:6px;display:inline-block;margin:4px 0}
+.ride-criteria{background:var(--surface);border:1px solid rgba(191,106,74,.25);border-radius:12px;padding:16px 20px;margin-top:16px}
+.ride-criteria h4{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:16px;color:var(--orange);margin-bottom:8px}
+.ride-criteria p{font-size:13px;margin-bottom:4px}
+.simpack-module{background:var(--surface);border:1px solid rgba(74,158,191,.3);border-radius:16px;overflow:hidden}
+.simpack-header{background:linear-gradient(135deg,rgba(74,158,191,.15),rgba(74,158,191,.05));padding:16px 28px;border-bottom:1px solid rgba(74,158,191,.2);display:flex;align-items:center;gap:10px}
+.simpack-badge{background:var(--blue);color:#fff;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;padding:3px 10px;border-radius:4px;letter-spacing:1px}
+.simpack-header span{color:var(--blue);font-weight:400;font-size:15px}
+.simpack-body{padding:24px 28px}
+.simpack-row{background:var(--surface2);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.simpack-row .sp-sym{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:16px;font-weight:500}
+.simpack-row .sp-path{font-family:'JetBrains Mono',monospace;color:var(--blue);font-size:12px;margin:6px 0}
+.simpack-row .sp-detail{font-size:13px;color:var(--text-dim)}
+.sp-warn{background:rgba(191,106,74,.1);border:1px solid rgba(191,106,74,.3);border-radius:8px;padding:10px 14px;margin-top:8px;font-size:12px;color:var(--orange)}
+.sp-workflow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.sp-wf-step{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.sp-wf-step .wf-num{font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--blue);font-weight:700;display:block}
+.sp-wf-step .wf-title{font-size:13px;color:var(--text-bright);font-weight:400;display:block;margin:4px 0}
+.sp-wf-step .wf-desc{font-size:11px;color:var(--text-dim)}
+.sp-wf-arrow{display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:20px}
+.accordion{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.accordion-toggle{width:100%;background:var(--surface);border:none;padding:18px 24px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;color:var(--text-bright);font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:400}
+.accordion-toggle:hover{background:var(--surface2)}
+.accordion-arrow{color:var(--gold);font-size:18px;transition:transform .3s}
+.accordion-content{max-height:0;overflow:hidden;transition:max-height .4s ease;background:var(--surface)}
+.accordion-content.open{max-height:5000px}
+.accordion-inner{padding:0 24px 24px}
+.accordion-inner p{font-size:14px;margin-bottom:10px}
+.accordion-inner .deriv-equation{margin-top:12px}
+.quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:16px}
+.quiz-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:10px}
+.quiz-q{font-size:15px;color:var(--text-bright);margin-bottom:16px;font-weight:400}
+.quiz-options{display:grid;gap:8px}
+.quiz-opt{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;cursor:pointer;font-size:14px;color:var(--text);transition:all .2s}
+.quiz-opt:hover{border-color:var(--gold);color:var(--text-bright)}
+.quiz-opt.correct{background:rgba(74,191,138,.12);border-color:var(--green);color:var(--green)}
+.quiz-opt.wrong{background:rgba(191,74,74,.12);border-color:#bf4a4a;color:#bf4a4a}
+.quiz-opt.disabled{pointer-events:none;opacity:.7}
+.quiz-feedback{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.correct-fb{background:rgba(74,191,138,.08);color:var(--green)}
+.quiz-feedback.wrong-fb{background:rgba(191,74,74,.08);color:#bf4a4a}
+.solution-panel{display:none;margin-top:16px;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.2);border-radius:12px;overflow:hidden;animation:solReveal .4s ease}
+.solution-panel.show{display:block}
+@keyframes solReveal{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.sol-header{background:rgba(201,168,76,.1);padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);font-weight:500;letter-spacing:1px;border-bottom:1px solid rgba(201,168,76,.15)}
+.sol-step{padding:10px 20px;font-size:13px;color:var(--text);border-bottom:1px solid rgba(201,168,76,.08);display:flex;align-items:baseline;gap:12px}
+.sol-step:last-of-type{border-bottom:none}
+.sol-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);font-weight:500;min-width:50px;letter-spacing:1px;flex-shrink:0}
+.sol-step.highlight-step{background:rgba(201,168,76,.08)}
+.sol-insight{padding:16px 20px;background:rgba(74,191,138,.06);border-top:1px solid rgba(74,191,138,.15);font-size:13px;color:var(--text);line-height:1.9}
+.sol-insight strong{color:var(--green)}
+.sr-track{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+.sr-dot{width:52px;height:52px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;font-family:'JetBrains Mono',monospace}
+.sr-dot.today{background:var(--gold);color:var(--bg);font-weight:700}
+.sr-dot.future{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim)}
+.sr-dot .sr-label{font-size:8px}
+.next-preview{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:20px 24px;margin-top:24px}
+.next-preview h4{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:18px;color:var(--gold);margin-bottom:8px}
+.next-preview p{font-size:14px;color:var(--text-dim)}
+.footer{text-align:center;padding:40px 0 20px;font-size:12px;color:var(--text-dim);border-top:1px solid var(--border);margin-top:60px}
+.placeholder-box{background:var(--surface);border:2px dashed var(--border);border-radius:16px;padding:40px;text-align:center;color:var(--text-dim);font-size:14px;margin:20px 0}
+.placeholder-box .ph-icon{font-size:36px;margin-bottom:12px;display:block}
+.nav-links{display:flex;justify-content:space-between;margin-top:40px;font-size:14px}
+.nav-links a{color:var(--gold);text-decoration:none;padding:8px 16px;border:1px solid var(--border);border-radius:8px;transition:all .2s}
+.nav-links a:hover{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.diagram-wrap{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin:20px 0;text-align:center;overflow-x:auto}
+.diagram-wrap svg{max-width:100%;height:auto}
+.diagram-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;text-align:center}
+.memory-hook{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:16px 20px;margin:16px 0;font-size:14px}
+.memory-hook strong{color:var(--gold-light)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.hero-equation code{font-size:18px}.container{padding:0 16px 60px}.time-split{grid-template-columns:repeat(2,1fr)}.deriv-equation code{font-size:16px}.sp-workflow{grid-template-columns:1fr}}
+@media print{body{background:#fff;color:#222}.sticky-header{display:none}.section{break-inside:avoid}}
+
+/* 인라인 수식도 부드럽게 */
+
+/* ══════ Mobile KaTeX Fix ══════ */
+.deriv-equation{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.deriv-equation code{white-space:normal;word-wrap:break-word}
+.katex{font-size:1.1em}
+@media(max-width:640px){
+  .hero-equation{padding:16px 20px !important;max-width:100%;overflow-x:auto !important;display:block !important;text-align:center}
+    .hero-equation code{font-size:15px !important;white-space:normal !important;word-break:break-all}
+  .deriv-equation{padding:12px 14px !important;margin-bottom:12px}
+    .deriv-equation code{font-size:14px !important}
+  .deriv-equation::before{width:2px}
+    .eq-tooltip{max-width:280px !important;font-size:12px !important}
+}
+@media(max-width:380px){
+      .hero-equation{padding:12px 14px !important}
+}
+
+/* ══════ Interactive Formula Explorer ══════ */
+.eq-explorer{position:relative;cursor:pointer}
+.eq-tooltip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1A1E28,#12151C);border:1px solid var(--gold);border-radius:10px;padding:12px 16px;min-width:220px;max-width:340px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 12px rgba(201,168,76,.15);animation:tooltipIn .2s ease;pointer-events:none}
+.eq-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--gold)}
+.eq-explorer:hover .eq-tooltip,.eq-explorer:focus .eq-tooltip,.eq-explorer.active .eq-tooltip{display:block}
+@keyframes tooltipIn{from{opacity:0;transform:translateX(-50%) translateY(4px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.eq-tooltip .tt-symbol{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--gold-light);font-weight:700;margin-bottom:6px}
+.eq-tooltip .tt-name{font-size:13px;color:var(--text-bright);font-weight:400;margin-bottom:4px}
+.eq-tooltip .tt-unit{font-size:11px;color:var(--blue);font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+.eq-tooltip .tt-ref{font-size:12px;color:var(--green);padding:6px 8px;background:rgba(74,191,138,.08);border-radius:6px;margin-top:6px}
+.eq-tooltip .tt-ref::before{content:'🚗 Ref: ';font-weight:700}
+.eq-tooltip .tt-meaning{font-size:12px;color:var(--text-dim);margin-top:4px;line-height:1.6}
+
+    </style>
+    <style id="katex-inline-css">@font-face{font-display:block;font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_AMS-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Script-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size1-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size2-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size3-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size4-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0;text-rendering:auto}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.16.38"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathboldfrak,.katex .textboldfrak{font-family:KaTeX_Fraktur;font-weight:700}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .mathsfit,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .smash{display:inline;line-height:0}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.2777777778em;margin-right:-.5555555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.1666666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.6666666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.4566666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.1466666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.7142857143em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.8571428571em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.1428571429em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.2857142857em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.4285714286em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.7142857143em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.0571428571em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.4685714286em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.9628571429em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.5542857143em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.7777777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.8888888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.1111111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.3044444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.7644444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.5833333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.7283333333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.0733333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.4861111111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.4402777778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.7277777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.2893518519em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.4050925926em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.462962963em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.5208333333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.2002314815em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.4398148148em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.2410800386em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.2892960463em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.337512054em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.3857280617em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.4339440694em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.4821600771em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.5785920926em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.6943105111em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.8331726133em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.1996142719em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.2009646302em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.2411575563em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.2813504823em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.3215434084em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.3617363344em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.4019292605em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.4823151125em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.578778135em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.6945337621em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.8336012862em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex svg{fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+</style>
+    <style id="math-enhanced-style">
+/* ══════ KaTeX Pre-rendered Math Styling ══════ */
+/* Hero equation - 메인 수식 */
+.hero-equation .katex-display{margin:0!important;padding:0!important}
+.hero-equation .katex{font-size:1.5em!important;color:#E8C96A!important}
+.hero-equation .katex .mord{color:#E8C96A!important}
+.hero-equation .katex .mbin{color:#4A9EBF!important}
+.hero-equation .katex .mrel{color:#4ABF8A!important}
+.hero-equation .katex .mop{color:#E8C96A!important}
+.hero-equation .katex .mopen,.hero-equation .katex .mclose{color:#BF8A4A!important}
+.hero-equation .katex .sqrt .sqrt-sign{color:#C9A84C!important}
+.hero-equation .katex .frac-line{border-bottom-color:#C9A84C!important}
+.hero-equation .katex .accent-body{color:#E8C96A!important}
+
+/* Derivation equation - 유도 단계 수식 */
+.deriv-equation .katex-display{margin:0!important;padding:0!important}
+.deriv-equation .katex{font-size:1.15em!important;color:#E8C96A!important}
+.deriv-equation .katex .mord{color:#E8C96A!important}
+.deriv-equation .katex .mord.mathnormal{color:#E8C96A!important}
+.deriv-equation .katex .mbin{color:#4A9EBF!important}
+.deriv-equation .katex .mrel{color:#4ABF8A!important}
+.deriv-equation .katex .mop{color:#E8C96A!important}
+.deriv-equation .katex .sqrt .sqrt-sign{color:#C9A84C!important}
+.deriv-equation .katex .sqrt .vlist{color:#E8C96A!important}
+.deriv-equation .katex .frac-line{border-bottom-color:#C9A84C!important}
+.deriv-equation .katex .mopen,.deriv-equation .katex .mclose{color:#BF8A4A!important}
+.deriv-equation .katex .accent-body{color:#E8C96A!important}
+
+/* 일반 영역 수식 */
+.katex{color:#E8C96A!important}
+.katex .mord{color:#E8C96A!important}
+.katex .mbin{color:#4A9EBF!important}
+.katex .mrel{color:#4ABF8A!important}
+.katex .mop{color:#E8C96A!important}
+.katex .frac-line{border-bottom-color:rgba(201,168,76,0.6)!important}
+.katex .sqrt .sqrt-sign{color:#C9A84C!important}
+
+/* katex-display 블록 스타일 */
+.katex-display{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:4px 0}
+.katex-display>.katex{text-align:center!important}
+
+/* Hero equation 박스 강화 */
+.hero-equation{display:inline-block;background:linear-gradient(135deg,#0D1017 0%,#151A25 100%);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:24px 48px;margin-bottom:32px;box-shadow:0 4px 20px rgba(201,168,76,0.1),0 0 40px rgba(201,168,76,0.03);position:relative;overflow:visible;max-width:100%}
+.hero-equation::before{content:'';position:absolute;inset:-1px;border-radius:16px;background:linear-gradient(135deg,rgba(201,168,76,0.2),transparent,rgba(201,168,76,0.1));z-index:0;pointer-events:none}
+
+/* Deriv equation 박스 강화 */
+.deriv-equation{background:linear-gradient(135deg,rgba(13,16,23,0.8),rgba(21,26,37,0.6));border-left:3px solid #C9A84C;border-radius:0 12px 12px 0;padding:16px 20px;margin:12px 0;box-shadow:0 2px 12px rgba(0,0,0,0.3);transition:border-color 0.3s,box-shadow 0.3s}
+.deriv-equation:hover{border-left-color:#E8C96A;box-shadow:0 4px 16px rgba(201,168,76,0.15)}
+
+/* 모바일 반응형 */
+@media(max-width:640px){
+  .hero-equation{padding:16px 20px!important;max-width:100%;overflow-x:auto!important;display:block!important}
+  .hero-equation .katex{font-size:1.1em!important}
+  .deriv-equation .katex{font-size:0.95em!important}
+  .deriv-equation{padding:12px 14px;margin:8px 0}
+}
+@media(max-width:380px){
+  .hero-equation .katex{font-size:0.9em!important}
+  .deriv-equation .katex{font-size:0.85em!important}
+}
+
+/* 체크포인트/파라미터 테이블 내 수식 */
+.checkpoint .katex{font-size:0.9em!important}
+.param-table .katex{font-size:0.95em!important}
+td .katex,th .katex{font-size:0.9em!important}
+
+/* 수식 에러 폴백 */
+.katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
+</style>
+</head>
+<body>
+
+<!-- ══════ STICKY HEADER ══════ -->
+<header class="sticky-header">
+    <div class="header-inner">
+        <div class="header-brand"><a href="index.html" style="color:inherit;text-decoration:none;">YS · 진동학 마스터</a> / Day 34</div>
+        <div class="header-progress-wrap">
+            <span>34 / 52</span>
+            <div class="header-progress-bar">
+                <div class="header-progress-fill" style="width:65.38461538461539%"></div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+
+<!-- ══════ SERIES INFO ══════ -->
+<div class="series-info">이 시리즈 예상 총 Day: 52일 &nbsp;|&nbsp; PART 6 — 서스펜션 기구학</div>
+
+<section class="hero">
+  <div class="hero-day">— DAY 34 —</div>
+  <h1 class="hero-title">서스펜션 기구학 기초</h1>
+  <p class="hero-title-en">Suspension Kinematics Fundamentals</p>
+  <div class="hero-equation"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">DOF</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">6</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2643em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9646em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></div>
+  <div class="gauge-wrap">
+    <svg class="gauge-svg" viewBox="0 0 100 100">
+      <circle class="gauge-bg" cx="50" cy="50" r="40"/>
+      <circle class="gauge-fill" cx="50" cy="50" r="40" transform="rotate(-90 50 50)" style="stroke-dashoffset:87.0"/>
+      <text class="gauge-text" x="50" y="48">65%</text>
+      <text class="gauge-label" x="50" y="62">DAY 34/52</text>
+    </svg>
+  </div>
+  <div class="meta-badges">
+    <div class="meta-badge">⏱ 포모도로 <span>25분</span></div>
+    <div class="meta-badge">📐 수식 <span>4단계</span></div>
+    <div class="meta-badge">⭐ 난이도 <span>★★★☆☆</span></div>
+    <div class="meta-badge">🔁 복습 <span>D+1, D+3, D+7</span></div>
+  </div>
+</section>
+
+<div style="max-width:960px;margin:0 auto;padding:0 24px">
+  <div style="background:linear-gradient(135deg,rgba(74,158,191,.08),rgba(74,158,191,.03));border:1px solid rgba(74,158,191,.2);border-radius:10px;padding:12px 18px;margin-top:-20px;margin-bottom:24px;font-size:13px;color:var(--text-dim);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:18px">🔍</span>
+    <span><strong style="color:var(--blue)">수식 탐색기</strong> — 파라미터 테이블의 기호나 계산식 위에 <strong style="color:var(--text-bright)">마우스를 올리거나 터치</strong>하면 물리적 의미·단위·레퍼런스 실차값이 표시됩니다.</span>
+  </div>
+</div>
+
+
+<!-- ══════ INTUITION SECTION ══════ -->
+<div class="section">
+    <div class="section-label">INTUITION</div>
+    <div class="section-title">핵심 개념</div>
+    <div class="brain-box">
+        <h3>💡 이번 강의의 목표</h3>
+        <p>Day01~33에서 수직 동역학(스프링-댐퍼-질량)을 마스터했습니다. 이제 현실의 서스펜션은 단순한 수직 운동이 아닙니다. 3차원 링크 메커니즘으로 이루어져 있으며, 바퀴가 바운스할 때 캠버(camber), 토(toe), 캐스터(caster)가 동시에 변합니다. 이러한 기하학적 변화가 바로 승차감과 조종안정성을 동시에 결정하는 핵심입니다.</p>
+        <div class="time-split">
+            <div class="time-block">
+                <span class="t-range">0-5m</span>
+                <span class="t-desc">개념 도입</span>
+            </div>
+            <div class="time-block">
+                <span class="t-range">5-15m</span>
+                <span class="t-desc">유도 과정</span>
+            </div>
+            <div class="time-block">
+                <span class="t-range">15-20m</span>
+                <span class="t-desc">Simpack 실습</span>
+            </div>
+            <div class="time-block">
+                <span class="t-range">20-25m</span>
+                <span class="t-desc">응용 사례</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════ DERIVATION SECTION ══════ -->
+<div class="section">
+    <div class="section-label">DERIVATION</div>
+    <div class="section-title">수학적 유도</div>
+    <div class="derivations-section">
+<div class="deriv-card">
+    <div class="deriv-step-num">Step 1 / 5</div>
+    <h4>Gruebler 공식 (일반 3D)</h4>
+    <div class="deriv-steps">
+        <p class="step-text">기구학 시스템의 자유도를 정확히 계산하기 위한 기본 공식입니다.</p>
+        <p class="step-text">DOF = 6(n-1) - Σc_i</p>
+        <p class="step-text">여기서 n = 링크 수 (고정된 지면도 1개 링크), c_i = i번째 조인트의 구속 자유도</p>
+        <p class="step-text">조인트 종류: 볼조인트(3), 핀(5), 프리즘(5), 우니버설(4)</p>
+    </div>
+    <div class="deriv-equation"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">DOF</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">3D</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">6</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2643em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9646em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></div>
+    <div class="deriv-explain">
+        <p class="label">해석:</p>
+        <p>3D 공간에서 링크 1개당 6개 자유도(3 병진, 3 회전)를 가집니다.</p>
+    </div>
+</div>
+<div class="checkpoint">
+    <strong>✅ 체크포인트</strong>
+    <p>Step 1을(를) 이해했으면 계속 진행.</p>
+</div>
+<div class="deriv-card">
+    <div class="deriv-step-num">Step 2 / 5</div>
+    <h4>2D 평면 기구학 단순화</h4>
+    <div class="deriv-steps">
+        <p class="step-text">대부분의 자동차 서스펜션은 측면에서 보면 평면 메커니즘에 가깝습니다.</p>
+        <p class="step-text">DOF_2D = 3(n-1) - 2j₁ - j₂</p>
+        <p class="step-text">j₁ = 1-DOF 조인트(핀), j₂ = 2-DOF 조인트(슬라이더)</p>
+        <p class="step-text">평면 운동으로 단순화하면 계산이 훨씬 간단해집니다.</p>
+    </div>
+    <div class="deriv-equation"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">DOF</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">2D</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">3</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord">2</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0572em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0572em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></div>
+    <div class="deriv-explain">
+        <p class="label">해석:</p>
+        <p>평면 내 운동만 고려할 때의 단순화된 공식입니다.</p>
+    </div>
+</div>
+<div class="checkpoint">
+    <strong>✅ 체크포인트</strong>
+    <p>Step 2을(를) 이해했으면 계속 진행.</p>
+</div>
+<div class="deriv-card">
+    <div class="deriv-step-num">Step 3 / 5</div>
+    <h4>MacPherson 스트럿 분석</h4>
+    <div class="deriv-steps">
+        <p class="step-text">MacPherson은 차 업계에서 가장 흔한 서스펜션입니다.</p>
+        <p class="step-text">구성: 스트럿(프리즘 조인트 1DOF) + 로어암(ball 2개) + 타이로드 = 4개 링크</p>
+        <p class="step-text">조인트: 프리즘(5) + 핀(5) + 핀(5) + 구형(3) = 18</p>
+        <p class="step-text">따라서 DOF = 6(4-1) - 18 = 0... 그런데 실제로는 1DOF. 부싱의 탄성 때문!</p>
+    </div>
+    <div class="deriv-equation"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">DOF</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">MacPherson</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord text"><span class="mord"> (</span><span class="mord hangul_fallback">부싱</span><span class="mord"> </span><span class="mord hangul_fallback">탄성</span><span class="mord">)</span></span></span></span></span></div>
+    <div class="deriv-explain">
+        <p class="label">해석:</p>
+        <p>이론적으로는 과결정이지만, 부싱의 탄성으로 인해 1DOF 운동이 가능합니다.</p>
+    </div>
+</div>
+<div class="checkpoint">
+    <strong>✅ 체크포인트</strong>
+    <p>Step 3을(를) 이해했으면 계속 진행.</p>
+</div>
+<div class="deriv-card">
+    <div class="deriv-step-num">Step 4 / 5</div>
+    <h4>더블 위시본(Double Wishbone) 분석</h4>
+    <div class="deriv-steps">
+        <p class="step-text">고급 스포츠카, 럭셔리 세단의 프론트 서스펜션입니다.</p>
+        <p class="step-text">어퍼암(A-arm, 볼조인트×2) + 로어암 + 타이로드 = 5개 링크</p>
+        <p class="step-text">각 암이 차체에 2개의 핀으로 고정되고, 너클에 볼조인트로 연결</p>
+        <p class="step-text">정교한 캠버, 토 제어 가능</p>
+    </div>
+    <div class="deriv-equation"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">DOF</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">DoubleW</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord text"><span class="mord"> (</span><span class="mord hangul_fallback">상하</span><span class="mord"> </span><span class="mord hangul_fallback">운동</span><span class="mord">)</span></span></span></span></span></div>
+    <div class="deriv-explain">
+        <p class="label">해석:</p>
+        <p>어퍼/로어 암의 길이 비로 캠버 변화를 정밀하게 제어할 수 있습니다.</p>
+    </div>
+</div>
+<div class="checkpoint">
+    <strong>✅ 체크포인트</strong>
+    <p>Step 4을(를) 이해했으면 계속 진행.</p>
+</div>
+<div class="deriv-card">
+    <div class="deriv-step-num">Step 5 / 5</div>
+    <h4>5-링크 멀티링크 설계</h4>
+    <div class="deriv-steps">
+        <p class="step-text">최상의 조종성능을 위해 설계된 고급 리어 서스펜션입니다.</p>
+        <p class="step-text">5개의 독립적인 로드 × 볼조인트 2개씩 = 매우 정교한 제어</p>
+        <p class="step-text">DOF = 6(6-1) - 5×5 = 30 - 25 = 5... 하지만 추가 제약으로 1DOF 확보</p>
+        <p class="step-text">비용과 성능의 최고 균형점</p>
+    </div>
+    <div class="deriv-equation"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">DOF</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">5-Link</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord text"><span class="mord"> (5</span><span class="mord hangul_fallback">개</span><span class="mord"> </span><span class="mord hangul_fallback">로드</span><span class="mord"> </span><span class="mord hangul_fallback">제약</span><span class="mord">)</span></span></span></span></span></div>
+    <div class="deriv-explain">
+        <p class="label">해석:</p>
+        <p>각 로드가 정교하게 배치되어 원하는 수직 운동 특성을 구현합니다.</p>
+    </div>
+</div>
+</div>
+
+</div>
+
+<!-- ══════ PARAMETER TABLE SECTION ══════ -->
+<div class="section">
+    <div class="section-label">PARAMETERS</div>
+    <div class="section-title">핵심 변수</div>
+    <table class="param-table">
+<thead><tr><th>기호</th><th>명칭</th><th>단위</th><th>물리의미</th><th>차량부품</th><th>전형적범위</th></tr></thead>
+<tbody>
+<tr>
+    <td class="sym">n</td>
+    <td class="name">링크 수</td>
+    <td class="unit">개</td>
+    <td class="meaning">메커니즘 구성 부재</td>
+    <td class="component">서스펜션 암+너클+차체</td>
+    <td class="range">4~7</td>
+</tr>
+<tr>
+    <td class="sym">j</td>
+    <td class="name">조인트 수</td>
+    <td class="unit">개</td>
+    <td class="meaning">부재 간 연결점</td>
+    <td class="component">볼조인트/부싱/피봇</td>
+    <td class="range">5~10</td>
+</tr>
+<tr>
+    <td class="sym">c_i</td>
+    <td class="name">구속 자유도</td>
+    <td class="unit">개</td>
+    <td class="meaning">각 조인트의 구속</td>
+    <td class="component">볼조인트=3, 레볼루트=5</td>
+    <td class="range">1~5</td>
+</tr>
+<tr>
+    <td class="sym">DOF</td>
+    <td class="name">자유도</td>
+    <td class="unit">개</td>
+    <td class="meaning">메커니즘의 독립 운동</td>
+    <td class="component">서스펜션 바운스</td>
+    <td class="range">1</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+<div class="section">
+    <div class="section-label">SIMPACK</div>
+    <div class="section-title">다물체 동역학 시뮬레이션</div>
+    <div class="simpack-module">
+    <h3>Simpack 적용</h3>
+    <div class="sp-rows">
+        <div class="sp-row">
+            <div class="sp-sym"><strong>하드포인트</strong></div>
+            <div class="sp-path"><code>Suspension > Hardpoints > [x,y,z]</code></div>
+            <div class="sp-detail">각 조인트의 3D 좌표 (mm 단위)</div>
+            <div class="sp-warn">⚠️ 1mm 오차 = 기하학 특성 크게 변화</div>
+        </div>
+        <div class="sp-row">
+            <div class="sp-sym"><strong>조인트 타입</strong></div>
+            <div class="sp-path"><code>Force Element > Joint > Type</code></div>
+            <div class="sp-detail">Ball=3DOF, Revolute=1DOF, Prismatic=1DOF 등</div>
+            <div class="sp-warn">⚠️ 잘못된 타입 설정 = 부정확한 DOF 계산</div>
+        </div>
+        <div class="sp-row">
+            <div class="sp-sym"><strong>부싱 강성</strong></div>
+            <div class="sp-path"><code>Bushing > Stiffness Matrix > K[6×6]</code></div>
+            <div class="sp-detail">각 방향별 강성 계수</div>
+            <div class="sp-warn">⚠️ 부싱 없으면 과결정 시스템</div>
+        </div>
+        <div class="sp-row">
+            <div class="sp-sym"><strong>운동학 해석</strong></div>
+            <div class="sp-path"><code>Analysis > Kinematics > Parallel Wheel Travel</code></div>
+            <div class="sp-detail">바운스 시 모든 좌표 추적</div>
+            <div class="sp-warn">⚠️ 정확한 하드포인트가 필수</div>
+        </div>
+    </div>
+</div>
+
+</div>
+<!-- ══════ VEHICLE EXAMPLE ══════ -->
+<div class="section">
+    <div class="section-label">EXAMPLE</div>
+    <div class="section-title">실차 적용 사례</div>
+    <div class="intuition-card">
+        <h4>현대 Elantra (프론트 MacPherson)</h4>
+        <p><strong>설명:</strong> n=4(차체+스트럿+로어암+너클), 조인트: 레볼루트×2(5+5) + 프리즘×1(5) + 볼×1(3) = 18</p>
+        <p><strong>계산:</strong> DOF_theoretical = 6(4-1) - 18 = 0. 하지만 부싱 탄성으로 1DOF 확보</p>
+        <p><strong>의미:</strong> 완벽한 스트럿 가이드 + 로어암의 유연한 바운스 = 승차감과 안정성 양립</p>
+    </div>
+</div>
+<!-- ══════ QUIZ SECTION ══════ -->
+<div class="section">
+    <div class="section-label">QUIZ</div>
+    <div class="quiz-section">
+<h3>이해도 확인 퀴즈</h3>
+<div class="quiz-card q1">
+    <h4>Q1: 수식 빈칸 채우기</h4>
+    <p class="q-question">5-링크 멀티링크에서 n=6, 각 조인트가 모두 볼조인트(c=3)일 때 DOF는?</p>
+    <p class="q-blank"><code>DOF = 6(___ - 1) - 5 × ___ = ___</code></p>
+    <div class="q-answer" style="display:none;">
+        <strong>정답:</strong> DOF = 6(6-1) - 5×3 = 30-15 = 15 (제약 조건으로 1DOF가 되도록 설계)<br>
+        <strong>힌트:</strong> n=6 대입하고, 볼조인트 개수 세기
+    </div>
+    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
+</div>
+<div class="quiz-card q2">
+    <h4>Q2: 물리의미 이해</h4>
+    <p class="q-question">MacPherson 스트럿의 '프리즘 조인트'가 허용하는 운동은 무엇인가?</p>
+    <div class="q-options">
+        <label><input type="radio" name="q2"> 상하 직선 운동만</label>
+        <label><input type="radio" name="q2"> 상하 회전 자유</label>
+        <label><input type="radio" name="q2"> 모든 방향 자유</label>
+        <label><input type="radio" name="q2"> 좌우 슬라이드</label>
+    </div>
+    <div class="q-answer" style="display:none;">
+        <strong>정답:</strong> 상하 직선 운동만 (프리즘 조인트 = 슬라이더)<br>
+        <strong>설명:</strong> 스트럿이 상하로만 움직이므로 바퀴도 수직 운동만 가능합니다.
+    </div>
+    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
+</div>
+<div class="quiz-card q3">
+    <h4>Q3: Simpack 적용</h4>
+    <p class="q-question">하드포인트 좌표 오차(±1mm)가 캠버 기하학에 미치는 영향을 최소화하려면?</p>
+    <div class="q-options">
+        <label><input type="radio" name="q3"> 부싱 강성 증가</label>
+        <label><input type="radio" name="q3"> 조인트 좌표 정밀도 극대화</label>
+        <label><input type="radio" name="q3"> 조인트 개수 증가</label>
+        <label><input type="radio" name="q3"> 링크 길이 증가</label>
+    </div>
+    <div class="q-answer" style="display:none;">
+        <strong>정답:</strong> 조인트 좌표 정밀도 극대화<br>
+        <strong>설명:</strong> Gruebler 공식의 정확성은 기하학적 정의(좌표)에 직접 의존합니다.
+    </div>
+    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
+</div>
+</div>
+
+</div>
+<!-- ══════ FORMULA EXPLORER ══════ -->
+
+<!-- ═══ INJECTED VEHICLE DIAGRAMS ═══ -->
+
+<!-- ══════ DEEP DIVE ══════ -->
+<div class="section">
+    <div class="section-label">DEEP DIVE</div>
+    <h2 class="section-title">심화 탐구</h2>
+    <div class="brain-box">
+        <h3>왜 이것이 중요한가?</h3>
+        <p>서스펜션기구학기초의 깊은 이해는 서스펜션 설계에서 핵심적인 역할을 합니다. 단순히 공식을 외우는 것이 아니라, 물리적 의미를 파악하고 실무에 적용할 수 있는 능력이 진정한 엔지니어의 역량입니다.</p>
+    </div>
+    <div class="derivation-block">
+        <div class="deriv-step">
+            <div class="step-badge">Advanced</div>
+            <p>실제 차량에서는 비선형 효과, 온도 변화, 마모 등이 이론적 모델과 차이를 만듭니다. 이러한 실무적 관점에서 서스펜션기구학기초을(를) 재검토해 보세요.</p>
+        </div>
+    </div>
+</div>
+<div class="section">
+    <div class="section-label">DIAGRAMS</div>
+    <div class="section-title">차량 개략도 및 기구학 다이어그램</div>
+    <div class="diagram-wrap">
+        <div class="diagram-label">차량 전면도 — 서스펜션 기하학 개요</div>
+        <svg viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#C9A84C"/></marker></defs>
+  <text x="260" y="22" text-anchor="middle" fill="#7A7A8A" font-size="13" font-family="JetBrains Mono">Front View — Suspension Geometry</text>
+  <!-- Ground -->
+  <line x1="30" y1="340" x2="490" y2="340" stroke="#252A38" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="260" y="365" text-anchor="middle" fill="#7A7A8A" font-size="11">Ground Level</text>
+  <!-- Body (Sprung Mass) -->
+  <rect x="130" y="80" width="260" height="60" rx="8" fill="none" stroke="#4A9EBF" stroke-width="2"/>
+  <text x="260" y="115" text-anchor="middle" fill="#4A9EBF" font-size="12" font-family="JetBrains Mono">Sprung Mass (Body)</text>
+  <!-- CG -->
+  <circle cx="260" cy="110" r="4" fill="#C9A84C"/>
+  <text x="275" y="108" fill="#C9A84C" font-size="10">CG</text>
+  <!-- Left suspension -->
+  <line x1="160" y1="140" x2="100" y2="260" stroke="#8A6ABF" stroke-width="2.5"/>
+  <text x="105" y="195" fill="#8A6ABF" font-size="10" transform="rotate(-25,105,195)">Upper Arm</text>
+  <line x1="180" y1="140" x2="80" y2="290" stroke="#4ABF8A" stroke-width="2.5"/>
+  <text x="100" y="240" fill="#4ABF8A" font-size="10" transform="rotate(-20,100,240)">Lower Arm</text>
+  <!-- Left Knuckle -->
+  <line x1="80" y1="260" x2="80" y2="310" stroke="#BF6A4A" stroke-width="3"/>
+  <text x="50" y="290" fill="#BF6A4A" font-size="10">Knuckle</text>
+  <!-- Left wheel -->
+  <ellipse cx="80" cy="310" rx="22" ry="32" fill="none" stroke="#C9A84C" stroke-width="2.5"/>
+  <line x1="80" y1="278" x2="80" y2="342" stroke="#C9A84C" stroke-width="1" stroke-dasharray="3,3"/>
+  <!-- Right suspension -->
+  <line x1="360" y1="140" x2="420" y2="260" stroke="#8A6ABF" stroke-width="2.5"/>
+  <line x1="340" y1="140" x2="440" y2="290" stroke="#4ABF8A" stroke-width="2.5"/>
+  <!-- Right Knuckle -->
+  <line x1="440" y1="260" x2="440" y2="310" stroke="#BF6A4A" stroke-width="3"/>
+  <!-- Right wheel -->
+  <ellipse cx="440" cy="310" rx="22" ry="32" fill="none" stroke="#C9A84C" stroke-width="2.5"/>
+  <line x1="440" y1="278" x2="440" y2="342" stroke="#C9A84C" stroke-width="1" stroke-dasharray="3,3"/>
+  <!-- Spring+Damper left -->
+  <path d="M140,140 L120,160 L140,175 L120,190 L140,205 L120,220 L130,230" fill="none" stroke="#4ABF8A" stroke-width="1.5"/>
+  <rect x="126" y="230" width="8" height="30" fill="none" stroke="#8A6ABF" stroke-width="1.5"/>
+  <!-- Spring+Damper right -->
+  <path d="M380,140 L400,160 L380,175 L400,190 L380,205 L400,220 L390,230" fill="none" stroke="#4ABF8A" stroke-width="1.5"/>
+  <rect x="386" y="230" width="8" height="30" fill="none" stroke="#8A6ABF" stroke-width="1.5"/>
+  <!-- Roll Center -->
+  <circle cx="260" cy="270" r="5" fill="#BF6A4A" stroke="#BF6A4A" stroke-width="1"/>
+  <text x="260" y="260" text-anchor="middle" fill="#BF6A4A" font-size="11" font-weight="bold">RC</text>
+  <!-- IC lines (dashed) -->
+  <line x1="80" y1="290" x2="260" y2="270" stroke="#BF6A4A" stroke-width="1" stroke-dasharray="4,3" opacity="0.6"/>
+  <line x1="440" y1="290" x2="260" y2="270" stroke="#BF6A4A" stroke-width="1" stroke-dasharray="4,3" opacity="0.6"/>
+  <!-- Track width -->
+  <line x1="80" y1="350" x2="440" y2="350" stroke="#C9A84C" stroke-width="1" marker-start="url(#ah)" marker-end="url(#ah)"/>
+  <text x="260" y="375" text-anchor="middle" fill="#C9A84C" font-size="11">Track Width (T)</text>
+</svg>
+    </div>
+    <div class="diagram-wrap">
+        <div class="diagram-label">차량 측면도 — 휠베이스 & 안티 지오메트리</div>
+        <svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="as" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#4A9EBF"/></marker></defs>
+  <text x="280" y="22" text-anchor="middle" fill="#7A7A8A" font-size="13" font-family="JetBrains Mono">Side View — Wheelbase &amp; Anti-Geometry</text>
+  <!-- Ground -->
+  <line x1="20" y1="270" x2="540" y2="270" stroke="#252A38" stroke-width="2" stroke-dasharray="8,4"/>
+  <!-- Body -->
+  <path d="M120,100 Q130,60 200,55 L380,55 Q450,60 460,100 L460,160 L120,160Z" fill="none" stroke="#4A9EBF" stroke-width="2" rx="10"/>
+  <text x="290" y="115" text-anchor="middle" fill="#4A9EBF" font-size="12">Vehicle Body</text>
+  <!-- CG -->
+  <circle cx="290" cy="130" r="5" fill="#C9A84C"/>
+  <text x="305" y="128" fill="#C9A84C" font-size="11" font-weight="bold">CG</text>
+  <line x1="290" y1="135" x2="290" y2="270" stroke="#C9A84C" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+  <text x="295" y="200" fill="#C9A84C" font-size="10">h_cg</text>
+  <!-- Front wheel -->
+  <circle cx="160" cy="240" r="30" fill="none" stroke="#C9A84C" stroke-width="2.5"/>
+  <circle cx="160" cy="240" r="3" fill="#C9A84C"/>
+  <line x1="160" y1="160" x2="160" y2="210" stroke="#4ABF8A" stroke-width="2"/>
+  <path d="M150,180 L160,170 L170,180" fill="none" stroke="#4ABF8A" stroke-width="1.5"/>
+  <path d="M150,190 L160,200 L170,190" fill="none" stroke="#4ABF8A" stroke-width="1.5"/>
+  <rect x="155" y="195" width="10" height="18" fill="none" stroke="#8A6ABF" stroke-width="1.5"/>
+  <text x="160" y="290" text-anchor="middle" fill="#7A7A8A" font-size="10">Front</text>
+  <!-- Rear wheel -->
+  <circle cx="420" cy="240" r="30" fill="none" stroke="#C9A84C" stroke-width="2.5"/>
+  <circle cx="420" cy="240" r="3" fill="#C9A84C"/>
+  <line x1="420" y1="160" x2="420" y2="210" stroke="#4ABF8A" stroke-width="2"/>
+  <path d="M410,180 L420,170 L430,180" fill="none" stroke="#4ABF8A" stroke-width="1.5"/>
+  <path d="M410,190 L420,200 L430,190" fill="none" stroke="#4ABF8A" stroke-width="1.5"/>
+  <rect x="415" y="195" width="10" height="18" fill="none" stroke="#8A6ABF" stroke-width="1.5"/>
+  <text x="420" y="290" text-anchor="middle" fill="#7A7A8A" font-size="10">Rear</text>
+  <!-- Wheelbase -->
+  <line x1="160" y1="300" x2="420" y2="300" stroke="#4A9EBF" stroke-width="1.5" marker-start="url(#as)" marker-end="url(#as)"/>
+  <text x="290" y="315" text-anchor="middle" fill="#4A9EBF" font-size="11" font-weight="bold">Wheelbase (L)</text>
+  <!-- Anti-dive line -->
+  <line x1="160" y1="240" x2="290" y2="130" stroke="#BF6A4A" stroke-width="1.5" stroke-dasharray="6,3" opacity="0.7"/>
+  <text x="210" y="170" fill="#BF6A4A" font-size="10" transform="rotate(-25,210,170)">Anti-Dive</text>
+  <!-- Anti-squat line -->
+  <line x1="420" y1="240" x2="290" y2="130" stroke="#8A6ABF" stroke-width="1.5" stroke-dasharray="6,3" opacity="0.7"/>
+  <text x="370" y="170" fill="#8A6ABF" font-size="10" transform="rotate(25,370,170)">Anti-Squat</text>
+</svg>
+    </div>
+    <div class="diagram-wrap">
+        <div class="diagram-label">K&C 시뮬레이션 결과 곡선</div>
+        <svg viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+  <text x="240" y="22" text-anchor="middle" fill="#7A7A8A" font-size="13" font-family="JetBrains Mono">K&amp;C Simulation Results</text>
+  <!-- Axes -->
+  <line x1="60" y1="40" x2="60" y2="260" stroke="#252A38" stroke-width="1.5"/>
+  <line x1="60" y1="260" x2="450" y2="260" stroke="#252A38" stroke-width="1.5"/>
+  <text x="255" y="290" text-anchor="middle" fill="#7A7A8A" font-size="11">Wheel Travel [mm]</text>
+  <text x="25" y="150" text-anchor="middle" fill="#7A7A8A" font-size="11" transform="rotate(-90,25,150)">Angle [deg]</text>
+  <!-- Grid -->
+  <line x1="60" y1="150" x2="450" y2="150" stroke="#252A38" stroke-width="0.5" stroke-dasharray="4,4"/>
+  <text x="55" y="155" text-anchor="end" fill="#7A7A8A" font-size="9">0</text>
+  <text x="55" y="50" text-anchor="end" fill="#7A7A8A" font-size="9">+3</text>
+  <text x="55" y="255" text-anchor="end" fill="#7A7A8A" font-size="9">-3</text>
+  <text x="60" y="275" fill="#7A7A8A" font-size="9">-80</text>
+  <text x="240" y="275" fill="#7A7A8A" font-size="9">0</text>
+  <text x="430" y="275" fill="#7A7A8A" font-size="9">+80</text>
+  <!-- Camber curve -->
+  <path d="M80,200 Q160,180 255,150 Q340,120 430,85" fill="none" stroke="#4ABF8A" stroke-width="2.5"/>
+  <text x="435" y="80" fill="#4ABF8A" font-size="11">Camber</text>
+  <!-- Toe curve -->
+  <path d="M80,160 Q160,155 255,150 Q340,148 430,155" fill="none" stroke="#8A6ABF" stroke-width="2.5"/>
+  <text x="435" y="160" fill="#8A6ABF" font-size="11">Toe</text>
+  <!-- Caster curve -->
+  <path d="M80,170 Q160,165 255,150 Q340,135 430,110" fill="none" stroke="#4A9EBF" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="435" y="115" fill="#4A9EBF" font-size="11">Caster</text>
+  <!-- Design point -->
+  <circle cx="255" cy="150" r="4" fill="#C9A84C"/>
+  <text x="260" y="143" fill="#C9A84C" font-size="10">Design Pt</text>
+</svg>
+    </div>
+</div>
+<div class="section">
+    <div class="section-label">TOOLS</div>
+    <div class="section-title">수식 탐색기</div>
+    <div class="formula-explorer" id="formulaExplorer">
+        <p>핵심 수식들의 관계를 탐색하세요.</p>
+        <pre id="eqData" style="display:none;">
+{
+  "day": 34,
+  "title": "서스펜션 기구학 기초",
+  "heroEq": "<span class="katex"><span class="katex-html" aria-hidden="true"><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">t</span><span class="mord mathnormal">e</span><span class="mord mathnormal">x</span><span class="mord mathnormal">t</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mord mathnormal" style="margin-right:0.13889em;">F</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">6</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1.2194em;vertical-align:-0.2769em;"></span><span class="mord mathnormal">s</span><span class="mord mathnormal">u</span><span class="mord"><span class="mord mathnormal">m</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9426em;"><span style="top:-2.4231em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.1809em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2769em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>",
+  "derivations": [
+    {
+      "title": "Gruebler 공식 (일반 3D)",
+      "eq": "<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext>DOF</mtext><mrow><mi>e</mi><mi>x</mi><mi>t</mi><mrow><mn>3</mn><mi>D</mi></mrow></mrow></msub><mo>=</mo><mn>6</mn><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>−</mo><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>j</mi></msubsup><msub><mi>c</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\text{DOF}_{	ext{3D}} = 6(n-1) - \sum_{i=1}^{j} c_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">DOF</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">x</span><span class="mord mathnormal mtight">t</span><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">D</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">6</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2643em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9646em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>",
+      "explanation": "3D 공간에서 링크 1개당 6개 자유도(3 병진, 3 회전)를 가집니다."
+    },
+    {
+      "title": "2D 평면 기구학 단순화",
+      "eq": "<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext>DOF</mtext><mrow><mi>e</mi><mi>x</mi><mi>t</mi><mrow><mn>2</mn><mi>D</mi></mrow></mrow></msub><mo>=</mo><mn>3</mn><mo stretchy="false">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>−</mo><mn>2</mn><msub><mi>j</mi><mn>1</mn></msub><mo>−</mo><msub><mi>j</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">\text{DOF}_{	ext{2D}} = 3(n-1) - 2j_1 - j_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">DOF</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">x</span><span class="mord mathnormal mtight">t</span><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">D</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">3</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord">2</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0572em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0572em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>",
+      "explanation": "평면 내 운동만 고려할 때의 단순화된 공식입니다."
+    },
+    {
+      "title": "MacPherson 스트럿 분석",
+      "eq": "<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext>DOF</mtext><mrow><mi>e</mi><mi>x</mi><mi>t</mi><mrow><mi>M</mi><mi>a</mi><mi>c</mi><mi>P</mi><mi>h</mi><mi>e</mi><mi>r</mi><mi>s</mi><mi>o</mi><mi>n</mi></mrow></mrow></msub><mo>=</mo><mn>1</mn><mtext> (부싱 탄성)</mtext></mrow><annotation encoding="application/x-tex">\text{DOF}_{	ext{MacPherson}} = 1 \text{ (부싱 탄성)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">DOF</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">x</span><span class="mord mathnormal mtight">t</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.10903em;">M</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span><span class="mord mathnormal mtight">h</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">er</span><span class="mord mathnormal mtight">so</span><span class="mord mathnormal mtight">n</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord text"><span class="mord"> (</span><span class="mord hangul_fallback">부싱</span><span class="mord"> </span><span class="mord hangul_fallback">탄성</span><span class="mord">)</span></span></span></span></span>",
+      "explanation": "이론적으로는 과결정이지만, 부싱의 탄성으로 인해 1DOF 운동이 가능합니다."
+    }
+  ]
+}
+        </pre>
+    </div>
+</div>
+<!-- ══════ SPACED REPETITION ══════ -->
+<div class="section">
+    <div class="section-label">MEMORY</div>
+    <div class="section-title">간격반복 학습 추적</div>
+    <div class="spaced-rep-tracker">
+        <table>
+            <tr>
+                <td>D+0 (오늘)</td>
+                <td>D+1 (내일)</td>
+                <td>D+3 (3일)</td>
+                <td>D+7 (1주)</td>
+                <td>D+14 (2주)</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" /> 복습</td>
+                <td><input type="checkbox" /> 복습</td>
+                <td><input type="checkbox" /> 복습</td>
+                <td><input type="checkbox" /> 복습</td>
+                <td><input type="checkbox" /> 복습</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<!-- ══════ NAVIGATION ══════ -->
+<div class="nav-section">
+    <a href="Day33_디지털트윈완성.html" class="nav-btn prev">← Day 33</a>
+    <a href="Day35.html" class="nav-btn next">Day 35 →</a>
+</div>
+
+<!-- ══════ FOOTER ══════ -->
+<footer class="footer">
+    <p>Vehicle Dynamics & Simulation | Part 6: 서스펜션 기구학</p>
+    <p>Generated: 2026-03-09 15:45:07 | Day 34/52</p>
+</footer>
+
+</div>
+
+<!-- ══════ SCRIPTS ══════ -->
+<script>
+function toggleAccordion(btn) {
+    const card = btn.closest('.deriv-card');
+    card.classList.toggle('expanded');
+}
+
+function toggleAnswer(btn) {
+    const answer = btn.previousElementSibling;
+    if (answer && answer.classList.contains('q-answer')) {
+        answer.style.display = answer.style.display === 'none' ? 'block' : 'none';
+        btn.textContent = answer.style.display === 'none' ? '정답 보기' : '정답 숨기기';
+    }
+}
+
+function checkAnswer(quizId) {
+    const selected = document.querySelector(`input[name="${quizId}"]:checked`);
+    if (selected) {
+        console.log(`Quiz <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mord mathnormal" style="margin-right:0.07847em;">I</span><span class="mord mathnormal">d</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span></span></span></span>{selected.value} selected`);
+    }
+}
+
+// Intersection Observer for animations
+document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.section').forEach(el => observer.observe(el));
+});
+</script>
+
+<style>
+.deriv-card { position: relative; transition: all 0.3s ease; }
+.deriv-steps { font-size: 14px; line-height: 1.6; }
+.step-text { margin: 8px 0; padding-left: 16px; border-left: 2px solid var(--gold); }
+.checkpoint { background: rgba(74,191,138,0.1); border: 1px solid rgba(74,191,138,0.3); padding: 16px; border-radius: 8px; margin: 16px 0; }
+.param-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+.param-table th, .param-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+.param-table th { background: var(--surface2); font-weight: 600; color: var(--gold); }
+.param-table tbody tr:hover { background: var(--surface2); }
+.svg-wrapper { margin: 24px 0; padding: 20px; background: var(--surface); border-radius: 12px; }
+.svg-wrapper h4 { color: var(--text-bright); margin-bottom: 16px; }
+.diagram-svg { width: 100%; height: auto; max-width: 500px; }
+.quiz-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--gold); padding: 20px; margin: 16px 0; border-radius: 8px; }
+.quiz-card h4 { color: var(--gold); margin-bottom: 12px; }
+.q-question { font-size: 15px; margin-bottom: 12px; }
+.q-blank { background: var(--surface2); padding: 12px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; overflow-x: auto; }
+.q-options label { display: block; padding: 8px; margin: 8px 0; background: var(--surface2); border-radius: 4px; cursor: pointer; }
+.q-btn { background: var(--gold); color: var(--bg); border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; }
+.q-btn:hover { background: var(--gold-light); }
+.q-answer { padding: 12px; background: rgba(74,191,138,0.1); border-radius: 6px; margin-top: 12px; }
+.simpack-module { background: var(--surface); border: 1px solid var(--border); padding: 24px; border-radius: 12px; }
+.sp-row { background: var(--surface2); padding: 16px; margin: 12px 0; border-radius: 8px; display: grid; grid-template-columns: 120px 1fr 1fr 1fr; gap: 12px; }
+.sp-sym { font-weight: 600; color: var(--gold); }
+.sp-path { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--blue); }
+.sp-detail { font-size: 13px; }
+.sp-warn { color: var(--orange); font-size: 12px; }
+.formula-explorer { background: var(--surface2); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
+.spaced-rep-tracker table { width: 100%; border-collapse: collapse; }
+.spaced-rep-tracker td { padding: 12px; border: 1px solid var(--border); text-align: center; }
+.spaced-rep-tracker input { width: 20px; height: 20px; cursor: pointer; }
+.nav-section { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 40px 0; }
+.nav-btn { padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; text-align: center; text-decoration: none; color: var(--gold); font-weight: 500; transition: all 0.3s; }
+.nav-btn:hover { background: var(--surface2); border-color: var(--gold); }
+.footer { text-align: center; padding: 40px 0; border-top: 1px solid var(--border); margin-top: 60px; color: var(--text-dim); font-size: 12px; }
+@media (max-width: 640px) {
+    .sp-row { grid-template-columns: 1fr; }
+    .nav-section { grid-template-columns: 1fr; }
+}
+</style>
+
+</body>
+</html>
