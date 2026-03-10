@@ -5,988 +5,422 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="수련">
+<meta name="apple-mobile-web-app-title" content="SAVOIR">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <meta name="theme-color" content="#0a0a0a">
-<title>수련 — 학습 대시보드</title>
+<title>MAISON DE SAVOIR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=JetBrains+Mono:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&display=swap');
-
-:root{
-  --ink:#0a0a0a;--paper:#f0e6d3;--paper-dark:#d4c4a8;--vermillion:#c23b22;
-  --rust:#8b4513;--ash:#3a3a3a;--smoke:#6b6b6b;--mist:#9a9a8a;
-  --deep:#111;--surface:#1a1a18;--surface2:#222220;--border:#333330;
-  --r:8px;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
-}
+:root{--bg:#0A0A0A;--surface:#111;--surface2:#1A1A1A;--border:#1C1C1C;--gold:#C5A55A;--gold-light:#D4B96A;--gold-dim:rgba(197,165,90,.15);--text:#F0EBE0;--text-dim:#7A756A;--text-muted:#4A4740;--cream:#F0E8D8;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{
-  background:var(--ink);color:var(--paper-dark);
-  font-family:'Noto Serif KR',serif;font-weight:400;line-height:1.7;
-  -webkit-font-smoothing:antialiased;
-  padding-top:var(--st);padding-bottom:var(--sb);overflow-x:hidden;
-}
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--ink)}
-::-webkit-scrollbar-thumb{background:var(--ash);border-radius:2px}
-a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;border:none;background:none}
-
-/* ═══ INK SPLASH OVERLAY ═══ */
-#inkOverlay{
-  position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;
-  pointer-events:none;display:none;
-}
-#inkOverlay.active{display:block}
-#inkOverlay svg{width:100%;height:100%}
-
-/* ═══ SLASH ANIMATION ═══ */
-@keyframes slashIn{
-  0%{clip-path:inset(0 100% 0 0);opacity:1}
-  40%{clip-path:inset(0 0 0 0);opacity:1}
-  100%{clip-path:inset(0 0 0 0);opacity:0}
-}
-@keyframes inkDrop{
-  0%{transform:scale(0);opacity:0.9}
-  50%{transform:scale(1.2);opacity:0.6}
-  100%{transform:scale(2);opacity:0}
-}
-@keyframes brushStroke{
-  0%{width:0;opacity:1}
-  60%{width:100%;opacity:0.8}
-  100%{width:100%;opacity:0}
-}
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(20px)}
-  to{opacity:1;transform:translateY(0)}
-}
-@keyframes breathe{
-  0%,100%{opacity:0.4}50%{opacity:0.8}
-}
-@keyframes strikeThrough{
-  0%{width:0}
-  100%{width:100%}
-}
-
-.slash-line{
-  position:fixed;top:50%;left:0;height:3px;
-  background:linear-gradient(90deg,transparent,var(--vermillion),var(--paper),var(--vermillion),transparent);
-  z-index:9998;animation:brushStroke 0.8s ease-out forwards;
-  pointer-events:none;
-}
-.ink-circle{
-  position:fixed;width:120px;height:120px;border-radius:50%;
-  background:radial-gradient(circle,var(--vermillion) 0%,transparent 70%);
-  z-index:9997;pointer-events:none;
-  animation:inkDrop 1s ease-out forwards;
-}
-
-/* ═══ HEADER ═══ */
-.hdr{
-  text-align:center;padding:40px 20px 20px;position:relative;
-  border-bottom:1px solid var(--border);
-}
-.hdr::after{
-  content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
-  width:60px;height:3px;background:var(--vermillion);
-}
-.hdr h1{
-  font-size:2.4rem;font-weight:900;color:var(--paper);
-  letter-spacing:8px;margin-bottom:2px;
-}
-.hdr .sub{color:var(--mist);font-size:0.72rem;letter-spacing:3px}
-.hdr .dt{color:var(--smoke);font-family:monospace;font-size:0.7rem;margin-top:8px;letter-spacing:1px}
-
-/* ═══ QUOTE ═══ */
-.quote-bar{
-  text-align:center;padding:12px 20px;font-size:0.72rem;
-  color:var(--mist);font-style:italic;letter-spacing:1px;
-  border-bottom:1px solid rgba(51,51,48,0.5);
-}
-
-/* ═══ NAV ═══ */
-.nav{
-  display:flex;gap:0;margin:0 16px;position:sticky;top:0;z-index:90;
-  background:var(--ink);border-bottom:1px solid var(--border);
-}
-.nav button{
-  flex:1;padding:12px 0;color:var(--smoke);
-  font-size:0.75rem;font-weight:400;letter-spacing:2px;
-  transition:all 0.3s;position:relative;
-}
-.nav button:hover{color:var(--paper-dark)}
-.nav button.on{color:var(--paper);font-weight:700}
-.nav button.on::after{
-  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  width:20px;height:2px;background:var(--vermillion);
-}
-
-.wrap{max-width:800px;margin:0 auto;padding:20px 16px 100px}
-.pnl{display:none}.pnl.on{display:block;animation:fadeUp 0.4s ease-out}
-
-/* ═══ STAT STONES ═══ */
-.stones{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-.stone{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:20px 14px;text-align:center;position:relative;overflow:hidden;
-}
-.stone::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--vermillion),transparent);
-  opacity:0.5;
-}
-.stone .n{font-size:2rem;font-weight:900;color:var(--paper);letter-spacing:2px}
-.stone .l{font-size:0.65rem;color:var(--mist);margin-top:4px;letter-spacing:2px}
-
-/* ═══ SECTION ═══ */
-.sect{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:18px;margin-bottom:14px;position:relative;
-}
-.sect h3{
-  font-size:0.8rem;font-weight:700;color:var(--paper);
-  margin-bottom:12px;letter-spacing:2px;display:flex;align-items:center;gap:8px;
-}
-.sect h3::after{
-  content:'';flex:1;height:1px;
-  background:linear-gradient(90deg,var(--border),transparent);
-}
-
-/* ═══ FEED ═══ */
-.feed-item{
-  display:flex;align-items:center;gap:12px;padding:12px;
-  border-radius:6px;margin-bottom:6px;cursor:pointer;
-  transition:all 0.2s;border-left:2px solid transparent;
-}
-.feed-item:hover{background:var(--surface2);border-left-color:var(--vermillion)}
-.feed-item:active{transform:scale(0.98)}
-.feed-icon{
-  width:36px;height:36px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1rem;flex-shrink:0;
-  background:rgba(194,59,34,0.08);border:1px solid rgba(194,59,34,0.15);
-}
-.feed-info{flex:1;min-width:0}
-.feed-info .t{font-size:0.78rem;font-weight:700;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.feed-info .s{font-size:0.62rem;color:var(--smoke);letter-spacing:1px;margin-top:1px}
-.badge{
-  font-size:0.58rem;padding:3px 8px;border-radius:2px;
-  font-weight:700;flex-shrink:0;letter-spacing:1px;
-}
-.badge.new{background:rgba(194,59,34,0.12);color:var(--vermillion)}
-.badge.rev{background:rgba(139,69,19,0.12);color:var(--rust)}
-
-/* ═══ COURSES ═══ */
-.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
-.ccard{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:16px;cursor:pointer;
-  transition:all 0.3s;position:relative;overflow:hidden;
-}
-.ccard:hover{border-color:var(--vermillion);transform:translateY(-2px)}
-.ccard::before{
-  content:'';position:absolute;top:0;right:0;width:40px;height:40px;
-  background:radial-gradient(circle at top right,rgba(194,59,34,0.06),transparent);
-}
-.ccard .icon{font-size:1.6rem;margin-bottom:8px}
-.ccard .nm{font-size:0.82rem;font-weight:700;color:var(--paper);letter-spacing:1px;margin-bottom:6px}
-.ccard .prog{height:2px;background:var(--ash);border-radius:1px;overflow:hidden;margin-bottom:6px}
-.ccard .prog .bar{height:100%;border-radius:1px;background:var(--vermillion);transition:width 0.4s}
-.ccard .cnt{font-size:0.62rem;color:var(--smoke);letter-spacing:1px}
-
-/* Lesson list */
-.llist{max-height:65vh;overflow-y:auto;padding-right:4px}
-.ll-item{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;
-  border-radius:4px;margin-bottom:2px;cursor:pointer;
-  transition:0.15s;font-size:0.78rem;border-left:2px solid transparent;
-}
-.ll-item:hover{background:var(--surface2);border-left-color:var(--vermillion)}
-.ll-item .num{
-  width:28px;height:28px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:0.6rem;font-weight:900;flex-shrink:0;
-}
-.ll-item.done .num{background:rgba(194,59,34,0.15);color:var(--vermillion)}
-.ll-item.undone .num{background:var(--surface2);color:var(--smoke)}
-.ll-item .lt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--paper-dark)}
-.ll-item.done .lt{color:var(--smoke)}
-.ll-item .ld{font-size:0.6rem;color:var(--smoke)}
-.back-btn{display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:var(--smoke);padding:8px 0;margin-bottom:12px;cursor:pointer;letter-spacing:1px}
-.back-btn:hover{color:var(--paper)}
-
-/* ═══ TIMER ═══ */
-.timer-display{text-align:center;padding:40px 0 20px}
-.timer-display .time{
-  font-size:3.6rem;font-weight:900;color:var(--paper);
-  letter-spacing:6px;font-family:monospace;
-}
-.timer-display .phase{font-size:0.75rem;color:var(--vermillion);margin-top:6px;letter-spacing:3px}
-.timer-btns{display:flex;justify-content:center;gap:12px;margin-top:20px}
-.timer-btns button{
-  padding:12px 30px;border-radius:4px;font-size:0.8rem;
-  font-weight:700;letter-spacing:2px;transition:0.2s;
-}
-.tbtn-start{background:var(--vermillion);color:var(--paper)}
-.tbtn-start:hover{background:#a83020}
-.tbtn-stop{background:var(--surface2);color:var(--paper-dark);border:1px solid var(--border)}
-.tbtn-stop:hover{background:var(--ash)}
-.timer-cfg{display:flex;justify-content:center;gap:20px;margin-top:16px}
-.timer-cfg label{font-size:0.68rem;color:var(--smoke);letter-spacing:1px}
-.timer-cfg input{
-  width:48px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:4px;color:var(--paper);padding:4px 6px;font-size:0.75rem;text-align:center;
-  font-family:monospace;
-}
-
-/* Log */
-.log-tbl{width:100%;font-size:0.7rem;border-collapse:collapse}
-.log-tbl th{text-align:left;color:var(--smoke);font-weight:400;padding:8px;border-bottom:1px solid var(--border);letter-spacing:1px;font-size:0.62rem}
-.log-tbl td{padding:8px;border-bottom:1px solid rgba(51,51,48,0.3);color:var(--paper-dark)}
-
-/* Chart */
-.chart-bar{display:flex;align-items:flex-end;gap:6px;height:80px;margin-top:10px}
-.chart-bar .cb{flex:1;background:var(--vermillion);border-radius:2px 2px 0 0;min-height:2px;transition:height 0.4s;opacity:0.7}
-.chart-bar .cb:hover{opacity:1}
-.chart-labels{display:flex;gap:6px;margin-top:6px}
-.chart-labels span{flex:1;text-align:center;font-size:0.55rem;color:var(--smoke)}
-
-/* Heatmap */
-.heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px}
-.hm-cell{aspect-ratio:1;border-radius:2px}
-.hm-label{font-size:0.5rem;color:var(--smoke);text-align:center;padding:2px 0}
-
-/* Tip */
-.tip-box{
-  background:linear-gradient(135deg,rgba(194,59,34,0.04),rgba(139,69,19,0.04));
-  border:1px solid rgba(194,59,34,0.12);border-radius:var(--r);
-  padding:16px;margin-bottom:14px;
-}
-.tip-box .tip-title{font-size:0.7rem;color:var(--vermillion);font-weight:700;margin-bottom:6px;letter-spacing:2px}
-.tip-box .tip-text{font-size:0.7rem;color:var(--paper-dark);line-height:1.8}
-
-/* Settings */
-.set-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(51,51,48,0.3)}
-.set-row .sl{font-size:0.78rem;color:var(--paper-dark)}.set-row .sr{font-size:0.7rem;color:var(--smoke)}
-.set-btn{
-  padding:10px 16px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:4px;font-size:0.72rem;color:var(--paper-dark);margin-top:8px;
-  transition:0.2s;letter-spacing:1px;
-}
-.set-btn:hover{background:var(--ash)}
-.set-btn.danger{color:var(--vermillion);border-color:rgba(194,59,34,0.3)}
-
-/* Float timer */
-.float-timer{
-  position:fixed;bottom:80px;right:16px;background:var(--surface);
-  border:1px solid var(--vermillion);border-radius:4px;
-  padding:8px 16px;font-family:monospace;font-size:0.85rem;
-  color:var(--vermillion);z-index:100;display:none;cursor:pointer;
-  box-shadow:0 4px 24px rgba(194,59,34,0.2);letter-spacing:2px;
-}
-.float-timer.show{display:block}
-
-/* Empty state */
-.empty-state{text-align:center;padding:40px 20px;color:var(--smoke);font-size:0.78rem;letter-spacing:1px}
-
-@media(max-width:480px){.wrap{padding:16px 12px 100px}.stones{grid-template-columns:1fr 1fr}.cgrid{grid-template-columns:1fr}}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-weight:300;line-height:1.7;-webkit-font-smoothing:antialiased;padding-top:var(--st);padding-bottom:calc(var(--sb)+60px);overflow-x:hidden;min-height:100vh}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--text-muted);border-radius:1px}
+a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.font-mono{font-family:'JetBrains Mono',monospace}
+.label-fr{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--gold)}
+.label-kr{font-size:11px;letter-spacing:2px;color:var(--text-dim)}
+.section-label{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.site-header{text-align:center;padding:32px 20px 0}
+.site-header h1{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:22px;letter-spacing:10px;text-transform:uppercase;color:var(--cream)}
+.header-rule{width:60px;height:1px;background:var(--gold);margin:16px auto 0}
+.tab-nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.92);border-bottom:1px solid var(--border);display:flex;justify-content:center;margin-top:24px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.tab-btn{flex:1;max-width:140px;padding:14px 8px 12px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid transparent;transition:color .3s,border-color .3s}
+.tab-btn span{display:block;font-family:'Noto Sans KR',sans-serif;font-size:9px;letter-spacing:1px;color:var(--text-muted);margin-top:2px;transition:color .3s}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-btn.active span{color:var(--text-dim)}
+.tab-btn:hover{color:var(--gold-light)}
+.tab-content{display:none;padding:24px 20px 40px;max-width:680px;margin:0 auto}
+.tab-content.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px}
+.stat-box{border:1px solid var(--border);border-radius:2px;padding:20px 16px;text-align:center}
+.stat-box .sv{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:300;color:var(--gold);line-height:1}
+.stat-box .sl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);margin-top:8px}
+.daily-item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:padding .3s}
+.daily-item:hover{padding-left:8px}
+.daily-check{width:18px;height:18px;border:1px solid var(--text-muted);border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s;font-size:10px;color:transparent}
+.daily-check.done{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+.daily-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.daily-meta{flex:1;min-width:0}
+.daily-day{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:1px}
+.daily-title{font-size:14px;font-weight:400;color:var(--text);transition:color .3s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.daily-subject{font-size:10px;color:var(--text-dim);letter-spacing:1px}
+.daily-item.completed .daily-title{color:var(--text-muted);text-decoration:line-through}
+.daily-item:hover .daily-title{color:var(--gold-light)}
+.completion-msg{text-align:center;padding:32px 20px;border:1px solid var(--gold);border-radius:2px;margin-top:20px;display:none}
+.completion-msg .mt{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:var(--gold);letter-spacing:2px}
+.review-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:padding .3s}
+.review-item:hover{padding-left:8px}
+.review-stage{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold);border:1px solid var(--gold-dim);border-radius:2px;padding:2px 6px;flex-shrink:0}
+.scenario-daily{border:1px solid var(--gold);border-radius:2px;padding:20px;margin-top:8px}
+.scenario-daily .sc-cat{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.scenario-daily .sc-name{font-size:16px;font-weight:400;color:var(--cream);margin-bottom:6px}
+.scenario-daily .sc-desc{font-size:12px;color:var(--text-dim);margin-bottom:12px}
+.course-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.course-card{border:1px solid var(--border);border-radius:2px;padding:20px 16px;cursor:pointer;transition:all .3s;position:relative}
+.course-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:transparent;transition:background .3s}
+.course-card:hover{border-color:var(--text-muted)}
+.course-card:hover::before{background:var(--gold)}
+.course-icon{font-size:20px;margin-bottom:8px}
+.course-name{font-size:14px;font-weight:400;color:var(--text);margin-bottom:12px}
+.cpb{width:100%;height:1px;background:var(--border);margin-bottom:6px}
+.cpf{height:100%;background:var(--gold);transition:width .5s}
+.cpt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim)}
+.lesson-list-view{display:none}.lesson-list-view.active{display:block}
+.course-grid-view.hidden{display:none}
+.back-btn{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);margin-bottom:20px;cursor:pointer;transition:color .3s;display:inline-block}
+.back-btn:hover{color:var(--gold)}
+.lesson-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:padding .3s}
+.lesson-item:hover{padding-left:8px}
+.lesson-bullet{width:6px;height:6px;border-radius:50%;border:1px solid var(--text-muted);flex-shrink:0;transition:all .3s}
+.lesson-bullet.done{border-color:var(--gold);background:var(--gold)}
+.lesson-day{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);width:40px;flex-shrink:0}
+.lesson-title{font-size:13px;color:var(--text);transition:color .3s;flex:1}
+.lesson-item:hover .lesson-title{color:var(--gold-light)}
+.lesson-item.di .lesson-title{color:var(--text-muted)}
+.search-bar{width:100%;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:300;outline:none;transition:border-color .3s;margin-bottom:16px}
+.search-bar:focus{border-color:var(--gold)}
+.search-bar::placeholder{color:var(--text-muted)}
+.cat-tabs{display:flex;overflow-x:auto;margin-bottom:24px;border-bottom:1px solid var(--border);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.cat-tabs::-webkit-scrollbar{display:none}
+.cat-tab{padding:10px 14px 8px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);white-space:nowrap;border-bottom:1px solid transparent;transition:all .3s;flex-shrink:0}
+.cat-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.cat-tab:hover{color:var(--text-dim)}
+.scenario-card{border:1px solid var(--border);border-radius:2px;padding:20px;margin-bottom:12px;transition:border-color .3s}
+.scenario-card:hover{border-color:var(--text-muted)}
+.sc-cat-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.sc-title{font-size:15px;font-weight:400;color:var(--cream);margin-bottom:6px}
+.sc-desc{font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.6}
+.sc-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.sc-chip{font-size:10px;padding:4px 10px;border-radius:2px;cursor:pointer;transition:all .3s;border:1px solid;white-space:nowrap}
+.sc-chip:hover{opacity:.8;transform:translateY(-1px)}
+.sc-tip{font-size:11px;color:var(--gold);border:1px solid var(--gold-dim);border-radius:2px;padding:10px 14px;line-height:1.6;font-style:italic}
+.timer-display{text-align:center;margin-bottom:24px}
+.timer-time{font-family:'JetBrains Mono',monospace;font-size:64px;font-weight:300;color:var(--cream);letter-spacing:4px;line-height:1}
+.timer-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text-muted);margin-top:8px}
+.timer-controls{display:flex;justify-content:center;gap:12px;margin-bottom:16px}
+.timer-btn{padding:10px 24px;border:1px solid var(--border);border-radius:2px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);transition:all .3s}
+.timer-btn:hover,.timer-btn.ab{border-color:var(--gold);color:var(--gold)}
+.timer-config{display:flex;justify-content:center;gap:20px;margin-bottom:32px}
+.timer-config label{font-size:10px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase}
+.timer-config input{width:48px;background:var(--surface);border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;text-align:center;padding:4px;margin-left:6px;outline:none}
+.timer-config input:focus{border-color:var(--gold)}
+.weekly-chart{display:flex;align-items:flex-end;gap:8px;height:100px;margin-bottom:8px}
+.week-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
+.week-bar{width:100%;background:var(--gold);border-radius:1px 1px 0 0;min-height:2px;margin-top:auto;transition:height .5s}
+.week-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:6px}
+.heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:32px}
+.heat-cell{aspect-ratio:1;border-radius:1px;background:var(--surface)}
+.heat-cell.l1{background:rgba(197,165,90,.15)}.heat-cell.l2{background:rgba(197,165,90,.3)}.heat-cell.l3{background:rgba(197,165,90,.5)}.heat-cell.l4{background:rgba(197,165,90,.75)}.heat-cell.l5{background:var(--gold)}
+.progress-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.progress-icon{font-size:16px;flex-shrink:0}
+.progress-info{flex:1}
+.progress-name{font-size:13px;color:var(--text)}
+.pbo{width:100%;height:1px;background:var(--border);margin-top:6px}
+.pbi{height:100%;background:var(--gold);transition:width .5s}
+.progress-pct{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);flex-shrink:0;width:42px;text-align:right}
+.settings-btn{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:2px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;text-align:left;transition:all .3s}
+.settings-btn:hover{border-color:var(--gold);color:var(--gold)}
+.version-info{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);text-align:center;margin-top:24px}
+.gold-rule{width:40px;height:1px;background:var(--gold);margin:32px auto}
+@media(max-width:480px){.tab-btn{font-size:9px;letter-spacing:2px;padding:12px 4px 10px}.tab-btn span{font-size:8px}.stat-box .sv{font-size:28px}.timer-time{font-size:48px}.course-grid{gap:8px}.course-card{padding:16px 12px}.tab-content{padding:20px 16px 40px}}
+@media(min-width:768px){.course-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
-
-<div class="hdr">
-  <h1>수 련</h1>
-  <div class="sub">하루의 수련이 내일의 무기가 된다</div>
-  <div class="dt" id="dateDisp"></div>
+<header class="site-header"><h1>MAISON DE SAVOIR</h1><div class="header-rule"></div></header>
+<nav class="tab-nav">
+<button class="tab-btn active" data-tab="today">AUJOURD'HUI<span>오늘</span></button>
+<button class="tab-btn" data-tab="parcours">PARCOURS<span>수행</span></button>
+<button class="tab-btn" data-tab="scenarios">SC&Eacute;NARIOS<span>가이드</span></button>
+<button class="tab-btn" data-tab="journal">JOURNAL<span>기록</span></button>
+</nav>
+<div id="tab-today" class="tab-content active">
+<div class="stats-row"><div class="stat-box"><div class="sv" id="streakCount">0</div><div class="sl">연속 수련일</div></div><div class="stat-box"><div class="sv" id="todayMinutes">0</div><div class="sl">오늘 수련 (분)</div></div></div>
+<div class="section-label"><span class="label-fr">ÉTUDES DU JOUR</span><span class="label-kr">— 오늘의 수련</span></div>
+<div id="dailyLectures"></div>
+<div class="completion-msg" id="completionMsg"><div class="mt">오늘의 수련, 완료</div></div>
+<div class="gold-rule"></div>
+<div class="section-label"><span class="label-fr">RÉVISION</span><span class="label-kr">— 복습 큐</span></div>
+<div id="reviewQueue"></div>
+<div class="gold-rule"></div>
+<div class="section-label"><span class="label-fr">SCÉNARIO DU JOUR</span><span class="label-kr">— 오늘의 시나리오</span></div>
+<div id="dailyScenario"></div>
 </div>
-<div class="quote-bar" id="quoteBar"></div>
-
-<div class="nav" id="nav">
-  <button class="on" data-tab="home">도장</button>
-  <button data-tab="course">수행</button>
-  <button data-tab="timer">집중</button>
-  <button data-tab="more">기록</button>
-</div>
-
-<div class="wrap">
-<!-- ═══ HOME ═══ -->
-<div class="pnl on" id="p-home">
-  <div class="stones">
-    <div class="stone"><div class="n" id="streakN">0</div><div class="l">연속 수련일</div></div>
-    <div class="stone"><div class="n" id="todayMin">0</div><div class="l">오늘 수련(분)</div></div>
-  </div>
-  <!-- 상황별 가이드 배너 -->
-  <a href="guide.html" style="display:block;background:linear-gradient(135deg,rgba(194,59,34,0.08),rgba(139,69,19,0.06));border:1px solid rgba(194,59,34,0.25);border-radius:var(--r);padding:16px 18px;margin-bottom:14px;transition:all 0.3s;text-decoration:none">
-    <div style="display:flex;align-items:center;gap:12px">
-      <span style="font-size:1.4rem">🧭</span>
-      <div style="flex:1">
-        <div style="font-size:0.82rem;font-weight:700;color:var(--paper);letter-spacing:1px">상황별 학습 가이드</div>
-        <div style="font-size:0.65rem;color:var(--smoke);margin-top:2px;letter-spacing:1px">54개 실전 시나리오 · 6개 과목 크로스 학습</div>
-      </div>
-      <span style="color:var(--smoke);font-size:0.8rem">→</span>
-    </div>
-  </a>
-
-  <div class="sect">
-    <h3>오늘의 수련</h3>
-    <div id="feedList"></div>
-    <div id="feedEmpty" class="empty-state" style="display:none">
-      오늘의 수련, 완료.<br>내일 다시 검을 잡아라.
-    </div>
-  </div>
-  <div class="sect" id="reviewCard" style="display:none">
-    <h3>복습 — 간격반복</h3>
-    <div id="reviewList"></div>
-  </div>
-</div>
-
-<!-- ═══ COURSES ═══ -->
-<div class="pnl" id="p-course">
-  <div id="courseGrid" class="cgrid"></div>
-  <div id="courseDetail" style="display:none">
-    <div class="back-btn" id="backBtn">← 수행 목록</div>
-    <div class="sect">
-      <h3 id="detailTitle"></h3>
-      <div class="llist" id="lessonList"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ TIMER ═══ -->
-<div class="pnl" id="p-timer">
-  <div class="sect">
-    <div class="timer-display">
-      <div class="time" id="timerDisp">25:00</div>
-      <div class="phase" id="phaseDisp">집중 준비</div>
-    </div>
-    <div class="timer-btns">
-      <button class="tbtn-start" id="timerStart">시작</button>
-      <button class="tbtn-stop" id="timerReset">리셋</button>
-    </div>
-    <div class="timer-cfg">
-      <label>집중 <input type="number" id="cfgWork" value="25" min="1" max="90">분</label>
-      <label>휴식 <input type="number" id="cfgBreak" value="5" min="1" max="30">분</label>
-    </div>
-  </div>
-  <div class="sect">
-    <h3>주간 수련량</h3>
-    <div class="chart-bar" id="weekChart"></div>
-    <div class="chart-labels" id="weekLabels"></div>
-  </div>
-  <div class="sect">
-    <h3>수련 기록</h3>
-    <table class="log-tbl">
-      <thead><tr><th>날짜</th><th>과목</th><th>시간</th></tr></thead>
-      <tbody id="logBody"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- ═══ MORE ═══ -->
-<div class="pnl" id="p-more">
-  <div id="tipBox" class="tip-box">
-    <div class="tip-title">뇌과학 수련법</div>
-    <div class="tip-text" id="tipText"></div>
-  </div>
-  <div class="sect">
-    <h3>수련 히트맵 (30일)</h3>
-    <div class="heatmap" id="heatmap"></div>
-  </div>
-  <div class="sect">
-    <h3>전체 진행</h3>
-    <div id="allProgress"></div>
-  </div>
-  <div class="sect">
-    <h3>설정</h3>
-    <div class="set-row"><span class="sl">데이터 버전</span><span class="sr">v3</span></div>
-    <div class="set-row"><span class="sl">총 수련 기록</span><span class="sr" id="totalLogs">0건</span></div>
-    <button class="set-btn" id="exportBtn">내보내기 — 데이터 백업</button>
-    <button class="set-btn" id="importBtn">가져오기 — 데이터 복원</button>
-    <input type="file" id="importFile" accept=".json" style="display:none">
-    <button class="set-btn danger" id="resetBtn">초기화 — 데이터 삭제</button>
-  </div>
+<div id="tab-parcours" class="tab-content">
+<div class="section-label"><span class="label-fr">PARCOURS</span><span class="label-kr">— 수행</span></div>
+<div class="course-grid-view" id="courseGridView"><div class="course-grid" id="courseGrid"></div></div>
+<div class="lesson-list-view" id="lessonListView">
+<button class="back-btn" id="backToCourses">&larr; PARCOURS</button>
+<div class="section-label"><span class="label-fr" id="lessonCourseLabel"></span><span class="label-kr" id="lessonCourseName"></span></div>
+<div id="lessonList"></div>
 </div>
 </div>
-
-<div class="float-timer" id="floatTimer"></div>
-
+<div id="tab-scenarios" class="tab-content">
+<div class="section-label"><span class="label-fr">SCÉNARIOS</span><span class="label-kr">— 실무 시나리오 가이드</span></div>
+<input type="text" class="search-bar" id="scenarioSearch" placeholder="상황 검색...">
+<div class="cat-tabs" id="catTabs"></div>
+<div id="scenarioList"></div>
+</div>
+<div id="tab-journal" class="tab-content">
+<div class="section-label"><span class="label-fr">POMODORO</span><span class="label-kr">— 집중 타이머</span></div>
+<div class="timer-display"><div class="timer-time" id="timerDisplay">25:00</div><div class="timer-label" id="timerPhase">TRAVAIL</div></div>
+<div class="timer-controls"><button class="timer-btn" id="timerStart">START</button><button class="timer-btn" id="timerStop">STOP</button><button class="timer-btn" id="timerReset">RESET</button></div>
+<div class="timer-config"><label>WORK <input type="number" id="workMin" value="25" min="1" max="90"></label><label>BREAK <input type="number" id="breakMin" value="5" min="1" max="30"></label></div>
+<div class="gold-rule"></div>
+<div class="section-label"><span class="label-fr">SEMAINE</span><span class="label-kr">— 주간 기록</span></div>
+<div class="weekly-chart" id="weeklyChart"></div>
+<div style="display:flex;justify-content:space-between;margin-bottom:32px"><span class="week-label" id="weekStart"></span><span class="week-label" id="weekEnd"></span></div>
+<div class="section-label"><span class="label-fr">CHALEUR</span><span class="label-kr">— 30일 히트맵</span></div>
+<div class="heatmap" id="heatmap"></div>
+<div class="section-label"><span class="label-fr">PROGRÈS</span><span class="label-kr">— 전체 진행률</span></div>
+<div id="allProgress"></div>
+<div class="gold-rule"></div>
+<div class="section-label"><span class="label-fr">PARAMÈTRES</span><span class="label-kr">— 설정</span></div>
+<div>
+<button class="settings-btn" id="exportBtn">EXPORT DATA</button>
+<button class="settings-btn" id="importBtn">IMPORT DATA</button>
+<button class="settings-btn" id="resetBtn" style="color:#8b4040">RESET ALL DATA</button>
+<input type="file" id="importFile" accept=".json" style="display:none">
+</div>
+<div class="version-info">MAISON DE SAVOIR v3.0</div>
+</div>
 <script>
-/* ═══ COURSE DATA ═══ */
-const C=[
-  {id:'vd',name:'차량동역학',icon:'⚔',color:'#c23b22',
-   folder:'VehicleDynamics_Lectures',lessons:[
-    {d:1,f:'Day01_운동방정식유도.html',t:'운동방정식 유도'},
-    {d:2,f:'Day02_비감쇠자유진동.html',t:'비감쇠 자유진동'},
-    {d:3,f:'Day03_감쇠비정의.html',t:'감쇠비 정의'},
-    {d:4,f:'Day04_부족감쇠자유진동.html',t:'부족감쇠 자유진동'},
-    {d:5,f:'Day05_강제조화진동.html',t:'강제조화 진동'},
-    {d:6,f:'Day06_위상각유도.html',t:'위상각 유도'},
-    {d:7,f:'Day07_공진조건분석.html',t:'공진조건 분석'},
-    {d:8,f:'Day08_쿼터카모델.html',t:'쿼터카 모델'},
-    {d:9,f:'Day09_쿼터카고유진동수.html',t:'쿼터카 고유진동수'},
-    {d:10,f:'Day10_하프카모델.html',t:'하프카 모델'},
-    {d:11,f:'Day11_하프카모드해석.html',t:'하프카 모드해석'},
-    {d:12,f:'Day12_전달함수유도.html',t:'전달함수 유도'},
-    {d:13,f:'Day13_전달률방진설계.html',t:'전달률 방진설계'},
-    {d:14,f:'Day14_노면스펙트럼승차감.html',t:'노면스펙트럼 승차감'},
-    {d:15,f:'Day15_Part2복습.html',t:'Part2 복습'},
-    {d:16,f:'Day16_스프링특성.html',t:'스프링 특성'},
-    {d:17,f:'Day17_댐퍼모델.html',t:'댐퍼 모델'},
-    {d:18,f:'Day18_부싱복소강성.html',t:'부싱 복소강성'},
-    {d:19,f:'Day19_타이어수직동특성.html',t:'타이어 수직동특성'},
-    {d:20,f:'Day20_TireHop.html',t:'Tire Hop'},
-    {d:21,f:'Day21_승차감트레이드오프.html',t:'승차감 트레이드오프'},
-    {d:22,f:'Day22_Part3복습.html',t:'Part3 복습'},
-    {d:23,f:'Day23_푸리에변환.html',t:'푸리에 변환'},
-    {d:24,f:'Day24_PSD정의.html',t:'PSD 정의'},
-    {d:25,f:'Day25_FRF측정.html',t:'FRF 측정'},
-    {d:26,f:'Day26_고유치문제.html',t:'고유치 문제'},
-    {d:27,f:'Day27_모드중첩법.html',t:'모드중첩법'},
-    {d:28,f:'Day28_Part4복습.html',t:'Part4 복습'},
-    {d:29,f:'Day29_수식Simpack매핑.html',t:'수식-Simpack 매핑'},
-    {d:30,f:'Day30_QuarterCar구현.html',t:'QuarterCar 구현'},
-    {d:31,f:'Day31_FRF상관성.html',t:'FRF 상관성'},
-    {d:32,f:'Day32_CoSimulation.html',t:'Co-Simulation'},
-    {d:33,f:'Day33_디지털트윈완성.html',t:'디지털트윈 완성'},
-    {d:34,f:'Day34_서스펜션기구학기초.html',t:'서스펜션 기구학 기초'},
-    {d:35,f:'Day35_캠버기하학.html',t:'캠버 기하학'},
-    {d:36,f:'Day36_토기하학.html',t:'토 기하학'},
-    {d:37,f:'Day37_킹핀기하학.html',t:'킹핀 기하학'},
-    {d:38,f:'Day38_롤센터안티지오메트리.html',t:'롤센터 안티지오메트리'},
-    {d:39,f:'Day39_순간중심롤스티어.html',t:'순간중심 롤스티어'},
-    {d:40,f:'Day40_KC시뮬레이션통합.html',t:'KC 시뮬레이션 통합'},
-    {d:41,f:'Day41_애커만기하학.html',t:'애커만 기하학'},
-    {d:42,f:'Day42_랙피니언역학.html',t:'랙피니언 역학'},
-    {d:43,f:'Day43_전동파워스티어링.html',t:'전동 파워스티어링'},
-    {d:44,f:'Day44_코너링포스슬립각.html',t:'코너링포스 슬립각'},
-    {d:45,f:'Day45_언더오버스티어.html',t:'언더/오버스티어'},
-    {d:46,f:'Day46_요응답전달함수.html',t:'요응답 전달함수'},
-    {d:47,f:'Day47_디스크브레이크열역학.html',t:'디스크브레이크 열역학'},
-    {d:48,f:'Day48_유압제동시스템.html',t:'유압 제동시스템'},
-    {d:49,f:'Day49_제동력배분하중이동.html',t:'제동력배분 하중이동'},
-    {d:50,f:'Day50_ABS_ESC제어.html',t:'ABS/ESC 제어'},
-    {d:51,f:'Day51_회생제동시스템.html',t:'회생제동 시스템'},
-    {d:52,f:'Day52_통합브레이크시스템.html',t:'통합 브레이크 시스템'}
-  ]},
-  {id:'en',name:'에너지관리',icon:'⚡',color:'#4a8b5c',
-   folder:'Energy_Lectures',lessons:[
-    {d:1,f:'day01_energy_systems.html',t:'에너지 시스템'},
-    {d:2,f:'day02_mitochondria.html',t:'미토콘드리아'},
-    {d:3,f:'day03_hormones.html',t:'호르몬'},
-    {d:4,f:'day04_autonomic.html',t:'자율신경계'},
-    {d:5,f:'day05_review.html',t:'Part1 복습'},
-    {d:6,f:'day06_sleep_architecture.html',t:'수면 구조'},
-    {d:7,f:'day07_sleep_hormones.html',t:'수면 호르몬'},
-    {d:8,f:'day08_sleep_environment.html',t:'수면 환경'},
-    {d:9,f:'day09_sleep_debt.html',t:'수면 부채'},
-    {d:10,f:'day10_sleep_tracking.html',t:'수면 추적'},
-    {d:11,f:'day11_nutrition_basics.html',t:'영양 기초'},
-    {d:12,f:'day12_protein.html',t:'단백질'},
-    {d:13,f:'day13_carbs.html',t:'탄수화물'},
-    {d:14,f:'day14_fats_micros.html',t:'지방·미량영양소'},
-    {d:15,f:'day15_hydration_caffeine.html',t:'수분·카페인'},
-    {d:16,f:'day16_meal_timing.html',t:'식사 타이밍'},
-    {d:17,f:'day17_nutrition_review.html',t:'영양 복습'},
-    {d:18,f:'day18_hypertrophy_science.html',t:'근비대 과학'},
-    {d:19,f:'day19_big_three.html',t:'빅3 운동'},
-    {d:20,f:'day20_upper_body.html',t:'상체 운동'},
-    {d:21,f:'day21_lower_core.html',t:'하체·코어'},
-    {d:22,f:'day22_periodization.html',t:'주기화'},
-    {d:23,f:'day23_injury_mobility.html',t:'부상·모빌리티'},
-    {d:24,f:'day24_recovery.html',t:'회복'},
-    {d:25,f:'day25_weight_review.html',t:'웨이트 복습'},
-    {d:26,f:'day26_vo2max_lactate.html',t:'VO2max·젖산'},
-    {d:27,f:'day27_running_form.html',t:'러닝 폼'},
-    {d:28,f:'day28_interval_training.html',t:'인터벌 트레이닝'},
-    {d:29,f:'day29_zone_training.html',t:'존 트레이닝'},
-    {d:30,f:'day30_concurrent_training.html',t:'동시 트레이닝'},
-    {d:31,f:'day31_running_review.html',t:'러닝 복습'},
-    {d:32,f:'day32_hrv.html',t:'HRV'},
-    {d:33,f:'day33_immune_energy.html',t:'면역·에너지'},
-    {d:34,f:'day34_fatigue_overtraining.html',t:'피로·과훈련'},
-    {d:35,f:'day35_travel_seasonal.html',t:'여행·시즌'},
-    {d:36,f:'day36_condition_review.html',t:'컨디션 복습'},
-    {d:37,f:'day37_morning_routine.html',t:'아침 루틴'},
-    {d:38,f:'day38_evening_routine.html',t:'저녁 루틴'},
-    {d:39,f:'day39_weekend_routine.html',t:'주말 루틴'},
-    {d:40,f:'day40_routine_review.html',t:'루틴 복습'},
-    {d:41,f:'day41_stress_neuroscience.html',t:'스트레스 신경과학'},
-    {d:42,f:'day42_meditation_breathwork.html',t:'명상·호흡'},
-    {d:43,f:'day43_flow_state.html',t:'몰입 상태'},
-    {d:44,f:'day44_emotional_regulation.html',t:'감정 조절'},
-    {d:45,f:'day45_mental_review.html',t:'멘탈 복습'},
-    {d:46,f:'day46_biohacking_tech.html',t:'바이오해킹'},
-    {d:47,f:'day47_supplementation.html',t:'보충제'},
-    {d:48,f:'day48_social_energy.html',t:'사회적 에너지'},
-    {d:49,f:'day49_digital_detox.html',t:'디지털 디톡스'},
-    {d:50,f:'day50_final_integration.html',t:'최종 통합'}
-  ]},
-  {id:'hu',name:'인간학',icon:'🧠',color:'#8a6abf',
-   folder:'Human_Lectures',lessons:[
-    {d:1,f:'day01_감정이란_무엇인가.html',t:'감정이란 무엇인가'},
-    {d:2,f:'day02_스트레스_호르몬_회로.html',t:'스트레스 호르몬 회로'},
-    {d:3,f:'day03_INFP_감정처리_패턴.html',t:'INFP 감정처리 패턴'},
-    {d:4,f:'day04_인지적_재평가.html',t:'인지적 재평가'},
-    {d:5,f:'day05_메타인지_훈련.html',t:'메타인지 훈련'},
-    {d:6,f:'day06_감정조절_실전_직장.html',t:'감정조절 실전 직장'},
-    {d:7,f:'day07_신뢰의_신경과학.html',t:'신뢰의 신경과학'},
-    {d:8,f:'day08_공감의_두_종류.html',t:'공감의 두 종류'},
-    {d:9,f:'day09_어서티브_커뮤니케이션.html',t:'어서티브 커뮤니케이션'},
-    {d:10,f:'day10_갈등의_신경과학.html',t:'갈등의 신경과학'},
-    {d:11,f:'day11_피드백_주고받기.html',t:'피드백 주고받기'},
-    {d:12,f:'day12_통합복습_Part1_2.html',t:'통합복습 Part1-2'},
-    {d:13,f:'day13_스토아_통제의_이분법.html',t:'스토아 통제의 이분법'},
-    {d:14,f:'day14_아우렐리우스_실천.html',t:'아우렐리우스 실천'},
-    {d:15,f:'day15_불교적_무상관.html',t:'불교적 무상관'},
-    {d:16,f:'day16_프랭클_의미치료.html',t:'프랭클 의미치료'},
-    {d:17,f:'day17_흐름_상태.html',t:'흐름 상태'},
-    {d:18,f:'day18_철학_프레임_통합.html',t:'철학 프레임 통합'},
-    {d:19,f:'day19_가치관_명료화.html',t:'가치관 명료화'},
-    {d:20,f:'day20_정체성과_역할_통합.html',t:'정체성과 역할 통합'},
-    {d:21,f:'day21_결정의_철학.html',t:'결정의 철학'},
-    {d:22,f:'day22_나만의_감정관리_시스템.html',t:'나만의 감정관리 시스템'}
-  ]},
-  {id:'fr',name:'프랑스어',icon:'🇫🇷',color:'#bf8a4a',
-   folder:'Franch_Lectures',lessons:[
-    {d:1,f:'day-01-pronunciation.html',t:'발음'},
-    {d:2,f:'day-02-greetings.html',t:'인사'},
-    {d:3,f:'day-03-vocab-partA.html',t:'어휘 A'},
-    {d:4,f:'day-04-vocab-partB.html',t:'어휘 B'},
-    {d:5,f:'day-05-numbers-units.html',t:'숫자·단위'},
-    {d:6,f:'day-06-email-expressions.html',t:'이메일 표현'},
-    {d:7,f:'day-07-review-part1.html',t:'Part1 복습'},
-    {d:8,f:'day-08-meeting-expressions.html',t:'회의 표현'},
-    {d:9,f:'day-09-technical-explanation.html',t:'기술 설명'},
-    {d:10,f:'day-10-problem-reporting.html',t:'문제 보고'},
-    {d:11,f:'day-11-scheduling.html',t:'일정 조율'},
-    {d:12,f:'day-12-presentation.html',t:'프레젠테이션'},
-    {d:13,f:'day-13-negotiation.html',t:'협상'},
-    {d:14,f:'day-14-review-part2.html',t:'Part2 복습'},
-    {d:15,f:'day-15-present-tense.html',t:'현재시제'},
-    {d:16,f:'day-16-passe-compose.html',t:'복합과거'},
-    {d:17,f:'day-17-conditionnel.html',t:'조건법'},
-    {d:18,f:'day-18-passive-impersonal.html',t:'수동·비인칭'},
-    {d:19,f:'day-19-questions-negation.html',t:'의문·부정'},
-    {d:20,f:'day-20-review-part3.html',t:'Part3 복습'},
-    {d:21,f:'day-21-french-culture.html',t:'프랑스 문화'},
-    {d:22,f:'day-22-email-correction.html',t:'이메일 교정'},
-    {d:23,f:'day-23-roleplay-meeting.html',t:'롤플레이 회의'},
-    {d:24,f:'day-24-roleplay-email.html',t:'롤플레이 이메일'},
-    {d:25,f:'day-25-self-intro-presentation.html',t:'자기소개 PT'},
-    {d:26,f:'day-26-final-review.html',t:'최종 복습'}
-  ]},
-  {id:'pa',name:'육아·부학',icon:'👶',color:'#4abfbf',
-   folder:'Parenting_Lectures',lessons:[
-    {d:1,f:'day01_brain_development.html',t:'뇌 발달'},
-    {d:2,f:'day02_attachment_theory.html',t:'애착 이론'},
-    {d:3,f:'day03_dad_play_neuroscience.html',t:'아빠 놀이 신경과학'},
-    {d:4,f:'day04_self_regulation.html',t:'자기 조절'},
-    {d:5,f:'day05_cognitive_development.html',t:'인지 발달'},
-    {d:6,f:'day06_language_explosion.html',t:'언어 폭발'},
-    {d:7,f:'day07_part1_review.html',t:'Part1 복습'},
-    {d:8,f:'day08_sibling_jealousy.html',t:'형제 질투'},
-    {d:9,f:'day09_fairness_equity.html',t:'공정·형평'},
-    {d:10,f:'day10_sibling_cooperation.html',t:'형제 협력'},
-    {d:11,f:'day11_one_on_one_time.html',t:'1:1 시간'},
-    {d:12,f:'day12_part2_review.html',t:'Part2 복습'},
-    {d:13,f:'day13_parenting_stress.html',t:'양육 스트레스'},
-    {d:14,f:'day14_gottman_marriage_science.html',t:'가트만 부부과학'},
-    {d:15,f:'day15_dual_income_communication.html',t:'맞벌이 소통'},
-    {d:16,f:'day16_coparenting_alignment.html',t:'공동양육 정렬'},
-    {d:17,f:'day17_part3_review.html',t:'Part3 복습'},
-    {d:18,f:'day18_focused_play_design.html',t:'집중놀이 설계'},
-    {d:19,f:'day19_bedtime_routine.html',t:'취침 루틴'},
-    {d:20,f:'day20_emotion_coaching.html',t:'감정 코칭'},
-    {d:21,f:'day21_dad_routine_system.html',t:'아빠 루틴 시스템'}
-  ]},
-  {id:'ec',name:'재테크',icon:'💰',color:'#c9a84c',
-   folder:'Economics_Lectures',lessons:[
-    {d:1,f:'day01_financial_goal_setting.html',t:'재무 목표 설정'},
-    {d:2,f:'day02_compound_interest.html',t:'복리의 힘'},
-    {d:3,f:'day03_asset_pipeline.html',t:'자산 파이프라인'},
-    {d:4,f:'day04_mortgage_optimization.html',t:'대출 최적화'},
-    {d:5,f:'day05_risk_assessment.html',t:'리스크 평가'},
-    {d:6,f:'day06_behavioral_finance.html',t:'행동재무학'},
-    {d:7,f:'day07_part1_review.html',t:'Part1 복습'},
-    {d:8,f:'day08_valuation_basics.html',t:'밸류에이션 기초'},
-    {d:9,f:'day09_semiconductor_analysis.html',t:'반도체 분석'},
-    {d:10,f:'day10_financial_statements.html',t:'재무제표'},
-    {d:11,f:'day11_technical_analysis.html',t:'기술적 분석'},
-    {d:12,f:'day12_timing_principles.html',t:'타이밍 원칙'},
-    {d:13,f:'day13_kospi_discount.html',t:'KOSPI 디스카운트'},
-    {d:14,f:'day14_part2_review.html',t:'Part2 복습'},
-    {d:15,f:'day15_real_estate_cycle.html',t:'부동산 사이클'},
-    {d:16,f:'day16_house_swap_simulation.html',t:'갈아타기 시뮬레이션'},
-    {d:17,f:'day17_rebalancing.html',t:'리밸런싱'},
-    {d:18,f:'day18_global_diversification.html',t:'글로벌 분산투자'},
-    {d:19,f:'day19_part3_review.html',t:'Part3 복습'},
-    {d:20,f:'day20_tax_optimization.html',t:'절세 전략'},
-    {d:21,f:'day21_financial_income_tax.html',t:'금융소득세'},
-    {d:22,f:'day22_financial_automation.html',t:'재무 자동화'},
-    {d:23,f:'day23_final_roadmap.html',t:'최종 로드맵'}
-  ]}
+"use strict";
+const C=[{id:'vd',name:'차량동역학',icon:'\u2694',color:'#c23b22',folder:'VehicleDynamics_Lectures',lessons:[{d:1,f:'Day01_운동방정식유도.html',t:'운동방정식 유도'},{d:2,f:'Day02_비감쇠자유진동.html',t:'비감쇠 자유진동'},{d:3,f:'Day03_감쇠비정의.html',t:'감쇠비 정의'},{d:4,f:'Day04_부족감쇠자유진동.html',t:'부족감쇠 자유진동'},{d:5,f:'Day05_강제조화진동.html',t:'강제조화 진동'},{d:6,f:'Day06_위상각유도.html',t:'위상각 유도'},{d:7,f:'Day07_공진조건분석.html',t:'공진조건 분석'},{d:8,f:'Day08_쿼터카모델.html',t:'쿼터카 모델'},{d:9,f:'Day09_쿼터카고유진동수.html',t:'쿼터카 고유진동수'},{d:10,f:'Day10_하프카모델.html',t:'하프카 모델'},{d:11,f:'Day11_하프카모드해석.html',t:'하프카 모드해석'},{d:12,f:'Day12_전달함수유도.html',t:'전달함수 유도'},{d:13,f:'Day13_전달률방진설계.html',t:'전달률 방진설계'},{d:14,f:'Day14_노면스펙트럼승차감.html',t:'노면스펙트럼 승차감'},{d:15,f:'Day15_Part2복습.html',t:'Part2 복습'},{d:16,f:'Day16_스프링특성.html',t:'스프링 특성'},{d:17,f:'Day17_댐퍼모델.html',t:'댐퍼 모델'},{d:18,f:'Day18_부싱복소강성.html',t:'부싱 복소강성'},{d:19,f:'Day19_타이어수직동특성.html',t:'타이어 수직동특성'},{d:20,f:'Day20_TireHop.html',t:'Tire Hop'},{d:21,f:'Day21_승차감트레이드오프.html',t:'승차감 트레이드오프'},{d:22,f:'Day22_Part3복습.html',t:'Part3 복습'},{d:23,f:'Day23_푸리에변환.html',t:'푸리에 변환'},{d:24,f:'Day24_PSD정의.html',t:'PSD 정의'},{d:25,f:'Day25_FRF측정.html',t:'FRF 측정'},{d:26,f:'Day26_고유치문제.html',t:'고유치 문제'},{d:27,f:'Day27_모드중첩법.html',t:'모드중첩법'},{d:28,f:'Day28_Part4복습.html',t:'Part4 복습'},{d:29,f:'Day29_수식Simpack매핑.html',t:'수식-Simpack 매핑'},{d:30,f:'Day30_QuarterCar구현.html',t:'QuarterCar 구현'},{d:31,f:'Day31_FRF상관성.html',t:'FRF 상관성'},{d:32,f:'Day32_CoSimulation.html',t:'Co-Simulation'},{d:33,f:'Day33_디지털트윈완성.html',t:'디지털트윈 완성'},{d:34,f:'Day34_서스펜션기구학기초.html',t:'서스펜션 기구학 기초'},{d:35,f:'Day35_캠버기하학.html',t:'캠버 기하학'},{d:36,f:'Day36_토기하학.html',t:'토 기하학'},{d:37,f:'Day37_킹핀기하학.html',t:'킹핀 기하학'},{d:38,f:'Day38_롤센터안티지오메트리.html',t:'롤센터 안티지오메트리'},{d:39,f:'Day39_순간중심롤스티어.html',t:'순간중심 롤스티어'},{d:40,f:'Day40_KC시뮬레이션통합.html',t:'KC 시뮬레이션 통합'},{d:41,f:'Day41_애커만기하학.html',t:'애커만 기하학'},{d:42,f:'Day42_랙피니언역학.html',t:'랙피니언 역학'},{d:43,f:'Day43_전동파워스티어링.html',t:'전동 파워스티어링'},{d:44,f:'Day44_코너링포스슬립각.html',t:'코너링포스 슬립각'},{d:45,f:'Day45_언더오버스티어.html',t:'언더/오버스티어'},{d:46,f:'Day46_요응답전달함수.html',t:'요응답 전달함수'},{d:47,f:'Day47_디스크브레이크열역학.html',t:'디스크브레이크 열역학'},{d:48,f:'Day48_유압제동시스템.html',t:'유압 제동시스템'},{d:49,f:'Day49_제동력배분하중이동.html',t:'제동력배분 하중이동'},{d:50,f:'Day50_ABS_ESC제어.html',t:'ABS/ESC 제어'},{d:51,f:'Day51_회생제동시스템.html',t:'회생제동 시스템'},{d:52,f:'Day52_통합브레이크시스템.html',t:'통합 브레이크 시스템'}]},{id:'en',name:'에너지관리',icon:'\u26A1',color:'#4a8b5c',folder:'Energy_Lectures',lessons:[{d:1,f:'day01_energy_systems.html',t:'에너지 시스템'},{d:2,f:'day02_mitochondria.html',t:'미토콘드리아'},{d:3,f:'day03_hormones.html',t:'호르몬'},{d:4,f:'day04_autonomic.html',t:'자율신경계'},{d:5,f:'day05_review.html',t:'Part1 복습'},{d:6,f:'day06_sleep_architecture.html',t:'수면 구조'},{d:7,f:'day07_sleep_hormones.html',t:'수면 호르몬'},{d:8,f:'day08_sleep_environment.html',t:'수면 환경'},{d:9,f:'day09_sleep_debt.html',t:'수면 부채'},{d:10,f:'day10_sleep_tracking.html',t:'수면 추적'},{d:11,f:'day11_nutrition_basics.html',t:'영양 기초'},{d:12,f:'day12_protein.html',t:'단백질'},{d:13,f:'day13_carbs.html',t:'탄수화물'},{d:14,f:'day14_fats_micros.html',t:'지방·미량영양소'},{d:15,f:'day15_hydration_caffeine.html',t:'수분·카페인'},{d:16,f:'day16_meal_timing.html',t:'식사 타이밍'},{d:17,f:'day17_nutrition_review.html',t:'영양 복습'},{d:18,f:'day18_hypertrophy_science.html',t:'근비대 과학'},{d:19,f:'day19_big_three.html',t:'빅3 운동'},{d:20,f:'day20_upper_body.html',t:'상체 운동'},{d:21,f:'day21_lower_core.html',t:'하체·코어'},{d:22,f:'day22_periodization.html',t:'주기화'},{d:23,f:'day23_injury_mobility.html',t:'부상·모빌리티'},{d:24,f:'day24_recovery.html',t:'회복'},{d:25,f:'day25_weight_review.html',t:'웨이트 복습'},{d:26,f:'day26_vo2max_lactate.html',t:'VO2max·젖산'},{d:27,f:'day27_running_form.html',t:'러닝 폼'},{d:28,f:'day28_interval_training.html',t:'인터벌 트레이닝'},{d:29,f:'day29_zone_training.html',t:'존 트레이닝'},{d:30,f:'day30_concurrent_training.html',t:'동시 트레이닝'},{d:31,f:'day31_running_review.html',t:'러닝 복습'},{d:32,f:'day32_hrv.html',t:'HRV'},{d:33,f:'day33_immune_energy.html',t:'면역·에너지'},{d:34,f:'day34_fatigue_overtraining.html',t:'피로·과훈련'},{d:35,f:'day35_travel_seasonal.html',t:'여행·시즌'},{d:36,f:'day36_condition_review.html',t:'컨디션 복습'},{d:37,f:'day37_morning_routine.html',t:'아침 루틴'},{d:38,f:'day38_evening_routine.html',t:'저녁 루틴'},{d:39,f:'day39_weekend_routine.html',t:'주말 루틴'},{d:40,f:'day40_routine_review.html',t:'루틴 복습'},{d:41,f:'day41_stress_neuroscience.html',t:'스트레스 신경과학'},{d:42,f:'day42_meditation_breathwork.html',t:'명상·호흡'},{d:43,f:'day43_flow_state.html',t:'몰입 상태'},{d:44,f:'day44_emotional_regulation.html',t:'감정 조절'},{d:45,f:'day45_mental_review.html',t:'멘탈 복습'},{d:46,f:'day46_biohacking_tech.html',t:'바이오해킹'},{d:47,f:'day47_supplementation.html',t:'보충제'},{d:48,f:'day48_social_energy.html',t:'사회적 에너지'},{d:49,f:'day49_digital_detox.html',t:'디지털 디톡스'},{d:50,f:'day50_final_integration.html',t:'최종 통합'}]},{id:'hu',name:'인간학',icon:'\uD83E\uDDE0',color:'#8a6abf',folder:'Human_Lectures',lessons:[{d:1,f:'day01_감정이란_무엇인가.html',t:'감정이란 무엇인가'},{d:2,f:'day02_스트레스_호르몬_회로.html',t:'스트레스 호르몬 회로'},{d:3,f:'day03_INFP_감정처리_패턴.html',t:'INFP 감정처리 패턴'},{d:4,f:'day04_인지적_재평가.html',t:'인지적 재평가'},{d:5,f:'day05_메타인지_훈련.html',t:'메타인지 훈련'},{d:6,f:'day06_감정조절_실전_직장.html',t:'감정조절 실전 직장'},{d:7,f:'day07_신뢰의_신경과학.html',t:'신뢰의 신경과학'},{d:8,f:'day08_공감의_두_종류.html',t:'공감의 두 종류'},{d:9,f:'day09_어서티브_커뮤니케이션.html',t:'어서티브 커뮤니케이션'},{d:10,f:'day10_갈등의_신경과학.html',t:'갈등의 신경과학'},{d:11,f:'day11_피드백_주고받기.html',t:'피드백 주고받기'},{d:12,f:'day12_통합복습_Part1_2.html',t:'통합복습 Part1-2'},{d:13,f:'day13_스토아_통제의_이분법.html',t:'스토아 통제의 이분법'},{d:14,f:'day14_아우렐리우스_실천.html',t:'아우렐리우스 실천'},{d:15,f:'day15_불교적_무상관.html',t:'불교적 무상관'},{d:16,f:'day16_프랭클_의미치료.html',t:'프랭클 의미치료'},{d:17,f:'day17_흐름_상태.html',t:'흐름 상태'},{d:18,f:'day18_철학_프레임_통합.html',t:'철학 프레임 통합'},{d:19,f:'day19_가치관_명료화.html',t:'가치관 명료화'},{d:20,f:'day20_정체성과_역할_통합.html',t:'정체성과 역할 통합'},{d:21,f:'day21_결정의_철학.html',t:'결정의 철학'},{d:22,f:'day22_나만의_감정관리_시스템.html',t:'나만의 감정관리 시스템'}]},{id:'fr',name:'프랑스어',icon:'\uD83C\uDDEB\uD83C\uDDF7',color:'#bf8a4a',folder:'Franch_Lectures',lessons:[{d:1,f:'day-01-pronunciation.html',t:'발음'},{d:2,f:'day-02-greetings.html',t:'인사'},{d:3,f:'day-03-vocab-partA.html',t:'어휘 A'},{d:4,f:'day-04-vocab-partB.html',t:'어휘 B'},{d:5,f:'day-05-numbers-units.html',t:'숫자·단위'},{d:6,f:'day-06-email-expressions.html',t:'이메일 표현'},{d:7,f:'day-07-review-part1.html',t:'Part1 복습'},{d:8,f:'day-08-meeting-expressions.html',t:'회의 표현'},{d:9,f:'day-09-technical-explanation.html',t:'기술 설명'},{d:10,f:'day-10-problem-reporting.html',t:'문제 보고'},{d:11,f:'day-11-scheduling.html',t:'일정 조율'},{d:12,f:'day-12-presentation.html',t:'프레젠테이션'},{d:13,f:'day-13-negotiation.html',t:'협상'},{d:14,f:'day-14-review-part2.html',t:'Part2 복습'},{d:15,f:'day-15-present-tense.html',t:'현재시제'},{d:16,f:'day-16-passe-compose.html',t:'복합과거'},{d:17,f:'day-17-conditionnel.html',t:'조건법'},{d:18,f:'day-18-passive-impersonal.html',t:'수동·비인칭'},{d:19,f:'day-19-questions-negation.html',t:'의문·부정'},{d:20,f:'day-20-review-part3.html',t:'Part3 복습'},{d:21,f:'day-21-french-culture.html',t:'프랑스 문화'},{d:22,f:'day-22-email-correction.html',t:'이메일 교정'},{d:23,f:'day-23-roleplay-meeting.html',t:'롤플레이 회의'},{d:24,f:'day-24-roleplay-email.html',t:'롤플레이 이메일'},{d:25,f:'day-25-self-intro-presentation.html',t:'자기소개 PT'},{d:26,f:'day-26-final-review.html',t:'최종 복습'}]},{id:'pa',name:'육아·부학',icon:'\uD83D\uDC76',color:'#4abfbf',folder:'Parenting_Lectures',lessons:[{d:1,f:'day01_brain_development.html',t:'뇌 발달'},{d:2,f:'day02_attachment_theory.html',t:'애착 이론'},{d:3,f:'day03_dad_play_neuroscience.html',t:'아빠 놀이 신경과학'},{d:4,f:'day04_self_regulation.html',t:'자기 조절'},{d:5,f:'day05_cognitive_development.html',t:'인지 발달'},{d:6,f:'day06_language_explosion.html',t:'언어 폭발'},{d:7,f:'day07_part1_review.html',t:'Part1 복습'},{d:8,f:'day08_sibling_jealousy.html',t:'형제 질투'},{d:9,f:'day09_fairness_equity.html',t:'공정·형평'},{d:10,f:'day10_sibling_cooperation.html',t:'형제 협력'},{d:11,f:'day11_one_on_one_time.html',t:'1:1 시간'},{d:12,f:'day12_part2_review.html',t:'Part2 복습'},{d:13,f:'day13_parenting_stress.html',t:'양육 스트레스'},{d:14,f:'day14_gottman_marriage_science.html',t:'가트만 부부과학'},{d:15,f:'day15_dual_income_communication.html',t:'맞벌이 소통'},{d:16,f:'day16_coparenting_alignment.html',t:'공동양육 정렬'},{d:17,f:'day17_part3_review.html',t:'Part3 복습'},{d:18,f:'day18_focused_play_design.html',t:'집중놀이 설계'},{d:19,f:'day19_bedtime_routine.html',t:'취침 루틴'},{d:20,f:'day20_emotion_coaching.html',t:'감정 코칭'},{d:21,f:'day21_dad_routine_system.html',t:'아빠 루틴 시스템'}]},{id:'ec',name:'재테크',icon:'\uD83D\uDCB0',color:'#c9a84c',folder:'Economics_Lectures',lessons:[{d:1,f:'day01_financial_goal_setting.html',t:'재무 목표 설정'},{d:2,f:'day02_compound_interest.html',t:'복리의 힘'},{d:3,f:'day03_asset_pipeline.html',t:'자산 파이프라인'},{d:4,f:'day04_mortgage_optimization.html',t:'대출 최적화'},{d:5,f:'day05_risk_assessment.html',t:'리스크 평가'},{d:6,f:'day06_behavioral_finance.html',t:'행동재무학'},{d:7,f:'day07_part1_review.html',t:'Part1 복습'},{d:8,f:'day08_valuation_basics.html',t:'밸류에이션 기초'},{d:9,f:'day09_semiconductor_analysis.html',t:'반도체 분석'},{d:10,f:'day10_financial_statements.html',t:'재무제표'},{d:11,f:'day11_technical_analysis.html',t:'기술적 분석'},{d:12,f:'day12_timing_principles.html',t:'타이밍 원칙'},{d:13,f:'day13_kospi_discount.html',t:'KOSPI 디스카운트'},{d:14,f:'day14_part2_review.html',t:'Part2 복습'},{d:15,f:'day15_real_estate_cycle.html',t:'부동산 사이클'},{d:16,f:'day16_house_swap_simulation.html',t:'갈아타기 시뮬레이션'},{d:17,f:'day17_rebalancing.html',t:'리밸런싱'},{d:18,f:'day18_global_diversification.html',t:'글로벌 분산투자'},{d:19,f:'day19_part3_review.html',t:'Part3 복습'},{d:20,f:'day20_tax_optimization.html',t:'절세 전략'},{d:21,f:'day21_financial_income_tax.html',t:'금융소득세'},{d:22,f:'day22_financial_automation.html',t:'재무 자동화'},{d:23,f:'day23_final_roadmap.html',t:'최종 로드맵'}]}];
+
+const CATS={mind:{name:'마음',label:'ESPRIT'},family:{name:'가족',label:'FAMILLE'},energy:{name:'체력',label:'\u00C9NERGIE'},money:{name:'재무',label:'FINANCE'},work:{name:'직장',label:'TRAVAIL'},french:{name:'프랑스어',label:'FRAN\u00C7AIS'},vehicle:{name:'차량',label:'V\u00C9HICULE'},routine:{name:'루틴',label:'ROUTINE'},crossroad:{name:'갈림길',label:'CARREFOUR'},integrated:{name:'통합',label:'SYNTH\u00C8SE'}};
+
+const SCENARIOS=[
+{id:1,cat:'mind',name:'분노가 치밀어 오를 때',desc:'감정의 신경과학적 이해와 인지적 재평가를 통한 분노 관리',lectures:[{cid:'hu',d:1},{cid:'hu',d:2},{cid:'hu',d:4},{cid:'en',d:42},{cid:'en',d:44}],tip:'6초 규칙 \u2014 편도체 반응이 전전두엽에 도달하는 6초만 참으면 이성적 판단 가능'},
+{id:2,cat:'mind',name:'불안이 잠을 뺏을 때',desc:'스토아 철학과 수면 과학을 결합한 불안 해소 전략',lectures:[{cid:'hu',d:2},{cid:'hu',d:5},{cid:'hu',d:13},{cid:'en',d:6},{cid:'en',d:7},{cid:'en',d:42}],tip:'통제 가능/불가능 분리만으로 불안의 60% 해소 (스토아)'},
+{id:3,cat:'mind',name:'의욕이 바닥날 때 (번아웃)',desc:'의미치료와 HRV 기반 번아웃 회복 프로토콜',lectures:[{cid:'hu',d:16},{cid:'hu',d:19},{cid:'hu',d:17},{cid:'en',d:34},{cid:'en',d:32},{cid:'en',d:37}],tip:'번아웃은 의미(meaning)의 고갈'},
+{id:4,cat:'mind',name:'실패\xB7좌절을 겪었을 때',desc:'스토아 철학과 리스크 평가를 통한 좌절 극복법',lectures:[{cid:'hu',d:14},{cid:'hu',d:15},{cid:'hu',d:16},{cid:'ec',d:6},{cid:'ec',d:5}],tip:'"장애물이 곧 길이다" \u2014 스토아 철학'},
+{id:5,cat:'mind',name:'자존감이 낮아질 때',desc:'INFP 감정 패턴 이해와 몰입을 통한 자존감 회복',lectures:[{cid:'hu',d:3},{cid:'hu',d:4},{cid:'hu',d:20},{cid:'en',d:41},{cid:'en',d:43}],tip:'몰입(Flow) 경험이 자존감의 가장 건강한 원천'},
+{id:6,cat:'family',name:'아이가 떼를 쓸 때',desc:'자기 조절 발달과 감정 코칭 실전 가이드',lectures:[{cid:'pa',d:4},{cid:'pa',d:20},{cid:'pa',d:1},{cid:'hu',d:1},{cid:'hu',d:8}],tip:'감정 라벨링으로 편도체 활성 50% 감소'},
+{id:7,cat:'family',name:'형제끼리 싸울 때',desc:'형제 갈등의 심리학적 이해와 형평 기반 중재법',lectures:[{cid:'pa',d:8},{cid:'pa',d:9},{cid:'pa',d:10},{cid:'pa',d:11},{cid:'hu',d:10}],tip:'공정이 아닌 형평 관점으로'},
+{id:8,cat:'family',name:'배우자와 양육관 충돌',desc:'가트만 부부과학과 어서티브 소통을 통한 양육관 정렬',lectures:[{cid:'pa',d:16},{cid:'pa',d:14},{cid:'pa',d:15},{cid:'hu',d:9},{cid:'hu',d:11}],tip:'가트만 비율 5:1'},
+{id:9,cat:'family',name:'퇴근 후 아이와 놀아주기 힘들 때',desc:'아빠 놀이 신경과학과 에너지 관리로 효율적 육아',lectures:[{cid:'pa',d:3},{cid:'pa',d:18},{cid:'pa',d:21},{cid:'en',d:38},{cid:'en',d:24}],tip:'15분 집중 놀이 > 2시간 피곤한 동행'},
+{id:10,cat:'family',name:'아이 취침이 전쟁일 때',desc:'수면 과학 기반 취침 루틴 설계',lectures:[{cid:'pa',d:19},{cid:'pa',d:1},{cid:'en',d:6},{cid:'en',d:7},{cid:'en',d:8}],tip:'취침 1시간 전 조명 낮추기가 핵심'},
+{id:11,cat:'family',name:'부부 대화가 없어질 때',desc:'신뢰의 신경과학과 어서티브 커뮤니케이션으로 대화 복원',lectures:[{cid:'pa',d:14},{cid:'pa',d:15},{cid:'hu',d:7},{cid:'hu',d:9}]},
+{id:12,cat:'energy',name:'만성 피로를 느낄 때',desc:'미토콘드리아 기능과 수면 부채 해소를 통한 에너지 회복',lectures:[{cid:'en',d:2},{cid:'en',d:3},{cid:'en',d:34},{cid:'en',d:32},{cid:'en',d:9}],tip:'만성 피로의 80%는 수면 부채 + 미토콘드리아 기능 저하'},
+{id:13,cat:'energy',name:'운동을 시작하려 할 때',desc:'근비대 과학과 빅3 운동 중심의 체계적 시작 가이드',lectures:[{cid:'en',d:18},{cid:'en',d:19},{cid:'en',d:22},{cid:'en',d:23},{cid:'en',d:12}],tip:'빅3만 제대로 하면 전신 근력의 80% 커버'},
+{id:14,cat:'energy',name:'다이어트 중일 때',desc:'영양 과학 기반 지속 가능한 식단 관리',lectures:[{cid:'en',d:11},{cid:'en',d:13},{cid:'en',d:14},{cid:'en',d:16},{cid:'en',d:15}],tip:'식사 타이밍과 단백질 비율이 핵심'},
+{id:15,cat:'energy',name:'마라톤/러닝 준비',desc:'VO2max부터 존 트레이닝까지 러닝 완전 가이드',lectures:[{cid:'en',d:26},{cid:'en',d:27},{cid:'en',d:28},{cid:'en',d:29},{cid:'en',d:30}],tip:'80/20 법칙 \u2014 훈련의 80%는 Zone 2'},
+{id:16,cat:'energy',name:'아침에 일어나기 힘들 때',desc:'수면 구조와 자율신경계 기반 기상 최적화',lectures:[{cid:'en',d:6},{cid:'en',d:7},{cid:'en',d:10},{cid:'en',d:37},{cid:'en',d:4}],tip:'기상 후 10분 내 자연광 노출이 핵심'},
+{id:17,cat:'energy',name:'카페인 의존에서 벗어나기',desc:'카페인 약리학과 수면 호르몬 이해를 통한 탈카페인',lectures:[{cid:'en',d:15},{cid:'en',d:7},{cid:'en',d:2}],tip:'카페인 반감기 5-6시간. 오후 2시 이후 섭취는 수면 질 20-30% 감소'},
+{id:18,cat:'energy',name:'해외 출장/시차 적응',desc:'시차 적응과 프랑스 문화 이해를 결합한 출장 준비',lectures:[{cid:'en',d:35},{cid:'en',d:6},{cid:'en',d:7},{cid:'fr',d:21}],tip:'도착지 시간에 맞춰 출발 2-3일 전부터 수면 조정'},
+{id:19,cat:'money',name:'월급날 \u2014 재무 자동화 구축',desc:'자산 파이프라인과 재무 자동화 시스템 구축',lectures:[{cid:'ec',d:3},{cid:'ec',d:22},{cid:'ec',d:1}],tip:'급여의 최소 20%를 자동이체로 투자 계좌에'},
+{id:20,cat:'money',name:'첫 주식 투자를 시작할 때',desc:'밸류에이션과 행동재무학 기반 투자 입문',lectures:[{cid:'ec',d:8},{cid:'ec',d:10},{cid:'ec',d:5},{cid:'ec',d:6},{cid:'ec',d:11}],tip:'첫 투자는 인덱스 ETF로'},
+{id:21,cat:'money',name:'시장 폭락이 왔을 때',desc:'행동재무학과 스토아 철학으로 폭락 대응',lectures:[{cid:'ec',d:6},{cid:'ec',d:5},{cid:'ec',d:12},{cid:'ec',d:17},{cid:'hu',d:13},{cid:'hu',d:4}],tip:'행동재무학(D06)을 먼저 이해해야 실행 가능'},
+{id:22,cat:'money',name:'집을 살지 고민할 때',desc:'부동산 사이클과 대출 최적화로 주거 의사결정',lectures:[{cid:'ec',d:15},{cid:'ec',d:16},{cid:'ec',d:4},{cid:'ec',d:2}],tip:'부동산은 사이클보다 보유 기간이 중요'},
+{id:23,cat:'money',name:'연말정산/절세 전략',desc:'절세와 금융소득세를 활용한 세금 최적화',lectures:[{cid:'ec',d:20},{cid:'ec',d:21},{cid:'ec',d:22}],tip:'연금저축+IRP 900만원 한도부터'},
+{id:24,cat:'money',name:'글로벌 분산투자를 고려할 때',desc:'코리아 디스카운트 이해와 글로벌 분산 전략',lectures:[{cid:'ec',d:18},{cid:'ec',d:13},{cid:'ec',d:17}],tip:'코리아 디스카운트 이해가 해외 분산의 동기'},
+{id:25,cat:'money',name:'반도체 주식 분석',desc:'반도체 산업 분석과 재무제표 읽기',lectures:[{cid:'ec',d:9},{cid:'ec',d:8},{cid:'ec',d:10},{cid:'ec',d:11}]},
+{id:26,cat:'work',name:'상사와 의견 충돌 시',desc:'어서티브 커뮤니케이션과 스토아 철학을 활용한 갈등 관리',lectures:[{cid:'hu',d:9},{cid:'hu',d:10},{cid:'hu',d:11},{cid:'hu',d:13}],tip:'DESC 기법 \u2014 Describe, Express, Specify, Consequence'},
+{id:27,cat:'work',name:'프레젠테이션 준비할 때',desc:'프레젠테이션 기술과 스트레스 관리를 결합한 발표 준비',lectures:[{cid:'fr',d:12},{cid:'fr',d:25},{cid:'en',d:41},{cid:'en',d:42},{cid:'hu',d:5}],tip:'발표 직전 Box Breathing 3회로 교감신경 진정'},
+{id:28,cat:'work',name:'부당한 평가를 받았을 때',desc:'감정 조절과 피드백 스킬을 통한 부당 평가 대응',lectures:[{cid:'hu',d:6},{cid:'hu',d:4},{cid:'hu',d:11},{cid:'hu',d:14}],tip:'24시간 냉각 시간 후 대응'},
+{id:29,cat:'work',name:'직장 내 신뢰 구축',desc:'신뢰의 신경과학과 공감을 활용한 관계 구축',lectures:[{cid:'hu',d:7},{cid:'hu',d:8},{cid:'hu',d:9}],tip:'작은 약속을 지키는 것이 큰 약속보다 효과적'},
+{id:30,cat:'work',name:'야근이 계속될 때',desc:'과훈련 이론과 감정 관리로 야근 시즌 돌파',lectures:[{cid:'en',d:34},{cid:'en',d:38},{cid:'en',d:9},{cid:'hu',d:2},{cid:'hu',d:22},{cid:'pa',d:13}],tip:'수면 부채는 주말 몰아자기로 해결 불가'},
+{id:31,cat:'french',name:'프랑스어 이메일 써야 할 때',desc:'격식체 이메일 작성과 시제 활용 가이드',lectures:[{cid:'fr',d:6},{cid:'fr',d:22},{cid:'fr',d:24},{cid:'fr',d:15},{cid:'fr',d:16}],tip:'격식(vouvoiement)이 기본'},
+{id:32,cat:'french',name:'프랑스어 회의 참석',desc:'회의 표현과 협상 어휘 집중 학습',lectures:[{cid:'fr',d:8},{cid:'fr',d:23},{cid:'fr',d:11},{cid:'fr',d:13},{cid:'fr',d:9}]},
+{id:33,cat:'french',name:'기술 이슈를 프랑스어로 설명',desc:'기술 설명과 문제 보고에 필요한 프랑스어 표현',lectures:[{cid:'fr',d:9},{cid:'fr',d:10}],tip:'기술 용어는 영어 차용어가 많으므로 문장 구조에 집중'},
+{id:34,cat:'french',name:'프랑스 출장 준비',desc:'프랑스 문화 이해와 기본 인사부터 시차 적응까지',lectures:[{cid:'fr',d:21},{cid:'fr',d:2},{cid:'fr',d:5},{cid:'en',d:35}],tip:'비즈(bise) 문화. 처음 만남에서는 악수가 안전'},
+{id:35,cat:'french',name:'프랑스어 프레젠테이션',desc:'자기소개 PT와 문법을 활용한 프랑스어 발표 준비',lectures:[{cid:'fr',d:12},{cid:'fr',d:25},{cid:'fr',d:17},{cid:'hu',d:5}]},
+{id:36,cat:'vehicle',name:'승차감 불만 피드백',desc:'쿼터카 모델과 트레이드오프 분석으로 승차감 문제 해결',lectures:[{cid:'vd',d:8},{cid:'vd',d:9},{cid:'vd',d:21},{cid:'vd',d:17},{cid:'vd',d:16}],tip:'주파수 분석(D25)으로 문제 대역 파악. 1~4Hz=바운스, 10~15Hz=휠홉'},
+{id:37,cat:'vehicle',name:'핸들이 떨린다는 클레임',desc:'킹핀 기하학과 랙피니언 역학으로 조향 진동 분석',lectures:[{cid:'vd',d:20},{cid:'vd',d:37},{cid:'vd',d:42},{cid:'vd',d:7}],tip:'차속 비례=타이어 밸런스, 특정 속도=킹핀축 공진'},
+{id:38,cat:'vehicle',name:'언더스티어가 심하다',desc:'코너링포스와 요응답으로 조향 특성 개선',lectures:[{cid:'vd',d:44},{cid:'vd',d:45},{cid:'vd',d:46}],tip:'후축 롤 강성 증가 or 전축 코너링 스티프니스 증가'},
+{id:39,cat:'vehicle',name:'EV 전환 프로젝트 착수',desc:'EV 차량동역학과 회생제동 시스템 이해',lectures:[{cid:'vd',d:8},{cid:'vd',d:21},{cid:'vd',d:51}]},
+{id:40,cat:'vehicle',name:'Simpack 모델 구축',desc:'수식-Simpack 매핑부터 디지털트윈까지 시뮬레이션 가이드',lectures:[{cid:'vd',d:29},{cid:'vd',d:30},{cid:'vd',d:31},{cid:'vd',d:33}],tip:'상세 가이드는 VehicleDynamics_Lectures/Guide 참조'},
+{id:41,cat:'routine',name:'아침 루틴 만들기',desc:'코르티솔 리듬과 호르몬 기반 최적의 아침 설계',lectures:[{cid:'en',d:37},{cid:'en',d:4},{cid:'en',d:3},{cid:'hu',d:17}],tip:'기상 후 90분이 코르티솔 피크'},
+{id:42,cat:'routine',name:'저녁 루틴 / 회복',desc:'수면 호르몬과 회복 과학 기반 저녁 루틴 설계',lectures:[{cid:'en',d:38},{cid:'en',d:7},{cid:'en',d:24},{cid:'pa',d:19},{cid:'pa',d:21}]},
+{id:43,cat:'routine',name:'주말 활용 전략',desc:'회복과 가족 시간을 균형 잡는 주말 설계',lectures:[{cid:'en',d:39},{cid:'en',d:24},{cid:'pa',d:18},{cid:'pa',d:11}]},
+{id:44,cat:'routine',name:'운동 루틴 설계',desc:'주기화와 동시 트레이닝으로 효율적 운동 계획',lectures:[{cid:'en',d:22},{cid:'en',d:19},{cid:'en',d:20},{cid:'en',d:21},{cid:'en',d:30}]},
+{id:45,cat:'routine',name:'디지털 디톡스',desc:'디지털 디톡스와 몰입 상태를 위한 주의력 관리',lectures:[{cid:'en',d:49},{cid:'en',d:43},{cid:'hu',d:17},{cid:'hu',d:5}],tip:'핵심은 시간이 아니라 주의력'},
+{id:46,cat:'crossroad',name:'인생의 방향이 불확실할 때',desc:'가치관 명료화와 의미치료로 방향 재설정',lectures:[{cid:'hu',d:19},{cid:'hu',d:20},{cid:'hu',d:16},{cid:'ec',d:1},{cid:'ec',d:23}],tip:'"삶이 당신에게 묻는 질문에 답하라" \u2014 프랭클'},
+{id:47,cat:'crossroad',name:'중요한 결정을 앞두고',desc:'결정의 철학과 메타인지를 활용한 의사결정 프레임워크',lectures:[{cid:'hu',d:21},{cid:'hu',d:5},{cid:'hu',d:13},{cid:'ec',d:5},{cid:'ec',d:6}],tip:'가역적 결정은 빠르게, 비가역적 결정은 70% 확신에서'},
+{id:48,cat:'crossroad',name:'나만의 시스템 구축하기',desc:'감정관리 시스템과 재무 자동화를 통합한 인생 시스템',lectures:[{cid:'hu',d:22},{cid:'hu',d:18},{cid:'en',d:50},{cid:'ec',d:22},{cid:'ec',d:23}],tip:'80% 자동화 + 20% 유연성'},
+{id:49,cat:'crossroad',name:'이직을 고민할 때',desc:'가치관과 리스크 평가 기반의 커리어 의사결정',lectures:[{cid:'hu',d:19},{cid:'hu',d:21},{cid:'hu',d:20},{cid:'ec',d:1},{cid:'ec',d:5},{cid:'fr',d:25}]},
+{id:50,cat:'integrated',name:'"완벽한 하루" 설계',desc:'아침 루틴부터 재무 자동화까지 하루 전체 최적화',lectures:[{cid:'en',d:37},{cid:'en',d:16},{cid:'en',d:19},{cid:'en',d:38},{cid:'hu',d:17},{cid:'pa',d:21},{cid:'ec',d:22}]},
+{id:51,cat:'integrated',name:'프랑스 출장 + 가족 관리',desc:'출장 중 업무와 가족을 동시에 관리하는 통합 전략',lectures:[{cid:'fr',d:8},{cid:'fr',d:21},{cid:'en',d:35},{cid:'pa',d:15},{cid:'pa',d:11}],tip:'출장 중 영상통화 루틴 유지'},
+{id:52,cat:'integrated',name:'연말 종합 정리',desc:'재무\xB7건강\xB7관계를 종합적으로 점검하는 연말 리뷰',lectures:[{cid:'ec',d:20},{cid:'ec',d:17},{cid:'ec',d:23},{cid:'en',d:50},{cid:'hu',d:19},{cid:'pa',d:16}]},
+{id:53,cat:'integrated',name:'"내가 왜 이러고 살지" 위기의 순간',desc:'실존적 위기를 다학제적으로 풀어내는 종합 프로토콜',lectures:[{cid:'hu',d:16},{cid:'hu',d:15},{cid:'hu',d:13},{cid:'en',d:42},{cid:'en',d:34},{cid:'pa',d:13},{cid:'ec',d:5}],tip:'위기는 한 번에 하나씩. 가장 급한 것(보통 수면)부터'},
+{id:54,cat:'integrated',name:'바이오해킹 \u2014 최적의 나 만들기',desc:'측정 기반 건강 최적화와 보충제 전략',lectures:[{cid:'en',d:46},{cid:'en',d:47},{cid:'en',d:32},{cid:'en',d:10},{cid:'en',d:2}],tip:'측정 없는 최적화는 없다'}
 ];
 
-/* ═══ MUSASHI QUOTES ═══ */
-const QUOTES=[
-  '천일의 수련을 단(鍛)이라 하고, 만일의 수련을 련(練)이라 한다 — 미야모토 무사시',
-  '나는 일에 있어 후회하지 않는다 — 미야모토 무사시',
-  '도(道)에 있어서는 죽음을 두려워하지 않는다 — 미야모토 무사시',
-  '마음은 항상 도(道)를 떠나지 않는다 — 미야모토 무사시',
-  '만리일공(萬理一空) — 미야모토 무사시',
-  '몸을 버릴지언정 명예는 버리지 않는다 — 미야모토 무사시',
-  '자세가 있되 자세가 없다 — 미야모토 무사시',
-  '단(鍛)은 천일, 련(練)은 만일 — 오륜서',
-  '하나의 길을 극하면 만 갈래 길에 통한다 — 미야모토 무사시',
-  '적을 알고 나를 알라 — 병법의 마음가짐'
-];
+// ═══ STORAGE ═══
+const SK='learn_data_v3',SRI=[1,3,7,14,30,60];
+function gs(){try{const r=localStorage.getItem(SK);return r?JSON.parse(r):{}}catch(e){return{}}}
+function ss(d){localStorage.setItem(SK,JSON.stringify(d))}
+function getProgress(cid){const d=gs();return(d[cid]&&d[cid].done)?d[cid].done:[]}
+function markDone(cid,day){const d=gs();if(!d[cid])d[cid]={done:[],reviews:{}};if(!d[cid].done.includes(day)){d[cid].done.push(day);const n=Date.now();d[cid].reviews[day]={stage:0,next:n+SRI[0]*864e5,last:n}}ss(d)}
+function unmarkDone(cid,day){const d=gs();if(!d[cid])return;d[cid].done=d[cid].done.filter(x=>x!==day);if(d[cid].reviews)delete d[cid].reviews[day];ss(d)}
+function getReviews(cid){const d=gs();return(d[cid]&&d[cid].reviews)?d[cid].reviews:{}}
+function advanceReview(cid,day){const d=gs();if(!d[cid]||!d[cid].reviews||!d[cid].reviews[day])return;const r=d[cid].reviews[day];r.stage=Math.min(r.stage+1,SRI.length-1);r.last=Date.now();r.next=Date.now()+SRI[r.stage]*864e5;d[cid].reviews[day]=r;ss(d)}
+function addLog(m){const d=gs();if(!d._logs)d._logs=[];const t=fmtDate(new Date());const e=d._logs.find(l=>l.date===t);if(e)e.minutes+=m;else d._logs.push({date:t,minutes:m});ss(d)}
+function getLogs(){return gs()._logs||[]}
+function getLogForDate(ds){const e=getLogs().find(l=>l.date===ds);return e?e.minutes:0}
 
-/* ═══ STATE ═══ */
-const SK='learn_data_v3';
-const INTERVALS=[1,3,7,14,30,60];
-function gs(){try{return JSON.parse(localStorage.getItem(SK))||{}}catch(e){return{}}}
-function ss(s){localStorage.setItem(SK,JSON.stringify(s))}
-function getProgress(cid){const s=gs();return(s[cid]||{}).done||[]}
-function markDone(cid,day){
-  const s=gs(),cd=s[cid]||{done:[],reviews:{}};
-  if(!cd.done.includes(day)){cd.done.push(day);cd.done.sort((a,b)=>a-b)}
-  const today=todayStr();
-  cd.reviews[day]={stage:0,next:addDays(today,INTERVALS[0]),last:today};
-  s[cid]=cd;ss(s);
-}
-function getReviews(cid){const s=gs();return(s[cid]||{}).reviews||{}}
-function advanceReview(cid,day){
-  const s=gs(),cd=s[cid]||{done:[],reviews:{}};
-  const r=cd.reviews[day];if(!r)return;
-  const ns=Math.min(r.stage+1,INTERVALS.length-1);
-  r.stage=ns;r.last=todayStr();r.next=addDays(todayStr(),INTERVALS[ns]);
-  s[cid]=cd;ss(s);
-}
-function addLog(cid,mins){const s=gs(),logs=s._logs||[];logs.push({date:todayStr(),cid,mins,ts:Date.now()});s._logs=logs;ss(s)}
-function getLogs(){return(gs()._logs||[])}
-function todayMins(){return getLogs().filter(l=>l.date===todayStr()).reduce((a,l)=>a+l.mins,0)}
-function calcStreak(){
-  const logs=getLogs(),dates=[...new Set(logs.map(l=>l.date))].sort().reverse();
-  if(!dates.length)return 0;
-  let streak=0,d=new Date();
-  for(let i=0;i<400;i++){
-    const ds=fmt(d);
-    if(dates.includes(ds)){streak++;d.setDate(d.getDate()-1)}
-    else if(i===0){d.setDate(d.getDate()-1)}
-    else break;
-  }
-  return streak;
-}
-function todayStr(){return fmt(new Date())}
-function fmt(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
-function addDays(ds,n){const d=new Date(ds);d.setDate(d.getDate()+n);return fmt(d)}
-function dayNames(){return['일','월','화','수','목','금','토']}
+// ═══ UTILS ═══
+function seededRandom(s){let x=Math.sin(s)*10000;return x-Math.floor(x)}
+function findCourse(cid){return C.find(c=>c.id===cid)}
+function findLesson(cid,day){const c=findCourse(cid);return c?c.lessons.find(l=>l.d===day):null}
+function openLesson(cid,day){const c=findCourse(cid),l=findLesson(cid,day);if(c&&l)window.location.href=c.folder+'/'+l.f}
+function fmtDate(d){return d.toISOString().slice(0,10)}
+function getDateSeed(){const t=new Date();return t.getFullYear()*10000+(t.getMonth()+1)*100+t.getDate()}
 
-/* ═══ SLASH ANIMATION ═══ */
-function triggerSlash(){
-  // Horizontal ink slash
-  const line=document.createElement('div');
-  line.className='slash-line';
-  document.body.appendChild(line);
-  setTimeout(()=>line.remove(),900);
+function calcStreak(){const logs=getLogs();if(!logs.length)return 0;const ds=logs.filter(l=>l.minutes>0).map(l=>l.date).sort().reverse();if(!ds.length)return 0;const today=fmtDate(new Date()),yest=fmtDate(new Date(Date.now()-864e5));if(ds[0]!==today&&ds[0]!==yest)return 0;let s=1,cur=new Date(ds[0]+'T00:00:00');for(let i=1;i<ds.length;i++){const p=new Date(cur.getTime()-864e5);if(ds[i]===fmtDate(p)){s++;cur=p}else break}return s}
 
-  // Ink circle at center
-  const circle=document.createElement('div');
-  circle.className='ink-circle';
-  circle.style.left=(window.innerWidth/2-60)+'px';
-  circle.style.top=(window.innerHeight/2-60)+'px';
-  document.body.appendChild(circle);
-  setTimeout(()=>circle.remove(),1100);
+// ═══ TABS ═══
+document.querySelectorAll('.tab-btn').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.tab-btn').forEach(function(x){x.classList.remove('active')});document.querySelectorAll('.tab-content').forEach(function(x){x.classList.remove('active')});b.classList.add('active');document.getElementById('tab-'+b.dataset.tab).classList.add('active')})});
+
+// ═══ TAB 1: TODAY ═══
+function genDailyPlan(){
+  const seed=getDateSeed();
+  const avail=C.map(function(c){const done=getProgress(c.id);return{course:c,undone:c.lessons.filter(function(l){return!done.includes(l.d)})}}).filter(function(x){return x.undone.length>0});
+  // Seed-based shuffle then sort by completion ascending
+  const sh=[...avail];
+  for(let i=sh.length-1;i>0;i--){const j=Math.floor(seededRandom(seed+i*7)*(i+1));[sh[i],sh[j]]=[sh[j],sh[i]]}
+  sh.sort(function(a,b){return(getProgress(a.course.id).length/a.course.lessons.length)-(getProgress(b.course.id).length/b.course.lessons.length)});
+  const cnt=Math.min(4,sh.length),picks=[];
+  for(let i=0;i<cnt;i++)picks.push({course:sh[i].course,lesson:sh[i].undone[0]});
+  const si=Math.floor(seededRandom(seed+100)*SCENARIOS.length);
+  return{lectures:picks,scenario:SCENARIOS[si]};
 }
 
-/* ═══ TABS ═══ */
-const nav=document.getElementById('nav');
-nav.addEventListener('click',e=>{
-  const btn=e.target.closest('button[data-tab]');if(!btn)return;
-  nav.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
-  document.getElementById('p-'+btn.dataset.tab).classList.add('on');
-});
-
-/* ═══ DATE + QUOTE ═══ */
-function showDate(){
-  const d=new Date(),dn=dayNames();
-  document.getElementById('dateDisp').textContent=`${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} (${dn[d.getDay()]})`;
-  document.getElementById('quoteBar').textContent=QUOTES[d.getDate()%QUOTES.length];
-}
-showDate();
-
-/* ═══ HOME ═══ */
-function renderHome(){
-  document.getElementById('streakN').textContent=calcStreak();
-  document.getElementById('todayMin').textContent=todayMins();
-  renderFeed();renderReviewQueue();
-}
-
-function renderFeed(){
-  const list=document.getElementById('feedList');
-  const empty=document.getElementById('feedEmpty');
-  list.textContent='';
-  const today=todayStr();const items=[];
-  C.forEach(c=>{
-    const done=getProgress(c.id);
-    const next=c.lessons.find(l=>!done.includes(l.d));
-    if(next)items.push({type:'new',c,l:next});
+function renderDaily(){
+  const plan=genDailyPlan(),el=document.getElementById('dailyLectures'),cm=document.getElementById('completionMsg');
+  let h='',allDone=true;
+  plan.lectures.forEach(function(p){
+    const done=getProgress(p.course.id).includes(p.lesson.d);
+    if(!done)allDone=false;
+    h+='<div class="daily-item'+(done?' completed':'')+'" data-cid="'+p.course.id+'" data-day="'+p.lesson.d+'"><div class="daily-check'+(done?' done':'')+'" data-action="toggle">'+(done?'\u2713':'')+'</div><div class="daily-dot" style="background:'+p.course.color+'"></div><div class="daily-meta" data-action="open"><div class="daily-day">DAY '+String(p.lesson.d).padStart(2,'0')+'</div><div class="daily-title">'+esc(p.lesson.t)+'</div><div class="daily-subject">'+esc(p.course.name)+'</div></div></div>';
   });
-  C.forEach(c=>{
-    const revs=getReviews(c.id);
-    Object.entries(revs).forEach(([day,r])=>{
-      if(r.next<=today){const l=c.lessons.find(x=>x.d===+day);if(l)items.push({type:'rev',c,l,r})}
-    });
+  el.innerHTML=h;
+  cm.style.display=(allDone&&plan.lectures.length>0)?'block':'none';
+  el.querySelectorAll('.daily-item').forEach(function(item){
+    const cid=item.dataset.cid,day=parseInt(item.dataset.day);
+    item.querySelector('[data-action="toggle"]').addEventListener('click',function(e){e.stopPropagation();if(getProgress(cid).includes(day))unmarkDone(cid,day);else{markDone(cid,day);addLog(5)}renderAll()});
+    item.querySelector('[data-action="open"]').addEventListener('click',function(){openLesson(cid,day)});
   });
-  if(!items.length){empty.style.display='block';return}
-  empty.style.display='none';
-  items.forEach((item,i)=>{
-    const row=document.createElement('div');
-    row.className='feed-item';
-    row.style.animation=`fadeUp 0.3s ease-out ${i*0.05}s both`;
-    row.addEventListener('click',()=>openLesson(item.c,item.l,item.type==='rev'));
-    const icon=document.createElement('div');icon.className='feed-icon';icon.textContent=item.c.icon;
-    const info=document.createElement('div');info.className='feed-info';
-    const t=document.createElement('div');t.className='t';t.textContent=`${item.l.d}일차 — ${item.l.t}`;
-    const s=document.createElement('div');s.className='s';s.textContent=item.c.name;
-    info.appendChild(t);info.appendChild(s);
-    const badge=document.createElement('span');
-    badge.className=item.type==='new'?'badge new':'badge rev';
-    badge.textContent=item.type==='new'?'신규':'복습';
-    row.appendChild(icon);row.appendChild(info);row.appendChild(badge);
-    list.appendChild(row);
-  });
+  renderDailyScenario(plan.scenario);
+}
+
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+function renderDailyScenario(sc){
+  const el=document.getElementById('dailyScenario'),ci=CATS[sc.cat];
+  let ch=sc.lectures.map(function(lec){const c=findCourse(lec.cid),l=findLesson(lec.cid,lec.d);if(!c||!l)return'';return'<span class="sc-chip" style="color:'+c.color+';border-color:'+c.color+'30;background:'+c.color+'10" onclick="openLesson(\''+lec.cid+'\','+lec.d+')">'+c.icon+' D'+String(lec.d).padStart(2,'0')+' '+esc(l.t)+'</span>'}).join('');
+  let tip=sc.tip?'<div class="sc-tip" style="margin-top:12px">'+esc(sc.tip)+'</div>':'';
+  el.innerHTML='<div class="scenario-daily"><div class="sc-cat">'+ci.label+' \u2014 '+ci.name+'</div><div class="sc-name">'+esc(sc.name)+'</div><div class="sc-desc">'+esc(sc.desc)+'</div><div style="display:flex;flex-wrap:wrap;gap:6px">'+ch+'</div>'+tip+'</div>';
 }
 
 function renderReviewQueue(){
-  const card=document.getElementById('reviewCard');
-  const list=document.getElementById('reviewList');
-  list.textContent='';const today=todayStr();let count=0;
-  C.forEach(c=>{
-    const revs=getReviews(c.id);
-    Object.entries(revs).forEach(([day,r])=>{
-      if(r.next<=today){
-        const l=c.lessons.find(x=>x.d===+day);if(!l)return;count++;
-        const row=document.createElement('div');row.className='feed-item';
-        row.addEventListener('click',()=>{advanceReview(c.id,+day);openLesson(c,l,true)});
-        const icon=document.createElement('div');icon.className='feed-icon';icon.textContent='🔄';
-        const info=document.createElement('div');info.className='feed-info';
-        const t=document.createElement('div');t.className='t';t.textContent=`${c.icon} ${l.d}일차 — ${l.t}`;
-        const s=document.createElement('div');s.className='s';s.textContent=`${c.name} · ${r.stage+1}/${INTERVALS.length}단계`;
-        info.appendChild(t);info.appendChild(s);
-        row.appendChild(icon);row.appendChild(info);list.appendChild(row);
-      }
-    });
+  const el=document.getElementById('reviewQueue'),now=Date.now(),revs=[];
+  C.forEach(function(c){const rv=getReviews(c.id);Object.keys(rv).forEach(function(ds){const day=parseInt(ds),r=rv[ds];if(r.next<=now){const l=findLesson(c.id,day);if(l)revs.push({course:c,lesson:l,day:day,stage:r.stage})}})});
+  if(!revs.length){el.innerHTML='<div style="font-size:12px;color:var(--text-muted);padding:12px 0">\uC624\uB298 \uBCF5\uC2B5\uD560 \uD56D\uBAA9\uC774 \uC5C6\uC2B5\uB2C8\uB2E4</div>';return}
+  let h='';revs.forEach(function(r){h+='<div class="review-item" data-cid="'+r.course.id+'" data-day="'+r.day+'"><div class="review-stage">'+(r.stage+1)+'/'+SRI.length+'</div><div class="daily-dot" style="background:'+r.course.color+'"></div><div class="daily-meta"><div class="daily-day">DAY '+String(r.day).padStart(2,'0')+'</div><div class="daily-title">'+esc(r.lesson.t)+'</div><div class="daily-subject">'+esc(r.course.name)+'</div></div></div>'});
+  el.innerHTML=h;
+  el.querySelectorAll('.review-item').forEach(function(item){item.addEventListener('click',function(){advanceReview(item.dataset.cid,parseInt(item.dataset.day));openLesson(item.dataset.cid,parseInt(item.dataset.day))})});
+}
+
+// ═══ TAB 2: PARCOURS ═══
+function renderCourseGrid(){
+  const el=document.getElementById('courseGrid');let h='';
+  C.forEach(function(c){const done=getProgress(c.id),total=c.lessons.length,pct=total?Math.round(done.length/total*100):0;h+='<div class="course-card" data-cid="'+c.id+'"><div class="course-icon">'+c.icon+'</div><div class="course-name">'+esc(c.name)+'</div><div class="cpb"><div class="cpf" style="width:'+pct+'%;background:'+c.color+'"></div></div><div class="cpt">'+done.length+'/'+total+' ('+pct+'%)</div></div>'});
+  el.innerHTML=h;
+  el.querySelectorAll('.course-card').forEach(function(card){card.addEventListener('click',function(){showLessonList(card.dataset.cid)})});
+}
+
+function showLessonList(cid){
+  const c=findCourse(cid);if(!c)return;
+  document.getElementById('courseGridView').classList.add('hidden');
+  document.getElementById('lessonListView').classList.add('active');
+  document.getElementById('lessonCourseLabel').textContent=c.icon+' '+c.name;
+  document.getElementById('lessonCourseName').textContent='';
+  const done=getProgress(cid),el=document.getElementById('lessonList');
+  let h='';c.lessons.forEach(function(l){const isDone=done.includes(l.d);h+='<div class="lesson-item'+(isDone?' di':'')+'" data-cid="'+cid+'" data-day="'+l.d+'"><div class="lesson-bullet'+(isDone?' done':'')+'" style="'+(isDone?'background:'+c.color+';border-color:'+c.color:'')+'"></div><div class="lesson-day">D'+String(l.d).padStart(2,'0')+'</div><div class="lesson-title">'+esc(l.t)+'</div></div>'});
+  el.innerHTML=h;
+  el.querySelectorAll('.lesson-item').forEach(function(item){item.addEventListener('click',function(){openLesson(item.dataset.cid,parseInt(item.dataset.day))})});
+}
+document.getElementById('backToCourses').addEventListener('click',function(){document.getElementById('courseGridView').classList.remove('hidden');document.getElementById('lessonListView').classList.remove('active')});
+
+// ═══ TAB 3: SCENARIOS ═══
+let curCat='all';
+function renderCatTabs(){
+  const el=document.getElementById('catTabs');let h='<button class="cat-tab active" data-cat="all">\uC804\uCCB4</button>';
+  Object.keys(CATS).forEach(function(k){h+='<button class="cat-tab" data-cat="'+k+'">'+CATS[k].name+'</button>'});
+  el.innerHTML=h;
+  el.querySelectorAll('.cat-tab').forEach(function(tab){tab.addEventListener('click',function(){el.querySelectorAll('.cat-tab').forEach(function(t){t.classList.remove('active')});tab.classList.add('active');curCat=tab.dataset.cat;renderScenarioList()})});
+}
+
+function renderScenarioList(){
+  const el=document.getElementById('scenarioList'),q=document.getElementById('scenarioSearch').value.toLowerCase();
+  let f=SCENARIOS;
+  if(curCat!=='all')f=f.filter(function(s){return s.cat===curCat});
+  if(q)f=f.filter(function(s){return s.name.toLowerCase().includes(q)||s.desc.toLowerCase().includes(q)});
+  if(!f.length){el.innerHTML='<div style="font-size:12px;color:var(--text-muted);padding:20px 0;text-align:center">\uAC80\uC0C9 \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4</div>';return}
+  let h='';f.forEach(function(sc){
+    const ci=CATS[sc.cat];
+    let ch=sc.lectures.map(function(lec){const c=findCourse(lec.cid),l=findLesson(lec.cid,lec.d);if(!c||!l)return'';return'<span class="sc-chip" style="color:'+c.color+';border-color:'+c.color+'30;background:'+c.color+'10" onclick="openLesson(\''+lec.cid+'\','+lec.d+')">'+c.icon+' D'+String(lec.d).padStart(2,'0')+' '+esc(l.t)+'</span>'}).join('');
+    let tip=sc.tip?'<div class="sc-tip">'+esc(sc.tip)+'</div>':'';
+    h+='<div class="scenario-card"><div class="sc-cat-label">'+ci.label+' \u2014 '+ci.name+'</div><div class="sc-title">'+esc(sc.name)+'</div><div class="sc-desc">'+esc(sc.desc)+'</div><div class="sc-chips">'+ch+'</div>'+tip+'</div>';
   });
-  card.style.display=count?'block':'none';
+  el.innerHTML=h;
 }
+document.getElementById('scenarioSearch').addEventListener('input',renderScenarioList);
 
-function openLesson(c,l,isReview){
-  triggerSlash();
-  setTimeout(()=>{
-    window.open(`${c.folder}/${l.f}`,'_blank');
-    if(!isReview)markDone(c.id,l.d);
-    setTimeout(()=>{renderHome();renderCourses()},300);
-  },400);
-}
-
-/* ═══ COURSES ═══ */
-let currentCourse=null;
-function renderCourses(){
-  const grid=document.getElementById('courseGrid');
-  const detail=document.getElementById('courseDetail');
-  if(currentCourse){renderCourseDetail(currentCourse);return}
-  grid.style.display='';detail.style.display='none';grid.textContent='';
-  C.forEach(c=>{
-    const done=getProgress(c.id);const pct=Math.round(done.length/c.lessons.length*100);
-    const card=document.createElement('div');card.className='ccard';
-    card.addEventListener('click',()=>{currentCourse=c;renderCourses()});
-    const iconEl=document.createElement('div');iconEl.className='icon';iconEl.textContent=c.icon;
-    const nm=document.createElement('div');nm.className='nm';nm.textContent=c.name;
-    const prog=document.createElement('div');prog.className='prog';
-    const bar=document.createElement('div');bar.className='bar';bar.style.width=pct+'%';
-    prog.appendChild(bar);
-    const cnt=document.createElement('div');cnt.className='cnt';cnt.textContent=`${done.length}/${c.lessons.length} (${pct}%)`;
-    card.appendChild(iconEl);card.appendChild(nm);card.appendChild(prog);card.appendChild(cnt);
-    grid.appendChild(card);
-  });
-}
-
-function renderCourseDetail(c){
-  document.getElementById('courseGrid').style.display='none';
-  document.getElementById('courseDetail').style.display='';
-  document.getElementById('detailTitle').textContent=`${c.icon} ${c.name}`;
-  const list=document.getElementById('lessonList');list.textContent='';
-  const done=getProgress(c.id);
-  c.lessons.forEach(l=>{
-    const isDone=done.includes(l.d);
-    const row=document.createElement('div');row.className='ll-item '+(isDone?'done':'undone');
-    row.addEventListener('click',()=>openLesson(c,l,false));
-    const num=document.createElement('div');num.className='num';num.textContent=l.d;
-    const lt=document.createElement('div');lt.className='lt';lt.textContent=l.t;
-    const ld=document.createElement('div');ld.className='ld';ld.textContent=isDone?'✓':'';
-    row.appendChild(num);row.appendChild(lt);row.appendChild(ld);list.appendChild(row);
-  });
-}
-document.getElementById('backBtn').addEventListener('click',()=>{currentCourse=null;renderCourses()});
-
-/* ═══ TIMER ═══ */
-let tmState='idle',tmSec=0,tmTotal=0,tmInterval=null,tmIsWork=true;
-const tmDisp=document.getElementById('timerDisp'),phDisp=document.getElementById('phaseDisp');
-const tmStart=document.getElementById('timerStart'),tmReset=document.getElementById('timerReset');
-const floatEl=document.getElementById('floatTimer');
-
-function fmtTime(s){const m=Math.floor(s/60),sc=s%60;return`${String(m).padStart(2,'0')}:${String(sc).padStart(2,'0')}`}
-function updateTimerDisplay(){
-  tmDisp.textContent=fmtTime(tmSec);
-  phDisp.textContent=tmIsWork?'집중 중':'휴식 중';
-  if(tmState==='running'){floatEl.textContent=fmtTime(tmSec);floatEl.classList.add('show')}
-}
-
-tmStart.addEventListener('click',()=>{
-  if(tmState==='idle'){
-    const workMin=parseInt(document.getElementById('cfgWork').value)||25;
-    tmSec=workMin*60;tmTotal=tmSec;tmIsWork=true;tmState='running';
-    tmStart.textContent='정지';tmInterval=setInterval(tick,1000);updateTimerDisplay();
-  } else if(tmState==='running'){
-    tmState='paused';tmStart.textContent='계속';clearInterval(tmInterval);floatEl.classList.remove('show');
-  } else if(tmState==='paused'){
-    tmState='running';tmStart.textContent='정지';tmInterval=setInterval(tick,1000);updateTimerDisplay();
-  }
+// ═══ TAB 4: JOURNAL ═══
+let tmrInt=null,tmrOn=false,tmrSec=1500,isWork=true,sesStart=null;
+function updTimer(){const m=Math.floor(tmrSec/60),s=tmrSec%60;document.getElementById('timerDisplay').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');document.getElementById('timerPhase').textContent=isWork?'TRAVAIL':'REPOS'}
+document.getElementById('timerStart').addEventListener('click',function(){
+  if(tmrOn)return;tmrOn=true;sesStart=Date.now();document.getElementById('timerStart').classList.add('ab');
+  tmrInt=setInterval(function(){tmrSec--;updTimer();if(tmrSec<=0){clearInterval(tmrInt);tmrOn=false;document.getElementById('timerStart').classList.remove('ab');if(isWork){addLog(parseInt(document.getElementById('workMin').value)||25);renderStats();renderWeekly();renderHeatmap()}isWork=!isWork;tmrSec=isWork?(parseInt(document.getElementById('workMin').value)||25)*60:(parseInt(document.getElementById('breakMin').value)||5)*60;updTimer()}},1000);
 });
-tmReset.addEventListener('click',()=>{
-  clearInterval(tmInterval);tmState='idle';
-  const workMin=parseInt(document.getElementById('cfgWork').value)||25;
-  tmSec=workMin*60;tmDisp.textContent=fmtTime(tmSec);phDisp.textContent='집중 준비';
-  tmStart.textContent='시작';floatEl.classList.remove('show');
-});
+document.getElementById('timerStop').addEventListener('click',function(){if(!tmrOn)return;clearInterval(tmrInt);tmrOn=false;document.getElementById('timerStart').classList.remove('ab');if(isWork&&sesStart){const e=Math.floor((Date.now()-sesStart)/6e4);if(e>0){addLog(e);renderStats();renderWeekly();renderHeatmap()}}sesStart=null});
+document.getElementById('timerReset').addEventListener('click',function(){clearInterval(tmrInt);tmrOn=false;isWork=true;tmrSec=(parseInt(document.getElementById('workMin').value)||25)*60;updTimer();document.getElementById('timerStart').classList.remove('ab');sesStart=null});
+document.getElementById('workMin').addEventListener('change',function(){if(!tmrOn&&isWork){tmrSec=(parseInt(this.value)||25)*60;updTimer()}});
+document.getElementById('breakMin').addEventListener('change',function(){if(!tmrOn&&!isWork){tmrSec=(parseInt(this.value)||5)*60;updTimer()}});
 
-function tick(){
-  if(tmSec>0){tmSec--;updateTimerDisplay();document.title=`${fmtTime(tmSec)} — 수련`;return}
-  clearInterval(tmInterval);
-  if(tmIsWork){
-    const worked=Math.round(tmTotal/60);addLog('_timer',worked);
-    triggerSlash();
-    try{new Notification('수련 완료',{body:`${worked}분 집중, 훌륭하다.`})}catch(e){}
-    tmIsWork=false;tmSec=(parseInt(document.getElementById('cfgBreak').value)||5)*60;
-    tmTotal=tmSec;tmInterval=setInterval(tick,1000);
-  } else {
-    try{new Notification('휴식 종료',{body:'다시 검을 잡아라.'})}catch(e){}
-    tmState='idle';tmStart.textContent='시작';
-    const workMin=parseInt(document.getElementById('cfgWork').value)||25;
-    tmSec=workMin*60;tmIsWork=true;tmDisp.textContent=fmtTime(tmSec);phDisp.textContent='집중 준비';
-    floatEl.classList.remove('show');
-  }
-  updateTimerDisplay();renderHome();
-}
-floatEl.addEventListener('click',()=>{nav.querySelector('[data-tab="timer"]').click()});
-
-/* ═══ WEEKLY CHART ═══ */
-function renderWeekChart(){
-  const chart=document.getElementById('weekChart'),labels=document.getElementById('weekLabels');
-  chart.textContent='';labels.textContent='';
-  const today=new Date(),dn=dayNames(),data=[];
-  for(let i=6;i>=0;i--){
-    const d=new Date(today);d.setDate(d.getDate()-i);const ds=fmt(d);
-    data.push({day:dn[d.getDay()],mins:getLogs().filter(l=>l.date===ds).reduce((a,l)=>a+l.mins,0)});
-  }
-  const max=Math.max(...data.map(d=>d.mins),1);
-  data.forEach(d=>{
-    const bar=document.createElement('div');bar.className='cb';
-    bar.style.height=Math.max(2,d.mins/max*100)+'%';if(d.mins)bar.title=d.mins+'분';
-    chart.appendChild(bar);
-    const lb=document.createElement('span');lb.textContent=d.day;labels.appendChild(lb);
-  });
+function renderWeekly(){
+  const el=document.getElementById('weeklyChart'),days=['\uC77C','\uC6D4','\uD654','\uC218','\uBAA9','\uAE08','\uD1A0'],today=new Date(),dd=[];
+  for(let i=6;i>=0;i--){const d=new Date(today.getTime()-i*864e5),ds=fmtDate(d);dd.push({label:days[d.getDay()],mins:getLogForDate(ds),ds:ds})}
+  const mx=Math.max(...dd.map(function(d){return d.mins}),1);
+  let h='';dd.forEach(function(d){const ht=Math.max(2,d.mins/mx*80);h+='<div class="week-bar-wrap"><div class="week-bar" style="height:'+ht+'px;'+(d.mins===0?'opacity:.2':'')+'"></div><div class="week-label">'+d.label+'</div></div>'});
+  el.innerHTML=h;
+  document.getElementById('weekStart').textContent=dd[0].ds.slice(5);
+  document.getElementById('weekEnd').textContent=dd[6].ds.slice(5);
 }
 
-/* ═══ LOG TABLE ═══ */
-function renderLogs(){
-  const body=document.getElementById('logBody');body.textContent='';
-  getLogs().slice(-15).reverse().forEach(l=>{
-    const tr=document.createElement('tr');
-    const td1=document.createElement('td');td1.textContent=l.date;
-    const td2=document.createElement('td');const c=C.find(x=>x.id===l.cid);
-    td2.textContent=c?c.name:(l.cid==='_timer'?'⏱ 집중':l.cid);
-    const td3=document.createElement('td');td3.textContent=l.mins+'분';
-    tr.appendChild(td1);tr.appendChild(td2);tr.appendChild(td3);body.appendChild(tr);
-  });
-  document.getElementById('totalLogs').textContent=getLogs().length+'건';
-}
-
-/* ═══ HEATMAP ═══ */
 function renderHeatmap(){
-  const hm=document.getElementById('heatmap');hm.textContent='';
-  dayNames().forEach(d=>{const lb=document.createElement('div');lb.className='hm-label';lb.textContent=d;hm.appendChild(lb)});
-  const today=new Date(),start=new Date(today);start.setDate(start.getDate()-29);start.setDate(start.getDate()-start.getDay());
-  const logs=getLogs(),dateMap={};logs.forEach(l=>{dateMap[l.date]=(dateMap[l.date]||0)+l.mins});
-  const maxMin=Math.max(...Object.values(dateMap),1);
-  for(let d=new Date(start);d<=today;d.setDate(d.getDate()+1)){
-    const ds=fmt(d),mins=dateMap[ds]||0;
-    const cell=document.createElement('div');cell.className='hm-cell';
-    cell.style.background=mins?`rgba(194,59,34,${Math.max(0.15,mins/maxMin)})`:'rgba(51,51,48,0.3)';
-    cell.title=`${ds}: ${mins}분`;hm.appendChild(cell);
-  }
+  const el=document.getElementById('heatmap'),today=new Date();let h='';
+  for(let i=34;i>=0;i--){const d=new Date(today.getTime()-i*864e5),ds=fmtDate(d),m=getLogForDate(ds);let lv='';if(m>=120)lv='l5';else if(m>=90)lv='l4';else if(m>=60)lv='l3';else if(m>=30)lv='l2';else if(m>0)lv='l1';h+='<div class="heat-cell '+lv+'" title="'+ds+': '+m+'\uBD84"></div>'}
+  el.innerHTML=h;
 }
 
-/* ═══ ALL PROGRESS ═══ */
 function renderAllProgress(){
-  const el=document.getElementById('allProgress');el.textContent='';
-  C.forEach(c=>{
-    const done=getProgress(c.id),pct=Math.round(done.length/c.lessons.length*100);
-    const row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(51,51,48,0.3)';
-    const icon=document.createElement('span');icon.textContent=c.icon;icon.style.fontSize='1.1rem';
-    const name=document.createElement('span');name.textContent=c.name;
-    name.style.cssText='flex:1;font-size:0.78rem;font-weight:700;color:var(--paper-dark);letter-spacing:1px';
-    const pctEl=document.createElement('span');pctEl.textContent=pct+'%';
-    pctEl.style.cssText='font-size:0.75rem;color:var(--vermillion);font-weight:900;min-width:36px;text-align:right';
-    row.appendChild(icon);row.appendChild(name);row.appendChild(pctEl);el.appendChild(row);
-  });
+  const el=document.getElementById('allProgress');let h='';
+  C.forEach(function(c){const done=getProgress(c.id),total=c.lessons.length,pct=total?Math.round(done.length/total*100):0;h+='<div class="progress-item"><div class="progress-icon">'+c.icon+'</div><div class="progress-info"><div class="progress-name">'+esc(c.name)+'</div><div class="pbo"><div class="pbi" style="width:'+pct+'%;background:'+c.color+'"></div></div></div><div class="progress-pct">'+pct+'%</div></div>'});
+  el.innerHTML=h;
 }
 
-/* ═══ NEURO TIP ═══ */
-const TIPS=[
-  '분산학습의 힘 — 여러 과목을 번갈아 공부하면 장기기억 전환율이 43% 증가한다.',
-  '인출연습의 비밀 — 노트를 다시 읽는 것보다 떠올려 보는 연습이 기억에 2배 효과적이다.',
-  '수면과 기억 — 학습 후 충분한 수면이 해마→대뇌피질 기억 전이를 활성화한다.',
-  '울트라디안 리듬 — 90분 집중 → 20분 휴식이 뇌의 자연 집중 사이클과 일치한다.',
-  '정교화 전략 — 새 정보를 기존 지식과 연결하면 기억 강도가 3배 강해진다.',
-  '시험효과 — 학습 직후 자가 테스트가 단순 복습보다 기억 유지율 50% 높다.',
-  '망각곡선 극복 — 1일 후 67% 망각하지만 간격복습 시 90% 이상 유지 가능하다.',
-  '운동+학습 — 중강도 유산소 직후 학습 시 BDNF 분비로 해마 신경생성이 촉진된다.',
-  '손글씨의 힘 — 손필기가 타이핑보다 개념 이해와 기억에 유의미하게 효과적이다.',
-  '명상과 집중 — 학습 전 5분 명상으로 전전두엽 활성화, 집중력과 작업기억 용량이 증가한다.'
-];
-function showTip(){document.getElementById('tipText').textContent=TIPS[new Date().getDate()%TIPS.length]}
+function renderStats(){document.getElementById('streakCount').textContent=calcStreak();document.getElementById('todayMinutes').textContent=getLogForDate(fmtDate(new Date()))}
 
-/* ═══ SETTINGS ═══ */
-document.getElementById('exportBtn').addEventListener('click',()=>{
-  const blob=new Blob([JSON.stringify(gs(),null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='suryon_backup_'+todayStr()+'.json';a.click();URL.revokeObjectURL(a.href);
-});
-document.getElementById('importBtn').addEventListener('click',()=>{document.getElementById('importFile').click()});
-document.getElementById('importFile').addEventListener('change',e=>{
-  const f=e.target.files[0];if(!f)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{try{ss(JSON.parse(ev.target.result));location.reload()}catch(err){alert('파일 형식 오류')}};
-  reader.readAsText(f);
-});
-document.getElementById('resetBtn').addEventListener('click',()=>{
-  if(confirm('모든 수련 데이터가 삭제됩니다. 계속?')){localStorage.removeItem(SK);location.reload()}
-});
+// ═══ SETTINGS ═══
+document.getElementById('exportBtn').addEventListener('click',function(){const b=new Blob([JSON.stringify(gs(),null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='savoir_backup_'+fmtDate(new Date())+'.json';a.click();URL.revokeObjectURL(u)});
+document.getElementById('importBtn').addEventListener('click',function(){document.getElementById('importFile').click()});
+document.getElementById('importFile').addEventListener('change',function(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){try{ss(JSON.parse(ev.target.result));renderAll();alert('\uB370\uC774\uD130\uB97C \uAC00\uC838\uC654\uC2B5\uB2C8\uB2E4.')}catch(err){alert('\uC720\uD6A8\uD558\uC9C0 \uC54A\uC740 \uD30C\uC77C\uC785\uB2C8\uB2E4.')}};r.readAsText(f);e.target.value=''});
+document.getElementById('resetBtn').addEventListener('click',function(){if(confirm('\uBAA8\uB4E0 \uD559\uC2B5 \uB370\uC774\uD130\uB97C \uCD08\uAE30\uD654\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C? \uC774 \uC791\uC5C5\uC740 \uB418\uB3CC\uB9B4 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.')){localStorage.removeItem(SK);renderAll()}});
 
-/* ═══ INIT ═══ */
-function init(){renderHome();renderCourses();renderWeekChart();renderLogs();renderHeatmap();renderAllProgress();showTip();
-  if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();
-}
-init();
-nav.addEventListener('click',()=>setTimeout(()=>{renderHome();renderWeekChart();renderLogs();renderHeatmap();renderAllProgress()},50));
-
-/* ═══ PWA ═══ */
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+// ═══ INIT ═══
+function renderAll(){renderStats();renderDaily();renderReviewQueue();renderCourseGrid();renderCatTabs();renderScenarioList();renderWeekly();renderHeatmap();renderAllProgress();updTimer()}
+renderAll();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
 </script>
 </body>
 </html>
