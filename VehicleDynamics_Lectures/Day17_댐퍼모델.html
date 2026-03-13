@@ -226,6 +226,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -334,6 +340,37 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     </div>
 </div>
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 점성 감쇠(Viscous Damping) 기본</p>
+    <div class="sub-eq">$$F_d = c\dot{x}$$</div>
+    <p class="sub-note">이상적 선형 모델. 실제 유압 댐퍼는 밸브 특성에 따라 비대칭·비선형</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 비대칭 댐핑: 리바운드/컴프레션</p>
+    <div class="sub-eq">$$F_d = \begin{cases} c_{comp}\,\dot{x} & \dot{x} < 0 \text{ (compression)} \\ c_{reb}\,\dot{x} & \dot{x} > 0 \text{ (rebound)} \end{cases}$$</div>
+    <div class="sub-eq">$$\text{일반적 비율: } c_{reb}/c_{comp} \approx 2.5 \sim 4.0$$</div>
+    <p class="sub-note"><strong>설계 이유:</strong> 리바운드 감쇠↑로 차체 복원 제어, 컴프레션 감쇠↓로 충격 흡수 (승차감 확보)</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 디그레시브(Degressive) 특성</p>
+    <div class="sub-eq">$$F_d = c_0 \dot{x} \cdot \frac{1}{1 + |\dot{x}|/v_0}$$</div>
+    <div class="sub-eq">$$\text{저속: } F \approx c_0 \dot{x} \quad \text{고속: } F \approx c_0 v_0 \text{ (포화)}$$</div>
+    <p class="sub-note">블로우오프 밸브가 열리면서 고속 영역 감쇠력 포화. <strong>이점:</strong> 소진폭 진동에는 충분한 감쇠, 대진폭 충격에는 과도한 힘 방지</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 등가 감쇠 계수</p>
+    <div class="sub-eq">$$c_{eq} = \frac{E_{dissipated}}{\pi \omega X_0^2}$$</div>
+    <div class="sub-eq">$$E_{dissipated} = \oint F_d\,dx = \text{F-V 히스테리시스 루프 면적}$$</div>
+    <p class="sub-note">비선형 댐퍼의 등가 선형화. <strong>주의:</strong> 등가 감쇠는 진폭과 주파수에 따라 변함 → 작동점 명시 필수</p>
+  </div>
+</div>
+
 <!-- ⑥ 파라미터 테이블 -->
 <div class="section">
   <div class="section-label">PARAMETERS</div>
@@ -472,7 +509,7 @@ td .katex,th .katex{font-size:0.9em!important}
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 CDC/MR 댐퍼: 가변 감쇠 기술 — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -483,7 +520,7 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 블로오프 밸브 — 왜 비선형 감쇠가 필요한가?</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -526,42 +563,118 @@ td .katex,th .katex{font-size:0.9em!important}
 <!-- ══════ FORMULA EXPLORER ══════ -->
 
 
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 댐퍼 F-V 특성곡선</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day17" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day17-controls" class="sim-controls"></div>
+    <div id="sim-day17-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day17');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day17-controls');
+    const metricBox = document.getElementById('sim-day17-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_cr = addSlider('리바운드 감쇠 Cr (Ns/m)', 500, 5000, 2000, 100, 'sim17-cr');
+    const sl_cc = addSlider('범프 감쇠 Cc (Ns/m)', 200, 3000, 800, 100, 'sim17-cc');
+    const sl_deg = addSlider('디그레시브 지수 n', 0.5, 1.5, 0.8, 0.05, 'sim17-deg');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const cr=+sl_cr.value, cc=+sl_cc.value, n=+sl_deg.value;
+      const maxV=2, cx=W/2, cy=H/2;
+      // Linear reference
+      ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+      ctx.beginPath();ctx.moveTo(0,cy+cr*maxV*(H-40)/(2*cr*maxV));ctx.lineTo(W,cy-cr*maxV*(H-40)/(2*cr*maxV));ctx.stroke();ctx.setLineDash([]);
+      // Degressive F-V: F = C * |v|^n * sign(v)
+      const maxF=Math.max(cr*Math.pow(maxV,n), cc*Math.pow(maxV,n));
+      const scV=(W-80)/(2*maxV), scF=(H-60)/(2*maxF);
+      ctx.strokeStyle='#C9A84C'; ctx.lineWidth=2.5; ctx.beginPath();
+      for(let i=-200;i<=200;i++){
+        const v=i*maxV/200;
+        let F;
+        if(v>=0) F=cr*Math.pow(Math.abs(v),n);
+        else F=-cc*Math.pow(Math.abs(v),n);
+        const px=cx+v*scV, py=cy-F*scF;
+        i===-200?ctx.moveTo(px,py):ctx.lineTo(px,py);
+      } ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,H);ctx.stroke();
+      ctx.fillStyle='#8A8F98';ctx.font='12px monospace';ctx.fillText('v (m/s)',W-70,cy+15);ctx.fillText('F (N)',cx+5,15);
+      ctx.fillStyle='#C9A84C';ctx.fillText('리바운드 ↑',cx+20,30);
+      ctx.fillStyle='#E06C75';ctx.fillText('범프 ↓',cx-100,H-20);
+      setMetrics([['리바운드/범프 비',((cr/cc)).toFixed(2)+':1'],['디그레시브 지수 n',n.toFixed(2)],['n<1: 디그레시브','n=1: 선형, n>1: 프로그레시브']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
 <!-- ⑩ 퀴즈 -->
 <div class="section">
   <div class="section-label">QUIZ</div>
   <h2 class="section-title">즉시 복습 퀴즈</h2>
-  
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 01 — 수식 빈칸 채우기</div>
-      <p class="quiz-q">리바운드/바운드 감쇠비 c_r/c_b의 일반적 범위는 ___배이다.</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q1')">정답 확인</button>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 01 — 댐퍼 기본 특성</div>
+      <p class="quiz-q">자동차 서스펜션 댐퍼에서 리바운드(extension) 감쇠력이 범프(compression)보다 큰 이유는?</p>
+      <div class="quiz-options" id="q1">
+        <div class="quiz-opt">A. 구조적 한계 때문</div>
+        <div class="quiz-opt">B. 스프링 에너지 방출을 효과적으로 제어하기 위해</div>
+        <div class="quiz-opt">C. 생산 공정상 제약</div>
+        <div class="quiz-opt">D. 소음 저감을 위해</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q1-fb" style="display:none;margin-top:10px">
-        ✅ 2~4
-      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 02 — 물리적 의미 연결</div>
-      <p class="quiz-q">블로오프 밸브가 열리면 왜 승차감이 좋아지는가?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q2')">정답 확인</button>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 02 — 비선형 감쇠</div>
+      <p class="quiz-q">속도 의존형 댐퍼에서 니(knee) 포인트의 역할은?</p>
+      <div class="quiz-options" id="q2">
+        <div class="quiz-opt">A. 최소 감쇠력을 결정</div>
+        <div class="quiz-opt">B. 저속↔고속 감쇠 영역 전환점</div>
+        <div class="quiz-opt">C. 댐퍼 최대 행정을 제한</div>
+        <div class="quiz-opt">D. 온도 보상 기준점</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q2-fb" style="display:none;margin-top:10px">
-        ✅ 고속 충격 입력에서 감쇠력 증가가 둔화되어 탑승자에게 전달되는 충격 피크가 감소한다
-      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 03 — Simpack 적용</div>
-      <p class="quiz-q">Simpack에서 댐퍼 F-v 곡선 입력 시 주의할 점은?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q3')">정답 확인</button>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 03 — Simpack 댐퍼</div>
+      <p class="quiz-q">Simpack에서 속도 의존 댐퍼를 모델링할 때 사용하는 입력 형식은?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. 단일 감쇠 계수 c</div>
+        <div class="quiz-opt">B. F-v(힘-속도) 커브 테이블</div>
+        <div class="quiz-opt">C. 주파수 대역 필터</div>
+        <div class="quiz-opt">D. 전달함수 H(s)</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q3-fb" style="display:none;margin-top:10px">
-        ✅ 바운드(음의 속도)와 리바운드(양의 속도) 양쪽 데이터를 모두 입력해야 하며, 원점(0,0)을 반드시 포함해야 한다
-      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
     </div>
 </div>
 
@@ -589,6 +702,26 @@ td .katex,th .katex{font-size:0.9em!important}
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -617,7 +750,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -673,15 +806,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

@@ -225,7 +225,63 @@ td .katex,th .katex{font-size:0.9em!important}
 
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
+
+@media (max-width: 640px) {
+    .nav-section { grid-template-columns: 1fr; }
+}
+
+/* ══════ Enhanced Derivation Sub-Steps ══════ */
+.sub-step{margin:12px 0;padding:14px 18px;background:rgba(74,158,191,0.06);border-left:2px solid var(--blue);border-radius:0 8px 8px 0}
+.sub-step .sub-label{font-size:13px;color:var(--blue);font-weight:400;margin-bottom:8px}
+.sub-step .sub-eq{background:#0D1017;border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:8px 0;overflow-x:auto}
+.sub-step .sub-note{font-size:13px;color:var(--text-dim);margin-top:8px;line-height:1.7}
+.sub-step .sub-note strong{color:var(--gold-light)}
+
+/* ══════ Interactive Simulation ══════ */
+.sim-container{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin:24px 0;overflow:hidden}
+.sim-title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright);margin-bottom:16px}
+.sim-canvas-wrap{background:#0A0C10;border:1px solid var(--border);border-radius:12px;padding:8px;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{max-width:100%;border-radius:8px}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.sim-slider-group{flex:1;min-width:200px;background:var(--surface2);border-radius:10px;padding:12px 16px}
+.sim-slider-group label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;font-family:'JetBrains Mono',monospace}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold);margin:4px 0}
+.sim-slider-group .sim-value{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold-light);text-align:right}
+.sim-btn{background:var(--gold);color:#0A0C10;border:none;border-radius:8px;padding:10px 20px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s}
+.sim-btn:hover{background:var(--gold-light);transform:translateY(-1px)}
+.sim-btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.sim-btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+.sim-readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:12px}
+.sim-metric{background:var(--surface2);border-radius:8px;padding:10px 14px;text-align:center}
+.sim-metric .sm-label{font-size:11px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+.sim-metric .sm-value{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--gold-light);font-weight:500;display:block;margin-top:4px}
+
 </style>
+<!-- KaTeX Auto-Render -->
+<script>
+(function() {
+  var katexJS = document.createElement('script');
+  katexJS.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js';
+  katexJS.onload = function() {
+    var autoRender = document.createElement('script');
+    autoRender.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js';
+    autoRender.onload = function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\(", right: "\)", display: false},
+          {left: "\[", right: "\]", display: true}
+        ],
+        throwOnError: false
+      });
+    };
+    document.head.appendChild(autoRender);
+  };
+  document.head.appendChild(katexJS);
+})();
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 </head>
 <body>
 
@@ -392,6 +448,39 @@ kₜ: 타이어 강성</span></div>
         <p><span class="label">이전 단계와의 연결:</span> 1DOF: 스칼라 방정식 → 2DOF: 2×2 행렬 방정식. 이 패턴은 NDOF로 일반화됩니다(Day 08 Deep Dive).</p>
       </div>
     </div>
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 쿼터카 2-DOF 운동방정식</p>
+    <div class="sub-eq">$$m_s\ddot{z}_s + c_s(\dot{z}_s - \dot{z}_u) + k_s(z_s - z_u) = 0$$</div>
+    <div class="sub-eq">$$m_u\ddot{z}_u - c_s(\dot{z}_s - \dot{z}_u) - k_s(z_s - z_u) + k_t(z_u - z_r) = 0$$</div>
+    <p class="sub-note">m_s: 스프렁 매스(차체 1/4), m_u: 언스프렁 매스(바퀴+허브). m_s/m_u ≈ 8-10:1</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 행렬 형태</p>
+    <div class="sub-eq">$$\begin{bmatrix} m_s & 0 \\\\ 0 & m_u \end{bmatrix}\ddot{\mathbf{z}} + \begin{bmatrix} c_s & -c_s \\\\ -c_s & c_s \end{bmatrix}\dot{\mathbf{z}} + \begin{bmatrix} k_s & -k_s \\\\ -k_s & k_s+k_t \end{bmatrix}\mathbf{z} = \begin{bmatrix} 0 \\\\ k_t z_r \end{bmatrix}$$</div>
+    <p class="sub-note">M, C, K 행렬이 대칭 → 에너지 보존 법칙 만족. MATLAB: M\K → eig()로 고유치 해석</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 전달률 유도 (차체/바퀴)</p>
+    <div class="sub-eq">$$T_{body} = \frac{|Z_s|}{|Z_r|} = \frac{k_t(k_s + jc_s\omega)}{D(\omega)}$$</div>
+    <div class="sub-eq">$$T_{wheel} = \frac{|Z_u|}{|Z_r|} = \frac{k_t(-m_s\omega^2 + k_s + jc_s\omega)}{D(\omega)}$$</div>
+    <div class="sub-eq">$$D(\omega) = (-m_s\omega^2+k_s+jc_s\omega)(-m_u\omega^2+k_s+k_t+jc_s\omega)-(k_s+jc_s\omega)^2$$</div>
+    <p class="sub-note">2개 공진 피크: ~1.2Hz(차체 바운스), ~12Hz(휠 홉). 이 사이 구간에서 승차감 결정</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 파라미터 트레이드오프</p>
+    <div class="sub-eq">$$k_s \downarrow \;\Rightarrow\; f_{body}\downarrow, \;\text{승차감}\uparrow , \;\text{롤}\uparrow $$</div>
+    <div class="sub-eq">$$c_s \uparrow \;\Rightarrow\; \text{피크 감소}\uparrow , \;\text{고주파 전달}\uparrow $$</div>
+    <div class="sub-eq">$$\text{최적: } \zeta_{opt} \approx 0.2\sim0.4 \;(\text{RMS 가속도 최소})$$</div>
+    <p class="sub-note"><strong>핵심 트레이드오프:</strong> 승차감 vs 조종안정성 vs 서스펜션 행정. 모든 서스펜션 개발의 본질</p>
+  </div>
+</div>
+
+
 </div>
 <!-- ⑥ 파라미터 테이블 -->
 <div class="section">
@@ -548,7 +637,7 @@ kₜ: 타이어 강성</span></div>
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 쿼터카 vs 하프카 vs 풀카 — 언제 어떤 모델을 쓰는가? — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -569,7 +658,7 @@ kₜ: 타이어 강성</span></div>
 
 
   <div class="accordion">
-    <button class="accordion-toggle" onclick="toggleAccordion(this)">
+    <button class="accordion-toggle">
       <span>🔬 1DOF → 2DOF 확장의 수학적 구조</span>
       <span class="accordion-arrow">▼</span>
     </button>
@@ -595,7 +684,7 @@ kₜ: 타이어 강성</span></div>
   </div>
 
   <div class="accordion">
-    <button class="accordion-toggle" onclick="toggleAccordion(this)">
+    <button class="accordion-toggle">
       <span>⚡ 왜 타이어를 스프링으로 모델링하는가?</span>
       <span class="accordion-arrow">▼</span>
     </button>
@@ -616,7 +705,7 @@ kₜ: 타이어 강성</span></div>
           </div>
         </div>
         <div class="accordion">
-          <button class="accordion-toggle" onclick="toggleAccordion(this)">
+          <button class="accordion-toggle">
             ⚡ 에너지 보존 관점에서 본 이 시스템 <span class="accordion-arrow">▸</span>
           </button>
           <div class="accordion-content">
@@ -654,42 +743,243 @@ kₜ: 타이어 강성</span></div>
     <p style="font-size:14px;color:var(--gold-light);">쿼터카 = 2층 건물. 1층(휠) + 2층(차체). 지진(노면) → 1층이 먼저 흔들리고 → 그 진동이 2층으로 전달. 1층과 2층 사이 완충재 = 서스펜션.</p>
   </div>
 <!-- ⑩ 퀴즈 -->
+
+<div class="section" id="simulation">
+<div class="section-label">INTERACTIVE SIMULATION</div>
+<div class="section-title">쿼터카 2-DOF 시뮬레이터</div>
+<div class="sim-container">
+  <div class="sim-title">🎮 노면 범프 입력 → 차체/휠 응답을 실시간 관찰하세요</div>
+  <div class="sim-canvas-wrap">
+    <canvas id="simCanvas8" width="860" height="380"></canvas>
+  </div>
+  <div class="sim-controls">
+    <div class="sim-slider-group">
+      <label>스프링 강성 k_s (N/mm)</label>
+      <input type="range" id="sim8-ks" min="10" max="50" value="22" step="1">
+      <div class="sim-value" id="sim8-ks-val">22 N/mm</div>
+    </div>
+    <div class="sim-slider-group">
+      <label>감쇠비 ζ</label>
+      <input type="range" id="sim8-z" min="5" max="80" value="25" step="1">
+      <div class="sim-value" id="sim8-z-val">0.25</div>
+    </div>
+    <div class="sim-slider-group">
+      <label>범프 높이 (mm)</label>
+      <input type="range" id="sim8-bump" min="5" max="50" value="20" step="1">
+      <div class="sim-value" id="sim8-bump-val">20 mm</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <button class="sim-btn" onclick="startSim8()">▶ 범프 통과</button>
+    <button class="sim-btn sim-btn-secondary" onclick="resetSim8()">↻ 리셋</button>
+  </div>
+  <div class="sim-readout">
+    <div class="sim-metric"><span class="sm-label">바디 f₁</span><span class="sm-value" id="sm8-f1">1.28 Hz</span></div>
+    <div class="sim-metric"><span class="sm-label">휠 f₂</span><span class="sm-value" id="sm8-f2">11.1 Hz</span></div>
+    <div class="sim-metric"><span class="sm-label">바디 최대변위</span><span class="sm-value" id="sm8-xmax">— mm</span></div>
+    <div class="sim-metric"><span class="sm-label">휠 최대변위</span><span class="sm-value" id="sm8-umax">— mm</span></div>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+  var canvas = document.getElementById('simCanvas8');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var animId, running = false;
+  var ms = 340, mu = 45, kt = 220000;
+  var dt = 0.0002, tMax = 3;
+  var xs = [], xu = [], roadInput = [];
+  
+  function getP(){
+    var ks = parseFloat(document.getElementById('sim8-ks').value)*1000;
+    var z = parseFloat(document.getElementById('sim8-z').value)/100;
+    var bump = parseFloat(document.getElementById('sim8-bump').value)/1000;
+    var wn = Math.sqrt(ks/ms);
+    var cs = 2*z*Math.sqrt(ks*ms);
+    return {ks:ks,z:z,bump:bump,wn:wn,cs:cs};
+  }
+  
+  function updateDisp(){
+    var p = getP();
+    document.getElementById('sim8-ks-val').textContent = (p.ks/1000).toFixed(0)+' N/mm';
+    document.getElementById('sim8-z-val').textContent = p.z.toFixed(2);
+    document.getElementById('sim8-bump-val').textContent = (p.bump*1000).toFixed(0)+' mm';
+    document.getElementById('sm8-f1').textContent = (p.wn/(2*Math.PI)).toFixed(2)+' Hz';
+    document.getElementById('sm8-f2').textContent = (Math.sqrt(kt/mu)/(2*Math.PI)).toFixed(1)+' Hz';
+  }
+  
+  function simulate(){
+    var p = getP();
+    var N = Math.floor(tMax/dt);
+    xs=[0]; xu=[0]; roadInput=[];
+    var vs=0, vu=0;
+    for(var i=0;i<N;i++){
+      var t=i*dt;
+      // Half-sine bump at t=0.1~0.15s
+      var zr = (t>0.1&&t<0.15)? p.bump*Math.sin(Math.PI*(t-0.1)/0.05):0;
+      roadInput.push(zr);
+      // Forces
+      var Fspring = p.ks*(xu[i]-xs[i]);
+      var Fdamp = p.cs*((vu)-(vs));
+      var Ftire = kt*(zr - xu[i]);
+      var as = (Fspring + Fdamp)/ms;
+      var au = (Ftire - Fspring - Fdamp)/mu;
+      vs += as*dt;
+      vu += au*dt;
+      xs.push(xs[i]+vs*dt);
+      xu.push(xu[i]+vu*dt);
+    }
+  }
+  
+  function drawQC(frame){
+    ctx.fillStyle='#0A0C10';ctx.fillRect(0,0,W,H);
+    var N=xs.length;
+    var plotL=80,plotR=W-20,plotT=30,plotB=H-30;
+    var midY=(plotT+plotB)/2;
+    
+    // Grid
+    ctx.strokeStyle='#1A1E28';ctx.lineWidth=1;
+    for(var s=0;s<=tMax;s+=0.5){
+      var x=plotL+(s/tMax)*(plotR-plotL);
+      ctx.beginPath();ctx.moveTo(x,plotT);ctx.lineTo(x,plotB);ctx.stroke();
+      if(s%1===0){ctx.fillStyle='#7A7A8A';ctx.font='10px JetBrains Mono';ctx.textAlign='center';ctx.fillText(s+'s',x,H-8);}
+    }
+    ctx.strokeStyle='#252A38';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(plotL,midY);ctx.lineTo(plotR,midY);ctx.stroke();
+    
+    var maxDisp = parseFloat(document.getElementById('sim8-bump').value)/1000 * 2;
+    if(maxDisp<0.01)maxDisp=0.01;
+    
+    // Draw curves
+    var step=Math.max(1,Math.floor(N/800));
+    var end=frame?Math.min(frame*20,N):N;
+    
+    // Road input (gray)
+    ctx.strokeStyle='#7A7A8A44';ctx.lineWidth=1.5;
+    ctx.beginPath();
+    for(var i=0;i<end;i+=step){
+      var t=(i/N)*tMax;
+      var px=plotL+(t/tMax)*(plotR-plotL);
+      var py=midY-(roadInput[Math.min(i,roadInput.length-1)]/maxDisp)*(midY-plotT-10);
+      if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    
+    // Wheel (blue)
+    ctx.strokeStyle='#4A9EBF';ctx.lineWidth=2;
+    ctx.beginPath();
+    for(var i=0;i<end;i+=step){
+      var t=(i/N)*tMax;
+      var px=plotL+(t/tMax)*(plotR-plotL);
+      var py=midY-(xu[i]/maxDisp)*(midY-plotT-10);
+      if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    
+    // Body (gold)
+    ctx.strokeStyle='#C9A84C';ctx.lineWidth=2.5;
+    ctx.beginPath();
+    for(var i=0;i<end;i+=step){
+      var t=(i/N)*tMax;
+      var px=plotL+(t/tMax)*(plotR-plotL);
+      var py=midY-(xs[i]/maxDisp)*(midY-plotT-10);
+      if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    
+    // Legend
+    ctx.font='12px Noto Sans KR';
+    ctx.fillStyle='#C9A84C';ctx.fillRect(plotL+10,plotT+5,20,3);ctx.fillText('차체 (Sprung)',plotL+35,plotT+12);
+    ctx.fillStyle='#4A9EBF';ctx.fillRect(plotL+10,plotT+22,20,3);ctx.fillText('휠 (Unsprung)',plotL+35,plotT+29);
+    ctx.fillStyle='#7A7A8A';ctx.fillRect(plotL+10,plotT+39,20,3);ctx.fillText('노면 입력',plotL+35,plotT+46);
+    
+    // Y labels
+    ctx.fillStyle='#7A7A8A';ctx.font='10px JetBrains Mono';ctx.textAlign='right';
+    ctx.fillText('+'+(maxDisp*1000).toFixed(0)+'mm',plotL-5,plotT+15);
+    ctx.fillText('0',plotL-5,midY+3);
+    ctx.fillText('-'+(maxDisp*1000).toFixed(0)+'mm',plotL-5,plotB-5);
+  }
+  
+  var frameCount;
+  function animateQC(){
+    if(!running)return;
+    frameCount++;
+    drawQC(frameCount);
+    if(frameCount*20>=xs.length){
+      running=false;
+      // Calculate max
+      var xMax=0,uMax=0;
+      for(var i=0;i<xs.length;i++){xMax=Math.max(xMax,Math.abs(xs[i]));uMax=Math.max(uMax,Math.abs(xu[i]));}
+      document.getElementById('sm8-xmax').textContent=(xMax*1000).toFixed(1)+' mm';
+      document.getElementById('sm8-umax').textContent=(uMax*1000).toFixed(1)+' mm';
+      return;
+    }
+    animId=requestAnimationFrame(animateQC);
+  }
+  
+  window.startSim8=function(){
+    simulate();
+    running=true;frameCount=0;
+    updateDisp();
+    animateQC();
+  };
+  window.resetSim8=function(){
+    running=false;
+    if(animId)cancelAnimationFrame(animId);
+    xs=[];xu=[];roadInput=[];
+    updateDisp();
+    ctx.fillStyle='#0A0C10';ctx.fillRect(0,0,W,H);
+    document.getElementById('sm8-xmax').textContent='— mm';
+    document.getElementById('sm8-umax').textContent='— mm';
+  };
+  
+  document.getElementById('sim8-ks').addEventListener('input',updateDisp);
+  document.getElementById('sim8-z').addEventListener('input',updateDisp);
+  document.getElementById('sim8-bump').addEventListener('input',updateDisp);
+  updateDisp();
+})();
+</script>
+
+
 <div class="section">
   <div class="section-label">QUIZ</div>
   <h2 class="section-title">즉시 복습 퀴즈</h2>
-  
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 01 — 수식 빈칸 채우기</div>
-      <p class="quiz-q">쿼터카 모델의 강성행렬 [K]에서 (2,2) 원소는?</p>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 01 — 모델 구성</div>
+      <p class="quiz-q">쿼터카(Quarter-Car) 모델의 자유도 수는?</p>
       <div class="quiz-options" id="q1">
-      <div class="quiz-opt" onclick="checkAnswer('q1',this,false)">A. kₛ</div>
-      <div class="quiz-opt" onclick="checkAnswer('q1',this,false)">B. kₜ</div>
-      <div class="quiz-opt" onclick="checkAnswer('q1',this,true)">C. kₛ + kₜ</div>
-      <div class="quiz-opt" onclick="checkAnswer('q1',this,false)">D. −kₛ</div>
+        <div class="quiz-opt">A. 1 DOF</div>
+        <div class="quiz-opt">B. 2 DOF</div>
+        <div class="quiz-opt">C. 3 DOF</div>
+        <div class="quiz-opt">D. 4 DOF</div>
       </div>
       <div class="quiz-feedback" id="q1-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 02 — 물리적 의미 연결</div>
-      <p class="quiz-q">승용차에서 타이어 강성 kₜ가 서스펜션 강성 kₛ보다 훨씬 큰 이유는?</p>
+    <div class="quiz-card" data-correct="3">
+      <div class="quiz-num">QUESTION 02 — 스프렁/언스프렁</div>
+      <p class="quiz-q">쿼터카 모델에서 스프렁 질량(mₛ)과 언스프렁 질량(mᵤ)의 일반적 비율은?</p>
       <div class="quiz-options" id="q2">
-      <div class="quiz-opt" onclick="checkAnswer('q2',this,false)">A. 타이어 공기압이 높아서</div>
-      <div class="quiz-opt" onclick="checkAnswer('q2',this,true)">B. 접지력 확보를 위해 타이어는 딱딱해야 하므로</div>
-      <div class="quiz-opt" onclick="checkAnswer('q2',this,false)">C. 제조 원가 절감</div>
-      <div class="quiz-opt" onclick="checkAnswer('q2',this,false)">D. NVH 성능 향상</div>
+        <div class="quiz-opt">A. 1:1</div>
+        <div class="quiz-opt">B. 3:1</div>
+        <div class="quiz-opt">C. 10:1</div>
+        <div class="quiz-opt">D. 50:1</div>
       </div>
       <div class="quiz-feedback" id="q2-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 03 — Simpack 적용</div>
-      <p class="quiz-q">Simpack에서 쿼터카 모델을 만들 때 필요한 최소 Body 수는?</p>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 03 — 입력 형태</div>
+      <p class="quiz-q">쿼터카 모델의 노면 입력은 일반적으로 어떤 변수로 표현하는가?</p>
       <div class="quiz-options" id="q3">
-      <div class="quiz-opt" onclick="checkAnswer('q3',this,false)">A. 1개</div>
-      <div class="quiz-opt" onclick="checkAnswer('q3',this,true)">B. 2개</div>
-      <div class="quiz-opt" onclick="checkAnswer('q3',this,false)">C. 3개</div>
-      <div class="quiz-opt" onclick="checkAnswer('q3',this,false)">D. 4개</div>
+        <div class="quiz-opt">A. 힘 F(t)</div>
+        <div class="quiz-opt">B. 노면 변위 z_r(t)</div>
+        <div class="quiz-opt">C. 가속도 a(t)</div>
+        <div class="quiz-opt">D. 모멘트 M(t)</div>
       </div>
       <div class="quiz-feedback" id="q3-fb"></div>
     </div>
@@ -735,7 +1025,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -791,15 +1081,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

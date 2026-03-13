@@ -233,6 +233,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -372,6 +378,40 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="checkpoint">
         <strong>✓ 체크포인트:</strong> 컴플라이언스 스티어 = <strong>부싱 강성 × 모멘트 암</strong> 관계 → <strong>횡력/종력에 의한 기하 변화</strong> → <strong>예측 불가능한 조향 응답</strong>
     </div>
+</div>
+
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 컴플라이언스 스티어 메커니즘</p>
+    <div class="sub-eq">$$\delta_{compliance} = \frac{F_y \cdot e_{pneumatic\;trail}}{K_{bushing,yaw}}$$</div>
+    <div class="sub-eq">$$\delta_{total} = \delta_{driver} + \delta_{compliance,f} + \delta_{compliance,r}$$</div>
+    <p class="sub-note">부싱 강성이 낮으면 횡력에 의한 토 변화 ↑. 의도적 컴플라이언스 설계로 안정성 확보</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 리어 토 변화 (하중이동 시)</p>
+    <div class="sub-eq">$$\delta_{toe,r} = \sum_i \frac{F_i}{K_{bushing,i}} \times l_i$$</div>
+    <div class="sub-eq">$$\text{토인 방향: } \delta_{toe,r} < 0 \;\Rightarrow\; \text{안정화 (패시브 리어 스티어)}$$</div>
+    <div class="sub-eq">$$\text{토아웃 방향: } \delta_{toe,r} > 0 \;\Rightarrow\; \text{불안정화 (위험!)}$$</div>
+    <p class="sub-note"><strong>설계 목표:</strong> 제동/코너링 시 후륜 토인 → 안정성 확보. 부싱 축 방향/강성으로 조절</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 등가 코너링 스티프니스 변화</p>
+    <div class="sub-eq">$$C_{\alpha,eff} = C_\alpha + \frac{\partial \delta_{compliance}}{\partial \alpha} \cdot C_\alpha$$</div>
+    <div class="sub-eq">$$\text{컴플라이언스 언더스티어 기울기: } K_{US,comp} = -\frac{m_f}{C_{\alpha f,eff}} + \frac{m_r}{C_{\alpha r,eff}}$$</div>
+    <p class="sub-note">컴플라이언스로 인해 유효 코너링 스티프니스가 변화 → 언더스티어 그래디언트에 직접 영향</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ K&C 시험과 컴플라이언스 측정</p>
+    <div class="sub-eq">$$\text{Force }\to\text{ } F_y = 0 \sim 5\text{kN 인가}$$</div>
+    <div class="sub-eq">$$\text{Measure }\to\text{ } \Delta\text{toe}, \Delta\text{camber}, \Delta\text{caster}$$</div>
+    <div class="sub-eq">$$\text{Compliance steer gradient: } \partial\delta/\partial F_y \;[\text{deg/kN}]$$</div>
+    <p class="sub-note"><strong>K&C (Kinematics & Compliance) 리그:</strong> 서스펜션 특성 실측의 표준. SIMPACK 가상 K&C로 사전 검증 가능</p>
+  </div>
 </div>
 
 <!-- ══════ PARAMETERS SECTION ══════ -->
@@ -529,7 +569,7 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="section-label">DEEP DIVE</div>
     <div class="section-title">심화 학습</div>
     <div class="accordion">
-        <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             하이드로 부싱(Hydro-Mount) — 주파수 특성
             <span class="accordion-arrow">▼</span>
         </button>
@@ -543,7 +583,7 @@ td .katex,th .katex{font-size:0.9em!important}
         </div>
     </div>
     <div class="accordion">
-        <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             제동(Braking) 시 컴플라이언스 스티어
             <span class="accordion-arrow">▼</span>
         </button>
@@ -557,11 +597,73 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 </div>
 
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 컴플라이언스 스티어</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day57" width="700" height="300"></canvas>
+    </div>
+    <div id="sim-day57-controls" class="sim-controls"></div>
+    <div id="sim-day57-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day57');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 300;
+    const ctrlBox = document.getElementById('sim-day57-controls');
+    const metricBox = document.getElementById('sim-day57-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_kb = addSlider('부싱 강성 (kN/m)', 10, 100, 40, 5, 'sim57-kb');
+    const sl_fy = addSlider('횡력 Fy (kN)', 0, 5, 2, 0.1, 'sim57-fy');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const kb=+sl_kb.value*1000, Fy=+sl_fy.value*1000;
+      const defl=Fy/kb*1000; // mm
+      const arm=0.05; // 50mm arm
+      const compSteer=Math.atan(defl/1000/0.3)*180/Math.PI; // simplified
+      // Compliance steer vs lateral force
+      ctx.strokeStyle='#C9A84C';ctx.lineWidth=2;ctx.beginPath();
+      for(let i=0;i<=200;i++){const f=i*5000/200;const d=f/kb*1000;const cs=Math.atan(d/1000/0.3)*180/Math.PI;const px=50+i*(W-100)/200,py=H/2-cs*(H-40)/2;i===0?ctx.moveTo(px,py):ctx.lineTo(px,Math.max(10,py));}ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(50,H-30);ctx.lineTo(W-50,H-30);ctx.stroke();
+      const cpx=50+Fy*(W-100)/5000, cpy=H/2-compSteer*(H-40)/2;
+      ctx.fillStyle='#E06C75';ctx.beginPath();ctx.arc(cpx,cpy,5,0,2*Math.PI);ctx.fill();
+      ctx.fillStyle='#8A8F98';ctx.font='12px monospace';ctx.fillText('횡력 (kN) →',W-100,H-10);ctx.fillText('컴플라이언스 스티어 (°) ↑',55,15);
+      setMetrics([['부싱 변위',defl.toFixed(1)+' mm'],['컴플라이언스 스티어',compSteer.toFixed(3)+'°'],['부싱 강성↑','스티어↓ but NVH↑']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
 <!-- ══════ QUIZ SECTION ══════ -->
 <div class="section">
     <div class="section-label">QUIZ</div>
     <div class="section-title">확인 문제</div>
-    <div class="quiz-card" id="q57-1" data-correct="0">
+    <div class="quiz-card" id="q57-1" data-correct="1">
         <div class="quiz-num">QUIZ 01</div>
         <div class="quiz-q">횡력 F_y = 8000 N, 모멘트 암 e_toe = 85 mm, 부싱 회전 강성 K_bush,rot = 500 Nm/rad일 때 컴플라이언스 토 변화는?</div>
         <div class="quiz-options">
@@ -580,7 +682,7 @@ td .katex,th .katex{font-size:0.9em!important}
             <div class="sol-insight"><strong>💡 실무 포인트:</strong> 부싱 강성이 약할수록(K ↓), 모멘트 암이 클수록(e ↑) 토 변화가 크다. 이는 조향 느낌을 "뭉글거리게" 만드는 주요 원인.</div>
         </div>
     </div>
-    <div class="quiz-card" id="q57-2" data-correct="2">
+    <div class="quiz-card" id="q57-2" data-correct="3">
         <div class="quiz-num">QUIZ 02</div>
         <div class="quiz-q">가속 시 종력(F_x)에 의한 컴플라이언스 토가 문제가 되는 이유는?</div>
         <div class="quiz-options">
@@ -596,6 +698,18 @@ td .katex,th .katex{font-size:0.9em!important}
             <div class="sol-step highlight-step"><span class="sol-num">STEP 2</span>운전자가 조향각을 조정하지 않았는데 타이어 토가 변함 → 예측 불가능한 조향 응답</div>
             <div class="sol-insight"><strong>💡 실무 포인트:</strong> 이를 "가속 중립성" 또는 "감속 중립성" 문제라 부르며, 고급 차량의 조향감 튜닝 핵심입니다.</div>
         </div>
+    </div>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 03 — 컴플라이언스 보상</div>
+      <p class="quiz-q">부싱 컴플라이언스로 인한 원치 않는 스티어를 보상하는 설계 방법은?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. 스프링 강성 증가</div>
+        <div class="quiz-opt">B. 부싱 축 방향과 경도를 최적화하여 원하는 컴플라이언스 스티어 특성 구현</div>
+        <div class="quiz-opt">C. 댐퍼 감쇠만 증가</div>
+        <div class="quiz-opt">D. 타이어 공기압 조정</div>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
     </div>
 </div>
 
@@ -676,6 +790,26 @@ td .katex,th .katex{font-size:0.9em!important}
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -704,7 +838,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -760,15 +894,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

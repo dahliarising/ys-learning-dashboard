@@ -225,6 +225,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -348,6 +354,39 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="checkpoint">
         <strong>✅ Checkpoint:</strong> 하중 이력 → Peak/Valley → Rainflow 사이클 → S-N 곡선 참조 → Miner 누적 손상 D 계산. D &lt; 1이면 설계 수명 만족!
     </div>
+</div>
+
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 레인플로우 카운팅 알고리즘</p>
+    <div class="sub-eq">$$\text{Range: } \Delta\sigma_i = |\sigma_{peak} - \sigma_{valley}|$$</div>
+    <div class="sub-eq">$$\text{Mean: } \sigma_{m,i} = \frac{\sigma_{peak} + \sigma_{valley}}{2}$$</div>
+    <div class="sub-eq">$$\text{결과: 하중 히스토그램 } n_i(\Delta\sigma_i, \sigma_{m,i})$$</div>
+    <p class="sub-note">레인플로우: 히스테리시스 루프 기반 사이클 추출. ASTM E1049 표준. 피로 해석의 출발점</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② Miner의 선형 피로 누적 법칙</p>
+    <div class="sub-eq">$$D = \sum_{i=1}^{k} \frac{n_i}{N_i} \leq 1.0$$</div>
+    <div class="sub-eq">$$N_i = N_0 \left(\frac{\sigma_0}{\Delta\sigma_i}\right)^m \quad (\text{S-N 곡선})$$</div>
+    <p class="sub-note">D = 1이면 파괴. 실무 안전계수: D ≤ 0.3~0.5 적용. m ≈ 3(강재), 5-8(알루미늄)</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ PSD → 시간 이력 변환</p>
+    <div class="sub-eq">$$x(t) = \sum_{k=1}^{N} \sqrt{2 S_{xx}(f_k) \Delta f} \cdot \cos(2\pi f_k t + \phi_k)$$</div>
+    <div class="sub-eq">$$\phi_k \sim \text{Uniform}(0, 2\pi) \quad (\text{랜덤 위상})$$</div>
+    <p class="sub-note">PSD 기반 가상 노면 생성 → MBD 시뮬레이션 입력. ISO 8608 노면 등급(A~H) 활용</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 등가 손상 하중 (Equivalent Damage Load)</p>
+    <div class="sub-eq">$$F_{eq} = \left(\frac{\sum n_i F_i^m}{N_{eq}}\right)^{1/m}$$</div>
+    <div class="sub-eq">$$\text{내구 목표: } N_{target} = 300{,}000 \;\text{km} \times \text{road mix factor}$$</div>
+    <p class="sub-note"><strong>르노 내구 기준:</strong> 유럽 고객 도로 믹스(도심 40%, 국도 35%, 고속 25%) 기반 등가 하중 산출</p>
+  </div>
 </div>
 
 <!-- ══════ PARAMETERS SECTION ══════ -->
@@ -646,12 +685,81 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 </div>
 
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 내구 하중 스펙트럼 (레인플로우)</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day58" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day58-controls" class="sim-controls"></div>
+    <div id="sim-day58-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day58');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day58-controls');
+    const metricBox = document.getElementById('sim-day58-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_rms = addSlider('하중 RMS (kN)', 1, 10, 5, 0.5, 'sim58-rms');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const rms=+sl_rms.value;
+      const hH=H/2;
+      // Random load time history (top)
+      const N=300;
+      ctx.strokeStyle='#4A9EBF';ctx.lineWidth=1;ctx.beginPath();
+      const loads=[];
+      for(let i=0;i<N;i++){loads.push(rms*(Math.sin(i*0.3)+0.5*Math.sin(i*0.7)+0.3*Math.sin(i*1.3)+0.8*(Math.random()-0.5)));}
+      loads.forEach((l,i)=>{const px=i*W/N,py=hH/2-l*(hH-20)/(rms*3);i?ctx.lineTo(px,py):ctx.moveTo(px,py);});ctx.stroke();
+      // Rainflow histogram (bottom) - simplified
+      const bins=[0,0,0,0,0,0,0,0];
+      loads.forEach((l,i)=>{if(i>0){const range=Math.abs(l-loads[i-1]);const bi=Math.min(7,Math.floor(range/rms*3));bins[bi]++;}});
+      const maxB=Math.max(...bins);
+      bins.forEach((b,i)=>{
+        const bw=(W-80)/8-4;
+        ctx.fillStyle=i<3?'#98C379':i<5?'#C9A84C':'#E06C75';
+        ctx.fillRect(40+i*(bw+4),H-20-b*(hH-30)/maxB,bw,b*(hH-30)/maxB);
+      });
+      ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.beginPath();ctx.moveTo(0,hH);ctx.lineTo(W,hH);ctx.stroke();
+      ctx.fillStyle='#8A8F98';ctx.font='11px monospace';ctx.fillText('하중 이력 x(t)',5,15);ctx.fillText('레인플로우 히스토그램',5,hH+15);
+      ctx.fillText('하중 범위 →',W-100,H-5);
+      setMetrics([['RMS 하중',rms+' kN'],['레인플로우','사이클 카운팅'],['피로수명','Miner 법칙: Σ(ni/Ni)≤1']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
 <!-- ══════ QUIZ SECTION ══════ -->
 <div class="section">
     <div class="section-label">QUIZ</div>
     <div class="section-title">이해도 점검</div>
 
-    <div class="quiz-card" id="q58-1" data-correct="2">
+    <div class="quiz-card" id="q58-1" data-correct="3">
         <div class="quiz-num">QUIZ 58-1</div>
         <div class="quiz-q">Palmgren-Miner 법칙에서 D = 0.6의 물리적 의미는?</div>
         <div class="quiz-options">
@@ -670,7 +778,7 @@ td .katex,th .katex{font-size:0.9em!important}
         </div>
     </div>
 
-    <div class="quiz-card" id="q58-2" data-correct="1">
+    <div class="quiz-card" id="q58-2" data-correct="2">
         <div class="quiz-num">QUIZ 58-2</div>
         <div class="quiz-q">레인플로우 카운팅의 핵심 목적은?</div>
         <div class="quiz-options">
@@ -688,6 +796,18 @@ td .katex,th .katex{font-size:0.9em!important}
             <div class="sol-insight"><strong>핵심:</strong> FFT(주파수 분석)와 혼동 주의! Rainflow는 시간 영역에서 사이클을 세는 방법이지, 주파수 변환이 아닙니다.</div>
         </div>
     </div>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 03 — 레인플로우 카운팅</div>
+      <p class="quiz-q">내구 해석에서 레인플로우 카운팅(Rainflow counting)의 목적은?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. 최대 하중만 추출</div>
+        <div class="quiz-opt">B. 불규칙 하중 이력을 하중-사이클 히스토그램으로 변환</div>
+        <div class="quiz-opt">C. 주파수 스펙트럼 생성</div>
+        <div class="quiz-opt">D. 평균 하중 계산</div>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
 </div>
 
 <!-- ══════ DEEP DIVE SECTION ══════ -->
@@ -696,7 +816,7 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="section-title">심화 학습</div>
 
     <div class="accordion">
-        <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             PSD vs 레인플로우 — 언제 어떤 방법을 쓸까?
             <span class="accordion-arrow">▼</span>
         </button>
@@ -709,7 +829,7 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 
     <div class="accordion">
-        <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             다축 피로 — Critical Plane Method
             <span class="accordion-arrow">▼</span>
         </button>
@@ -723,7 +843,7 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 
     <div class="accordion">
-        <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             가속 내구 시험 (Accelerated Durability Test)
             <span class="accordion-arrow">▼</span>
         </button>
@@ -737,7 +857,7 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 
     <div class="accordion">
-        <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             하중 외삽 (Load Extrapolation)
             <span class="accordion-arrow">▼</span>
         </button>
@@ -751,7 +871,7 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 
     <div class="accordion">
-        <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             디지털 트윈 기반 가상 내구
             <span class="accordion-arrow">▼</span>
         </button>
@@ -823,6 +943,26 @@ td .katex,th .katex{font-size:0.9em!important}
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -851,7 +991,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -907,15 +1047,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

@@ -225,7 +225,37 @@ td .katex,th .katex{font-size:0.9em!important}
 
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
+
+@media (max-width: 640px) {
+    .nav-section { grid-template-columns: 1fr; }
+}
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -400,6 +430,38 @@ a: CG~전축 거리, b: CG~후축 거리</span></div>
         <p><span class="label">이전 단계와의 연결:</span> Day 08의 2×2 행렬과 같은 구조. 비대각 원소가 물리적 커플링을 나타냄.</p>
       </div>
     </div>
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 하프카 모델 구성 (4-DOF)</p>
+    <div class="sub-eq">$$\text{상태: } [z_s, \dot{z}_s, \theta, \dot{\theta}, z_{uf}, \dot{z}_{uf}, z_{ur}, \dot{z}_{ur}]$$</div>
+    <div class="sub-eq">$$\text{전/후 서스펜션 포스: } F_{sf} = k_f(z_{uf}-z_s+l_f\theta) + c_f(\dot{z}_{uf}-\dot{z}_s+l_f\dot{\theta})$$</div>
+    <p class="sub-note">4-DOF: 차체 바운스 + 피치 + 전륜 바운스 + 후륜 바운스</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 차체 바운스/피치 연성 방정식</p>
+    <div class="sub-eq">$$m_s\ddot{z}_s = -F_{sf} - F_{sr}$$</div>
+    <div class="sub-eq">$$I_y\ddot{\theta} = F_{sf} \cdot l_f - F_{sr} \cdot l_r$$</div>
+    <p class="sub-note">l_f, l_r: 무게중심에서 전/후 축까지 거리. 바운스-피치 커플링의 핵심</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 질량 행렬과 강성 행렬</p>
+    <div class="sub-eq">$$\mathbf{M} = \text{diag}[m_s, I_y, m_{uf}, m_{ur}]$$</div>
+    <div class="sub-eq">$$\mathbf{K} = \begin{bmatrix} k_f+k_r & k_r l_r - k_f l_f & -k_f & -k_r \\ k_r l_r - k_f l_f & k_f l_f^2+k_r l_r^2 & k_f l_f & -k_r l_r \\ -k_f & k_f l_f & k_f+k_{tf} & 0 \\ -k_r & -k_r l_r & 0 & k_r+k_{tr} \end{bmatrix}$$</div>
+    <p class="sub-note">K 행렬의 비대각 항이 바운스-피치 커플링. k_f·l_f = k_r·l_r 이면 디커플링</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 고유치 해석</p>
+    <div class="sub-eq">$$\det(\mathbf{K} - \omega^2\mathbf{M}) = 0 \;\Rightarrow\; 4\text{개 고유진동수}$$</div>
+    <div class="sub-eq">$$f_{bounce} \approx 1.0\text{-}1.3\text{Hz}, \; f_{pitch} \approx 1.2\text{-}1.5\text{Hz}$$</div>
+    <p class="sub-note"><strong>설계 목표:</strong> f_pitch / f_bounce ≈ 1.05-1.20 (Flat Ride). MATLAB eig(K,M)으로 즉시 계산</p>
+  </div>
+</div>
+
+
 </div>
 <!-- ⑥ 파라미터 테이블 -->
 <div class="section">
@@ -552,7 +614,7 @@ a: CG~전축 거리, b: CG~후축 거리</span></div>
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 피치 센터(Pitch Center)와 flat ride 튜닝 — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -573,7 +635,7 @@ f_r/f_f ≈ 1.1~1.2 범위인지 확인합니다.</p>
 
 
   <div class="accordion">
-    <button class="accordion-toggle" onclick="toggleAccordion(this)">
+    <button class="accordion-toggle">
       <span>🔬 바운스-피치 커플링과 디커플링 조건</span>
       <span class="accordion-arrow">▼</span>
     </button>
@@ -596,7 +658,7 @@ f_r/f_f ≈ 1.1~1.2 범위인지 확인합니다.</p>
   </div>
 
   <div class="accordion">
-    <button class="accordion-toggle" onclick="toggleAccordion(this)">
+    <button class="accordion-toggle">
       <span>⚡ Flat Ride 조건 — 왜 후축이 더 높은 주파수여야 하는가?</span>
       <span class="accordion-arrow">▼</span>
     </button>
@@ -629,43 +691,132 @@ f_r/f_f ≈ 1.1~1.2 범위인지 확인합니다.</p>
     <h3 style="color:var(--purple);margin-bottom:12px;">🧠 기억 앵커: "시소 위의 물컵"</h3>
     <p style="font-size:14px;color:var(--gold-light);">하프카 = 시소(피치) 위에 물컵을 놓은 것. 범프를 지날 때 물이 안 쏟아지려면? → 앞뒤 흔들림(피치)을 최소화 → Flat ride → f_rear > f_front.</p>
   </div>
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 하프카 바운스-피치 모드 시뮬레이터</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day10" width="700" height="400"></canvas>
+    </div>
+    <div id="sim-day10-controls" class="sim-controls"></div>
+    <div id="sim-day10-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day10');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 400;
+    const ctrlBox = document.getElementById('sim-day10-controls');
+    const metricBox = document.getElementById('sim-day10-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_kf = addSlider('전방강성 kf (kN/m)', 15, 40, 22, 1, 'sim10-kf');
+    const sl_kr = addSlider('후방강성 kr (kN/m)', 15, 40, 25, 1, 'sim10-kr');
+    const sl_a = addSlider('전방거리 a (m)', 0.8, 1.5, 1.1, 0.05, 'sim10-a');
+    const sl_b = addSlider('후방거리 b (m)', 1.0, 2.0, 1.5, 0.05, 'sim10-b');
+    let animT=0, animId=null;
+    addBtn('▶ 바운스 모드', function(){ animMode='bounce'; startAnim(); });
+    addBtn('▶ 피치 모드', function(){ animMode='pitch'; startAnim(); });
+    let animMode='bounce';
+    function startAnim(){ if(animId)cancelAnimationFrame(animId); animT=0; animate(); }
+    function animate(){ animT+=0.05; drawAnim(); animId=requestAnimationFrame(animate); if(animT>12)cancelAnimationFrame(animId); }
+    function draw(){ drawAnim(); }
+    function drawAnim() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const m=1500, I=2500, kf=+sl_kf.value*1000, kr=+sl_kr.value*1000;
+      const a=+sl_a.value, b=+sl_b.value, L=a+b;
+      // Eigenfrequencies (approximate)
+      const wBounce=Math.sqrt((kf+kr)/m), wPitch=Math.sqrt((kf*a*a+kr*b*b)/I);
+      // Draw car body
+      const cx=W/2, cy=H*0.45, carW=300, carH=40;
+      const amp=animMode==='bounce'?20:0;
+      const ampPitch=animMode==='pitch'?0.15:0;
+      const z=amp*Math.sin(wBounce*animT);
+      const theta=ampPitch*Math.sin(wPitch*animT);
+      ctx.save(); ctx.translate(cx,cy+z); ctx.rotate(-theta);
+      ctx.fillStyle='rgba(201,168,76,0.3)'; ctx.strokeStyle='#C9A84C'; ctx.lineWidth=2;
+      ctx.fillRect(-carW/2,-carH/2,carW,carH); ctx.strokeRect(-carW/2,-carH/2,carW,carH);
+      // CG marker
+      ctx.fillStyle='#E06C75'; ctx.beginPath(); ctx.arc(0,0,4,0,2*Math.PI); ctx.fill();
+      ctx.fillStyle='#fff'; ctx.font='10px monospace'; ctx.fillText('CG',5,-5);
+      // Front/rear markers
+      const fa=-a*carW/L*0.8, ra=b*carW/L*0.8;
+      ctx.fillStyle='#4A9EBF'; ctx.beginPath(); ctx.arc(-carW*0.35,carH/2,5,0,2*Math.PI); ctx.fill();
+      ctx.beginPath(); ctx.arc(carW*0.35,carH/2,5,0,2*Math.PI); ctx.fill();
+      ctx.restore();
+      // Springs
+      ctx.strokeStyle='rgba(74,158,191,0.5)'; ctx.lineWidth=1;
+      [[cx-carW*0.35,cy+carH/2+z+carW*0.35*Math.sin(theta)],[cx+carW*0.35,cy+carH/2+z-carW*0.35*Math.sin(theta)]].forEach(([sx,sy])=>{
+        ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx,H-40);ctx.stroke();
+      });
+      // Ground
+      ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.beginPath(); ctx.moveTo(50,H-40); ctx.lineTo(W-50,H-40); ctx.stroke();
+      ctx.fillStyle='#8A8F98'; ctx.font='12px monospace';
+      ctx.fillText('모드: '+(animMode==='bounce'?'바운스 (상하)':'피치 (회전)'),10,20);
+      setMetrics([['바운스 주파수',(wBounce/2/Math.PI).toFixed(2)+' Hz'],['피치 주파수',(wPitch/2/Math.PI).toFixed(2)+' Hz'],['디커플링 조건','a·kf = b·kr → '+(a*kf/1000).toFixed(1)+'≈'+(b*kr/1000).toFixed(1)+'?']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
 <!-- ⑩ 퀴즈 -->
 <div class="section">
   <div class="section-label">QUIZ</div>
   <h2 class="section-title">즉시 복습 퀴즈</h2>
-  
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 01 — 수식 빈칸 채우기</div>
-      <p class="quiz-q">바운스-피치 디커플링 조건은 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>⋅</mo><msub><mi>k</mi><mi>f</mi></msub></mrow><annotation encoding="application/x-tex">a \cdot k_f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4445em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0315em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> = ___·___?</p>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 01 — 모델 확장</div>
+      <p class="quiz-q">하프카(Half-Car) 모델이 쿼터카 대비 추가로 고려하는 운동은?</p>
       <div class="quiz-options" id="q1">
-      <div class="quiz-opt" onclick="checkAnswer('q1',this,false)">A. a · kᵣ</div>
-      <div class="quiz-opt" onclick="checkAnswer('q1',this,true)">B. b · kᵣ</div>
-      <div class="quiz-opt" onclick="checkAnswer('q1',this,false)">C. b · k_f</div>
-      <div class="quiz-opt" onclick="checkAnswer('q1',this,false)">D. L · kₜ</div>
+        <div class="quiz-opt">A. 요(Yaw) 운동</div>
+        <div class="quiz-opt">B. 피치(Pitch) 또는 롤(Roll) 운동</div>
+        <div class="quiz-opt">C. 횡방향 병진</div>
+        <div class="quiz-opt">D. 종방향 가속</div>
       </div>
       <div class="quiz-feedback" id="q1-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 02 — 물리적 의미 연결</div>
-      <p class="quiz-q">Flat ride를 위해 전축과 후축 바운스 주파수의 관계는?</p>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 02 — 자유도</div>
+      <p class="quiz-q">피치 연성 하프카 모델의 자유도 수는?</p>
       <div class="quiz-options" id="q2">
-      <div class="quiz-opt" onclick="checkAnswer('q2',this,false)">A. f_f = f_r</div>
-      <div class="quiz-opt" onclick="checkAnswer('q2',this,false)">B. f_f &gt; f_r</div>
-      <div class="quiz-opt" onclick="checkAnswer('q2',this,true)">C. f_f &lt; f_r</div>
-      <div class="quiz-opt" onclick="checkAnswer('q2',this,false)">D. 관계없음</div>
+        <div class="quiz-opt">A. 2 DOF</div>
+        <div class="quiz-opt">B. 4 DOF</div>
+        <div class="quiz-opt">C. 6 DOF</div>
+        <div class="quiz-opt">D. 8 DOF</div>
       </div>
       <div class="quiz-feedback" id="q2-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 03 — Simpack 적용</div>
-      <p class="quiz-q">Simpack에서 피치 모드를 확인할 때 어떤 좌표의 모드 형상을 봐야 하는가?</p>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 03 — 전후 배분</div>
+      <p class="quiz-q">피치 공진을 억제하기 위한 전후 스프링/댐퍼 배분 원리는?</p>
       <div class="quiz-options" id="q3">
-      <div class="quiz-opt" onclick="checkAnswer('q3',this,false)">A. X축 병진</div>
-      <div class="quiz-opt" onclick="checkAnswer('q3',this,true)">B. Y축 회전 (Ry)</div>
-      <div class="quiz-opt" onclick="checkAnswer('q3',this,false)">C. Z축 병진</div>
-      <div class="quiz-opt" onclick="checkAnswer('q3',this,false)">D. Z축 회전 (Rz)</div>
+        <div class="quiz-opt">A. 전후 동일하게</div>
+        <div class="quiz-opt">B. 후축을 더 강하게 (flat ride 조건)</div>
+        <div class="quiz-opt">C. 전축을 더 강하게</div>
+        <div class="quiz-opt">D. 감쇠비만 조정</div>
       </div>
       <div class="quiz-feedback" id="q3-fb"></div>
     </div>
@@ -711,7 +862,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -767,15 +918,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

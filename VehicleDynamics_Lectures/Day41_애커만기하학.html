@@ -233,6 +233,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -402,6 +408,37 @@ td .katex,th .katex{font-size:0.9em!important}
 </div>
 </div>
 
+</div>
+
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 애커만 조향 기하학 조건</p>
+    <div class="sub-eq">$$\cot\delta_o - \cot\delta_i = \frac{w}{L}$$</div>
+    <div class="sub-eq">$$\delta_o: \text{바깥바퀴 조향각}, \; \delta_i: \text{안바퀴 조향각}, \; w: \text{트레드}, \; L: \text{휠베이스}$$</div>
+    <p class="sub-note">모든 바퀴가 하나의 선회 중심을 공유하는 조건. 저속 주차 시 타이어 마모 최소화</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 실제 조향 기구와 애커만 비율</p>
+    <div class="sub-eq">$$\text{Ackerman Ratio} = \frac{\delta_i - \delta_o}{\delta_{i,Ackerman} - \delta_{o,Ackerman}} \times 100\%$$</div>
+    <div class="sub-eq">$$\text{일반 승용차: 60-80\% Ackerman, 스포츠카: 40-60\%}$$</div>
+    <p class="sub-note"><strong>저속:</strong> 100% 애커만 이상적. <strong>고속:</strong> 바깥바퀴 슬립각↑ 필요 → 역애커만(parallel 또는 anti-Ackerman) 유리</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 최소 회전반경</p>
+    <div class="sub-eq">$$R_{min} = \frac{L}{\tan\delta_{max}} + \frac{w}{2}$$</div>
+    <div class="sub-eq">$$\text{예: } L=2.7\text{m}, \delta_{max}=35^{\circ}, w=1.5\text{m} \;\Rightarrow\; R_{min} \approx 4.6\text{m}$$</div>
+    <p class="sub-note">도시 주행에서 최소 회전반경 < 5.5m 요구. 르노 소형차 설계 시 중요 사양</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 조향각-요레이트 정상상태 관계</p>
+    <div class="sub-eq">$$\frac{\dot{\psi}}{\delta} = \frac{V/L}{1 + K_{us}V^2} \quad (K_{us}: \text{언더스티어 그래디언트})$$</div>
+    <p class="sub-note">K_us > 0: 언더스티어(안전), K_us = 0: 뉴트럴, K_us < 0: 오버스티어(불안정). <strong>목표:</strong> 약한 언더스티어</p>
+  </div>
 </div>
 
 <!-- ══════ PARAMETER TABLE SECTION ══════ -->
@@ -576,139 +613,187 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 </div>
 
+
+<div class="section">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">애커만 조향 기하학 심화</h2>
+
+  <!-- Deep Dive 1 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>💡 100% 애커만은 왜 실차에서 쓰지 않는가?</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive1">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">이론적 완벽함 vs 실주행 최적</h4>
+        <p>애커만 기하학의 이론적 조건은 저속 선회 시 모든 바퀴가 하나의 공통 회전중심을 갖도록 내륜과 외륜의 조향각 차이를 만드는 것입니다. cot(δ_o) - cot(δ_i) = w/L 이 관계를 '100% 애커만'이라 합니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">이상 애커만 조건: $\cot(\delta_o) - \cot(\delta_i) = \frac{w}{L}$ 여기서 $w$는 윤거, $L$은 축거, $\delta_i$, $\delta_o$는 내·외측 조향각. 100% 애커만 달성 시 모든 바퀴의 순간중심이 후축 연장선 위의 한 점에 일치.</p>
+        <p><strong style="color:var(--gold-light);">문제점:</strong> 이 조건은 타이어 슬립각이 0인 매우 저속에서만 유효합니다. 실제 코너링에서는 타이어가 슬립각을 가져야 횡력을 발생시키므로, 100% 애커만은 중·고속에서 오히려 성능을 해칩니다.</p>
+        <p>중·고속에서는 외측 타이어에 하중이 집중되어 더 큰 횡력을 분담합니다. 외측 타이어의 슬립각이 내측보다 커야 하므로, 역 애커만(anti-Ackermann 또는 parallel steer) 방향이 유리합니다.</p>
+        <p>실차 설정: 일반 승용차 70~80% 애커만, 스포츠카 50~60%, 레이싱카 0~40%(역 애커만에 가까움). 르노코리아에서는 K&C 시험에서 애커만 비율을 측정하며, 타겟은 차급과 핸들링 성격에 따라 결정합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deep Dive 2 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>🔬 조향 기하학과 타이로드 배치 — 애커만 비율을 결정하는 설계 변수</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive2">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">타이로드 아우터 볼조인트 위치가 핵심</h4>
+        <p>애커만 비율은 조향 너클의 스티어링 암(steering arm)과 타이로드의 기하학적 관계로 결정됩니다. 전통적인 방법은 너클의 킹핀 축과 후축 중심을 잇는 선 위에 타이로드 아우터 볼조인트를 배치하는 것입니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">애커만 비율(Ackermann ratio): 실제 타이로드 기하학에 의한 내외측 조향각 차이 $\div$ 이론 애커만 차이 $\times 100\%$. 일반적으로 승용차 $40\sim70\%$, 스포츠카 $0\sim40\%$.</p>
+        <p><strong style="color:var(--gold-light);">설계 자유도:</strong> 타이로드 아우터 볼조인트를 이 '이상적 선'에서 앞뒤로 이동시키면 애커만 비율이 변합니다. 앞으로 이동 → 역 애커만 방향, 뒤로 이동 → 과(過) 애커만 방향.</p>
+        <p>MacPherson 스트럿에서는 스트럿 축 방향의 제약 때문에 스티어링 암 길이와 각도 조절이 제한적입니다. 이것이 MacPherson 차량에서 애커만 비율 튜닝의 어려움 중 하나입니다.</p>
+        <p>Adams/Car에서 애커만 비율 분석: steering analysis → inner/outer wheel angle plot. 이상적 애커만 선과 실제 곡선의 차이가 애커만 오류(Ackermann error)이며, 이를 최소화하는 것이 조향 기하학 최적화의 목표입니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deep Dive 3 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>⚙️ 전자식 후륜 조향(4WS)과 가상 애커만</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive3">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">후륜 조향이 애커만 기하학을 바꾸는 방법</h4>
+        <p>4WS(4-Wheel Steering) 시스템은 후륜도 조향하여 차량의 회전 거동을 제어합니다. 저속에서는 후륜을 전륜 반대 방향으로 조향하여 회전반경을 줄이고, 고속에서는 동일 방향으로 조향하여 안정성을 높입니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">후륜 조향 가상 축거: $L_{eff} = L \cdot \frac{1}{1 - \delta_r / \delta_f}$. 저속 역위상($\delta_r < 0$)이면 $L_{eff} < L$로 회전반경 축소, 고속 동위상($\delta_r > 0$)이면 $L_{eff} > L$로 안정성 향상.</p>
+        <p><strong style="color:var(--gold-light);">가상 애커만:</strong> 4WS에서는 전통적인 전륜 기하학적 애커만 외에, 후륜 조향각까지 포함한 '가상 회전중심'을 정의합니다. 이 가상 회전중심은 전자 제어로 속도와 횡가속도에 따라 동적으로 이동합니다.</p>
+        <p>르노의 4-Control 시스템이 대표적입니다: 60km/h 이하에서 후륜 반대 방향 최대 5°, 이상에서 동일 방향 최대 2.5°. 이를 통해 저속 최소 회전반경을 10.5m → 9.0m로 줄이면서 고속 차선변경 안정성도 개선합니다.</p>
+        <p>시뮬레이션에서 4WS 효과를 정확히 모델링하려면 후륜 조향 액추에이터의 응답 지연(~50ms)과 조향각 제한(saturation)을 반드시 포함해야 합니다.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
 <!-- ══════ QUIZ SECTION ══════ -->
-<div class="section">
-    <div class="section-label">QUIZ</div>
-    <div class="quiz-section">
-<h3>이해도 확인 퀴즈</h3>
-<div class="quiz-card q1">
-    <h4>Q1: 빈칸 채우기</h4>
-    <p class="q-question">애커만 조건 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">cot</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03785em;">δ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0379em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">o</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">cot</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03785em;">δ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0379em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;vertical-align:-0.31em;"></span><span class="mord" style="margin-right:0.02778em;">___</span></span></span></span>에서 빈칸에 들어갈 식은?</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> w/L (윤거/축거)<br>
-        <strong>해설:</strong> 선회반경 R이 소거되어 차량 고유 기하학적 상수만 남습니다.
-    </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q2">
-    <h4>Q2: O/X 퀴즈</h4>
-    <p class="q-question">O/X: 애커만 조건에서 외측 바퀴의 조향각이 내측보다 항상 크다.</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> X (거짓)<br>
-        <strong>해설:</strong> 내측 바퀴가 선회 중심에 가까우므로 δ_i > δ_o입니다. 외측이 더 작습니다.
-    </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q3">
-    <h4>Q3: Simpack 적용</h4>
-    <p class="q-question">Simpack에서 애커만 오차를 0으로 만들기 위한 링키지 조정 방법은?</p>
-    <div class="q-options"><label><input type="radio" name="q3" value="타이로드 길이를 줄인다"/> 타이로드 길이를 줄인다</label>
-<label><input type="radio" name="q3" value="너클암 각도를 변경한다"/> 너클암 각도를 변경한다</label>
-<label><input type="radio" name="q3" value="랙 위치를 이동한다"/> 랙 위치를 이동한다</label>
-<label><input type="radio" name="q3" value="피니언 기어비를 바꾼다"/> 피니언 기어비를 바꾼다</label>
-</div>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> 너클암 각도를 변경한다<br>
-        <strong>해설:</strong> 너클암의 경사각(inclination)이 트래피조이달 기구학의 애커만 비율을 결정하는 핵심 설계 변수입니다.
-    </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-</div>
 
-</div>
-
-<!-- ══════ DEEP DIVES ══════ -->
-<div class="section">
-    <div class="section-label">DEEP DIVE</div>
-    <div class="section-title">심화 학습</div>
-    <div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 역사: 애커만과 랑겐스페르거
-    </button>
-    <div class="accordion-content">
-        <p>1817년 독일의 Georg Lankensperger가 발명하고, 영국의 Rudolph Ackermann이 특허를 취득했습니다. 마차 시대의 발명이 200년이 지난 지금도 모든 자동차 설계의 기본이 됩니다.</p><p>핵심 원리는 간단합니다: <strong>모든 바퀴의 회전축 연장선이 하나의 점(선회 중심)에서 만나야 한다</strong>는 것입니다.</p>
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 애커만 조향 기하학</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day41" width="700" height="400"></canvas>
     </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 100% 애커만 vs 병렬 조향
-    </button>
-    <div class="accordion-content">
-        <p><strong>100% 애커만:</strong> 내외측 조향각 차이가 이론값과 정확히 일치. 저속 선회 시 이상적.</p><p><strong>0% (병렬 조향):</strong> 양쪽 바퀴가 같은 각도로 회전. 고속에서 횡력 분배가 균일.</p><p>실제 차량은 <strong>60~80% 애커만</strong>을 사용합니다. 저속과 고속의 타협점입니다.</p><div class='deriv-equation'><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">%</span><span class="mord mathnormal">A</span><span class="mord mathnormal">c</span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.5473em;vertical-align:-0.5481em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9992em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03785em;">δ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0379em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">A</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2901em;"><span></span></span></span></span></span></span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03785em;">δ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0379em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2901em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.5131em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03785em;">δ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0379em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2901em;"><span></span></span></span></span></span></span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03785em;">δ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0379em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2901em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.5481em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">100</span></span></span></span></div>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 트래피조이달 링키지 설계
-    </button>
-    <div class="accordion-content">
-        <p>가장 널리 사용되는 스티어링 링키지입니다. 너클암이 차체 중심선을 향해 경사져 있어 자연스럽게 내/외측 조향각 차이를 만들어냅니다.</p><p>설계 변수: 너클암 길이, 너클암 경사각, 타이로드 길이, 랙 위치(전후)</p><div class='deriv-equation'><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span><span class="mord mathnormal mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.8em;vertical-align:-0.65em;"></span><span class="mop"><span class="mop">tan</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8191em;"><span style="top:-3.068em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size2">(</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:0em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span><span class="mord mathnormal mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1512em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span><span class="mord mtight">/2</span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mord mathnormal mtight">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:0em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1512em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4509em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size2">)</span></span></span></span></span></span></div>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 전자식 조향 (Steer-by-Wire)
-    </button>
-    <div class="accordion-content">
-        <p>기계적 연결 없이 센서와 모터만으로 조향하는 차세대 기술입니다. 인피니티 Q50이 최초 양산 적용.</p><p>장점: 가변 기어비, 능동 애커만 제어, 충격 차단, 자율주행 통합 용이</p><p>과제: 안전 redundancy, 조향감(steering feel) 재현, 법규 인증</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 뇌과학 학습 팁: 공간 추론과 기하학
-    </button>
-    <div class="accordion-content">
-        <p>기하학적 관계를 이해할 때 <strong>해마(hippocampus)</strong>가 활성화됩니다. 선회 중심이라는 가상의 점을 상상하며 공간 추론을 연습하면 뇌의 공간 인지 능력이 강화됩니다.</p><p><strong>실습 팁:</strong> 종이에 직접 선회 기하를 그려보세요. 시각-운동 연합학습이 기억 정착에 가장 효과적입니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> Simpack 워크플로우: 애커만 검증
-    </button>
-    <div class="accordion-content">
-        <p>1. 스티어링 모델 구축 (랙, 타이로드, 너클)</p><p>2. 저속 정상원선회 시뮬레이션 (V=5km/h)</p><p>3. 내/외측 조향각 출력 후 이론값과 비교</p><p>4. 애커만 오차를 선회반경 함수로 플로팅</p><div class='deriv-equation'><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">A</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.5862em;vertical-align:-0.5481em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0381em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03785em;">δ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0379em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">h</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">eor</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2901em;"><span></span></span></span></span></span></span><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.00773em;">R</span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.5131em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03785em;">δ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.0379em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">s</span><span class="mord mathnormal mtight">im</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2819em;"><span></span></span></span></span></span></span><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.00773em;">R</span><span class="mclose mtight">)</span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03785em;">δ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0379em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">o</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">h</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">eor</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2901em;"><span></span></span></span></span></span></span><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.00773em;">R</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.5481em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">100%</span></span></span></span></div>
-    </div>
-</div>
-
-</div>
-
-
-<!-- ══════ FORMULA EXPLORER ══════ -->
-<div class="section">
-    <div class="section-label">TOOLS</div>
-    <div class="section-title">수식 탐색기</div>
-    <div class="formula-explorer" id="formulaExplorer">
-        <p>핵심 수식들의 관계를 탐색하세요.</p>
-        <pre id="eqData" style="display:none;">
-{
-  "day": 41,
-  "title": "애커만 기하학",
-  "heroEq": "<span class="katex"><span class="katex-html" aria-hidden="true"><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">co</span><span class="mord mathnormal">t</span><span class="mopen">(</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">d</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">t</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">o</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">co</span><span class="mord mathnormal">t</span><span class="mopen">(</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">d</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">t</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span></span><span class="mord"><span class="mord mathnormal">L</span></span></span></span></span>",
-  "derivations": [
-    {
-      "title": "선회 기하 조건 설정",
-      "eq": "<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span><span class="mord"><span class="mord mathnormal">L</span></span><span class="mord"><span class="mspace newline"></span><span class="mord mathnormal">t</span><span class="mord mathnormal">an</span><span class="mspace newline"></span><span class="mord mathnormal">d</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">t</span><span class="mord mathnormal">a</span></span></span></span></span>",
-      "explanation": "순수 구름 조건(pure rolling)에서 차량의 선회반경 R은 축거 L과 조향각 δ의 함수입니다. 이는 저속 선회(kinematic steering)의 기본 가정입니다."
-    },
-    {
-      "title": "내측 바퀴 조향각",
-      "eq": "<span class="katex"><span class="katex-html" aria-hidden="true"><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mord mathnormal">an</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord mathnormal">d</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">t</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span><span class="mord"><span class="mord mathnormal">L</span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord">/2</span></span></span></span></span>",
-      "explanation": "내측 바퀴는 선회 중심에 더 가까우므로 분모가 (R - w/2)로 작아져 조향각 δ_i가 더 커집니다."
-    },
-    {
-      "title": "외측 바퀴 조향각",
-      "eq": "<span class="katex"><span class="katex-html" aria-hidden="true"><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mord mathnormal">an</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord mathnormal">d</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">t</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">o</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span><span class="mord"><span class="mord mathnormal">L</span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mord">/2</span></span></span></span></span>",
-      "explanation": "외측 바퀴는 선회 중심에서 더 멀리 있으므로 분모가 (R + w/2)로 커져 조향각 δ_o가 더 작아집니다."
+    <div id="sim-day41-controls" class="sim-controls"></div>
+    <div id="sim-day41-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day41');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 400;
+    const ctrlBox = document.getElementById('sim-day41-controls');
+    const metricBox = document.getElementById('sim-day41-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
     }
-  ]
-}
-        </pre>
-    </div>
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_L = addSlider('축거 L (m)', 2.0, 3.5, 2.7, 0.1, 'sim41-L');
+    const sl_delta = addSlider('조향각 δ (°)', 1, 40, 15, 1, 'sim41-delta');
+    const sl_tw = addSlider('윤거 T (m)', 1.2, 1.8, 1.5, 0.05, 'sim41-tw');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const L=+sl_L.value, delta=+sl_delta.value*Math.PI/180, tw=+sl_tw.value;
+      const R=L/Math.tan(delta); // Ackerman radius
+      const di=Math.atan(L/(R-tw/2))*180/Math.PI;
+      const do_=Math.atan(L/(R+tw/2))*180/Math.PI;
+      const sc=40;
+      const cx=W/2, cy=H*0.6;
+      // Car rectangle
+      ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1;
+      ctx.strokeRect(cx-tw*sc/2,cy-L*sc,tw*sc,L*sc);
+      // Wheels
+      const wLen=25;
+      // Front inner
+      ctx.save();ctx.translate(cx-tw*sc/2,cy-L*sc);ctx.rotate(di*Math.PI/180);
+      ctx.fillStyle='#C9A84C';ctx.fillRect(-5,-wLen/2,10,wLen);ctx.restore();
+      // Front outer
+      ctx.save();ctx.translate(cx+tw*sc/2,cy-L*sc);ctx.rotate(do_*Math.PI/180);
+      ctx.fillStyle='#4A9EBF';ctx.fillRect(-5,-wLen/2,10,wLen);ctx.restore();
+      // Rear wheels
+      ctx.fillStyle='rgba(255,255,255,0.3)';ctx.fillRect(cx-tw*sc/2-5,cy-wLen/2,10,wLen);ctx.fillRect(cx+tw*sc/2-5,cy-wLen/2,10,wLen);
+      // Turn center
+      if(Math.abs(R)<50){const tcx=cx,tcy=cy;
+        ctx.setLineDash([3,3]);ctx.strokeStyle='#E06C75';ctx.beginPath();ctx.arc(tcx+R*sc,tcy,Math.abs(R*sc),0,2*Math.PI);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle='#E06C75';ctx.beginPath();ctx.arc(tcx+R*sc,tcy,4,0,2*Math.PI);ctx.fill();ctx.fillText('');ctx.fillStyle='#E06C75';ctx.font='11px monospace';ctx.fillText('O',tcx+R*sc+5,tcy-5);
+      }
+      setMetrics([['선회반경 R',R.toFixed(2)+' m'],['내륜각 δi',di.toFixed(1)+'°'],['외륜각 δo',do_.toFixed(1)+'°'],['애커만','cot(δo)-cot(δi)=T/L']]);
+    }
+
+    draw();
+  })();
+  </script>
 </div>
 
-<!-- ══════ SPACED REPETITION ══════ -->
+<!-- ══════ QUIZ ══════ -->
+<div class="section">
+  <div class="section-label">QUIZ</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
 
+  <!-- Q1 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 01 — 애커만 조건</div>
+    <p class="quiz-q">이상적 애커만 조건에서 내륜 조향각 δi와 외륜 조향각 δo의 관계식 핵심은?</p>
+    <div class="quiz-options" id="q1">
+      <div class="quiz-opt">A. cot(δo) − cot(δi) = W/L</div>
+      <div class="quiz-opt">B. δo = δi (동일 조향)</div>
+      <div class="quiz-opt">C. δo = 2δi</div>
+      <div class="quiz-opt">D. tan(δo) + tan(δi) = L/W</div>
+    </div>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
 
+  <!-- Q2 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 02 — 애커만 비율</div>
+    <p class="quiz-q">100% 애커만 대비 실제 차량에서 80~90% 애커만을 사용하는 이유는?</p>
+    <div class="quiz-options" id="q2">
+      <div class="quiz-opt">A. 고속 코너링 시 타이어 슬립각을 고려하기 위해</div>
+      <div class="quiz-opt">B. 제조 비용 절감</div>
+      <div class="quiz-opt">C. 주차 시 편의성</div>
+      <div class="quiz-opt">D. 법규 요구사항</div>
+    </div>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 03 — Simpack 구현</div>
+    <p class="quiz-q">Simpack에서 애커만 특성을 확인하는 시뮬레이션 방법은?</p>
+    <div class="quiz-options" id="q3">
+      <div class="quiz-opt">A. 극저속 정상원선회(Constant Radius) 시험</div>
+      <div class="quiz-opt">B. 고속 직선 주행</div>
+      <div class="quiz-opt">C. 긴급 제동 시험</div>
+      <div class="quiz-opt">D. 파형 노면 주행</div>
+    </div>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
+</div>
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section">
     <a href="Day40_KC시뮬레이션통합.html" class="nav-btn prev">← Day 40</a>
@@ -765,14 +850,6 @@ td .katex,th .katex{font-size:0.9em!important}
 .nav-btn { padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; text-align: center; text-decoration: none; color: var(--gold); font-weight: 500; transition: all 0.3s; }
 .nav-btn:hover { background: var(--surface2); border-color: var(--gold); }
 .footer { text-align: center; padding: 40px 0; border-top: 1px solid var(--border); margin-top: 60px; color: var(--text-dim); font-size: 12px; }
-.accordion { margin: 12px 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-.accordion-toggle { width: 100%; padding: 16px 20px; background: var(--surface); border: none; color: var(--text-bright); font-size: 14px; font-weight: 500; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
-.accordion-toggle:hover { background: var(--surface2); }
-.accordion-toggle.active { background: var(--surface2); border-bottom: 1px solid var(--border); }
-.accordion-icon { color: var(--gold); font-size: 12px; transition: transform 0.2s; }
-.accordion-content{display:none;background:var(--surface);padding:0}
-.accordion-content.show { max-height: 2000px; padding: 16px 20px; }
-.accordion-content p { margin: 8px 0; line-height: 1.6; font-size: 14px; }
 .intuition-card { background: var(--surface); border: 1px solid var(--border); padding: 24px; border-radius: 12px; }
 .intuition-card h4 { color: var(--gold); margin-bottom: 12px; }
 .intuition-card p { margin: 8px 0; line-height: 1.6; }
@@ -780,6 +857,26 @@ td .katex,th .katex{font-size:0.9em!important}
     .sp-row { grid-template-columns: 1fr; }
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -808,7 +905,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -864,15 +961,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

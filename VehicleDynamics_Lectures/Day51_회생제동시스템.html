@@ -245,7 +245,33 @@ td .katex,th .katex{font-size:0.9em!important}
 .nav-btn{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;text-decoration:none;color:var(--gold);font-weight:500;transition:all 0.3s}
 .nav-btn:hover{background:var(--surface2);border-color:var(--gold)}
 @media(max-width:600px){.nav-section{grid-template-columns:1fr}}
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -398,6 +424,41 @@ td .katex,th .katex{font-size:0.9em!important}
 </div>
 </div>
 
+</div>
+
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 회생제동 에너지 회수량</p>
+    <div class="sub-eq">$$E_{regen} = \int_{t_1}^{t_2} F_{brake,regen} \cdot v(t) \, dt$$</div>
+    <div class="sub-eq">$$F_{brake,regen} = T_{motor} / r_{eff} \leq F_{brake,total} \cdot \beta_{regen}$$</div>
+    <div class="sub-eq">$$\eta_{regen} = \frac{E_{battery,in}}{E_{kinetic,lost}} = \eta_{motor} \times \eta_{inverter} \times \eta_{battery}$$</div>
+    <p class="sub-note">회생효율 η_regen ≈ 0.60-0.75. 도심 주행 시 제동 에너지의 약 30-40% 회수 가능</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 블렌딩 전략 (Regen + Friction)</p>
+    <div class="sub-eq">$$F_{brake,total} = F_{regen} + F_{friction}$$</div>
+    <div class="sub-eq">$$F_{regen} = \min(F_{brake,demand}, \; T_{motor,max}/r_{eff}, \; P_{batt,max}/v)$$</div>
+    <div class="sub-eq">$$F_{friction} = F_{brake,total} - F_{regen}$$</div>
+    <p class="sub-note"><strong>직렬 블렌딩:</strong> 저속에서 회생 우선 → 부족분만 마찰 보충. 페달 필에 영향 최소화가 핵심</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ SOC 제한 조건</p>
+    <div class="sub-eq">$$\text{IF } SOC > SOC_{max} \;\Rightarrow\; F_{regen} = 0 \;\text{(과충전 방지)}$$</div>
+    <div class="sub-eq">$$\text{IF } v < v_{min} \;\Rightarrow\; F_{regen} \to 0 \;\text{(저속 모터 효율 저하)}$$</div>
+    <div class="sub-eq">$$P_{regen,limit} = f(SOC, T_{batt}, v, \omega_{motor})$$</div>
+    <p class="sub-note">배터리 온도 -10°C 이하에서 회생 출력 50% 이상 제한. 충전 전류 제한이 회생량 결정</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 원-페달 드라이빙 감속도</p>
+    <div class="sub-eq">$$a_{coast} = -\frac{F_{regen,coast}}{m} \approx -0.10 \sim -0.25 \;\text{g}$$</div>
+    <div class="sub-eq">$$F_{regen,coast} = f(\text{driver mode: Eco/Normal/Sport})$$</div>
+    <p class="sub-note">원-페달 모드에서 완전 정차 시 마찰 브레이크 자동 작동(크리프 토크). <strong>르노 E-Tech:</strong> 기본 0.15g 감속</p>
+  </div>
 </div>
 
 <!-- Parameters Table -->
@@ -564,106 +625,180 @@ td .katex,th .katex{font-size:0.9em!important}
 </div>
 
 <!-- Quiz Section -->
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 회생 제동 에너지 회수</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day51" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day51-controls" class="sim-controls"></div>
+    <div id="sim-day51-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day51');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day51-controls');
+    const metricBox = document.getElementById('sim-day51-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_v = addSlider('속도 (km/h)', 20, 150, 80, 5, 'sim51-v');
+    const sl_soc = addSlider('배터리 SOC (%)', 10, 95, 60, 5, 'sim51-soc');
+    const sl_decel = addSlider('감속도 (g)', 0.05, 0.5, 0.2, 0.01, 'sim51-decel');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const V=+sl_v.value/3.6, soc=+sl_soc.value, decel=+sl_decel.value;
+      const m=1800, P_motor_max=60000; // 60kW motor
+      const F_brake=m*decel*9.81;
+      const P_regen=Math.min(F_brake*V, P_motor_max*(1-soc/100));
+      const P_friction=Math.max(0,F_brake*V-P_regen);
+      const efficiency=P_regen/(F_brake*V+0.01)*100;
+      // Bar chart
+      const bw=100, bx1=W*0.3, bx2=W*0.6;
+      const maxP=P_motor_max;
+      ctx.fillStyle='#98C379';ctx.fillRect(bx1-bw/2,H-30-P_regen*(H-80)/maxP,bw,P_regen*(H-80)/maxP);
+      ctx.fillStyle='#E06C75';ctx.fillRect(bx2-bw/2,H-30-P_friction*(H-80)/maxP,bw,P_friction*(H-80)/maxP);
+      ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.strokeRect(bx1-bw/2,H-30-P_regen*(H-80)/maxP,bw,P_regen*(H-80)/maxP);
+      ctx.strokeRect(bx2-bw/2,H-30-P_friction*(H-80)/maxP,bw,P_friction*(H-80)/maxP);
+      ctx.fillStyle='#98C379';ctx.font='13px sans-serif';ctx.fillText('회생 제동',(bx1-30),30);
+      ctx.fillStyle='#E06C75';ctx.fillText('마찰 제동',(bx2-30),30);
+      ctx.fillStyle='#8A8F98';ctx.font='12px monospace';
+      ctx.fillText((P_regen/1000).toFixed(1)+' kW',bx1-20,H-30-P_regen*(H-80)/maxP-5);
+      ctx.fillText((P_friction/1000).toFixed(1)+' kW',bx2-20,H-30-P_friction*(H-80)/maxP-5);
+      setMetrics([['회수율',efficiency.toFixed(0)+'%'],['회생 파워',(P_regen/1000).toFixed(1)+' kW'],['SOC 제한',soc>85?'⚠ 높은 SOC':'정상'],['총 제동력',(F_brake/1000).toFixed(1)+' kN']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
+<!-- ══════ QUIZ ══════ -->
+
 <div class="section">
-    <div class="section-label">QUIZ</div>
-    <div class="quiz-section">
-<h3>이해도 확인 퀴즈</h3>
-<div class="quiz-card q1">
-    <h4>Q1: 빈칸 채우기</h4>
-    <p class="q-question">회생 제동의 에너지 회수 효율은 모터, 인버터, ___의 효율을 모두 곱한 값이다.</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> 배터리(Battery)<br>
-        <strong>해설:</strong> 총 효율 = ηmotor × ηinverter × ηbattery ≈ 0.77~0.88입니다.
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">회생제동 시스템 심화</h2>
+
+  <!-- Deep Dive 1 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>💡 회생제동 효율의 물리적 한계 — 왜 100% 회생은 불가능한가?</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive1">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">에너지 회수율을 결정하는 5가지 요소</h4>
+        <p>회생제동(regenerative braking)은 운동 에너지를 전기 에너지로 변환하여 배터리에 저장합니다. 이론적 최대 회수 에너지 = ½mv²이지만, 실제 회수율은 30~60%에 불과합니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">회생 에너지: $E_{regen} = \eta_{motor} \times \eta_{inverter} \times \eta_{battery} \times \frac{1}{2} m V^2 \times \text{BR}$ 여기서 BR은 회생 제동 비율, 종합 효율 $\eta_{total} \approx 0.5\sim0.7$.</p>
+        <p><strong style="color:var(--gold-light);">효율 손실 요인:</strong> (1) 모터/인버터 효율 ~90%, (2) 배터리 충전 효율 ~95%, (3) 배터리 SOC 제한 — SOC > 90%이면 회생 불가, (4) 저속에서 모터 토크 제한 — 정지 직전에는 기계식 제동 필수, (5) 급제동 시 회생 토크 > 모터 최대 토크이면 마찰 제동 보조 필요.</p>
+        <p>종합 효율: 0.90 × 0.95 × (SOC 가용률 0.85) × (속도 가용률 0.90) ≈ 65%. 여기에 보조기기 손실과 열관리 전력을 빼면 실질 회수율은 40~55% 수준입니다.</p>
+        <p>BEV에서 원페달(one-pedal) 감속 모드의 회생량은 도심 주행 기준 주행 거리의 15~25%를 회수합니다. 르노 ZOE의 'B 모드'에서 감속도 약 0.15g까지가 회생제동 영역이며, 이를 초과하면 마찰제동이 블렌딩됩니다.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q2">
-    <h4>Q2: O/X 퀴즈</h4>
-    <p class="q-question">O/X: 배터리 SOC가 100%에 가까울수록 회생 제동으로 더 많은 에너지를 회수할 수 있다.</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> X (거짓)<br>
-        <strong>해설:</strong> SOC가 높으면 배터리가 추가 충전을 받을 수 없어 회생 제동이 제한됩니다.
+  </div>
+
+  <!-- Deep Dive 2 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>🔬 회생-마찰 블렌딩(Blending) 전략 — 운전자가 모르게 전환하는 기술</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive2">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">브레이크 페달 뒤에서 벌어지는 실시간 배분</h4>
+        <p>회생-마찰 블렌딩은 운전자의 총 감속 요구를 회생제동과 마찰제동으로 실시간 배분하는 것입니다. 핵심 원칙: 운전자는 어떤 제동 방식이 사용되는지 전혀 느끼지 못해야 합니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">블렌딩 전환 조건: 총 요구 제동 토크 $T_{req}$에서 모터 가용 회생 토크 $T_{regen,max}(\omega, SOC)$를 우선 사용하고, 부족분 $T_{friction} = T_{req} - T_{regen}$을 유압으로 보충. 전환 시 토크 합 일정 유지가 핵심.</p>
+        <p><strong style="color:var(--gold-light);">직렬(Series) 블렌딩:</strong> 회생제동을 최대한 먼저 사용하고, 부족분만 마찰제동으로 보충. 에너지 회수율이 높지만, 전환 시 '토크 홀(torque hole)' — 일시적 제동력 빈 구간 — 이 발생할 수 있습니다.</p>
+        <p><strong style="color:var(--gold-light);">병렬(Parallel) 블렌딩:</strong> 회생제동과 마찰제동을 항상 일정 비율로 동시 사용. 전환 충격이 적지만 회수율이 낮습니다.</p>
+        <p>실차에서는 직렬 블렌딩을 기본으로 하되, 급제동(>0.3g)이나 ABS 작동 시에는 회생을 즉시 차단하고 마찰제동으로 전환합니다. 이 전환의 응답 속도가 150ms 이내여야 운전자가 이질감을 느끼지 못합니다. Bosch iBooster + ESP hev 시스템이 이 요구를 충족합니다.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q3">
-    <h4>Q3: Simpack 적용</h4>
-    <p class="q-question">Simpack에서 회생-마찰 블렌딩을 시뮬레이션할 때 필수적인 컨트롤러는?</p>
-    <div class="q-options"><label><input type="radio" name="q3" value="Blend Controller"/> Blend Controller</label>
-<label><input type="radio" name="q3" value="클라이밋 컨트롤"/> 클라이밋 컨트롤</label>
-<label><input type="radio" name="q3" value="시트 히터 컨트롤러"/> 시트 히터 컨트롤러</label>
-<label><input type="radio" name="q3" value="오디오 이퀄라이저"/> 오디오 이퀄라이저</label>
-</div>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> Blend Controller<br>
-        <strong>해설:</strong> 회생과 마찰 제동의 배분을 결정하는 블렌드 컨트롤러가 핵심입니다.
+  </div>
+
+  <!-- Deep Dive 3 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>⚙️ 회생제동과 ABS의 충돌 문제 — 전기 모터가 ABS를 방해하는가?</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive3">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">구동축 회생 토크의 제어 간섭</h4>
+        <p>ABS가 작동하면 슬립률 제어를 위해 각 휠의 제동 토크를 빠르게 증감합니다. 하지만 전기 모터의 회생 토크는 구동축(보통 전축 또는 후축) 전체에 걸리므로, ABS의 개별 휠 제어와 충돌합니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">회생+ABS 충돌: ABS 작동 시 바퀴 슬립률 제어를 위해 빠른 토크 변화 필요. 모터 응답($\sim10$ ms)은 유압($\sim5$ ms)보다 느려, ABS 작동 감지 즉시 회생 토크를 0으로 해제하는 것이 일반적 전략.</p>
+        <p><strong style="color:var(--gold-light);">문제 시나리오:</strong> 전축 구동 BEV에서 ABS가 좌전륜만 감압하려는데, 모터 회생 토크가 좌우 전륜 모두에 제동력을 유지 → ABS 감압 효과가 반감 → 제동 거리 연장.</p>
+        <p>해결 전략: (1) ABS 작동 감지 시 회생 토크 즉시 0으로 감소(가장 단순하지만 회수 손실), (2) ABS와 VCU(Vehicle Control Unit)간 CAN 통신으로 회생 토크 상한을 실시간 조정, (3) 인휠 모터 시스템에서는 각 휠별 독립 회생 제어 가능(가장 이상적).</p>
+        <p>현재 양산 BEV 대부분은 전략 (1)+(2) 조합을 사용합니다. ABS 작동 시 50ms 이내에 회생 토크를 완전 해제하고, ABS 사이클이 안정되면 점진적으로 회생을 재개합니다.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-</div>
+  </div>
 
 </div>
 
-<!-- Deep Dives -->
 <div class="section">
-    <div class="section-label">DEEP DIVE</div>
-    <div class="section-title">심화 학습</div>
-    <div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 회생 제동과 ABS의 충돌
-    </button>
-    <div class="accordion-content">
-        <p>ABS 작동 시 바퀴 토크를 빠르게 변화시켜야 하지만, 모터 토크 응답은 유압 밸브보다 느릴 수 있습니다. 해결책: ABS 개입 시 회생을 즉시 차단하고 100% 유압 제동으로 전환합니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 브레이크 패드 수명과 회생 제동
-    </button>
-    <div class="accordion-content">
-        <p>전기차는 마찰 제동 사용 빈도가 낮아 패드 수명이 기존 차 대비 2~3배 길어집니다. 그러나 장기 미사용 시 <strong>디스크 부식(rust)</strong> 문제가 발생할 수 있습니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> V2G(Vehicle-to-Grid)
-    </button>
-    <div class="accordion-content">
-        <p>회생 에너지를 차량 배터리에 저장한 후 다시 전력망에 공급하는 V2G 기술입니다. 피크 시간대에 전력을 판매하여 수익을 얻을 수 있습니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 열전 회수(Thermoelectric Recovery)
-    </button>
-    <div class="accordion-content">
-        <p>미래 기술로, 브레이크 열을 직접 전기로 변환하는 열전 소자(TEG)를 디스크에 장착하는 연구가 진행 중입니다. 현재 효율은 ~5%로 실용화까지는 먼 길이 있습니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 뇌과학: 원페달 드라이빙의 학습 곡선
-    </button>
-    <div class="accordion-content">
-        <p>원페달 드라이빙에 적응하는 데 평균 1~2주가 소요됩니다. 이는 <strong>소뇌(cerebellum)</strong>의 운동 학습과 <strong>기저핵(basal ganglia)</strong>의 습관 형성이 관여합니다. 가속 페달 떼기 = 제동이라는 새로운 운동 스키마(motor schema)가 형성됩니다.</p>
-    </div>
-</div>
+  <div class="section-label">QUIZ</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
 
-</div>
-
-<!-- Footer Navigation -->
-<!-- ══════ FORMULA EXPLORER ══════ -->
-<div class="section">
-    <div class="section-label">TOOLS</div>
-    <div class="section-title">수식 탐색기</div>
-    <div class="formula-explorer">
-        <p style="color:var(--text-dim);font-style:italic;">이 섹션의 핵심 수식을 인터랙티브하게 탐색하세요. 각 변수에 마우스를 올리면 설명이 표시됩니다.</p>
+  <!-- Q1 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 01 — 목적함수</div>
+    <p class="quiz-q">서스펜션 최적화에서 승차감과 접지성(타이어 하중 변동)의 관계는?</p>
+    <div class="quiz-options" id="q1">
+      <div class="quiz-opt">A. 상충(Trade-off) 관계 — 동시 최적화 불가</div>
+      <div class="quiz-opt">B. 항상 비례 관계</div>
+      <div class="quiz-opt">C. 서로 무관</div>
+      <div class="quiz-opt">D. 둘 다 스프링으로만 결정</div>
     </div>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 02 — 설계 변수</div>
+    <p class="quiz-q">서스펜션 최적화에서 가장 효과적인 설계 변수 조합은?</p>
+    <div class="quiz-options" id="q2">
+      <div class="quiz-opt">A. 스프링 강성 + 댐핑 비율 + 안티롤바 강성</div>
+      <div class="quiz-opt">B. 차체 색상 + 시트 재질</div>
+      <div class="quiz-opt">C. 타이어 브랜드만</div>
+      <div class="quiz-opt">D. 엔진 출력</div>
+    </div>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 03 — 파레토 프론트</div>
+    <p class="quiz-q">다목적 최적화의 파레토 프론트(Pareto Front)란?</p>
+    <div class="quiz-options" id="q3">
+      <div class="quiz-opt">A. 어느 목적함수도 다른 것을 악화시키지 않고는 개선 불가능한 해의 집합</div>
+      <div class="quiz-opt">B. 모든 목적함수가 최대인 점</div>
+      <div class="quiz-opt">C. 가장 비용이 낮은 해</div>
+      <div class="quiz-opt">D. 첫 번째 시행 결과</div>
+    </div>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
 </div>
-
-<!-- ══════ SPACED REPETITION ══════ -->
-
-
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section">
     <a href="Day50_ABS_ESC제어.html" class="nav-btn">← Day 50: ABS/ESC 제어</a>
@@ -707,7 +842,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -763,15 +898,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

@@ -233,6 +233,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
     <!-- Sticky Header -->
@@ -338,7 +344,42 @@ td .katex,th .katex{font-size:0.9em!important}
             </div>
         </div>
 
-        <!-- ========== SECTION 3: PARAMETERS ========== -->
+        
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 7-DOF 풀카 상태벡터</p>
+    <div class="sub-eq">$$\mathbf{x} = [z_s, \dot{z}_s, \phi, \dot{\phi}, \theta, \dot{\theta}, z_{uf}, \dot{z}_{uf}, z_{ur}, \dot{z}_{ur}, ...]^T$$</div>
+    <div class="sub-eq">$$\text{7-DOF: bounce}(z_s), \text{roll}(\phi), \text{pitch}(\theta), 4 \times \text{wheel}(z_{ui})$$</div>
+    <p class="sub-note">풀카 = 하프카(전/후) + 롤 자유도. 실무에서는 14-DOF(조향 + 엔진 마운트)까지 확장</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 바운스-피치 커플링</p>
+    <div class="sub-eq">$$m\ddot{z}_s = -(k_f + k_r)z_s - (c_f + c_r)\dot{z}_s + (k_r l_r - k_f l_f)\theta$$</div>
+    <div class="sub-eq">$$I_y\ddot{\theta} = (k_r l_r - k_f l_f)z_s - (k_f l_f^2 + k_r l_r^2)\theta$$</div>
+    <div class="sub-eq">$$\text{디커플링 조건: } k_f l_f = k_r l_r \;\Rightarrow\; \text{바운스-피치 독립}$$</div>
+    <p class="sub-note">디커플링 조건이 만족되면 바운스/피치 모드가 분리 → 각각 독립적으로 튜닝 가능. 실무 목표!</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 모드 주파수 설계 목표</p>
+    <div class="sub-eq">$$f_{bounce} \approx 1.0\sim1.3 \;\text{Hz}, \quad f_{pitch} \approx 1.2\sim1.5 \;\text{Hz}$$</div>
+    <div class="sub-eq">$$f_{roll} \approx 1.5\sim2.0 \;\text{Hz}$$</div>
+    <div class="sub-eq">$$\text{비율: } f_{pitch}/f_{bounce} \approx 1.05\sim1.20 \;\text{(flat ride 조건)}$$</div>
+    <p class="sub-note"><strong>Flat Ride:</strong> 피치 주파수 > 바운스 주파수 → 노면 입력 시 앞/뒤 진동 위상이 맞아 '떠가는' 느낌 감소</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 상태공간 표현</p>
+    <div class="sub-eq">$$\dot{\mathbf{x}} = \mathbf{A}\mathbf{x} + \mathbf{B}\mathbf{u}$$</div>
+    <div class="sub-eq">$$\mathbf{y} = \mathbf{C}\mathbf{x} + \mathbf{D}\mathbf{u}$$</div>
+    <div class="sub-eq">$$\mathbf{u} = [z_{road,fl}, z_{road,fr}, z_{road,rl}, z_{road,rr}]^T$$</div>
+    <p class="sub-note">MATLAB/Simulink에서 ss() 함수로 직접 구현. 고유값 분석으로 모드 주파수/감쇠비 즉시 확인</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 3: PARAMETERS ========== -->
         <div class="section-label">PARAMETERS</div>
         <div class="card">
             <h2>중형 세단 7-DOF 대표 파라미터</h2>
@@ -609,12 +650,79 @@ $excitation four_post_FL
             </div>
         </div>
 
-        <!-- ========== SECTION 7: QUIZ ========== -->
+        
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 풀카 모드 시각화</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day55" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day55-controls" class="sim-controls"></div>
+    <div id="sim-day55-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day55');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day55-controls');
+    const metricBox = document.getElementById('sim-day55-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    let animT=0, animMode=1, afId=null;
+    addBtn('바운스', ()=>{animMode=1;animT=0;run();});
+    addBtn('피치', ()=>{animMode=2;animT=0;run();});
+    addBtn('롤', ()=>{animMode=3;animT=0;run();});
+    addBtn('워프', ()=>{animMode=4;animT=0;run();});
+    function run(){if(afId)cancelAnimationFrame(afId);animT+=0.05;draw();if(animT<15)afId=requestAnimationFrame(run);}
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const cx=W/2,cy=H/2,cW=250,cH=100;
+      const a=Math.sin(8*animT)*15;
+      ctx.save();ctx.translate(cx,cy);
+      if(animMode===1)ctx.translate(0,a);
+      if(animMode===2)ctx.rotate(a*0.005);
+      if(animMode===3){/*roll: tilt perspective*/ctx.transform(1,0,a*0.005,1,0,0);}
+      if(animMode===4){ctx.transform(1,a*0.003,0,1,0,0);}
+      ctx.fillStyle='rgba(201,168,76,0.2)';ctx.strokeStyle='#C9A84C';ctx.lineWidth=2;
+      ctx.fillRect(-cW/2,-cH/2,cW,cH);ctx.strokeRect(-cW/2,-cH/2,cW,cH);
+      ctx.fillStyle='#E06C75';ctx.beginPath();ctx.arc(0,0,4,0,2*Math.PI);ctx.fill();
+      ctx.restore();
+      const modes=['','Bounce (상하)','Pitch (전후회전)','Roll (좌우회전)','Warp (비틀림)'];
+      ctx.fillStyle='#C9A84C';ctx.font='bold 14px sans-serif';ctx.fillText('Mode: '+modes[animMode],10,25);
+      setMetrics([['모드 수','7개 (4 body + 4 wheel-hop - 1)'],['바운스','~1.2 Hz'],['피치','~1.5 Hz'],['롤','~1.8 Hz']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
+<!-- ========== SECTION 7: QUIZ ========== -->
         <div class="section-label">QUIZ</div>
         <div class="card">
             <h2>이해도 점검</h2>
 
-            <div class="quiz-card" data-correct="3" id="q55-1">
+            <div class="quiz-card" data-correct="4" id="q55-1">
                 <p class="quiz-q"><strong>Q1.</strong> 7-DOF 풀카 모델에서 Roll-Pitch 커플링이 발생하는 근본 원인은?</p>
                 <div class="quiz-options">
                     <div class="quiz-opt" data-value="1">① 전·후 스프링 강성이 다르기 때문</div>
@@ -627,7 +735,7 @@ $excitation four_post_FL
                 </div>
             </div>
 
-            <div class="quiz-card" data-correct="2" id="q55-2">
+            <div class="quiz-card" data-correct="3" id="q55-2">
                 <p class="quiz-q"><strong>Q2.</strong> 4-Post Rig에서 Warp 모드 가진을 만들기 위한 4개 액추에이터 위상 조합은?</p>
                 <div class="quiz-options">
                     <div class="quiz-opt" data-value="1">① FL↑ FR↑ RL↑ RR↑ (모두 동위상)</div>
@@ -639,6 +747,18 @@ $excitation four_post_FL
                     <strong>정답: ②</strong> Warp = (FL - FR - RL + RR)/4. 대각선 코너가 같은 방향으로, 인접 코너는 반대 방향으로 움직이는 "비틀림" 모드입니다. 차체의 비틀림 강성을 평가하는 핵심 모드입니다.
                 </div>
             </div>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 03 — 풀카 자유도</div>
+      <p class="quiz-q">풀카(Full-Car) 모델에서 바디의 주요 3가지 운동 모드는?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. 전진, 후진, 좌회전</div>
+        <div class="quiz-opt">B. Bounce, Pitch, Roll</div>
+        <div class="quiz-opt">C. Yaw, Surge, Sway</div>
+        <div class="quiz-opt">D. Heave, Lateral, Longitudinal</div>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
         </div>
 
         <!-- ========== SECTION 8: DEEP DIVE ========== -->
@@ -647,64 +767,73 @@ $excitation four_post_FL
             <h2>심화 학습</h2>
 
             <div class="accordion">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
+                <button class="accordion-toggle">
                     <span>14-DOF 확장 모델</span>
-                    <span class="accordion-icon">+</span>
-                </div>
+                    <span class="accordion-arrow">▼</span>
+                </button>
                 <div class="accordion-content">
+                    <div class="accordion-inner">
                     <p>7-DOF에 Yaw, Lateral, Longitudinal, 그리고 4바퀴 회전(ω)을 추가하면 14-DOF가 됩니다. 이 모델은 <strong>조향 응답</strong>과 <strong>제동 안정성</strong>까지 해석할 수 있어 실제 차량 개발에서 가장 많이 사용됩니다. 특히 ESC(Electronic Stability Control) 알고리즘 개발에 필수적인 모델입니다.</p>
                     <p>추가 자유도: Yaw(ψ), Lateral(y), Longitudinal(x), ω<sub>FL</sub>, ω<sub>FR</sub>, ω<sub>RL</sub>, ω<sub>RR</sub></p>
+                    </div>
                 </div>
             </div>
 
             <div class="accordion">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
+                <button class="accordion-toggle">
                     <span>비선형 스프링/댐퍼 효과</span>
-                    <span class="accordion-icon">+</span>
-                </div>
+                    <span class="accordion-arrow">▼</span>
+                </button>
                 <div class="accordion-content">
+                    <div class="accordion-inner">
                     <p>실제 서스펜션에서 스프링은 Progressive Rate(하중에 따라 강성 증가), 댐퍼는 속도 의존 비선형 특성을 가집니다. 7-DOF 모델에 이 비선형성을 추가하면:</p>
                     <p>• <strong>Bump Stop</strong>: 큰 변위에서 급격한 강성 증가 → Jounce/Rebound 리미트</p>
                     <p>• <strong>댐퍼 Blow-off</strong>: 고속 영역에서 밸브가 열려 감쇠력 포화</p>
                     <p>• <strong>부시 히스테리시스</strong>: 고무 부시의 에너지 흡수로 추가 감쇠 발생</p>
                     <p>이러한 비선형 효과는 승차감 설계의 핵심이며, 선형 모델과 실차 사이의 간극을 줄이는 열쇠입니다.</p>
+                    </div>
                 </div>
             </div>
 
             <div class="accordion">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
+                <button class="accordion-toggle">
                     <span>Ride & Handling 밸런스 전략</span>
-                    <span class="accordion-icon">+</span>
-                </div>
+                    <span class="accordion-arrow">▼</span>
+                </button>
                 <div class="accordion-content">
+                    <div class="accordion-inner">
                     <p>풀카 모델의 가장 큰 가치는 <strong>Ride(승차감)</strong>와 <strong>Handling(조종성)</strong> 간의 트레이드오프를 정량적으로 분석할 수 있다는 점입니다.</p>
                     <p><strong>전략 1: 전후 Roll 강성 배분</strong><br>전륜 ARB 강성↑ → Understeer 증가, Roll 감소. 후륜 ARB 강성↑ → Oversteer 경향, 후축 Ride 악화. 일반적으로 전:후 = 60:40 ~ 65:35 배분.</p>
                     <p><strong>전략 2: Bounce/Pitch 주파수 분리</strong><br>f<sub>pitch</sub>/f<sub>bounce</sub> ≈ 1.0~1.2일 때 최적. 비율이 1보다 크면 "Flat Ride"(갤럽 없는 주행감), 1보다 작으면 "Pitching" 발생.</p>
                     <p><strong>전략 3: 감쇠비 최적화</strong><br>Bounce ζ = 0.2~0.4, Roll ζ = 0.3~0.5가 일반적. 세미 액티브 댐퍼(CDC)를 사용하면 Comfort/Sport 모드 전환이 가능합니다.</p>
+                    </div>
                 </div>
             </div>
 
             <div class="accordion">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
+                <button class="accordion-toggle">
                     <span>4-Post Rig 시험과 가상 시험 상관성</span>
-                    <span class="accordion-icon">+</span>
-                </div>
+                    <span class="accordion-arrow">▼</span>
+                </button>
                 <div class="accordion-content">
+                    <div class="accordion-inner">
                     <p>실제 4-Post Rig 시험과 7-DOF 시뮬레이션을 비교하면 일반적으로:</p>
                     <p>• <strong>Bounce 주파수</strong>: ±3% 이내 일치 (가장 정확)</p>
                     <p>• <strong>Roll 주파수</strong>: ±5% (ARB 부시 강성 불확실성)</p>
                     <p>• <strong>Pitch 주파수</strong>: ±4% (CG 위치 정확도 의존)</p>
                     <p>• <strong>Warp 주파수</strong>: ±10% (차체 비틀림 강성 미반영)</p>
                     <p>상관성을 높이려면: ① 정확한 관성 측정(K&C 시험), ② 비선형 부시 특성 반영, ③ 차체 유연성(FEM) 추가가 필요합니다.</p>
+                    </div>
                 </div>
             </div>
 
             <div class="accordion">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
+                <button class="accordion-toggle">
                     <span>디지털 트윈으로의 확장</span>
-                    <span class="accordion-icon">+</span>
-                </div>
+                    <span class="accordion-arrow">▼</span>
+                </button>
                 <div class="accordion-content">
+                    <div class="accordion-inner">
                     <p>7-DOF 풀카 모델은 디지털 트윈의 <strong>물리 코어</strong> 역할을 합니다. 실시간 센서 데이터(가속도계, 자이로, 서스펜션 스트로크)를 입력받아 <strong>칼만 필터</strong>로 상태를 추정하고, 머신러닝으로 비선형 파라미터를 온라인 업데이트합니다.</p>
                     <p><strong>구현 파이프라인:</strong></p>
                     <p>1. 7-DOF 물리 모델 → State-Space 표현 (A, B, C, D 행렬)</p>
@@ -712,6 +841,7 @@ $excitation four_post_FL
                     <p>3. Neural Network → 비선형 댐퍼/부시 특성 학습</p>
                     <p>4. Predictive Control → 세미 액티브 댐퍼 최적 제어</p>
                     <p>이 파이프라인은 현재 BMW, Mercedes의 E-ABC, Audi의 Predictive Active Suspension에서 실제 구현되어 양산 적용되고 있습니다.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -796,6 +926,26 @@ $excitation four_post_FL
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 <script>
@@ -823,7 +973,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -879,15 +1029,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

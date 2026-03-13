@@ -226,6 +226,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -383,6 +389,35 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     </div>
 </div>
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 좌표 변환: 물리좌표 → 모달좌표</p>
+    <div class="sub-eq">$$\{x\} = [\Phi]\{q\}, \quad [\Phi] = [\{\phi\}_1 \; \{\phi\}_2 \; \cdots \; \{\phi\}_n]$$</div>
+    <p class="sub-note">물리 변위 x를 모드형상의 선형 조합으로 표현. q_i = i번째 모드의 기여도</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 비연립 방정식으로 변환</p>
+    <div class="sub-eq">$$[M]\ddot{x} + [C]\dot{x} + [K]x = F \xrightarrow{x=\Phi q} [\Phi]^T[M][\Phi]\ddot{q} + [\Phi]^T[C][\Phi]\dot{q} + [\Phi]^T[K][\Phi]q = [\Phi]^T F$$</div>
+    <div class="sub-eq">$$\bar{m}_i \ddot{q}_i + \bar{c}_i \dot{q}_i + \bar{k}_i q_i = \bar{f}_i \quad (i = 1, 2, \ldots, n)$$</div>
+    <p class="sub-note">직교성 덕분에 n-DOF 연립 → n개 독립 1-DOF 방정식! 각각을 Day01의 방법으로 풀 수 있음</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 모달 참여계수 (Modal Participation Factor)</p>
+    <div class="sub-eq">$$\Gamma_i = \frac{\{\phi\}_i^T [M] \{r\}}{\{\phi\}_i^T [M] \{\phi\}_i}$$</div>
+    <p class="sub-note">{r}은 가진 방향 벡터. Γ_i가 크면 해당 모드가 응답에 크게 기여 → <strong>모드 트런케이션</strong> 시 Γ 기준으로 중요 모드 선별</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 물리응답 복원</p>
+    <div class="sub-eq">$$x(t) = \sum_{i=1}^{n} \phi_i \cdot q_i(t) \approx \sum_{i=1}^{m} \phi_i \cdot q_i(t) \quad (m \ll n)$$</div>
+    <p class="sub-note"><strong>실무:</strong> 차량 풀카 모델(수백 DOF)에서 20-30개 모드만 사용해도 0-100Hz 응답 정확도 95%+ 확보 가능</p>
+  </div>
+</div>
+
 <!-- ⑥ 파라미터 테이블 -->
 <div class="section">
   <div class="section-label">PARAMETERS</div>
@@ -543,7 +578,7 @@ td .katex,th .katex{font-size:0.9em!important}
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 Craig-Bampton 방법: 유연체 모델의 핵심 — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -554,7 +589,7 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 Craig-Bampton 방법 — Simpack 유연체의 핵심</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -591,23 +626,124 @@ td .katex,th .katex{font-size:0.9em!important}
 
 <!-- ══════ FORMULA EXPLORER ══════ -->
 
-<!-- ══════ QUIZ ══════ -->
-<div class="section">
-    <div class="section-label">QUIZ</div>
-    <h2 class="section-title">퀴즈</h2>
-    <div class="quiz-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin:12px 0;">
-        <p style="color:var(--gold);font-weight:600;margin-bottom:8px;">Q1. 모드중첩법에서 핵심 개념 확인</p>
-        <p style="color:var(--text-primary);font-size:14px;">오늘 학습한 내용의 핵심 원리를 자신의 말로 설명해 보세요. 수식 없이 물리적 직관만으로 설명할 수 있다면 진정한 이해입니다.</p>
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 모드 중첩법 애니메이션</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day27" width="700" height="350"></canvas>
     </div>
-    <div class="quiz-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin:12px 0;">
-        <p style="color:var(--gold);font-weight:600;margin-bottom:8px;">Q2. 실무 적용</p>
-        <p style="color:var(--text-primary);font-size:14px;">이 개념이 실제 서스펜션 설계에서 어떤 영향을 미치는지 구체적인 예를 들어 설명해 보세요.</p>
-    </div>
+    <div id="sim-day27-controls" class="sim-controls"></div>
+    <div id="sim-day27-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day27');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day27-controls');
+    const metricBox = document.getElementById('sim-day27-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_a1 = addSlider('모드1 기여도', 0, 1, 0.7, 0.05, 'sim27-a1');
+    const sl_a2 = addSlider('모드2 기여도', 0, 1, 0.3, 0.05, 'sim27-a2');
+    let t=0,afId=null;
+    addBtn('▶ 애니메이션', function(){ t=0; run(); });
+    function run(){if(afId)cancelAnimationFrame(afId);t+=0.05;draw();if(t<20)afId=requestAnimationFrame(run);}
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const a1=+sl_a1.value, a2=+sl_a2.value;
+      const w1=5, w2=15; // rad/s
+      // Mode 1 contribution
+      const q1=a1*Math.sin(w1*t), q2=a2*Math.sin(w2*t);
+      // Total response = φ1*q1 + φ2*q2
+      const x1=q1+0.5*q2, x2=q1-0.5*q2; // simplified mode shapes
+      // Draw two masses
+      const cx1=W*0.3, cx2=W*0.7, cy=H/2, amp=80;
+      [[cx1,x1*amp,'m₁','#C9A84C'],[cx2,x2*amp,'m₂','#4A9EBF']].forEach(([cx,disp,lbl,col])=>{
+        ctx.fillStyle=col+'30';ctx.strokeStyle=col;ctx.lineWidth=2;
+        const y=cy+disp;
+        ctx.beginPath();ctx.arc(cx,y,25,0,2*Math.PI);ctx.fill();ctx.stroke();
+        ctx.fillStyle=col;ctx.font='14px monospace';ctx.fillText(lbl,cx-10,y+5);
+      });
+      // Spring between
+      ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(cx1+25,cy+x1*amp);ctx.lineTo(cx2-25,cy+x2*amp);ctx.stroke();
+      // Time response (bottom)
+      ctx.fillStyle='#8A8F98';ctx.font='12px monospace';
+      ctx.fillText('x(t) = Σ φᵢ·qᵢ(t)  (모드 중첩)',10,H-15);
+      ctx.fillText('q₁(t)='+q1.toFixed(3),10,30); ctx.fillText('q₂(t)='+q2.toFixed(3),200,30);
+      setMetrics([['모드1 기여',a1.toFixed(2)],['모드2 기여',a2.toFixed(2)],['원리','x = [Φ]{q(t)}']]);
+    }
+
+    draw();
+  })();
+  </script>
 </div>
 
+<!-- ══════ QUIZ ══════ -->
+<div class="section">
+  <div class="section-label">QUIZ</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
 
-<!-- ⑩ 퀴즈 -->
+  <!-- QUESTION 01 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 01 — 모드 중첩법 원리</div>
+    <p class="quiz-q">모드 중첩법의 핵심 전제 조건은?</p>
+    <div class="quiz-options" id="q1">
+      <div class="quiz-opt">A. 시스템이 비선형이어야 한다</div>
+      <div class="quiz-opt">B. 모드 형상이 직교성을 가져야 한다</div>
+      <div class="quiz-opt">C. 감쇠가 반드시 0이어야 한다</div>
+      <div class="quiz-opt">D. 외력이 정현파여야 한다</div>
+    </div>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
 
+  <!-- QUESTION 02 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 02 — 모달 좌표 변환</div>
+    <p class="quiz-q">물리 좌표 {x}와 모달 좌표 {η}의 관계는?</p>
+    <div class="quiz-options" id="q2">
+      <div class="quiz-opt">A. {x} = [M]{η}</div>
+      <div class="quiz-opt">B. {x} = [Φ]{η}</div>
+      <div class="quiz-opt">C. {x} = [K]{η}</div>
+      <div class="quiz-opt">D. {x} = [C]{η}</div>
+    </div>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- QUESTION 03 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 03 — 실무 적용</div>
+    <p class="quiz-q">N-DOF 시스템에서 모드 중첩 시 모든 모드를 사용하지 않아도 되는 이유는?</p>
+    <div class="quiz-options" id="q3">
+      <div class="quiz-opt">A. 계산 오류가 발생하므로</div>
+      <div class="quiz-opt">B. 고차 모드의 기여가 특정 주파수 대역에서 무시할 수 있으므로</div>
+      <div class="quiz-opt">C. 저차 모드가 항상 부정확하므로</div>
+      <div class="quiz-opt">D. 고유진동수가 너무 낮으므로</div>
+    </div>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
+</div>
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:40px 0;">
     <a href="Day26_고유치문제.html" class="nav-btn prev">← Day 26: 고유치문제</a>
@@ -632,6 +768,26 @@ td .katex,th .katex{font-size:0.9em!important}
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -660,7 +816,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -716,15 +872,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

@@ -226,6 +226,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -385,6 +391,32 @@ Spherical: 3 ROT DOF</annotation></semantics></math></span><span class="katex-ht
       </div>
     </div>
 </div>
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 수식 ↔ SIMPACK 변수 매핑</p>
+    <div class="sub-eq">$$m_s \;\leftrightarrow\; \text{Body.mass}$$</div>
+    <div class="sub-eq">$$k_s \;\leftrightarrow\; \text{Spring\_Force.stiffness}$$</div>
+    <div class="sub-eq">$$c_s \;\leftrightarrow\; \text{Damper\_Force.damping}$$</div>
+    <p class="sub-note"><strong>핵심:</strong> 수식의 각 항이 SIMPACK의 어떤 요소에 대응하는지 명확히 매핑해야 검증 가능</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 상태공간 → SIMPACK ODE</p>
+    <div class="sub-eq">$$\dot{\mathbf{z}} = \mathbf{A}\mathbf{z} + \mathbf{B}u \;\;\leftrightarrow\;\; \text{SIMPACK internal ODE solver (SODASRT2)}$$</div>
+    <div class="sub-eq">$$\mathbf{z} = \begin{bmatrix} x_1 \\ \dot{x}_1 \\ x_2 \\ \dot{x}_2 \end{bmatrix} \;\leftrightarrow\; \text{State variables in .subvar}$$</div>
+    <p class="sub-note">SIMPACK은 DAE(미분대수방정식) 솔버를 사용. 구속조건이 있으면 ODE가 아닌 DAE → 수식 직접 비교 시 주의!</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 전달함수 비교법</p>
+    <div class="sub-eq">$$H_{analytical}(f) = \frac{X_{output}}{X_{input}} \quad \text{vs} \quad H_{SIMPACK}(f) = \frac{\text{FFT}(output)}{\text{FFT}(input)}$$</div>
+    <p class="sub-note"><strong>검증 절차:</strong> 같은 입력(chirp, random) → 해석해 vs SIMPACK 응답 → FRF 오버레이 비교. 오차 < 5%이면 모델 신뢰도 확보</p>
+  </div>
+</div>
+
 <!-- ⑥ 파라미터 테이블 -->
 <div class="section">
   <div class="section-label">PARAMETERS</div>
@@ -523,7 +555,7 @@ Spherical: 3 ROT DOF</annotation></semantics></math></span><span class="katex-ht
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 실무 함정: 단위 변환 &amp; 좌표계 — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -534,7 +566,7 @@ Spherical: 3 ROT DOF</annotation></semantics></math></span><span class="katex-ht
       </div>
     
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 Simpack 좌표계 규약 — 흔한 실수 방지</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -575,23 +607,116 @@ Spherical: 3 ROT DOF</annotation></semantics></math></span><span class="katex-ht
 
 <!-- ══════ FORMULA EXPLORER ══════ -->
 
-<!-- ══════ QUIZ ══════ -->
-<div class="section">
-    <div class="section-label">QUIZ</div>
-    <h2 class="section-title">퀴즈</h2>
-    <div class="quiz-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin:12px 0;">
-        <p style="color:var(--gold);font-weight:600;margin-bottom:8px;">Q1. 수식Simpack매핑에서 핵심 개념 확인</p>
-        <p style="color:var(--text-primary);font-size:14px;">오늘 학습한 내용의 핵심 원리를 자신의 말로 설명해 보세요. 수식 없이 물리적 직관만으로 설명할 수 있다면 진정한 이해입니다.</p>
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 수식↔SIMPACK 매핑</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day29" width="700" height="300"></canvas>
     </div>
-    <div class="quiz-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin:12px 0;">
-        <p style="color:var(--gold);font-weight:600;margin-bottom:8px;">Q2. 실무 적용</p>
-        <p style="color:var(--text-primary);font-size:14px;">이 개념이 실제 서스펜션 설계에서 어떤 영향을 미치는지 구체적인 예를 들어 설명해 보세요.</p>
-    </div>
+    <div id="sim-day29-controls" class="sim-controls"></div>
+    <div id="sim-day29-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day29');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 300;
+    const ctrlBox = document.getElementById('sim-day29-controls');
+    const metricBox = document.getElementById('sim-day29-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const map=[
+        {math:'m (질량)',simpack:'Body (Mass)',y:30},
+        {math:'k (강성)',simpack:'Force_Spring',y:70},
+        {math:'c (감쇠)',simpack:'Force_Damper',y:110},
+        {math:'DOF (자유도)',simpack:'Joint + Constraint',y:150},
+        {math:'F(t) (외력)',simpack:'Force_Expression',y:190},
+        {math:'x(t) (응답)',simpack:'Sensor / y_Output',y:230}
+      ];
+      map.forEach(m=>{
+        ctx.fillStyle='rgba(201,168,76,0.1)';ctx.fillRect(30,m.y,200,30);
+        ctx.fillStyle='rgba(74,158,191,0.1)';ctx.fillRect(W-230,m.y,200,30);
+        ctx.fillStyle='#C9A84C';ctx.font='13px monospace';ctx.fillText(m.math,40,m.y+20);
+        ctx.fillStyle='#4A9EBF';ctx.fillText(m.simpack,W-220,m.y+20);
+        ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.beginPath();ctx.moveTo(235,m.y+15);ctx.lineTo(W-235,m.y+15);ctx.stroke();
+        ctx.fillStyle='#E06C75';ctx.fillText('→',W/2-5,m.y+20);
+      });
+      ctx.fillStyle='#C9A84C';ctx.font='bold 14px sans-serif';ctx.fillText('수학 모델',80,20);
+      ctx.fillStyle='#4A9EBF';ctx.fillText('SIMPACK 요소',W-180,20);
+      setMetrics([['원리','수식 파라미터 = MBS 요소 속성']]);
+    }
+
+    draw();
+  })();
+  </script>
 </div>
 
+<!-- ══════ QUIZ ══════ -->
+<div class="section">
+  <div class="section-label">QUIZ</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
 
-<!-- ⑩ 퀴즈 -->
+  <!-- QUESTION 01 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 01 — 매핑 기본</div>
+    <p class="quiz-q">수식의 감쇠계수 c를 Simpack에서 설정할 때 사용하는 요소는?</p>
+    <div class="quiz-options" id="q1">
+      <div class="quiz-opt">A. Spring element</div>
+      <div class="quiz-opt">B. Damper element (Force: Spring-Damper)</div>
+      <div class="quiz-opt">C. Mass element</div>
+      <div class="quiz-opt">D. Constraint element</div>
+    </div>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
 
+  <!-- QUESTION 02 -->
+  <div class="quiz-card" data-correct="2">
+    <div class="quiz-num">QUESTION 02 — 단위 변환</div>
+    <p class="quiz-q">수식에서 k = 25,000 N/m일 때, Simpack 입력 단위가 N/mm라면 입력값은?</p>
+    <div class="quiz-options" id="q2">
+      <div class="quiz-opt">A. 25,000</div>
+      <div class="quiz-opt">B. 2,500</div>
+      <div class="quiz-opt">C. 25</div>
+      <div class="quiz-opt">D. 0.025</div>
+    </div>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- QUESTION 03 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 03 — 검증 방법</div>
+    <p class="quiz-q">Simpack 모델의 고유진동수가 이론값과 5% 이상 차이 날 때 가장 먼저 확인할 것은?</p>
+    <div class="quiz-options" id="q3">
+      <div class="quiz-opt">A. 솔버 설정(시간 스텝)</div>
+      <div class="quiz-opt">B. 질량/강성 파라미터 입력 단위와 값</div>
+      <div class="quiz-opt">C. 중력 방향 설정</div>
+      <div class="quiz-opt">D. 애니메이션 프레임 레이트</div>
+    </div>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
+</div>
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:40px 0;">
     <a href="Day28_Part4복습.html" class="nav-btn prev">← Day 28: Part4복습</a>
@@ -616,6 +741,26 @@ Spherical: 3 ROT DOF</annotation></semantics></math></span><span class="katex-ht
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -644,7 +789,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -700,15 +845,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

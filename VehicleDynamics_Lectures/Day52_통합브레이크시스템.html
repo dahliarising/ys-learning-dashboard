@@ -245,7 +245,33 @@ td .katex,th .katex{font-size:0.9em!important}
 .nav-btn{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;text-decoration:none;color:var(--gold);font-weight:500;transition:all 0.3s}
 .nav-btn:hover{background:var(--surface2);border-color:var(--gold)}
 @media(max-width:600px){.nav-section{grid-template-columns:1fr}}
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -398,6 +424,41 @@ td .katex,th .katex{font-size:0.9em!important}
 </div>
 </div>
 
+</div>
+
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① iBooster 전동 부스터 힘 전달</p>
+    <div class="sub-eq">$$F_{pedal} \xrightarrow{\text{sensor}} ECU \xrightarrow{\text{motor}} F_{boost}$$</div>
+    <div class="sub-eq">$$F_{master} = F_{pedal} \times r_{boost} + F_{motor}$$</div>
+    <div class="sub-eq">$$P_{brake} = F_{master} / A_{master\;cylinder}$$</div>
+    <p class="sub-note">iBooster: 유압 진공 부스터 대체. <strong>장점:</strong> 회생 블렌딩 자유도 ↑, 응답시간 120ms → 80ms</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② Brake-by-Wire 압력 제어</p>
+    <div class="sub-eq">$$P_{wheel,i} = P_{master} \times \frac{A_{caliper,i}}{A_{master}} \times G_{ABS,i}$$</div>
+    <div class="sub-eq">$$G_{ABS,i} \in \{0: \text{release}, \; 0.5: \text{hold}, \; 1: \text{apply}\}$$</div>
+    <div class="sub-eq">$$F_{clamp,i} = P_{wheel,i} \times A_{piston,i} \times \mu_{pad} \times 2$$</div>
+    <p class="sub-note">디스크 양면 패드 → ×2. EMB(전자기계 브레이크)는 유압 라인 자체 제거 → 경량화 + 응답성 극대</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 페달 필 시뮬레이터</p>
+    <div class="sub-eq">$$F_{pedal} = k_1 x + k_2 x^2 + c \dot{x}$$</div>
+    <div class="sub-eq">$$\text{히스테리시스: } \Delta F = F_{apply} - F_{release} \approx 5\sim10\text{N}$$</div>
+    <p class="sub-note">Brake-by-Wire에서 마스터실린더 피드백 없으므로 스프링+댐퍼로 인위적 페달 반력 생성</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 시스템 안전 (ASIL-D)</p>
+    <div class="sub-eq">$$\text{FTTI (Fault Tolerant Time Interval)} \leq 50\text{ms}$$</div>
+    <div class="sub-eq">$$\text{Redundancy: } \text{2-channel 독립 전원 + 기계적 백업}$$</div>
+    <div class="sub-eq">$$\lambda_{failure} < 10^{-8} \;\text{/hour (ASIL-D requirement)}$$</div>
+    <p class="sub-note"><strong>Fail-operational:</strong> 한 채널 고장 시 나머지 채널로 50% 이상 제동력 유지 필수</p>
+  </div>
 </div>
 
 <!-- Parameters Table -->
@@ -564,106 +625,177 @@ td .katex,th .katex{font-size:0.9em!important}
 </div>
 
 <!-- Quiz Section -->
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 통합 브레이크 블렌딩</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day52" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day52-controls" class="sim-controls"></div>
+    <div id="sim-day52-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day52');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day52-controls');
+    const metricBox = document.getElementById('sim-day52-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_decel = addSlider('요구 감속도 (g)', 0.05, 1.0, 0.3, 0.05, 'sim52-decel');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const decel=+sl_decel.value;
+      // Blending strategy: regen up to ~0.3g, friction above
+      ctx.strokeStyle='#98C379';ctx.lineWidth=2.5;ctx.beginPath();
+      for(let i=0;i<=200;i++){const d=i/200;const regen=Math.min(d,0.3);const px=50+i*(W-100)/200,py=H-30-regen*(H-60)/1;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}ctx.stroke();
+      ctx.strokeStyle='#E06C75';ctx.lineWidth=2.5;ctx.beginPath();
+      for(let i=0;i<=200;i++){const d=i/200;const friction=Math.max(0,d-0.3);const px=50+i*(W-100)/200,py=H-30-friction*(H-60)/1;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}ctx.stroke();
+      // Total
+      ctx.strokeStyle='#C9A84C';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();
+      for(let i=0;i<=200;i++){const d=i/200;const px=50+i*(W-100)/200,py=H-30-d*(H-60)/1;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}ctx.stroke();ctx.setLineDash([]);
+      // Current operating point
+      const cpx=50+decel*(W-100);
+      ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.beginPath();ctx.moveTo(cpx,0);ctx.lineTo(cpx,H);ctx.stroke();
+      ctx.fillStyle='#98C379';ctx.font='12px monospace';ctx.fillText('— 회생 제동',10,20);
+      ctx.fillStyle='#E06C75';ctx.fillText('— 마찰 제동',10,36);
+      ctx.fillStyle='#C9A84C';ctx.fillText('--- 총 제동',10,52);
+      ctx.fillStyle='#8A8F98';ctx.fillText('요구 감속도 (g) →',W-160,H-10);
+      const regen=Math.min(decel,0.3), friction=Math.max(0,decel-0.3);
+      setMetrics([['회생',regen.toFixed(2)+' g'],['마찰',friction.toFixed(2)+' g'],['블렌딩 포인트','0.3g'],['원칙','회생 우선, 부족분 마찰 보충']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
+<!-- ══════ QUIZ ══════ -->
+
 <div class="section">
-    <div class="section-label">QUIZ</div>
-    <div class="quiz-section">
-<h3>이해도 확인 퀴즈</h3>
-<div class="quiz-card q1">
-    <h4>Q1: 빈칸 채우기</h4>
-    <p class="q-question">100km/h에서 정지까지의 총 정지거리는 반응거리, 빌드업거리, ___의 합이다.</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> 순수 제동거리(Brake Distance)<br>
-        <strong>해설:</strong> d_stop = d_react + d_buildup + d_brake입니다.
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">통합 브레이크 시스템 심화</h2>
+
+  <!-- Deep Dive 1 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>💡 One-Box vs Two-Box 브레이크 시스템 — 전동화 시대의 아키텍처 선택</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive1">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">부스터+ESC 통합이 왜 필수가 되었는가</h4>
+        <p>전통적인 'Two-Box' 시스템: 진공 부스터(또는 iBooster) + ESC 유닛이 별도 구성. 'One-Box' 시스템: 부스터 + ESC + 유압 생성을 하나의 모듈로 통합 (예: Continental MK C1, ZF IBC).</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">One-Box 시스템(예: Continental MK C1): ESC + 부스터 + 마스터 실린더 통합. 응답 시간 $\sim 150$ ms (기존 Two-Box $\sim 600$ ms), 무게 절감 약 $30\%$.</p>
+        <p><strong style="color:var(--gold-light);">One-Box의 장점:</strong> (1) 패키징 축소 — 엔진룸 공간 절약 (BEV 필수), (2) 유압 경로 단축 — 응답 속도 향상 (~130ms → ~80ms), (3) 회생 블렌딩 최적화 — 내부적으로 마찰/회생 배분을 직접 제어, (4) 원가 절감 — 부품 수 30% 감소.</p>
+        <p>One-Box의 과제: 단일 ECU 고장 시 제동 기능 상실 위험. 이를 해결하기 위해 이중화(redundancy) 설계가 필수입니다 — 독립적인 백업 유압 회로 + 별도 전원 공급 + 독립 프로세서.</p>
+        <p>르노코리아 전동화 플랫폼에서는 Continental MK C2 (One-Box 2세대)가 검토되고 있으며, 자율주행 Level 3 이상에서 요구되는 이중화 제동(redundant braking)을 충족합니다.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q2">
-    <h4>Q2: O/X 퀴즈</h4>
-    <p class="q-question">O/X: AEB 시스템은 운전자의 반응시간을 완전히 0으로 만든다.</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> X (거짓)<br>
-        <strong>해설:</strong> AEB는 반응시간을 크게 줄이지만(~0.3s), 센서 처리 시간과 유압 빌드업 시간은 여전히 존재합니다.
+  </div>
+
+  <!-- Deep Dive 2 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>🔬 Brake-by-Wire와 페일세이프(Fail-Safe) — 유압 없는 미래가 가능한가?</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive2">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">기계적 백업의 필요성과 한계</h4>
+        <p>Brake-by-Wire(BBW)는 페달 입력을 전기 신호로만 전달하고, 유압 생성을 전동 액추에이터가 담당합니다. 페달과 마스터 실린더 사이의 기계적 연결이 없으므로 '디커플링(decoupling)'이라 합니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">Brake-by-Wire 페일세이프: Level 1(전기 백업) → 이중 전원 + 이중 모터. Level 2(유압 백업) → 기계적 유압 연결 유지. ASIL-D 기능안전 요구: $\lambda_{dangerous} < 10^{-8}$/h.</p>
+        <p><strong style="color:var(--gold-light);">디커플링의 혁신:</strong> 페달 스트로크와 유압을 독립적으로 제어할 수 있어, (1) 회생제동 블렌딩 시 페달 느낌을 완벽히 시뮬레이션 가능, (2) 자율주행 시 페달 없이도 제동 가능, (3) 차량 거동 제어(ESC, AEB)의 응답 속도 극대화.</p>
+        <p>페일세이프 전략: ISO 26262 ASIL-D 등급 요구. (1) 1차 고장 시: 이중화 전원 + 이중 프로세서 + 독립 유압 회로로 기능 유지, (2) 2차 고장(극희박): 기계적 폴백 — 페달 직결 마스터 실린더로 최소 제동력(0.3g) 확보.</p>
+        <p>현재 양산 BBW 시스템: Bosch IPB(Integrated Power Brake), Continental MK C1/C2, ZF IBC. 이들 모두 전기적 폴백 + 기계적 백업의 이중 안전망을 갖추고 있으며, NCAP 긴급제동 평가에서 최고 등급을 달성합니다.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q3">
-    <h4>Q3: Simpack 적용</h4>
-    <p class="q-question">Simpack에서 100→0 정지거리 시뮬레이션 시 적분기 최대 스텝 사이즈는?</p>
-    <div class="q-options"><label><input type="radio" name="q3" value="≤ 1ms"/> ≤ 1ms</label>
-<label><input type="radio" name="q3" value="≤ 1s"/> ≤ 1s</label>
-<label><input type="radio" name="q3" value="≤ 10s"/> ≤ 10s</label>
-<label><input type="radio" name="q3" value="제한 없음"/> 제한 없음</label>
-</div>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> ≤ 1ms<br>
-        <strong>해설:</strong> ABS 사이클(6~15Hz)과 빠른 하중이동을 정확히 포착하려면 1ms 이하의 스텝 사이즈가 필요합니다.
+  </div>
+
+  <!-- Deep Dive 3 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>⚙️ ADAS와 통합 제동 — AEB, ACC, TJA의 브레이크 요구사항</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive3">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">자율주행이 브레이크 시스템에 요구하는 것</h4>
+        <p>AEB(자동긴급제동)은 전방 충돌 위험 감지 시 운전자 개입 없이 최대 1.0g의 감속도를 발생시켜야 합니다. 이를 위해 브레이크 시스템은 운전자 입력 없이 'prefill(사전 충전)' → 'full brake(최대 제동)'을 200ms 이내에 완료해야 합니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">AEB 요구사항: 반응 시간 $< 300$ ms, 최대 감속도 $\geq 1.0$ g, 작동 속도 범위 $10\sim80$ km/h (Euro NCAP 2025 기준). 통합 제동 시스템은 AEB 요구 감속도를 유압 prefill 없이 달성해야 함.</p>
+        <p><strong style="color:var(--gold-light);">ACC/TJA 제동:</strong> ACC(Adaptive Cruise Control)와 TJA(Traffic Jam Assist)는 부드러운 감속(0.1~0.3g)을 요구합니다. 이때 제동 '잡음'(NVH)이 더 문제가 됩니다 — 저속 저압 제동에서 캘리퍼 떨림이 실내에 전달되기 때문입니다.</p>
+        <p>Euro NCAP 2025 프로토콜은 AEB 성능 평가를 대폭 강화했습니다: (1) 차대차 시나리오 확장, (2) 보행자/자전거 야간 감지, (3) 교차로 시나리오 추가. 이 모든 시나리오에서 브레이크 시스템의 응답 시간과 최대 감속도가 평가됩니다.</p>
+        <p>자율주행 Level 3+에서는 '이중화 제동 시스템(redundant braking system)'이 법적 요구사항이 됩니다. 주 시스템 고장 시에도 0.6g 이상의 감속도를 독립적으로 발생시킬 수 있어야 하며, 이것이 One-Box 시스템 + 전동 백업 캘리퍼 조합이 부상하는 이유입니다.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-</div>
+  </div>
 
 </div>
 
-<!-- Deep Dives -->
 <div class="section">
-    <div class="section-label">DEEP DIVE</div>
-    <div class="section-title">심화 학습</div>
-    <div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> Euro NCAP AEB 평가
-    </button>
-    <div class="accordion-content">
-        <p>Euro NCAP은 차량-보행자, 차량-자전거, 차량-차량 시나리오에서 AEB 성능을 평가합니다. 2026년부터는 <strong>교차로 시나리오</strong>와 <strong>도어 열림 감지</strong>가 추가됩니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 브레이크 바이 와이어(BBW)의 미래
-    </button>
-    <div class="accordion-content">
-        <p>2025년 이후 양산 예정인 완전 BBW는 유압 배관을 제거하여 중량 10~15kg 절감, 배치 자유도 향상, 자율주행 최적화를 달성합니다. Brembo SENSIFY가 대표적입니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 52일 학습 로드맵 회고
-    </button>
-    <div class="accordion-content">
-        <p><strong>1~14일:</strong> 진동의 기초<br><strong>15~26일:</strong> 다자유도·모달 해석<br><strong>27~33일:</strong> 주파수응답·감쇠<br><strong>34~40일:</strong> 타이어·서스펜션<br><strong>41~46일:</strong> 조향·선회<br><strong>47~52일:</strong> 브레이크 동역학</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 디지털 트윈과 시뮬레이션
-    </button>
-    <div class="accordion-content">
-        <p>52일간 배운 모든 물리 모델을 실시간으로 실행하는 것이 <strong>디지털 트윈</strong>입니다. 클라우드에서 수천 개의 시나리오를 병렬 시뮬레이션하여 제어 로직을 최적화합니다.</p><div class='deriv-equation'><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Digital Twin</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Physics Model</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">Sensor Data</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">ML Correction</span></span></span></span></span></div>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 뇌과학: 52일 학습의 신경과학
-    </button>
-    <div class="accordion-content">
-        <p>52일의 집중 학습은 <strong>해마(hippocampus)</strong>에서 <strong>신피질(neocortex)</strong>로의 기억 공고화(memory consolidation)를 통해 장기 기억으로 전환됩니다. 수면 중 <strong>재활성화(replay)</strong>가 핵심이며, 규칙적인 복습이 시냅스 강화를 촉진합니다.</p>
-    </div>
-</div>
+  <div class="section-label">QUIZ</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
 
-</div>
-
-<!-- Footer Navigation -->
-<!-- ══════ FORMULA EXPLORER ══════ -->
-<div class="section">
-    <div class="section-label">TOOLS</div>
-    <div class="section-title">수식 탐색기</div>
-    <div class="formula-explorer">
-        <p style="color:var(--text-dim);font-style:italic;">이 섹션의 핵심 수식을 인터랙티브하게 탐색하세요. 각 변수에 마우스를 올리면 설명이 표시됩니다.</p>
+  <!-- Q1 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 01 — 제동 거리</div>
+    <p class="quiz-q">100km/h → 0 정지거리를 구성하는 3요소는?</p>
+    <div class="quiz-options" id="q1">
+      <div class="quiz-opt">A. 반응거리 + 빌드업거리 + 순수 제동거리</div>
+      <div class="quiz-opt">B. 가속거리 + 관성거리 + 마찰거리</div>
+      <div class="quiz-opt">C. 전진거리 + 횡이동거리 + 수직거리</div>
+      <div class="quiz-opt">D. 타이어거리 + 도로거리 + 공기거리</div>
     </div>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 02 — AEB 시스템</div>
+    <p class="quiz-q">AEB(자동긴급제동)가 반응시간을 완전히 0으로 만들 수 있는가?</p>
+    <div class="quiz-options" id="q2">
+      <div class="quiz-opt">A. 아니오 — 센서 처리시간(~0.1s)과 유압 빌드업은 여전히 존재</div>
+      <div class="quiz-opt">B. 예 — 완전히 0이 됨</div>
+      <div class="quiz-opt">C. 오히려 더 길어짐</div>
+      <div class="quiz-opt">D. 속도에 따라 다름</div>
+    </div>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 03 — 적분기 스텝</div>
+    <p class="quiz-q">Simpack에서 100→0 제동 시뮬레이션 시 적분기 최대 스텝 사이즈는?</p>
+    <div class="quiz-options" id="q3">
+      <div class="quiz-opt">A. ≤ 1ms (ABS 사이클과 빠른 하중이동 포착)</div>
+      <div class="quiz-opt">B. ≤ 1s</div>
+      <div class="quiz-opt">C. ≤ 10s</div>
+      <div class="quiz-opt">D. 제한 없음</div>
+    </div>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
 </div>
-
-<!-- ══════ SPACED REPETITION ══════ -->
-
-
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section">
     <a href="Day51_회생제동시스템.html" class="nav-btn">← Day 51: 회생 제동 시스템</a>
@@ -707,7 +839,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -763,15 +895,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

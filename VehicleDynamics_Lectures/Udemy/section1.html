@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Section 1: Modeling the Suspension System</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:#f5f6fa;color:#1a1a2e;line-height:1.85}
+.banner{background:linear-gradient(135deg,#0d1b2a 0%,#1d3557 50%,#457b9d 100%);color:#fff;padding:55px 40px;text-align:center}
+.banner h1{font-size:2.1em;border-bottom:3px solid #e63946;display:inline-block;padding-bottom:8px}
+.banner .sub{color:#a8dadc;font-size:1.05em;margin-top:14px}
+.banner .meta{color:#7fb3c7;font-size:.9em;margin-top:6px}
+.wrap{max-width:920px;margin:0 auto;padding:25px 42px 70px}
+h2{font-size:1.65em;color:#1d3557;margin:52px 0 14px;border-left:5px solid #e63946;padding-left:16px}
+h3{font-size:1.25em;color:#457b9d;margin:28px 0 10px}
+h4{font-size:1.08em;color:#e63946;margin:20px 0 8px}
+p{margin:11px 0;font-size:1.04em}
+.eq{background:#fff;border:1px solid #dde;border-radius:8px;padding:18px 24px;margin:18px 0;box-shadow:0 2px 7px rgba(0,0,0,.045);overflow-x:auto}
+.eq.hl{border-left:5px solid #e63946;background:#fff6f6}
+.eq.res{border:2px solid #2a9d8f;background:#f0faf8}
+.eq.pr{border-left:5px solid #e6b800;background:#fffef0}
+.nt{padding:14px 20px;margin:18px 0;border-radius:0 8px 8px 0;font-size:.97em}
+.nt.info{background:#edf6ff;border-left:4px solid #457b9d}
+.nt.warn{background:#fff8e1;border-left:4px solid #f4a261}
+.nt.key{background:#f0faf8;border-left:4px solid #2a9d8f}
+.tag{display:inline-block;background:#e63946;color:#fff;padding:2px 13px;border-radius:18px;font-size:.82em;font-weight:700;margin-right:7px}
+.lr{font-size:.83em;color:#999;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;margin:18px 0}
+th,td{padding:10px 14px;border:1px solid #ddd;text-align:left}
+th{background:#1d3557;color:#fff;font-weight:500}
+tr:nth-child(even){background:#f6f6f6}
+.dia{text-align:center;margin:32px auto;overflow-x:auto}
+.toc{background:#fff;border:1px solid #dde;border-radius:10px;padding:26px 30px;margin:32px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.toc h3{margin:0 0 14px;color:#1d3557;border:none;padding:0}
+.toc ol{padding-left:22px}.toc li{margin:6px 0;font-size:.99em}
+.toc a{color:#457b9d;text-decoration:none}.toc a:hover{color:#e63946;text-decoration:underline}
+.cols{display:flex;gap:28px;margin:18px 0;flex-wrap:wrap}.cols>div{flex:1;min-width:260px}
+hr{border:none;border-top:1px solid #dde;margin:40px 0}
+@media(max-width:700px){.wrap{padding:16px 18px 40px}.banner{padding:30px 18px}}
+</style>
+</head>
+<body>
+<div class="banner">
+  <h1>Section 1: Modeling the Suspension System</h1>
+  <div class="sub">Vehicle Suspension Control 1 — 수식을 한 줄 한 줄 풀어가며 이해하기</div>
+  <div class="meta">14 Lectures · 1hr 17min · 비선형 서스펜션 운동방정식의 완전한 유도</div>
+</div>
+<div class="wrap">
+<!-- ======================== TOC ======================== -->
+<div class="toc">
+<h3>📑 목차</h3>
+<ol>
+  <li><a href="#ch1">강의 1: 코스 구조 소개</a></li>
+  <li><a href="#ch2">강의 2: 차량 모델링 — 스프링과 댐퍼</a></li>
+  <li><a href="#ch3">강의 3-4: 뉴턴 제2법칙으로 비선형 운동방정식 유도</a></li>
+  <li><a href="#ch4">강의 5-7: 정적 평형 (Static Equilibrium)</a></li>
+  <li><a href="#ch5">강의 8-11: 선형 vs 비선형 시스템</a></li>
+  <li><a href="#ch6">강의 12-14: 선형화와 모달 분석의 동기</a></li>
+</ol>
+</div>
+<!-- ======================== CH1 ======================== -->
+<h2 id="ch1"><span class="tag">강의 1</span> 코스 구조 소개</h2>
+<p class="lr">Introduction to the course structure · 4min</p>
+<p>이 코스의 최종 목표는 <strong>비선형 서스펜션 시스템을 선형화(Linearize)</strong>하여 선형 제어 기법을 적용할 수 있는 형태로 만드는 것입니다.</p>
+<p>전체 여정은 다음과 같습니다:</p>
+<div class="eq pr">
+$$\\underbrace{\\text{물리 시스템}}_{\\text{차량 서스펜션}} \\;\\xrightarrow{\\text{뉴턴 법칙}}\\; \\underbrace{\\text{비선형 ODE}}_{\\sin\\theta,\\;\\cos\\theta\\;\\text{포함}} \\;\\xrightarrow{\\text{테일러 급수}}\\; \\underbrace{\\text{선형 ODE}}_{\\text{제어 가능}}$$
+</div>
+<p>Section 1에서는 이 여정의 첫 두 단계 — <strong>물리 시스템을 비선형 미분방정식으로 표현</strong>하는 과정을 다룹니다.</p>
+<hr>
+<!-- ======================== CH2 ======================== -->
+<h2 id="ch2"><span class="tag">강의 2</span> 차량 모델링 — 스프링과 댐퍼</h2>
+<p class="lr">Modeling the vehicle - springs &amp; dampers · 6min</p>
+<h3>🚗 시스템 개요: Passive Suspension</h3>
+<p>실제 차량의 서스펜션을 극도로 단순화하면, <strong>차체(sprung mass)</strong>가 전방과 후방의 <strong>스프링+댐퍼 조합</strong>으로 지면에 연결된 2자유도(2-DOF) 시스템이 됩니다.</p>
+<!-- === SVG DIAGRAM: Suspension Model === -->
+<div class="dia">
+<svg viewBox="0 0 700 420" width="700" height="420" xmlns="http://www.w3.org/2000/svg" style="font-family:'Noto Sans KR',sans-serif">
+  <!-- Ground -->
+  <line x1="30" y1="380" x2="670" y2="380" stroke="#333" stroke-width="2.5"/>
+  <g stroke="#666" stroke-width="1">
+    <line x1="40" y1="380" x2="28" y2="400"/><line x1="70" y1="380" x2="58" y2="400"/>
+    <line x1="100" y1="380" x2="88" y2="400"/><line x1="130" y1="380" x2="118" y2="400"/>
+    <line x1="160" y1="380" x2="148" y2="400"/><line x1="190" y1="380" x2="178" y2="400"/>
+    <line x1="220" y1="380" x2="208" y2="400"/><line x1="250" y1="380" x2="238" y2="400"/>
+    <line x1="280" y1="380" x2="268" y2="400"/><line x1="310" y1="380" x2="298" y2="400"/>
+    <line x1="340" y1="380" x2="328" y2="400"/><line x1="370" y1="380" x2="358" y2="400"/>
+    <line x1="400" y1="380" x2="388" y2="400"/><line x1="430" y1="380" x2="418" y2="400"/>
+    <line x1="460" y1="380" x2="448" y2="400"/><line x1="490" y1="380" x2="478" y2="400"/>
+    <line x1="520" y1="380" x2="508" y2="400"/><line x1="550" y1="380" x2="538" y2="400"/>
+    <line x1="580" y1="380" x2="568" y2="400"/><line x1="610" y1="380" x2="598" y2="400"/>
+    <line x1="640" y1="380" x2="628" y2="400"/><line x1="670" y1="380" x2="658" y2="400"/>
+  </g>
+  <!-- Wheels -->
+  <circle cx="175" cy="355" r="25" fill="#444" stroke="#222" stroke-width="2"/>
+  <circle cx="175" cy="355" r="8" fill="#888"/>
+  <circle cx="525" cy="355" r="25" fill="#444" stroke="#222" stroke-width="2"/>
+  <circle cx="525" cy="355" r="8" fill="#888"/>
+  <!-- Car Body -->
+  <rect x="100" y="140" width="500" height="80" rx="12" fill="#4A90D9" stroke="#2c5f8a" stroke-width="2.5" opacity="0.9"/>
+  <text x="350" y="188" text-anchor="middle" fill="white" font-size="18" font-weight="bold">Car Body  ( m , J )</text>
+  <!-- C.M. -->
+  <circle cx="350" cy="180" r="7" fill="#e63946"/>
+  <text x="370" y="150" fill="#e63946" font-size="14" font-weight="bold">C.M.</text>
+  <line x1="358" y1="174" x2="367" y2="155" stroke="#e63946" stroke-width="1.5" marker-end="none"/>
+  <!-- Front Spring (left) - zigzag -->
+  <polyline points="145,220 145,240 135,248 155,264 135,280 155,296 135,312 145,320 145,330" fill="none" stroke="#e67e22" stroke-width="2.5"/>
+  <text x="112" y="280" fill="#e67e22" font-size="16" font-weight="bold">k₁</text>
+  <!-- Front Damper -->
+  <line x1="200" y1="220" x2="200" y2="260" stroke="#8e44ad" stroke-width="2.5"/>
+  <rect x="188" y="260" width="24" height="40" fill="#e8e0f0" stroke="#8e44ad" stroke-width="2"/>
+  <line x1="200" y1="300" x2="200" y2="330" stroke="#8e44ad" stroke-width="2.5"/>
+  <text x="218" y="280" fill="#8e44ad" font-size="16" font-weight="bold">c₁</text>
+  <!-- Rear Spring (right) - zigzag -->
+  <polyline points="495,220 495,240 485,248 505,264 485,280 505,296 485,312 495,320 495,330" fill="none" stroke="#e67e22" stroke-width="2.5"/>
+  <text x="510" y="280" fill="#e67e22" font-size="16" font-weight="bold">k₂</text>
+  <!-- Rear Damper -->
+  <line x1="555" y1="220" x2="555" y2="260" stroke="#8e44ad" stroke-width="2.5"/>
+  <rect x="543" y="260" width="24" height="40" fill="#e8e0f0" stroke="#8e44ad" stroke-width="2"/>
+  <line x1="555" y1="300" x2="555" y2="330" stroke="#8e44ad" stroke-width="2.5"/>
+  <text x="572" y="280" fill="#8e44ad" font-size="16" font-weight="bold">c₂</text>
+  <!-- Distance labels -->
+  <line x1="175" y1="235" x2="350" y2="235" stroke="#2a9d8f" stroke-width="1.8" stroke-dasharray="4"/>
+  <polygon points="175,235 183,231 183,239" fill="#2a9d8f"/>
+  <polygon points="350,235 342,231 342,239" fill="#2a9d8f"/>
+  <text x="255" y="228" fill="#2a9d8f" font-size="16" font-weight="bold">ℓ₁</text>
+  <line x1="350" y1="235" x2="525" y2="235" stroke="#2a9d8f" stroke-width="1.8" stroke-dasharray="4"/>
+  <polygon points="525,235 517,231 517,239" fill="#2a9d8f"/>
+  <text x="430" y="228" fill="#2a9d8f" font-size="16" font-weight="bold">ℓ₂</text>
+  <!-- x(t) bounce arrow -->
+  <line x1="42" y1="180" x2="42" y2="90" stroke="#1d3557" stroke-width="2.5"/>
+  <polygon points="42,85 36,97 48,97" fill="#1d3557"/>
+  <text x="50" y="95" fill="#1d3557" font-size="15" font-weight="bold">x(t)</text>
+  <text x="50" y="113" fill="#1d3557" font-size="12">Bounce</text>
+  <!-- theta(t) pitch arc -->
+  <path d="M 310,70 A 60,25 0 0,1 390,70" fill="none" stroke="#e63946" stroke-width="2.5"/>
+  <polygon points="390,70 380,64 384,75" fill="#e63946"/>
+  <text x="328" y="55" fill="#e63946" font-size="15" font-weight="bold">θ(t) Pitch</text>
+  <!-- mg arrow -->
+  <line x1="350" y1="220" x2="350" y2="270" stroke="#c0392b" stroke-width="2"/>
+  <polygon points="350,275 344,263 356,263" fill="#c0392b"/>
+  <text x="358" y="268" fill="#c0392b" font-size="14" font-weight="bold">mg</text>
+  <!-- Labels -->
+  <text x="155" y="345" text-anchor="middle" fill="#fff" font-size="10">Front</text>
+  <text x="505" y="345" text-anchor="middle" fill="#fff" font-size="10">Rear</text>
+</svg>
+</div>
+<h3>변수 정의</h3>
+<table>
+<tr><th>기호</th><th>의미</th><th>단위</th></tr>
+<tr><td>$m$</td><td>차체 질량 (sprung mass)</td><td>kg</td></tr>
+<tr><td>$J$</td><td>차체의 질량 중심에 대한 회전 관성 모멘트</td><td>kg·m²</td></tr>
+<tr><td>$k_1,\\; k_2$</td><td>전방/후방 스프링 상수</td><td>N/m</td></tr>
+<tr><td>$c_1,\\; c_2$</td><td>전방/후방 댐퍼(감쇠) 계수</td><td>N·s/m</td></tr>
+<tr><td>$x(t)$</td><td>무게중심의 수직 변위 (bounce) — <em>위쪽 양(+)</em></td><td>m</td></tr>
+<tr><td>$\\theta(t)$</td><td>차체 피칭 각도 (pitch) — <em>반시계 양(+)</em></td><td>rad</td></tr>
+<tr><td>$\\ell_1,\\; \\ell_2$</td><td>무게중심에서 전방/후방 서스펜션까지의 수평 거리</td><td>m</td></tr>
+</table>
+<div class="nt key">
+<strong>핵심 포인트:</strong> 이 시스템은 <strong>2자유도(2-DOF)</strong> 시스템입니다. 차체는 위아래로 움직이고(bounce, $x$), 동시에 앞뒤로 회전합니다(pitch, $\\theta$). 이 두 운동이 결합되어 있습니다.
+</div>
+<h3>🔵 스프링이 만드는 힘</h3>
+<p>스프링은 <strong>변위(늘어난 길이)에 비례</strong>하는 복원력을 만듭니다. 후크의 법칙(Hooke's Law):</p>
+<div class="eq pr">
+$$F_{\\text{spring}} = -k \\cdot \\Delta x$$
+</div>
+<p>마이너스(−)는 변위 방향의 <em>반대</em>로 힘이 작용한다는 의미입니다(복원력). $\\Delta x$는 스프링이 평형 위치에서 얼마나 변형되었는지입니다.</p>
+<h3>🔴 댐퍼(감쇠기)가 만드는 힘</h3>
+<p>댐퍼는 스프링과 다릅니다. 댐퍼는 <strong>속도(변위의 시간 변화율)에 비례</strong>하는 힘을 만듭니다:</p>
+<div class="eq pr">
+$$F_{\\text{damper}} = -c \\cdot \\dot{\\Delta x}$$
+</div>
+<p>여기서 $\\dot{\\Delta x} = \\dfrac{d(\\Delta x)}{dt}$, 즉 변위의 시간 미분(= 속도)입니다.</p>
+<div class="nt info">
+<strong>정리:</strong> 스프링은 <em>"얼마나 움직였는가"</em>(변위)에 반응하고, 댐퍼는 <em>"얼마나 빨리 움직이는가"</em>(속도)에 반응합니다. 이 둘이 합쳐져서 서스펜션의 동적 특성을 결정합니다.
+</div>
+<hr>
+<!-- ======================== CH3 ======================== -->
+<h2 id="ch3"><span class="tag">강의 3-4</span> 뉴턴 제2법칙으로 비선형 운동방정식 유도</h2>
+<p class="lr">Modeling the vehicle - Newton's 2nd law 1 &amp; 2 · 4min + 11min</p>
+<p>이제 드디어 운동방정식을 세울 차례입니다. 물리학의 가장 기본 법칙에서 출발합니다.</p>
+<!-- === SVG DIAGRAM: Free Body Diagram === -->
+<h3>자유물체도 (Free Body Diagram)</h3>
+<div class="dia">
+<svg viewBox="0 0 660 350" width="660" height="350" xmlns="http://www.w3.org/2000/svg" style="font-family:'Noto Sans KR',sans-serif">
+  <!-- Body -->
+  <rect x="100" y="120" width="460" height="65" rx="10" fill="#4A90D9" stroke="#2c5f8a" stroke-width="2" opacity=".85"/>
+  <text x="330" y="160" text-anchor="middle" fill="#fff" font-size="16" font-weight="bold">m, J</text>
+  <!-- C.M. -->
+  <circle cx="330" cy="152" r="6" fill="#e63946"/>
+  <!-- Tilt line (theta) -->
+  <line x1="80" y1="170" x2="580" y2="120" stroke="#f4a261" stroke-width="2" stroke-dasharray="6"/>
+  <text x="585" y="118" fill="#f4a261" font-size="13" font-weight="bold">θ(t)</text>
+  <!-- mg -->
+  <line x1="330" y1="185" x2="330" y2="260" stroke="#c0392b" stroke-width="2.5"/>
+  <polygon points="330,265 324,252 336,252" fill="#c0392b"/>
+  <text x="342" y="250" fill="#c0392b" font-size="15" font-weight="bold">mg</text>
+  <!-- Fs1 up -->
+  <line x1="150" y1="120" x2="150" y2="60" stroke="#e67e22" stroke-width="2.5"/>
+  <polygon points="150,55 144,68 156,68" fill="#e67e22"/>
+  <text x="125" y="50" fill="#e67e22" font-size="14" font-weight="bold">F<tspan font-size="10" dy="4">s₁</tspan></text>
+  <!-- FD1 up -->
+  <line x1="200" y1="120" x2="200" y2="60" stroke="#8e44ad" stroke-width="2.5"/>
+  <polygon points="200,55 194,68 206,68" fill="#8e44ad"/>
+  <text x="208" y="50" fill="#8e44ad" font-size="14" font-weight="bold">F<tspan font-size="10" dy="4">D₁</tspan></text>
+  <!-- Fs2 up -->
+  <line x1="460" y1="120" x2="460" y2="60" stroke="#e67e22" stroke-width="2.5"/>
+  <polygon points="460,55 454,68 466,68" fill="#e67e22"/>
+  <text x="435" y="50" fill="#e67e22" font-size="14" font-weight="bold">F<tspan font-size="10" dy="4">s₂</tspan></text>
+  <!-- FD2 up -->
+  <line x1="510" y1="120" x2="510" y2="60" stroke="#8e44ad" stroke-width="2.5"/>
+  <polygon points="510,55 504,68 516,68" fill="#8e44ad"/>
+  <text x="518" y="50" fill="#8e44ad" font-size="14" font-weight="bold">F<tspan font-size="10" dy="4">D₂</tspan></text>
+  <!-- ell_1 -->
+  <line x1="175" y1="200" x2="330" y2="200" stroke="#2a9d8f" stroke-width="1.5" stroke-dasharray="4"/>
+  <polygon points="175,200 185,196 185,204" fill="#2a9d8f"/>
+  <polygon points="330,200 320,196 320,204" fill="#2a9d8f"/>
+  <text x="240" y="218" fill="#2a9d8f" font-size="15" font-weight="bold">ℓ₁</text>
+  <!-- ell_2 -->
+  <line x1="330" y1="200" x2="485" y2="200" stroke="#2a9d8f" stroke-width="1.5" stroke-dasharray="4"/>
+  <polygon points="485,200 475,196 475,204" fill="#2a9d8f"/>
+  <text x="395" y="218" fill="#2a9d8f" font-size="15" font-weight="bold">ℓ₂</text>
+  <!-- Coordinate axes -->
+  <line x1="40" y1="300" x2="40" y2="240" stroke="#1d3557" stroke-width="2"/>
+  <polygon points="40,235 34,248 46,248" fill="#1d3557"/>
+  <text x="48" y="248" fill="#1d3557" font-size="13" font-weight="bold">+x</text>
+  <path d="M 22,310 A 18,18 0 0,0 58,310" fill="none" stroke="#e63946" stroke-width="2"/>
+  <polygon points="58,310 50,304 52,316" fill="#e63946"/>
+  <text x="26" y="335" fill="#e63946" font-size="13" font-weight="bold">+θ</text>
+  <!-- geometric labels -->
+  <line x1="150" y1="290" x2="150" y2="310" stroke="#888" stroke-width="1" stroke-dasharray="3"/>
+  <text x="135" y="325" fill="#888" font-size="11">−ℓ₁sinθ</text>
+  <line x1="510" y1="290" x2="510" y2="310" stroke="#888" stroke-width="1" stroke-dasharray="3"/>
+  <text x="490" y="325" fill="#888" font-size="11">+ℓ₂sinθ</text>
+</svg>
+</div>
+<h3>Step 1: 각 서스펜션 지점의 변위 (기하학)</h3>
+<p>차체가 $x$만큼 올라가고 $\\theta$만큼 기울었을 때, 각 서스펜션 연결점의 <strong>수직 변위</strong>를 구합니다.</p>
+<p><strong>전방 서스펜션</strong> (무게중심에서 $\\ell_1$ 왼쪽)의 변위:</p>
+<div class="eq">
+$$\\Delta x_1 = x - \\ell_1 \\sin\\theta$$
+</div>
+<p>차체가 $\\theta$만큼 기울면, 전방은 무게중심보다 $\\ell_1 \\sin\\theta$만큼 <em>낮아집니다</em>.</p>
+<p><strong>후방 서스펜션</strong> (무게중심에서 $\\ell_2$ 오른쪽)의 변위:</p>
+<div class="eq">
+$$\\Delta x_2 = x + \\ell_2 \\sin\\theta$$
+</div>
+<p>반대로, 후방은 무게중심보다 $\\ell_2 \\sin\\theta$만큼 <em>높아집니다</em>.</p>
+<div class="nt warn">
+<strong>⚠️ 주의:</strong> 여기서 $\\sin\\theta$를 그대로 유지합니다. 작은 각도 근사($\\sin\\theta \\approx \\theta$)를 아직 적용하지 않습니다 — 이것이 이 방정식을 <strong>비선형</strong>으로 만드는 핵심입니다!
+</div>
+<h3>Step 2: 각 변위의 시간 미분 (속도)</h3>
+<p>댐퍼 힘을 구하려면 변위의 시간 미분(= 속도)이 필요합니다. $\\Delta x_1$을 시간으로 미분합니다:</p>
+<div class="eq">
+$$\\dot{\\Delta x_1} = \\dot{x} - \\ell_1 \\cos\\theta \\cdot \\dot{\\theta}$$
+</div>
+<p>체인 룰에 의해 $\\dfrac{d}{dt}(\\sin\\theta) = \\cos\\theta \\cdot \\dot\\theta$가 됩니다. 마찬가지로:</p>
+<div class="eq">
+$$\\dot{\\Delta x_2} = \\dot{x} + \\ell_2 \\cos\\theta \\cdot \\dot{\\theta}$$
+</div>
+<div class="nt info">
+<strong>$\\cos\\theta$가 등장하는 이유:</strong> $\\sin\\theta$를 시간 미분하면 체인 룰에 의해 $\\cos\\theta \\cdot \\dot\\theta$가 됩니다. 이것이 비선형 항을 더 복잡하게 만듭니다.
+</div>
+<h3>Step 3: 각 힘의 표현</h3>
+<p>이제 스프링과 댐퍼의 힘을 $x$와 $\\theta$로 표현합니다. 부호 규약: 스프링이 눌리면(서스펜션 변위가 양이면) 차체를 <strong>위로</strong> 미는 복원력이 작용합니다. 이 강의에서는 차체 기준으로 아래 방향 변위에 대한 복원력이 위쪽이므로 부호가 마이너스(−)가 됩니다:</p>
+<div class="eq hl">
+$$F_{s_1} = -k_1(x - \\ell_1 \\sin\\theta)$$
+$$F_{D_1} = -c_1(\\dot{x} - \\ell_1 \\cos\\theta \\cdot \\dot{\\theta})$$
+$$F_{s_2} = -k_2(x + \\ell_2 \\sin\\theta)$$
+$$F_{D_2} = -c_2(\\dot{x} + \\ell_2 \\cos\\theta \\cdot \\dot{\\theta})$$
+</div>
+<h3>Step 4: 뉴턴 제2법칙 — 수직 방향 (Bounce)</h3>
+<h4>대원칙</h4>
+<div class="eq pr">
+$$\\uparrow^{+}\\;\\sum F = m\\ddot{x}$$
+</div>
+<p>"<strong>모든 힘의 합 = 질량 × 가속도</strong>" — 이것이 출발점입니다.</p>
+<p>차체에 수직 방향으로 작용하는 모든 힘을 더합니다:</p>
+<div class="eq">
+$$F_{s_1} + F_{D_1} + F_{s_2} + F_{D_2} - mg = m\\ddot{x}$$
+</div>
+<p>Step 3의 힘 표현을 대입합니다:</p>
+<div class="eq hl">
+$$-k_1(x - \\ell_1\\sin\\theta) - c_1(\\dot{x} - \\ell_1\\cos\\theta\\cdot\\dot\\theta) - k_2(x + \\ell_2\\sin\\theta) - c_2(\\dot{x} + \\ell_2\\cos\\theta\\cdot\\dot\\theta) - mg = m\\ddot{x}$$
+</div>
+<p>좌변을 정리하여 $m\\ddot{x}$를 좌변으로 옮기면:</p>
+<div class="eq res">
+$$\\boxed{m\\ddot{x} + (c_1 + c_2)\\dot{x} + (c_2\\ell_2 - c_1\\ell_1)\\cos\\theta\\cdot\\dot\\theta + (k_1 + k_2)x + (k_2\\ell_2 - k_1\\ell_1)\\sin\\theta + mg = 0}$$
+</div>
+<div class="nt key">
+<strong>비선형 항 확인:</strong> $\\sin\\theta$와 $\\cos\\theta\\cdot\\dot\\theta$가 포함되어 있으므로 이것은 <strong>비선형</strong> 미분방정식입니다!
+</div>
+<h3>Step 5: 뉴턴 제2법칙 — 회전 방향 (Pitch)</h3>
+<h4>대원칙: 회전 운동의 뉴턴 법칙</h4>
+<div class="eq pr">
+$$\\circlearrowleft^{+}\\;\\sum M_{C.M.} = J\\ddot{\\theta}$$
+</div>
+<p>"<strong>모든 모멘트의 합 = 관성 모멘트 × 각가속도</strong>" — 회전 버전입니다.</p>
+<p>무게중심(C.M.)을 기준으로 각 힘이 만드는 모멘트를 계산합니다. <strong>모멘트 = 힘 × 거리</strong>이므로:</p>
+<div class="eq">
+$$F_{s_2}\\cdot\\ell_2 + F_{D_2}\\cdot\\ell_2 - F_{s_1}\\cdot\\ell_1 - F_{D_1}\\cdot\\ell_1 = J\\ddot{\\theta}$$
+</div>
+<p>후방(+$\\ell_2$)의 힘은 반시계 모멘트(+), 전방(+$\\ell_1$)의 힘은 시계 모멘트(−)를 만듭니다.</p>
+<p>Step 3의 힘을 대입하고 정리하면:</p>
+<div class="eq res">
+$$\\boxed{J\\ddot\\theta + (c_1\\ell_1^2 + c_2\\ell_2^2)\\cos\\theta\\cdot\\dot\\theta + (k_1\\ell_1^2 + k_2\\ell_2^2)\\sin\\theta + (c_2\\ell_2 - c_1\\ell_1)\\dot{x} + (k_2\\ell_2 - k_1\\ell_1)x = 0}$$
+</div>
+<h3>🎯 Step 6: 최종 비선형 연립 운동방정식</h3>
+<p>지금까지 유도한 두 방정식을 모으면:</p>
+<div class="eq res" style="border-width:3px">
+<p style="text-align:center;font-weight:700;color:#1d3557;margin-bottom:10px">2-DOF 비선형 서스펜션 운동방정식</p>
+$$m\\ddot{x} + (c_1+c_2)\\dot{x} + (c_2\\ell_2 - c_1\\ell_1)\\cos\\theta\\cdot\\dot\\theta + (k_1+k_2)x + (k_2\\ell

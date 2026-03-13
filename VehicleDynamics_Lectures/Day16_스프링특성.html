@@ -226,6 +226,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -334,6 +340,36 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     </div>
 </div>
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 선형 스프링: 후크의 법칙</p>
+    <div class="sub-eq">$$F = kx \quad \Rightarrow \quad k = \frac{dF}{dx} = \text{const}$$</div>
+    <p class="sub-note">이상적인 경우. 실제 스프링은 비선형성이 항상 존재</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 프로그레시브(Progressive) 스프링 모델</p>
+    <div class="sub-eq">$$F(x) = k_1 x + k_3 x^3 \quad (k_3 > 0)$$</div>
+    <div class="sub-eq">$$k_{eff}(x) = \frac{dF}{dx} = k_1 + 3k_3 x^2$$</div>
+    <p class="sub-note"><strong>물리적 의미:</strong> 변위가 커질수록 강성↑. 코일 스프링의 피치가 불균일하면 자연스럽게 프로그레시브 특성</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 듀얼 레이트 스프링</p>
+    <div class="sub-eq">$$k_{eff} = \begin{cases} k_1 & |x| \leq x_{transition} \\ k_1 + k_2 & |x| > x_{transition} \end{cases}$$</div>
+    <p class="sub-note">범프스톱 접촉 시 갑자기 강성↑ → 충격 완화를 위해 <strong>프로그레시브 범프스톱</strong> 적용</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 에너지 저장과 위치에너지</p>
+    <div class="sub-eq">$$U = \int_0^x F(x')\,dx' = \frac{1}{2}k_1 x^2 + \frac{1}{4}k_3 x^4$$</div>
+    <div class="sub-eq">$$\text{등가 선형 강성: } k_{eq} = \frac{2U}{x_{max}^2}$$</div>
+    <p class="sub-note"><strong>SIMPACK 적용:</strong> 비선형 스프링은 Force Element → Spline Data로 F-x 곡선 직접 입력</p>
+  </div>
+</div>
+
 <!-- ⑥ 파라미터 테이블 -->
 <div class="section">
   <div class="section-label">PARAMETERS</div>
@@ -475,7 +511,7 @@ td .katex,th .katex{font-size:0.9em!important}
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 에어 스프링 vs 코일 스프링: 강성 비교 — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -486,7 +522,7 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 Progressive Spring — 왜 비선형이 필요한가?</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -507,7 +543,7 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     </div>
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 범프스톱과 리바운드스톱 — 스트로크 관리</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -546,42 +582,112 @@ td .katex,th .katex{font-size:0.9em!important}
 <!-- ══════ FORMULA EXPLORER ══════ -->
 
 
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 스프링 특성곡선 시뮬레이터</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day16" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day16-controls" class="sim-controls"></div>
+    <div id="sim-day16-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day16');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day16-controls');
+    const metricBox = document.getElementById('sim-day16-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_k = addSlider('선형강성 k (N/mm)', 10, 50, 25, 1, 'sim16-k');
+    const sl_nl = addSlider('비선형계수 α', 0, 5, 0.5, 0.1, 'sim16-nl');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const k=+sl_k.value, nl=+sl_nl.value;
+      const maxX=100, maxF=k*maxX*(1+nl*maxX/100);
+      // Linear
+      ctx.strokeStyle='rgba(74,158,191,0.5)'; ctx.lineWidth=1; ctx.setLineDash([4,4]); ctx.beginPath();
+      for(let i=0;i<=200;i++){const x=i*maxX/200;const F=k*x;const px=50+i*(W-100)/200;const py=H-30-F*(H-60)/maxF;ctx.lineTo(px,py);} ctx.stroke(); ctx.setLineDash([]);
+      // Nonlinear: F = k*x*(1+α*x/100)
+      ctx.strokeStyle='#C9A84C'; ctx.lineWidth=2.5; ctx.beginPath();
+      for(let i=0;i<=200;i++){const x=i*maxX/200;const F=k*x*(1+nl*x/100);const px=50+i*(W-100)/200;const py=H-30-F*(H-60)/maxF;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);} ctx.stroke();
+      // Compression side (negative)
+      ctx.strokeStyle='#E06C75'; ctx.lineWidth=2; ctx.beginPath();
+      for(let i=0;i<=200;i++){const x=i*maxX/200;const F=k*x*(1+nl*0.3*x/100);const px=50-i*(W-100)/400;const py=H-30+F*(H-60)/maxF/2;i===0?ctx.moveTo(50,H-30):ctx.lineTo(px,py);} ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.beginPath();ctx.moveTo(50,0);ctx.lineTo(50,H);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(0,H-30);ctx.lineTo(W,H-30);ctx.stroke();
+      ctx.fillStyle='#8A8F98';ctx.font='12px monospace';ctx.fillText('변위 x (mm)',W-110,H-10);ctx.fillText('힘 F (N)',55,15);
+      ctx.fillStyle='#C9A84C';ctx.fillText('— 리바운드 (비선형)',150,20);
+      ctx.fillStyle='#E06C75';ctx.fillText('— 범프 (비선형)',150,36);
+      ctx.fillStyle='rgba(74,158,191,0.7)';ctx.fillText('--- 선형',150,52);
+      setMetrics([['선형강성',k+' N/mm'],['에너지 비대칭','범프/리바운드 비선형 차이']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
 <!-- ⑩ 퀴즈 -->
 <div class="section">
   <div class="section-label">QUIZ</div>
   <h2 class="section-title">즉시 복습 퀴즈</h2>
-  
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 01 — 수식 빈칸 채우기</div>
-      <p class="quiz-q">직렬 스프링 합성 공식: 1/k_eq = 1/k₁ + 1/k₂에서 k₁=20, k₂=30이면 k_eq = ___N/mm.</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q1')">정답 확인</button>
+
+    <div class="quiz-card" data-correct="3">
+      <div class="quiz-num">QUESTION 01 — 직렬·병렬 강성</div>
+      <p class="quiz-q">동일한 강성 k인 스프링 두 개를 직렬로 연결했을 때 합성 강성은?</p>
+      <div class="quiz-options" id="q1">
+        <div class="quiz-opt">A. 2k</div>
+        <div class="quiz-opt">B. k</div>
+        <div class="quiz-opt">C. k/2</div>
+        <div class="quiz-opt">D. k²</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q1-fb" style="display:none;margin-top:10px">
-        ✅ 12 (= 20×30/(20+30) = 600/50)
-      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 02 — 물리적 의미 연결</div>
-      <p class="quiz-q">범프스톱이 메인 스프링과 &#x27;병렬&#x27;인 이유는?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q2')">정답 확인</button>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 02 — 범프스톱 역할</div>
+      <p class="quiz-q">범프스톱(bump stop)이 메인 코일 스프링과 병렬로 작용하는 이유는?</p>
+      <div class="quiz-options" id="q2">
+        <div class="quiz-opt">A. 동일한 힘을 분담하므로</div>
+        <div class="quiz-opt">B. 동일한 변위를 공유하므로</div>
+        <div class="quiz-opt">C. 직렬 경로에 위치하므로</div>
+        <div class="quiz-opt">D. 댐퍼와 일체형이므로</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q2-fb" style="display:none;margin-top:10px">
-        ✅ 둘 다 같은 변위(휠 트래블)를 공유하고 힘이 합산되기 때문이다. 범프스톱 접촉 후 합성 강성이 급증한다.
-      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 03 — Simpack 적용</div>
-      <p class="quiz-q">Simpack에서 비선형 스프링을 입력하는 방법은?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q3')">정답 확인</button>
+    <div class="quiz-card" data-correct="3">
+      <div class="quiz-num">QUESTION 03 — Simpack 스프링 입력</div>
+      <p class="quiz-q">Simpack에서 비선형 스프링 특성을 입력하는 올바른 방법은?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. 단일 강성값 K 입력</div>
+        <div class="quiz-opt">B. 다항식 계수 입력</div>
+        <div class="quiz-opt">C. F-x 테이블(포인트별) 입력</div>
+        <div class="quiz-opt">D. 주파수 응답 함수 입력</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q3-fb" style="display:none;margin-top:10px">
-        ✅ Force Element &gt; Spring &gt; Nonlinear에서 F-x 곡선을 테이블(포인트별)로 입력한다
-      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
     </div>
 </div>
 
@@ -609,6 +715,26 @@ td .katex,th .katex{font-size:0.9em!important}
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -637,7 +763,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -693,15 +819,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

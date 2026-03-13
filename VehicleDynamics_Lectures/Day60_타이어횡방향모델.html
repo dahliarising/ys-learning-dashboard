@@ -232,6 +232,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -361,6 +367,40 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 
     <div class="checkpoint"><strong>✅ 체크포인트:</strong> Magic Formula의 4계수(B,C,D,E)가 각각 강성, 형상, 피크, 곡률을 결정하며, 이들은 모두 하중의 함수라는 점을 기억하세요.</div>
+</div>
+
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① Pacejka Magic Formula (횡력)</p>
+    <div class="sub-eq">$$F_y = D \sin\bigl(C \arctan(B\alpha - E(B\alpha - \arctan(B\alpha)))\bigr)$$</div>
+    <div class="sub-eq">$$D = \mu_{y} F_z, \quad C \approx 1.3\sim1.65, \quad B = \frac{K_{y\alpha}}{C \cdot D}$$</div>
+    <p class="sub-note">B: 강성 팩터, C: 형상 팩터, D: 피크값, E: 곡률 팩터. 4개 계수로 타이어 특성 완전 표현</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 복합 슬립 (Combined Slip)</p>
+    <div class="sub-eq">$$\sigma_x = \frac{s}{1+s}, \quad \sigma_y = \frac{\tan\alpha}{1+s}$$</div>
+    <div class="sub-eq">$$\sigma = \sqrt{\sigma_x^2 + \sigma_y^2}$$</div>
+    <div class="sub-eq">$$F_x = \frac{\sigma_x}{\sigma} F(\sigma), \quad F_y = \frac{\sigma_y}{\sigma} F(\sigma)$$</div>
+    <p class="sub-note">마찰원(friction circle/ellipse) 개념: 종+횡 합력이 μFz 이내. 제동 중 조향 시 횡력 감소!</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 하중 감도 (Load Sensitivity)</p>
+    <div class="sub-eq">$$\mu_{eff}(F_z) = D/F_z = p_{Dy1} + p_{Dy2}(F_z - F_{z0})/F_{z0}$$</div>
+    <div class="sub-eq">$$\frac{\partial \mu}{\partial F_z} < 0 \quad (\text{하중 증가 }\to\text{ 마찰계수 감소})$$</div>
+    <p class="sub-note"><strong>핵심:</strong> 하중 감도 때문에 하중이동 시 총 횡력 감소. 낮은 CG가 유리한 물리적 근거</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 온도/마모 보정</p>
+    <div class="sub-eq">$$F_y(T) = F_{y,ref} \times \lambda_T(T_{surface})$$</div>
+    <div class="sub-eq">$$\lambda_T = 1 + p_{Ty1}(T - T_{ref}) + p_{Ty2}(T - T_{ref})^2$$</div>
+    <div class="sub-eq">$$\text{최적 온도: } T_{opt} \approx 80\sim100^{\circ}C \;(\text{일반 승용 타이어})$$</div>
+    <p class="sub-note">MF 6.2 이상에서 온도 효과 포함. 레이싱에서 타이어 워밍업이 중요한 이유 = 점착력 온도 의존성</p>
+  </div>
 </div>
 
 <!-- ══════ PARAMETERS SECTION ══════ -->
@@ -566,12 +606,80 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 </div>
 
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 Pacejka Magic Formula</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day60" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day60-controls" class="sim-controls"></div>
+    <div id="sim-day60-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day60');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day60-controls');
+    const metricBox = document.getElementById('sim-day60-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_B = addSlider('B (강성)', 5, 20, 10, 0.5, 'sim60-B');
+    const sl_C = addSlider('C (형상)', 1.0, 2.0, 1.3, 0.05, 'sim60-C');
+    const sl_D = addSlider('D (피크) (kN)', 2, 8, 5, 0.5, 'sim60-D');
+    const sl_E = addSlider('E (곡률)', -3, 1, -0.5, 0.1, 'sim60-E');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const B=+sl_B.value, C=+sl_C.value, D=+sl_D.value*1000, E=+sl_E.value;
+      // Fy = D*sin(C*atan(B*α - E*(B*α - atan(B*α))))
+      ctx.strokeStyle='#C9A84C';ctx.lineWidth=2.5;ctx.beginPath();
+      for(let i=0;i<=300;i++){
+        const alpha=(i-150)*15/150; // -15~15 deg
+        const aRad=alpha*Math.PI/180;
+        const Ba=B*aRad;
+        const Fy=D*Math.sin(C*Math.atan(Ba-E*(Ba-Math.atan(Ba))));
+        const px=i*W/300, py=H/2-Fy*(H-40)/(D*1.1);
+        i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+      } ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();
+      ctx.fillStyle='#8A8F98';ctx.font='12px monospace';ctx.fillText('슬립각 α (°)',W-100,H/2+15);ctx.fillText('Fy (kN) ↑',5,15);
+      // Peak point
+      ctx.fillStyle='#E06C75';ctx.font='11px monospace';ctx.fillText('Fy = D·sin(C·atan(Bα-E(Bα-atan(Bα))))',10,H-15);
+      setMetrics([['B (강성인자)',B.toFixed(1)],['C (형상인자)',C.toFixed(2)],['D (피크값)',(D/1000).toFixed(1)+' kN'],['E (곡률인자)',E.toFixed(1)]]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
 <!-- ══════ QUIZ SECTION ══════ -->
 <div class="section">
     <div class="section-label">QUIZ</div>
     <div class="section-title">퀴즈</div>
 
-    <div class="quiz-card" id="q60-1" data-correct="1">
+    <div class="quiz-card" id="q60-1" data-correct="2">
         <div class="quiz-num">QUIZ 01</div>
         <div class="quiz-q">Pacejka Magic Formula에서 <strong>초기 기울기(Cornering Stiffness)</strong>를 결정하는 조합은?</div>
         <div class="quiz-options">
@@ -590,7 +698,7 @@ td .katex,th .katex{font-size:0.9em!important}
         </div>
     </div>
 
-    <div class="quiz-card" id="q60-2" data-correct="2">
+    <div class="quiz-card" id="q60-2" data-correct="3">
         <div class="quiz-num">QUIZ 02</div>
         <div class="quiz-q">제동 중 코너링 시 타이어의 횡력이 감소하는 이유를 <strong>마찰원</strong> 관점에서 올바르게 설명한 것은?</div>
         <div class="quiz-options">
@@ -608,6 +716,18 @@ td .katex,th .katex{font-size:0.9em!important}
             <div class="sol-insight"><strong>💡 실무 포인트:</strong> ABS/ESP 튜닝에서 제동 시 코너링 그립 확보가 핵심 과제입니다.</div>
         </div>
     </div>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 03 — 횡방향 모델 활용</div>
+      <p class="quiz-q">타이어 횡방향 모델이 차량 동역학 시뮬레이션에서 필수적인 이유는?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. 승차감 분석에만 필요</div>
+        <div class="quiz-opt">B. 코너링 시 횡력-슬립각 관계가 차량 거동을 결정하므로</div>
+        <div class="quiz-opt">C. 제동 해석에만 사용</div>
+        <div class="quiz-opt">D. 타이어 마모 예측만 가능</div>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
 </div>
 
 <!-- ══════ DEEP DIVE SECTION ══════ -->
@@ -616,7 +736,7 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="section-title">심화 학습</div>
 
     <div class="accordion">
-        <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             MF 5.2 vs MF 6.2 — 무엇이 다른가?
             <span class="accordion-arrow">▼</span>
         </button>
@@ -630,7 +750,7 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 
     <div class="accordion">
-        <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             Relaxation Length — 타이어의 응답 지연
             <span class="accordion-arrow">▼</span>
         </button>
@@ -645,7 +765,7 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 
     <div class="accordion">
-        <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             열 영향 모델링 — 타이어 온도와 그립
             <span class="accordion-arrow">▼</span>
         </button>
@@ -660,7 +780,7 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 
     <div class="accordion">
-        <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             하중 감도(Load Sensitivity)의 동역학적 의미
             <span class="accordion-arrow">▼</span>
         </button>
@@ -716,7 +836,7 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
     <div style="margin-top:20px">
         <div class="accordion">
-            <button class="accordion-toggle" onclick="toggleAccordion(this)">
+            <button class="accordion-toggle">
                 🔧 실무 도구 안내 — Optimum T, MF-Tool, MATLAB
                 <span class="accordion-arrow">▼</span>
             </button>
@@ -793,6 +913,26 @@ td .katex,th .katex{font-size:0.9em!important}
     .nav-section { grid-template-columns: 1fr; }
     .celebration .stat-grid { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -821,7 +961,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -877,15 +1017,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

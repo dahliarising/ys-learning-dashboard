@@ -226,6 +226,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -539,7 +545,7 @@ td .katex,th .katex{font-size:0.9em!important}
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 디지털 트윈의 미래 — AI + MBD — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -550,7 +556,7 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 Physics-Informed Neural Network — 차세대 디지털 트윈</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -592,23 +598,111 @@ td .katex,th .katex{font-size:0.9em!important}
 
 <!-- ══════ FORMULA EXPLORER ══════ -->
 
-<!-- ══════ QUIZ ══════ -->
-<div class="section">
-    <div class="section-label">QUIZ</div>
-    <h2 class="section-title">퀴즈</h2>
-    <div class="quiz-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin:12px 0;">
-        <p style="color:var(--gold);font-weight:600;margin-bottom:8px;">Q1. 디지털트윈완성에서 핵심 개념 확인</p>
-        <p style="color:var(--text-primary);font-size:14px;">오늘 학습한 내용의 핵심 원리를 자신의 말로 설명해 보세요. 수식 없이 물리적 직관만으로 설명할 수 있다면 진정한 이해입니다.</p>
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 디지털 트윈 아키텍처</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day33" width="700" height="300"></canvas>
     </div>
-    <div class="quiz-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin:12px 0;">
-        <p style="color:var(--gold);font-weight:600;margin-bottom:8px;">Q2. 실무 적용</p>
-        <p style="color:var(--text-primary);font-size:14px;">이 개념이 실제 서스펜션 설계에서 어떤 영향을 미치는지 구체적인 예를 들어 설명해 보세요.</p>
-    </div>
+    <div id="sim-day33-controls" class="sim-controls"></div>
+    <div id="sim-day33-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day33');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 300;
+    const ctrlBox = document.getElementById('sim-day33-controls');
+    const metricBox = document.getElementById('sim-day33-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const boxes=[
+        {x:50,y:20,w:150,h:60,t:'실차 센서',c:'#4A9EBF'},
+        {x:270,y:20,w:150,h:60,t:'데이터 수집',c:'#98C379'},
+        {x:490,y:20,w:150,h:60,t:'클라우드/Edge',c:'#C678DD'},
+        {x:50,y:130,w:150,h:60,t:'MBS 모델',c:'#C9A84C'},
+        {x:270,y:130,w:150,h:60,t:'파라미터 업데이트',c:'#E06C75'},
+        {x:490,y:130,w:150,h:60,t:'예측/진단',c:'#D19A66'},
+        {x:270,y:230,w:150,h:50,t:'Digital Twin',c:'#56B6C2'}
+      ];
+      boxes.forEach(b=>{ctx.fillStyle=b.c+'20';ctx.strokeStyle=b.c;ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(b.x,b.y,b.w,b.h,8);ctx.fill();ctx.stroke();ctx.fillStyle=b.c;ctx.font='bold 13px sans-serif';ctx.fillText(b.t,b.x+10,b.y+35);});
+      // Arrows
+      ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1.5;
+      [[200,50,270,50],[420,50,490,50],[200,160,270,160],[420,160,490,160],[345,80,345,130],[345,190,345,230]].forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
+      setMetrics([['실시간','센서 → 모델 동기화'],['예측','잔여수명, 성능저하 예측']]);
+    }
+
+    draw();
+  })();
+  </script>
 </div>
 
+<!-- ══════ QUIZ ══════ -->
+<div class="section">
+  <div class="section-label">QUIZ</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
 
-<!-- ⑩ 퀴즈 -->
+  <!-- QUESTION 01 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 01 — 디지털 트윈 정의</div>
+    <p class="quiz-q">디지털 트윈이 단순 시뮬레이션 모델과 구별되는 핵심 요소는?</p>
+    <div class="quiz-options" id="q1">
+      <div class="quiz-opt">A. 3D 그래픽이 포함됨</div>
+      <div class="quiz-opt">B. 실시간 데이터 피드백과 모델 업데이트 루프</div>
+      <div class="quiz-opt">C. 클라우드에서 실행됨</div>
+      <div class="quiz-opt">D. AI가 포함됨</div>
+    </div>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
 
+  <!-- QUESTION 02 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 02 — 검증 프로세스</div>
+    <p class="quiz-q">디지털 트윈 모델의 신뢰도 확보를 위해 반드시 수행해야 하는 것은?</p>
+    <div class="quiz-options" id="q2">
+      <div class="quiz-opt">A. V&V (Verification & Validation)</div>
+      <div class="quiz-opt">B. 코드 리팩토링</div>
+      <div class="quiz-opt">C. UI 디자인 개선</div>
+      <div class="quiz-opt">D. 데이터베이스 최적화</div>
+    </div>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- QUESTION 03 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 03 — 60일 커리큘럼 통합</div>
+    <p class="quiz-q">이 커리큘럼에서 배운 순서로 올바른 것은?</p>
+    <div class="quiz-options" id="q3">
+      <div class="quiz-opt">A. Simpack → 수식유도 → 전달함수 → 디지털트윈</div>
+      <div class="quiz-opt">B. 수식유도 → 전달함수 → Simpack → 디지털트윈</div>
+      <div class="quiz-opt">C. 디지털트윈 → 수식유도 → Simpack → 전달함수</div>
+      <div class="quiz-opt">D. 전달함수 → 디지털트윈 → 수식유도 → Simpack</div>
+    </div>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
+</div>
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:40px 0;">
     <a href="Day32_CoSimulation.html" class="nav-btn prev">← Day 32: CoSimulation</a>
@@ -633,6 +727,26 @@ td .katex,th .katex{font-size:0.9em!important}
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -661,7 +775,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -717,15 +831,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

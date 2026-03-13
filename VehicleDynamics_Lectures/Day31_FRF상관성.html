@@ -226,6 +226,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -334,6 +340,38 @@ td .katex,th .katex{font-size:0.9em!important}
         <p><span class="label">이전 단계와의 연결:</span> 이것이 Day 33 디지털 트윈의 핵심 — 실차 데이터로 모델을 지속 교정하는 과정입니다.</p>
       </div>
     </div>
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① FRF 측정 원리</p>
+    <div class="sub-eq">$$H(f) = \frac{S_{xy}(f)}{S_{xx}(f)} = \frac{\text{Cross-PSD}}{\text{Input Auto-PSD}}$$</div>
+    <div class="sub-eq">$$\text{Coherence: } \gamma^2(f) = \frac{|S_{xy}|^2}{S_{xx} \cdot S_{yy}} \leq 1$$</div>
+    <p class="sub-note">코히어런스 γ² ≈ 1이면 선형 입출력 관계 성립. γ² < 0.8이면 비선형/노이즈 의심</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 시뮬레이션-시험 상관성 지표</p>
+    <div class="sub-eq">$$\text{MAC (Modal Assurance Criterion): } MAC = \frac{|\phi_A^T \phi_B|^2}{(\phi_A^T\phi_A)(\phi_B^T\phi_B)}$$</div>
+    <div class="sub-eq">$$\text{FRAC: } FRAC(f) = \frac{|H_{sim}(f) \cdot H_{test}^*(f)|^2}{|H_{sim}|^2 |H_{test}|^2}$$</div>
+    <p class="sub-note">MAC > 0.9: 우수한 상관성. 0.7-0.9: 수정 필요. < 0.7: 모델 재검토</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 모델 업데이트 절차</p>
+    <div class="sub-eq">$$\min_\theta \sum_i w_i |f_{sim,i}(\theta) - f_{test,i}|^2$$</div>
+    <div class="sub-eq">$$\theta = [k_1, c_1, k_2, c_2, ...] \quad (\text{업데이트 파라미터})$$</div>
+    <p class="sub-note">민감도 분석으로 영향 큰 파라미터 선별 → 최적화. SIMPACK Parameter Identification 모듈 활용</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 검증 프로토콜</p>
+    <div class="sub-eq">$$\text{Error}_f = \frac{|f_{sim} - f_{test}|}{f_{test}} \times 100\% < 5\%$$</div>
+    <div class="sub-eq">$$\text{Error}_{peak} = \frac{|H_{sim,peak} - H_{test,peak}|}{H_{test,peak}} \times 100\% < 10\%$$</div>
+    <p class="sub-note"><strong>르노 기준:</strong> 주요 모드 주파수 오차 < 3%, 진폭 오차 < 15% (서스펜션 리그 시험 대비)</p>
+  </div>
+</div>
+
+
 </div>
 <!-- ⑥ 파라미터 테이블 -->
 <div class="section">
@@ -455,7 +493,7 @@ td .katex,th .katex{font-size:0.9em!important}
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 실무 상관성 분석 워크플로우 — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -466,7 +504,7 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 Model Updating — 민감도 분석 기반 접근</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -506,42 +544,102 @@ td .katex,th .katex{font-size:0.9em!important}
 <!-- ══════ FORMULA EXPLORER ══════ -->
 
 
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 FRF 상관성 분석</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day31" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day31-controls" class="sim-controls"></div>
+    <div id="sim-day31-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day31');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day31-controls');
+    const metricBox = document.getElementById('sim-day31-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_err = addSlider('모델 오차 (%)', 0, 20, 5, 1, 'sim31-err');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const err=+sl_err.value/100, z=0.1, fn=8;
+      ctx.strokeStyle='#C9A84C';ctx.lineWidth=2;ctx.beginPath();
+      for(let i=1;i<=300;i++){const f=i*30/300;const r=f/fn;const mag=20*Math.log10(1/Math.sqrt((1-r*r)**2+(2*z*r)**2));const px=i*W/300,py=H/2-mag*2;ctx.lineTo(px,Math.max(10,Math.min(H-10,py)));} ctx.stroke();
+      ctx.strokeStyle='#4A9EBF';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();
+      for(let i=1;i<=300;i++){const f=i*30/300;const r=f/(fn*(1+err));const mag=20*Math.log10(1/Math.sqrt((1-r*r)**2+(2*(z+err*0.5)*r)**2));const px=i*W/300,py=H/2-mag*2;ctx.lineTo(px,Math.max(10,Math.min(H-10,py)));} ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='#C9A84C';ctx.font='12px monospace';ctx.fillText('— 실험 FRF',10,20);
+      ctx.fillStyle='#4A9EBF';ctx.fillText('--- 시뮬레이션 FRF',10,36);
+      const corr=Math.max(0,(100-err*300)).toFixed(1);
+      setMetrics([['FRAC',corr+'%'],['모델오차',Math.round(err*100)+'%'],['목표','FRAC > 90%']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
 <!-- ⑩ 퀴즈 -->
 <div class="section">
   <div class="section-label">QUIZ</div>
   <h2 class="section-title">즉시 복습 퀴즈</h2>
-  
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 01 — qa</div>
-      <p class="quiz-q">FRAC과 MAC의 차이를 설명하시오.</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q1')">정답 확인</button>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 01 — MAC 지표</div>
+      <p class="quiz-q">MAC(Modal Assurance Criterion) 값이 0.9 이상일 때 의미는?</p>
+      <div class="quiz-options" id="q1">
+        <div class="quiz-opt">A. 두 모드가 직교함</div>
+        <div class="quiz-opt">B. 두 모드 셰이프가 높은 상관성을 가짐</div>
+        <div class="quiz-opt">C. 주파수 오차가 10% 이내</div>
+        <div class="quiz-opt">D. 감쇠비가 동일함</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q1-fb" style="display:none;margin-top:10px">
-        ✅ FRAC은 두 FRF(주파수응답함수) 간의 유사도를 주파수별로 비교. MAC은 두 모드 형상(mode shape) 벡터 간의 유사도를 비교. FRAC은 전달함수 기반, MAC은 고유벡터 기반.
-      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 02 — qa</div>
-      <p class="quiz-q">시뮬레이션 Bounce 주파수가 실측보다 10% 높게 나왔다. 어떤 파라미터를 어떻게 조정해야 하는가?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q2')">정답 확인</button>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 02 — FRF 비교</div>
+      <p class="quiz-q">시험과 해석 FRF를 비교할 때 주파수 축 불일치의 주된 원인은?</p>
+      <div class="quiz-options" id="q2">
+        <div class="quiz-opt">A. 센서 감도 오차</div>
+        <div class="quiz-opt">B. FE 모델의 강성/질량 모델링 오차</div>
+        <div class="quiz-opt">C. 윈도우 함수 종류</div>
+        <div class="quiz-opt">D. 데이터 저장 형식</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q2-fb" style="display:none;margin-top:10px">
-        ✅ f_bounce ∝ √(kₛ/mₛ)이므로: ① kₛ를 낮추거나(스프링 강성 과대 입력), ② mₛ를 높이거나(차체 질량 과소 입력). 부싱 강성이 직렬로 작용하여 유효 강성을 높이는 경우도 확인.
-      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 03 — qa</div>
-      <p class="quiz-q">Model Updating에서 &#x27;설계변수&#x27; 선정 기준은 무엇인가?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q3')">정답 확인</button>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 03 — Model Update</div>
+      <p class="quiz-q">FE 모델 업데이트(model updating)에서 MAC과 함께 주로 사용하는 주파수 상관 지표는?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. THD (Total Harmonic Distortion)</div>
+        <div class="quiz-opt">B. FRAC (Frequency Response Assurance Criterion)</div>
+        <div class="quiz-opt">C. SNR (Signal to Noise Ratio)</div>
+        <div class="quiz-opt">D. CMIF (Complex Mode Indicator Function)</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q3-fb" style="display:none;margin-top:10px">
-        ✅ ① 불확실성이 큰 파라미터(부싱 강성, 댐퍼 특성 등 비선형/노화 영향), ② 감도가 높은 파라미터(목적함수에 미치는 영향이 큰 것), ③ 물리적 범위 내에서 조정 가능한 파라미터. 측정으로 정확히 알 수 있는 질량은 보통 고정.
-      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
     </div>
 </div>
 
@@ -569,6 +667,26 @@ td .katex,th .katex{font-size:0.9em!important}
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -597,7 +715,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -653,15 +771,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

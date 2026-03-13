@@ -226,6 +226,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -334,6 +340,35 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     </div>
 </div>
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 푸리에 급수 → 푸리에 변환</p>
+    <div class="sub-eq">$$x(t) = \sum_{n=-\infty}^{\infty} c_n e^{j n \omega_0 t} \quad \xrightarrow{T\to\infty} \quad X(f) = \int_{-\infty}^{\infty} x(t) e^{-j2\pi ft}\,dt$$</div>
+    <p class="sub-note">주기함수의 이산 스펙트럼(급수) → 비주기함수의 연속 스펙트럼(적분)으로 일반화</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 역변환 (Inverse Fourier Transform)</p>
+    <div class="sub-eq">$$x(t) = \int_{-\infty}^{\infty} X(f) e^{j2\pi ft}\,df$$</div>
+    <p class="sub-note">시간→주파수, 주파수→시간 양방향 변환 가능. 정보 손실 없음 (Parseval 정리)</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 파시발 정리 (에너지 보존)</p>
+    <div class="sub-eq">$$\int_{-\infty}^{\infty} |x(t)|^2\,dt = \int_{-\infty}^{\infty} |X(f)|^2\,df$$</div>
+    <p class="sub-note"><strong>물리적 의미:</strong> 시간영역 에너지 = 주파수영역 에너지. |X(f)|²가 에너지 스펙트럼 밀도</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ DFT/FFT 이산화</p>
+    <div class="sub-eq">$$X[k] = \sum_{n=0}^{N-1} x[n] e^{-j2\pi kn/N}, \quad k = 0, 1, \ldots, N-1$$</div>
+    <div class="sub-eq">$$\Delta f = \frac{f_s}{N} = \frac{1}{T_{record}}, \quad f_{max} = \frac{f_s}{2} \text{ (Nyquist)}$$</div>
+    <p class="sub-note"><strong>실무:</strong> 샘플링 f_s ≥ 2×관심주파수. 분해능↑ → 측정시간↑. 차량 시험 통상 f_s = 512~2048Hz</p>
+  </div>
+</div>
+
 <!-- ⑥ 파라미터 테이블 -->
 <div class="section">
   <div class="section-label">PARAMETERS</div>
@@ -497,7 +532,7 @@ td .katex,th .katex{font-size:0.9em!important}
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 윈도우 함수: 왜 Hanning을 기본으로 쓰는가? — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -508,7 +543,7 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 윈도우 함수 선택 가이드 — Hanning vs Flat-top</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -547,42 +582,125 @@ td .katex,th .katex{font-size:0.9em!important}
 <!-- ══════ FORMULA EXPLORER ══════ -->
 
 
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 푸리에 변환 시각화</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day23" width="700" height="400"></canvas>
+    </div>
+    <div id="sim-day23-controls" class="sim-controls"></div>
+    <div id="sim-day23-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day23');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 400;
+    const ctrlBox = document.getElementById('sim-day23-controls');
+    const metricBox = document.getElementById('sim-day23-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_n = addSlider('합성 고조파 수 N', 1, 20, 5, 1, 'sim23-n');
+    const sl_type = addSlider('파형 (1:사각 2:톱니 3:삼각)', 1, 3, 1, 1, 'sim23-type');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const N=+sl_n.value, type=+sl_type.value, hH=H/2;
+      // Time domain (top half)
+      ctx.strokeStyle='#C9A84C'; ctx.lineWidth=2; ctx.beginPath();
+      for(let i=0;i<=500;i++){
+        const t=i*4*Math.PI/500; let y=0;
+        for(let n=1;n<=N;n++){
+          const k=2*n-1;
+          if(type===1) y+=Math.sin(k*t)/k; // square
+          else if(type===2) y+=Math.pow(-1,n+1)*Math.sin(n*t)/n; // sawtooth
+          else y+=Math.pow(-1,(n-1))*Math.sin((2*n-1)*t)/((2*n-1)*(2*n-1)); // triangle
+        }
+        y*=4/Math.PI;
+        const px=i*W/500, py=hH/2-y*(hH-20)/4*0.8;
+        i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+      } ctx.stroke();
+      // Frequency domain (bottom half) - bar chart of coefficients
+      ctx.fillStyle='#8A8F98';ctx.font='11px monospace';ctx.fillText('시간 영역',5,15);ctx.fillText('주파수 영역 (계수)',5,hH+15);
+      for(let n=1;n<=Math.min(N,15);n++){
+        let coeff;
+        if(type===1) coeff=n%2?4/(Math.PI*(2*Math.ceil(n/2)-1)):0;
+        else if(type===2) coeff=2*Math.pow(-1,n+1)/(Math.PI*n);
+        else coeff=n%2?8/(Math.PI*Math.PI*n*n):0;
+        const bw=Math.min(30,W/(N+2));
+        const bx=30+n*(bw+5), bh=Math.abs(coeff)*80;
+        ctx.fillStyle=coeff>=0?'#C9A84C':'#4A9EBF';
+        ctx.fillRect(bx,H-30-bh,bw,bh);
+        ctx.fillStyle='#8A8F98';ctx.font='9px monospace';ctx.fillText(n+'',bx+bw/2-3,H-15);
+      }
+      ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.beginPath();ctx.moveTo(0,hH);ctx.lineTo(W,hH);ctx.stroke();
+      const names=['','사각파','톱니파','삼각파'];
+      setMetrics([['파형',names[type]],['고조파 수',N+''],['수렴','N↑ → 원래 파형']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
 <!-- ⑩ 퀴즈 -->
 <div class="section">
   <div class="section-label">QUIZ</div>
   <h2 class="section-title">즉시 복습 퀴즈</h2>
-  
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 01 — 수식 빈칸 채우기</div>
-      <p class="quiz-q">샘플링 주파수 1024Hz, FFT 포인트 4096이면 주파수 해상도 Δf = ___Hz.</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q1')">정답 확인</button>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 01 — FFT 기본</div>
+      <p class="quiz-q">이산 푸리에 변환(DFT)에서 N개 샘플, 샘플링 주파수 fₛ일 때 주파수 분해능 Δf는?</p>
+      <div class="quiz-options" id="q1">
+        <div class="quiz-opt">A. fₛ × N</div>
+        <div class="quiz-opt">B. fₛ / N</div>
+        <div class="quiz-opt">C. N / fₛ</div>
+        <div class="quiz-opt">D. fₛ / 2</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q1-fb" style="display:none;margin-top:10px">
-        ✅ 0.25 (= 1024/4096)
-      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 02 — 물리적 의미 연결</div>
-      <p class="quiz-q">에일리어싱(aliasing)이란 무엇인가?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q2')">정답 확인</button>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 02 — 나이퀴스트 정리</div>
+      <p class="quiz-q">나이퀴스트(Nyquist) 정리에 의한 최대 분석 가능 주파수는?</p>
+      <div class="quiz-options" id="q2">
+        <div class="quiz-opt">A. fₛ</div>
+        <div class="quiz-opt">B. fₛ / 2</div>
+        <div class="quiz-opt">C. 2 × fₛ</div>
+        <div class="quiz-opt">D. fₛ / N</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q2-fb" style="display:none;margin-top:10px">
-        ✅ 샘플링 주파수의 절반(나이퀴스트 주파수)을 초과하는 고주파 성분이 저주파로 접혀 나타나는 현상. 실제 없는 저주파 성분이 생겨 분석 결과를 왜곡한다.
-      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 03 — Simpack 적용</div>
-      <p class="quiz-q">Simpack 후처리에서 FFT 수행 시 윈도우 함수를 적용해야 하는 이유는?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q3')">정답 확인</button>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 03 — 윈도우 함수</div>
+      <p class="quiz-q">FFT 수행 시 Hanning 윈도우를 적용하는 주된 목적은?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. 주파수 분해능 향상</div>
+        <div class="quiz-opt">B. 스펙트럼 누설(leakage) 저감</div>
+        <div class="quiz-opt">C. 계산 속도 향상</div>
+        <div class="quiz-opt">D. 신호 크기 증폭</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q3-fb" style="display:none;margin-top:10px">
-        ✅ 유한 길이 시뮬레이션 데이터의 양 끝 불연속으로 인한 스펙트럼 누출(leakage)을 방지하기 위함이다
-      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
     </div>
 </div>
 
@@ -610,6 +728,26 @@ td .katex,th .katex{font-size:0.9em!important}
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -638,7 +776,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -694,15 +832,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

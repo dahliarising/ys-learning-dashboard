@@ -187,7 +187,37 @@ td .katex,th .katex{font-size:0.9em!important}
 
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
+
+@media (max-width: 640px) {
+    .nav-section { grid-template-columns: 1fr; }
+}
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -319,6 +349,39 @@ td .katex,th .katex{font-size:0.9em!important}
             </p>
         </div>
     </div>
+</div>
+
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 스카이훅 댐퍼 이상 제어법</p>
+    <div class="sub-eq">$$F_{skyhook} = -c_{sky} \dot{z}_s$$</div>
+    <div class="sub-eq">$$\text{반능동 구현: } c_{actual} = \begin{cases} c_{sky} \frac{\dot{z}_s}{\dot{z}_s - \dot{z}_u} & \text{if } \dot{z}_s(\dot{z}_s-\dot{z}_u) > 0 \\\\ c_{min} & \text{otherwise} \end{cases}$$</div>
+    <p class="sub-note">스카이훅: 가상 관성 기준으로 차체 감쇠. 에너지 소산만 가능(반능동) → 입력 불가능 영역은 c_min 적용</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 그라운드훅 (타이어 접지력 최적화)</p>
+    <div class="sub-eq">$$F_{groundhook} = -c_{ground} \dot{z}_u$$</div>
+    <div class="sub-eq">$$\text{반능동: } c = \begin{cases} c_{ground} \frac{\dot{z}_u}{\dot{z}_s - \dot{z}_u} & \text{if } \dot{z}_u(\dot{z}_s-\dot{z}_u) < 0 \\\\ c_{min} & \text{otherwise} \end{cases}$$</div>
+    <p class="sub-note">그라운드훅: 타이어 동하중 변동 최소화 → 접지력 유지. <strong>절충안:</strong> α·스카이훅 + (1-α)·그라운드훅</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ CDC (Continuous Damping Control) MR 댐퍼</p>
+    <div class="sub-eq">$$F_{MR} = F_{viscous} + F_{yield}\text{sgn}(\dot{x})$$</div>
+    <div class="sub-eq">$$F_{yield} = \alpha_1 I^2 + \alpha_2 I \quad (\text{전류 } I \text{에 의해 제어})$$</div>
+    <p class="sub-note"><strong>MR 유체:</strong> 자기장으로 점성 실시간 변경. 응답시간 < 10ms. 르노 다카르 랠리 차량에도 적용</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 능동 서스펜션 에너지 소비</p>
+    <div class="sub-eq">$$P_{active} = F_{actuator} \times \dot{x}_{actuator}$$</div>
+    <div class="sub-eq">$$\text{평균 소비: } P_{avg} \approx 1\sim5 \;\text{kW (풀 액티브)}$$</div>
+    <div class="sub-eq">$$\text{반능동 소비: } P_{avg} \approx 10\sim50 \;\text{W}$$</div>
+    <p class="sub-note">풀 액티브 대비 반능동은 에너지 효율 100배 이상. EV에서는 에너지 소비가 주행거리 직결 → 반능동 선호</p>
+  </div>
 </div>
 
 <!-- ══════ PARAMETERS SECTION ══════ -->
@@ -687,139 +750,117 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 </div>
 
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 능동/반능동 서스펜션 제어</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day56" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day56-controls" class="sim-controls"></div>
+    <div id="sim-day56-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day56');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day56-controls');
+    const metricBox = document.getElementById('sim-day56-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_ctrl = addSlider('제어 (1:패시브 2:스카이훅 3:그라운드훅)', 1, 3, 2, 1, 'sim56-ctrl');
+    const sl_gain = addSlider('제어 게인', 0.5, 5, 2, 0.1, 'sim56-gain');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const ctrl=+sl_ctrl.value, gain=+sl_gain.value;
+      const ms=300,ks=20000,cs_passive=1500,dt=0.0005;
+      let xs=0,vs=0; const hist=[];
+      for(let i=0;i<6000;i++){
+        const t=i*dt;
+        const zr=(t>0.1&&t<0.15)?0.03:0;
+        let Fd;
+        if(ctrl===1) Fd=-cs_passive*vs; // passive
+        else if(ctrl===2) Fd=-cs_passive*gain*vs; // skyhook (simplified)
+        else Fd=-cs_passive*gain*(vs); // groundhook variation
+        const Fs=-ks*(xs-zr)+Fd;
+        vs+=Fs/ms*dt; xs+=vs*dt;
+        if(i%6===0) hist.push(xs);
+      }
+      const N=hist.length, maxA=Math.max(...hist.map(Math.abs),0.001);
+      ctx.strokeStyle='#C9A84C';ctx.lineWidth=2;ctx.beginPath();
+      hist.forEach((x,i)=>{const px=i*W/N,py=H/2-x*H*0.4/maxA;i?ctx.lineTo(px,py):ctx.moveTo(px,py);});ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+      const names=['','패시브','스카이훅','그라운드훅'];
+      ctx.fillStyle='#C9A84C';ctx.font='bold 14px sans-serif';ctx.fillText('제어: '+names[ctrl],10,25);
+      const rms=Math.sqrt(hist.reduce((s,x)=>s+x*x,0)/N)*1000;
+      setMetrics([['제어 방식',names[ctrl]],['RMS 변위',rms.toFixed(2)+' mm'],['게인',gain.toFixed(1)],['스카이훅','Fd=-c_sky·ẋ_body']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
 <!-- ══════ QUIZ SECTION ══════ -->
 <div class="section">
     <div class="section-label">QUIZ</div>
     <div class="section-title">자가 검증</div>
     
-    <div class="quiz-card" id="q56-1">
-        <div class="quiz-num">QUESTION 1</div>
-        <div class="quiz-q">
-            스카이훅 댐퍼의 이상적인 감쇠력 법칙은?
-        </div>
-        <div class="quiz-options">
-            <div class="quiz-opt" data-correct="true">
-                ① F_sky = c_sky · ẋ_body (차체 속도에 비례)
-            </div>
-            <div class="quiz-opt" data-correct="false">
-                ② F_sky = c · Δv (상대 속도에 비례)
-            </div>
-            <div class="quiz-opt" data-correct="false">
-                ③ F_sky = k · x (스프링 처럼 위치에 비례)
-            </div>
-            <div class="quiz-opt" data-correct="false">
-                ④ F_sky = m · a_wheel (휠 가속도에 비례)
-            </div>
-        </div>
-        <div class="quiz-feedback"></div>
-        <div class="solution-panel">
-            <div class="sol-header">풀이</div>
-            <div class="sol-step">
-                <span class="sol-num">1.</span>
-                <span>스카이훅은 '하늘에 고정된 기준점'에 연결된 이상적 댐퍼입니다.</span>
-            </div>
-            <div class="sol-step">
-                <span class="sol-num">2.</span>
-                <span>차체가 노면과 무관하게 "하늘"에 대해 움직이는 속도로 감쇠해야 하므로</span>
-            </div>
-            <div class="sol-step highlight-step">
-                <span class="sol-num">3.</span>
-                <span>F = c_sky · ẋ_body 형태 (차체 절대 속도에만 의존)</span>
-            </div>
-            <div class="sol-insight">
-                <strong>핵심:</strong> CDC는 이 스카이훅 이상을 근사하기 위해 상대속도 부호를 보고 
-                c_soft ↔ c_stiff를 빠르게 전환합니다.
-            </div>
-        </div>
+    <div class="quiz-card" data-correct="1">
+      <div class="quiz-num">QUESTION 01 — 스카이훅 댐퍼</div>
+      <p class="quiz-q">스카이훅 댐퍼의 이상적인 감쇠력 법칙 F_sky = c_sky · ẋ_body에서 ẋ_body가 의미하는 것은?</p>
+      <div class="quiz-options" id="q1">
+        <div class="quiz-opt">A. 차체의 절대 속도</div>
+        <div class="quiz-opt">B. 휠과 차체의 상대 속도</div>
+        <div class="quiz-opt">C. 노면 입력 속도</div>
+        <div class="quiz-opt">D. 휠의 절대 속도</div>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
     </div>
-    
-    <div class="quiz-card" id="q56-2">
-        <div class="quiz-num">QUESTION 2</div>
-        <div class="quiz-q">
-            반능동 서스펜션이 능동 서스펜션보다 실제 차량에 많이 채용되는 이유는?
-        </div>
-        <div class="quiz-options">
-            <div class="quiz-opt" data-correct="true">
-                ① 전력 소비가 훨씬 적고 (액추에이터 불필요) 신뢰성이 높음
-            </div>
-            <div class="quiz-opt" data-correct="false">
-                ② 제어 성능이 능동보다 우수하기 때문
-            </div>
-            <div class="quiz-opt" data-correct="false">
-                ③ 비용이 더 저렴하고 제조가 간단하기 때문
-            </div>
-            <div class="quiz-opt" data-correct="false">
-                ④ 롤 방지 성능이 더 좋기 때문
-            </div>
-        </div>
-        <div class="quiz-feedback"></div>
-        <div class="solution-panel">
-            <div class="sol-header">풀이</div>
-            <div class="sol-step">
-                <span class="sol-num">1.</span>
-                <span>능동 서스펜션: 별도 펌프/액추에이터 필요 → 고전력 소비, 복잡성 증가</span>
-            </div>
-            <div class="sol-step">
-                <span class="sol-num">2.</span>
-                <span>반능동 (CDC): 댐퍼 밸브만 전자 제어 → 최소 전력, 신뢰성 높음</span>
-            </div>
-            <div class="sol-step highlight-step">
-                <span class="sol-num">3.</span>
-                <span>성능 vs 비용 최적 균형점 → 프리미엄 ~ 중형차까지 광범위 채용</span>
-            </div>
-            <div class="sol-insight">
-                <strong>시장 현황:</strong> 고급차(BMW, Audi, Mercedes) = 능동/MR 댐퍼, 
-                일반 프리미엄차 = CDC 반능동, 대중차 = 패시브
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- ══════ TOOLS SECTION ══════ -->
-<div class="section">
-    <div class="section-label">TOOLS</div>
-    <div class="section-title">수식 탐색기 (Formula Explorer)</div>
-    
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px">
-        <div style="margin-bottom:20px">
-            <h4 style="font-size:15px;color:var(--text-bright);margin-bottom:12px">1. 스카이훅 댐핑력</h4>
-            <div style="background:#0D1017;padding:12px;border-radius:8px;border-left:3px solid #C9A84C;font-family:'JetBrains Mono',monospace;font-size:14px;color:#E8C96A">
-                F_sky = c_sky · ẋ_body
-            </div>
-            <p style="margin-top:8px;font-size:13px;color:var(--text-dim)">
-                각 기호에 마우스를 올려보세요 (데스크톱) 또는 터치 (모바일):
-            </p>
-            <ul style="margin:8px 0 0 20px;font-size:13px;color:var(--text-dim)">
-                <li><span style="color:#4A9EBF">c_sky</span>: 스카이훅 댐핑 계수 [N·s/m]</li>
-                <li><span style="color:#4ABF8A">ẋ_body</span>: 차체 절대 상하 속도 [m/s]</li>
-            </ul>
-        </div>
-        
-        <div style="margin-bottom:20px">
-            <h4 style="font-size:15px;color:var(--text-bright);margin-bottom:12px">2. 에어스프링 강성</h4>
-            <div style="background:#0D1017;padding:12px;border-radius:8px;border-left:3px solid #C9A84C;font-family:'JetBrains Mono',monospace;font-size:14px;color:#E8C96A">
-                k_air = γ · P_air / V_ref
-            </div>
-            <ul style="margin:8px 0 0 20px;font-size:13px;color:var(--text-dim)">
-                <li><span style="color:#BF8A4A">γ</span>: 단열 계수 (공기: 1.4) [-]</li>
-                <li><span style="color:#4A9EBF">P_air</span>: 에어스프링 압력 [bar]</li>
-                <li><span style="color:#4ABF8A">V_ref</span>: 기준 용적 [L]</li>
-            </ul>
-        </div>
-        
-        <div>
-            <h4 style="font-size:15px;color:var(--text-bright);margin-bottom:12px">3. 공진 주파수 (드라이브 모드별)</h4>
-            <div style="background:#0D1017;padding:12px;border-radius:8px;border-left:3px solid #C9A84C;font-family:'JetBrains Mono',monospace;font-size:14px;color:#E8C96A">
-                f_n = √(k_total / m) / (2π)
-            </div>
-            <ul style="margin:8px 0 0 20px;font-size:13px;color:var(--text-dim)">
-                <li>Eco 모드: k_soft → f_n ≈ 0.5~0.7 Hz (쾌적)</li>
-                <li>Normal: k_medium → f_n ≈ 1.0 Hz (균형)</li>
-                <li>Sport: k_stiff + c_high → f_n ≈ 1.2~1.5 Hz (민첩)</li>
-            </ul>
-        </div>
+    <div class="quiz-card" data-correct="1">
+      <div class="quiz-num">QUESTION 02 — 반능동 vs 능동</div>
+      <p class="quiz-q">반능동 서스펜션(CDC)이 능동 서스펜션 대비 양산 차량에 많이 채용되는 핵심 이유는?</p>
+      <div class="quiz-options" id="q2">
+        <div class="quiz-opt">A. 별도 액추에이터 불필요로 전력 소비 낮고 신뢰성 높음</div>
+        <div class="quiz-opt">B. 제어 성능이 능동보다 우수</div>
+        <div class="quiz-opt">C. 승차감만 개선 가능</div>
+        <div class="quiz-opt">D. 롤 방지 성능이 더 우수</div>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
     </div>
-</div>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 03 — CDC 제어 전략</div>
+      <p class="quiz-q">CDC(Continuous Damping Control)에서 스카이훅 이상을 근사하기 위한 핵심 전략은?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. 댐핑 계수를 고정값으로 유지</div>
+        <div class="quiz-opt">B. 상대속도 부호 판별로 c_soft ↔ c_stiff를 빠르게 전환</div>
+        <div class="quiz-opt">C. 스프링 강성만 가변</div>
+        <div class="quiz-opt">D. 타이어 공기압 조절</div>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
 
 <!-- ══════ MEMORY SECTION ══════ -->
 
@@ -837,7 +878,7 @@ td .katex,th .katex{font-size:0.9em!important}
 </div>
 
 </div>
-
+</div>
 
 <script>
 /* Accordion */
@@ -864,7 +905,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -920,15 +961,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

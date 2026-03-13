@@ -245,7 +245,33 @@ td .katex,th .katex{font-size:0.9em!important}
 .nav-btn{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;text-decoration:none;color:var(--gold);font-weight:500;transition:all 0.3s}
 .nav-btn:hover{background:var(--surface2);border-color:var(--gold)}
 @media(max-width:600px){.nav-section{grid-template-columns:1fr}}
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -397,6 +423,40 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 </div>
 </div>
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 유압 제동 기본 원리 (파스칼 법칙)</p>
+    <div class="sub-eq">$$P = \frac{F_{pedal} \times r_{lever} \times r_{boost}}{A_{MC}}$$</div>
+    <div class="sub-eq">$$F_{caliper} = P \times A_{caliper\;piston}$$</div>
+    <div class="sub-eq">$$\text{증배비: } \frac{F_{caliper}}{F_{pedal}} = \frac{A_{caliper}}{A_{MC}} \times r_{lever} \times r_{boost}$$</div>
+    <p class="sub-note">페달 힘 ~50N → 캘리퍼 클램핑 ~15kN. 부스터 비율 3-5, 유압 비율 5-10 조합</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 듀얼 서킷 (X-배관 vs H-배관)</p>
+    <div class="sub-eq">$$\text{X-split: 좌전+우후 / 우전+좌후 }\to\text{ 균일 제동 보장}$$</div>
+    <div class="sub-eq">$$\text{H-split: 전전 / 후후 }\to\text{ 배관 단순화}$$</div>
+    <div class="sub-eq">$$\text{한 회로 실패 시: } F_{brake} \geq 50\% F_{total}$$</div>
+    <p class="sub-note">X-배관이 한 회로 고장 시에도 좌우 균형 유지 → 대부분의 현대 승용차 채택</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 브레이크 토크 계산</p>
+    <div class="sub-eq">$$T_{brake} = \mu_{pad} \times F_{clamp} \times r_{eff,disc} \times 2 \;(\text{양면 패드})$$</div>
+    <div class="sub-eq">$$F_{clamp} = P \times A_{piston} \times n_{piston}$$</div>
+    <p class="sub-note">μ_pad: 0.35-0.45(일반), 0.50-0.60(스포츠). 고온 페이드: μ가 최대 30% 감소</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 페달 스트로크 vs 압력</p>
+    <div class="sub-eq">$$x_{pedal} = x_{clearance} + \frac{V_{caliper,expand}}{A_{MC}} + \frac{P \cdot V_{fluid}}{K_{fluid}}$$</div>
+    <div class="sub-eq">$$\text{목표: } x_{pedal} \leq 120\text{mm}, \; F_{pedal} \leq 500\text{N (풀 브레이킹)}$$</div>
+    <p class="sub-note">페달 트래블의 3요소: 갭 흡수 + 캘리퍼 확장 + 유체 압축. 에어 혼입 시 스트로크 급증 → 퍼지 필요</p>
+  </div>
+</div>
+
+
 
 </div>
 
@@ -570,106 +630,157 @@ td .katex,th .katex{font-size:0.9em!important}
 </div>
 
 <!-- Quiz Section -->
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 유압 제동 시스템</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day48" width="700" height="300"></canvas>
+    </div>
+    <div id="sim-day48-controls" class="sim-controls"></div>
+    <div id="sim-day48-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day48');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 300;
+    const ctrlBox = document.getElementById('sim-day48-controls');
+    const metricBox = document.getElementById('sim-day48-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const boxes=[
+        {x:30,y:H/2-30,w:100,h:60,t:'마스터\n실린더',c:'#C9A84C'},
+        {x:180,y:40,w:80,h:45,t:'ABS\nHCU',c:'#E06C75'},
+        {x:180,y:H-85,w:80,h:45,t:'ESC\n밸브',c:'#4A9EBF'},
+        {x:340,y:20,w:80,h:40,t:'FL',c:'#98C379'},{x:480,y:20,w:80,h:40,t:'FR',c:'#98C379'},
+        {x:340,y:H-60,w:80,h:40,t:'RL',c:'#C678DD'},{x:480,y:H-60,w:80,h:40,t:'RR',c:'#C678DD'}
+      ];
+      boxes.forEach(b=>{
+        ctx.fillStyle=b.c+'20';ctx.strokeStyle=b.c;ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(b.x,b.y,b.w,b.h,6);ctx.fill();ctx.stroke();
+        ctx.fillStyle=b.c;ctx.font='11px sans-serif';
+        b.t.split('\n').forEach((line,li)=>ctx.fillText(line,b.x+8,b.y+15+li*14));
+      });
+      // Lines
+      ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1;
+      [[130,H/2,180,62],[130,H/2,180,H-62],[260,62,340,40],[260,62,480,40],[260,H-62,340,H-40],[260,H-62,480,H-40]].forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
+      ctx.fillStyle='#8A8F98';ctx.font='12px monospace';ctx.fillText('X-배관: FL+RR, FR+RL (대각선)',200,H/2);
+      setMetrics([['배관','X-split (대각선)'],['안전성','한 회로 실패 시 50% 제동력 유지']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
+<!-- ══════ QUIZ ══════ -->
+
 <div class="section">
-    <div class="section-label">QUIZ</div>
-    <div class="quiz-section">
-<h3>이해도 확인 퀴즈</h3>
-<div class="quiz-card q1">
-    <h4>Q1: 빈칸 채우기</h4>
-    <p class="q-question">유압 브레이크에서 마스터 실린더 직경을 줄이면 같은 페달 힘으로 ___이 높아지지만, 페달 ___가 길어진다.</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> 유압(라인 압력) / 스트로크<br>
-        <strong>해설:</strong> 파스칼의 원리에 의해 A가 작으면 P=F/A가 높아지지만, 같은 유량에 대해 피스톤 이동이 커집니다.
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">유압 제동 시스템 심화</h2>
+
+  <!-- Deep Dive 1 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>💡 브레이크 페달 필(Pedal Feel) — 운전자가 '좋은 브레이크'를 느끼는 기준</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive1">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">페달 스트로크-힘-감속도의 3차원 관계</h4>
+        <p>운전자가 브레이크 성능을 평가하는 기준은 실제 제동 거리보다 '페달 느낌(pedal feel)'이 더 큽니다. 좋은 페달 필이란: (1) 초기 유격(free play)이 짧고, (2) 페달 답력에 비례하여 감속도가 선형적으로 증가하며, (3) 페달이 딱딱한(firm) 느낌을 주는 것입니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">유압 제동력: $F_{brake} = P_{mc} \times A_{piston} \times \mu_{pad} \times 2$ (양면 캘리퍼). 마스터 실린더 압력: $P_{mc} = \frac{F_{pedal} \times B_{ratio}}{A_{mc}}$ 여기서 $B_{ratio}$는 부스터 배력비(진공: 3~5, iBooster: 가변).</p>
+        <p><strong style="color:var(--gold-light);">페달 스트로크 구성:</strong> 총 페달 스트로크 = 유격(~5mm) + 부스터 작동 구간(~30mm) + 유압 압축 구간(~15mm) + 캘리퍼 변형(~10mm). 합계 약 60~70mm이 일반적 타겟입니다.</p>
+        <p>페달 강성(pedal stiffness) = dF/dS [N/mm]. 부스터 작동 후 페달 강성이 급격히 높아지는 '월(wall)'이 느껴져야 합니다. 이 '월감'이 없으면 페달이 '스폰지 같다'는 불만이 발생합니다.</p>
+        <p>페달 필에 가장 큰 영향을 미치는 요소: (1) 브레이크 호스의 팽창(호스 컴플라이언스) — 고압에서 호스가 부풀어 스트로크가 늘어남, (2) 마스터 실린더 보어 직경 — 작을수록 유압은 높지만 스트로크가 길어짐, (3) 캘리퍼 강성 — 피스톤 수와 재질(알루미늄 vs 주철)에 의존.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q2">
-    <h4>Q2: O/X 퀴즈</h4>
-    <p class="q-question">O/X: X-분할(대각선 분할) 유압 회로에서 한 회로가 고장 나면 전축 또는 후축의 브레이크가 모두 작동하지 않는다.</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> X (거짓)<br>
-        <strong>해설:</strong> X-분할은 FL+RR / FR+RL로 분리되어 한 회로 고장 시에도 전후축 각 1개씩 작동합니다.
+  </div>
+
+  <!-- Deep Dive 2 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>🔬 진공 부스터 vs 전동 부스터(iBooster) — 전동화 시대의 제동 시스템 전환</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive2">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">엔진 진공이 사라지면 어떻게 되는가</h4>
+        <p>전통적인 진공 부스터(vacuum booster)는 엔진 흡기 매니폴드의 부압을 이용해 페달 답력을 4~8배 증폭합니다. 배력비(boost ratio) = 진공 다이어프램 면적 / 마스터 실린더 면적.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">페달 스트로크 구성: $S_{total} = S_{freeplay} + S_{hydraulic} + S_{pad\_compression} + S_{fluid\_compression}$. 목표: 초기 무효 스트로크 $< 15$ mm, 총 스트로크 $< 120$ mm, 0.3 g 감속 시 $40\sim60$ mm.</p>
+        <p><strong style="color:var(--gold-light);">전동화의 문제:</strong> HEV/PHEV/BEV에서는 엔진이 항상 가동되지 않거나 아예 없으므로 안정적인 진공 공급이 불가능합니다. 전동 진공 펌프(EVP)를 추가하는 것이 과도기적 솔루션이지만, 소음과 에너지 소비가 문제입니다.</p>
+        <p>Bosch iBooster는 전동 모터 + 볼스크류로 부스터를 대체합니다. 장점: (1) 진공 불필요 — BEV 적합, (2) 응답 속도 120ms(진공 부스터 300ms 대비 2.5배), (3) 자율주행 능동 제동 가능, (4) 회생제동 블렌딩 최적화.</p>
+        <p>르노코리아 전동화 차량에서는 Continental MK C1(통합형 ESC) 또는 iBooster + ESP hev 조합이 채택되고 있습니다. 시스템 선택은 회생제동 효율, 패키징, 원가의 트레이드오프입니다.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q3">
-    <h4>Q3: Simpack 적용</h4>
-    <p class="q-question">Simpack에서 유압 브레이크 시스템을 모델링할 때 가장 중요한 파라미터는?</p>
-    <div class="q-options"><label><input type="radio" name="q3" value="마스터 실린더 직경"/> 마스터 실린더 직경</label>
-<label><input type="radio" name="q3" value="브레이크 오일 색상"/> 브레이크 오일 색상</label>
-<label><input type="radio" name="q3" value="차체 페인트 두께"/> 차체 페인트 두께</label>
-<label><input type="radio" name="q3" value="사이드미러 각도"/> 사이드미러 각도</label>
-</div>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> 마스터 실린더 직경<br>
-        <strong>해설:</strong> MC 직경이 전체 시스템의 압력-스트로크 특성을 결정합니다.
-    </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-</div>
+  </div>
 
 </div>
 
-<!-- Deep Dives -->
 <div class="section">
-    <div class="section-label">DEEP DIVE</div>
-    <div class="section-title">심화 학습</div>
-    <div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 진공 부스터 vs 전동 부스터
-    </button>
-    <div class="accordion-content">
-        <p><strong>진공 부스터:</strong> 엔진 매니폴드 부압 이용, 저가, 단순. 터보/전기차에서 부압 부족 문제.</p><p><strong>전동 부스터 (iBooster):</strong> 전기모터 구동, 회생제동 협조 가능, 빠른 응답(~50ms), AEB 최적화.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 브레이크 바이 와이어(BBW)
-    </button>
-    <div class="accordion-content">
-        <p>기계적 연결 없이 센서 신호만으로 제동하는 시스템입니다. 현재는 항공기에 상용화되어 있으며, 자동차는 'wet BBW'(유압 백업 포함)가 일반적입니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> ABS 모듈레이터 구조
-    </button>
-    <div class="accordion-content">
-        <p>ABS HCU(Hydraulic Control Unit)에는 각 채널당 2개의 솔레노이드 밸브(NV: 상시 개방, NC: 상시 폐쇄)와 모터 펌프, 어큐뮬레이터가 내장됩니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 페달 필(Pedal Feel) 튜닝
-    </button>
-    <div class="accordion-content">
-        <p>좋은 페달 필은 힘-스트로크 곡선의 <strong>비선형 특성</strong>에 의해 결정됩니다. 초기 유격(free play) → 선형 구간 → 프로그레시브 구간의 3단계로 설계합니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 뇌과학: 제동 판단의 신경 경로
-    </button>
-    <div class="accordion-content">
-        <p>위험 인지 시 시각 정보는 <strong>V1(시각 피질) → 두정엽(공간 인지) → 전두엽(의사결정) → 운동 피질(근육 명령)</strong>의 경로를 거칩니다. 이 중 사전 예측(predictive coding)이 빠르면 반응시간이 단축됩니다.</p>
-    </div>
-</div>
+  <div class="section-label">QUIZ</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
 
-</div>
-
-<!-- Footer Navigation -->
-<!-- ══════ FORMULA EXPLORER ══════ -->
-<div class="section">
-    <div class="section-label">TOOLS</div>
-    <div class="section-title">수식 탐색기</div>
-    <div class="formula-explorer">
-        <p style="color:var(--text-dim);font-style:italic;">이 섹션의 핵심 수식을 인터랙티브하게 탐색하세요. 각 변수에 마우스를 올리면 설명이 표시됩니다.</p>
+  <!-- Q1 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 01 — 안정성 팩터</div>
+    <p class="quiz-q">안정성 팩터(Stability Factor) K = m/(L²)·(Lf/Cαr − Lr/Cαf)에서 K > 0이면?</p>
+    <div class="quiz-options" id="q1">
+      <div class="quiz-opt">A. 언더스티어</div>
+      <div class="quiz-opt">B. 오버스티어</div>
+      <div class="quiz-opt">C. 뉴트럴스티어</div>
+      <div class="quiz-opt">D. 판단 불가</div>
     </div>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 02 — 임계 속도</div>
+    <p class="quiz-q">오버스티어 차량(K < 0)에서 임계 속도(Vcritical) 이상이면?</p>
+    <div class="quiz-options" id="q2">
+      <div class="quiz-opt">A. 요 발산(스핀) — 동적 불안정</div>
+      <div class="quiz-opt">B. 자동으로 직진</div>
+      <div class="quiz-opt">C. 속도가 줄어듦</div>
+      <div class="quiz-opt">D. 타이어 온도 급상승</div>
+    </div>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 03 — 설계 목표</div>
+    <p class="quiz-q">양산 승용차에서 안정성 팩터 K의 설계 목표 범위는?</p>
+    <div class="quiz-options" id="q3">
+      <div class="quiz-opt">A. K > 0 (약한 언더스티어, 0.001~0.004 s²/m²)</div>
+      <div class="quiz-opt">B. K = 0 (완벽한 뉴트럴)</div>
+      <div class="quiz-opt">C. K < 0 (오버스티어)</div>
+      <div class="quiz-opt">D. K > 0.1 (강한 언더스티어)</div>
+    </div>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
 </div>
-
-<!-- ══════ SPACED REPETITION ══════ -->
-
-
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section">
     <a href="Day47_디스크브레이크열역학.html" class="nav-btn">← Day 47: 디스크 브레이크 열역학</a>
@@ -713,7 +824,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -769,15 +880,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

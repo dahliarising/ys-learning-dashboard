@@ -226,6 +226,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -535,7 +541,7 @@ td .katex,th .katex{font-size:0.9em!important}
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 Simpack 모델 체크리스트: PART 3 부품 입력 순서 — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -546,7 +552,7 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 서스펜션 부품 간 상호작용 — 시스템 관점</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -583,23 +589,107 @@ td .katex,th .katex{font-size:0.9em!important}
 
 <!-- ══════ FORMULA EXPLORER ══════ -->
 
-<!-- ══════ QUIZ ══════ -->
-<div class="section">
-    <div class="section-label">QUIZ</div>
-    <h2 class="section-title">퀴즈</h2>
-    <div class="quiz-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin:12px 0;">
-        <p style="color:var(--gold);font-weight:600;margin-bottom:8px;">Q1. Part3복습에서 핵심 개념 확인</p>
-        <p style="color:var(--text-primary);font-size:14px;">오늘 학습한 내용의 핵심 원리를 자신의 말로 설명해 보세요. 수식 없이 물리적 직관만으로 설명할 수 있다면 진정한 이해입니다.</p>
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 Part3 핵심 복습</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day22" width="700" height="250"></canvas>
     </div>
-    <div class="quiz-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin:12px 0;">
-        <p style="color:var(--gold);font-weight:600;margin-bottom:8px;">Q2. 실무 적용</p>
-        <p style="color:var(--text-primary);font-size:14px;">이 개념이 실제 서스펜션 설계에서 어떤 영향을 미치는지 구체적인 예를 들어 설명해 보세요.</p>
-    </div>
+    <div id="sim-day22-controls" class="sim-controls"></div>
+    <div id="sim-day22-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day22');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 250;
+    const ctrlBox = document.getElementById('sim-day22-controls');
+    const metricBox = document.getElementById('sim-day22-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const items=[
+        {x:20,y:20,w:210,h:90,t:'스프링 특성',s:'선형/비선형, 범프/리바운드',c:'#C9A84C'},
+        {x:245,y:20,w:210,h:90,t:'댐퍼 모델',s:'F=C|v|ⁿ, 디그레시브',c:'#4A9EBF'},
+        {x:470,y:20,w:210,h:90,t:'부싱 복소강성',s:"k*=k'+jk''",c:'#E06C75'},
+        {x:20,y:130,w:210,h:90,t:'타이어 수직',s:'kt ∝ 공기압',c:'#98C379'},
+        {x:245,y:130,w:210,h:90,t:'타이어홉',s:'f_hop=10~15Hz',c:'#C678DD'},
+        {x:470,y:130,w:210,h:90,t:'승차감 Trade-off',s:'Comfort ⟺ Handling',c:'#D19A66'}
+      ];
+      items.forEach(it=>{ctx.fillStyle='rgba(255,255,255,0.03)';ctx.strokeStyle=it.c;ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(it.x,it.y,it.w,it.h,8);ctx.fill();ctx.stroke();ctx.fillStyle=it.c;ctx.font='bold 13px sans-serif';ctx.fillText(it.t,it.x+10,it.y+25);ctx.fillStyle='#8A8F98';ctx.font='11px monospace';ctx.fillText(it.s,it.x+10,it.y+55);});
+      setMetrics([['Day16-21','부품특성 → 시스템 트레이드오프']]);
+    }
+
+    draw();
+  })();
+  </script>
 </div>
 
+<!-- ══════ QUIZ ══════ -->
+<div class="section">
+  <div class="section-label">QUIZ</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
 
-<!-- ⑩ 퀴즈 -->
+  <!-- QUESTION 01 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 01 — 2DOF 시스템 종합</div>
+    <p class="quiz-q">2DOF 시스템의 고유진동수 개수는?</p>
+    <div class="quiz-options" id="q1">
+      <div class="quiz-opt">A. 1개</div>
+      <div class="quiz-opt">B. 2개</div>
+      <div class="quiz-opt">C. 4개</div>
+      <div class="quiz-opt">D. 무한대</div>
+    </div>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
 
+  <!-- QUESTION 02 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 02 — 모드 형상 이해</div>
+    <p class="quiz-q">차량 2DOF(바운스-피치) 모델에서 두 고유모드가 완전히 분리되는 조건은?</p>
+    <div class="quiz-options" id="q2">
+      <div class="quiz-opt">A. 전/후 스프링 강성이 같을 때</div>
+      <div class="quiz-opt">B. 무게중심이 축간 중앙에 있을 때</div>
+      <div class="quiz-opt">C. 감쇠비가 0일 때</div>
+      <div class="quiz-opt">D. 타이어 강성이 무한대일 때</div>
+    </div>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- QUESTION 03 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 03 — 커플링 효과</div>
+    <p class="quiz-q">바운스-피치 커플링이 강한 차량에서 나타나는 현상은?</p>
+    <div class="quiz-options" id="q3">
+      <div class="quiz-opt">A. 전/후 독립적으로 진동</div>
+      <div class="quiz-opt">B. 앞 범프 입력에 뒤가 반응하는 연성 운동</div>
+      <div class="quiz-opt">C. 좌/우 롤 모드 활성화</div>
+      <div class="quiz-opt">D. 타이어 접지력 증가</div>
+    </div>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
+</div>
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:40px 0;">
     <a href="Day21_승차감트레이드오프.html" class="nav-btn prev">← Day 21: 승차감트레이드오프</a>
@@ -624,6 +714,26 @@ td .katex,th .katex{font-size:0.9em!important}
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -652,7 +762,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -708,15 +818,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

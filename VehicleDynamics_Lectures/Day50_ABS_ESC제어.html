@@ -245,7 +245,33 @@ td .katex,th .katex{font-size:0.9em!important}
 .nav-btn{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;text-decoration:none;color:var(--gold);font-weight:500;transition:all 0.3s}
 .nav-btn:hover{background:var(--surface2);border-color:var(--gold)}
 @media(max-width:600px){.nav-section{grid-template-columns:1fr}}
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -400,6 +426,40 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v1200 v585 h43z"/></svg></span></span
 </div>
 </div>
 
+</div>
+
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 슬립률 정의</p>
+    <div class="sub-eq">$$s = \frac{V_{wheel} - V_{vehicle}}{V_{vehicle}} \times 100\%$$</div>
+    <div class="sub-eq">$$\text{제동: } s < 0 \quad (V_{wheel} < V_{vehicle})$$</div>
+    <div class="sub-eq">$$\text{구동: } s > 0 \quad (V_{wheel} > V_{vehicle})$$</div>
+    <p class="sub-note">μ-slip 곡선에서 최대 마찰계수는 s ≈ 10-20%에서 발생. 이 영역을 ABS가 유지!</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② ABS 제어 로직 (Threshold Control)</p>
+    <div class="sub-eq">$$\text{IF } |\dot{\omega}_{wheel}| > \dot{\omega}_{threshold} \;\text{THEN release pressure}$$</div>
+    <div class="sub-eq">$$\text{IF } s > s_{target} \;\text{THEN release pressure}$$</div>
+    <div class="sub-eq">$$\text{IF } s < s_{target} \;\text{THEN apply pressure}$$</div>
+    <p class="sub-note">1초에 15-20회 가압/감압 반복. <strong>3단계:</strong> 가압 → 유지 → 감압 사이클</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ ESC (Electronic Stability Control) 요 모멘트</p>
+    <div class="sub-eq">$$M_{ESC} = \Delta F_x \times \frac{w}{2}$$</div>
+    <div class="sub-eq">$$\dot{\psi}_{error} = \dot{\psi}_{actual} - \dot{\psi}_{desired}$$</div>
+    <div class="sub-eq">$$\text{오버스티어: 바깥바퀴 앞 제동, 언더스티어: 안바퀴 뒤 제동}$$</div>
+    <p class="sub-note"><strong>ESC 효과:</strong> 사고 감소 30-50%. 2012년부터 EU 신차 의무 장착. ABS + TCS + 요 레이트 센서 통합</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ μ 추정 알고리즘</p>
+    <div class="sub-eq">$$\hat{\mu} = \frac{F_{x,max}}{F_z} = \frac{T_{brake,max}}{r_{eff} \cdot F_z}$$</div>
+    <p class="sub-note">실시간 노면 μ 추정이 ABS/ESC 성능의 핵심. <strong>최신 트렌드:</strong> AI 기반 μ 예측(카메라 + 타이어 소음 분석)</p>
+  </div>
 </div>
 
 <!-- Parameters Table -->
@@ -564,106 +624,192 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v1200 v585 h43z"/></svg></span></span
 </div>
 
 <!-- Quiz Section -->
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 ABS/ESC 제어 로직</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day50" width="700" height="400"></canvas>
+    </div>
+    <div id="sim-day50-controls" class="sim-controls"></div>
+    <div id="sim-day50-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day50');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 400;
+    const ctrlBox = document.getElementById('sim-day50-controls');
+    const metricBox = document.getElementById('sim-day50-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_mu = addSlider('노면 마찰 μ', 0.2, 1.0, 0.8, 0.05, 'sim50-mu');
+    const sl_slip = addSlider('목표 슬립 (%)', 5, 25, 15, 1, 'sim50-slip');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const mu=+sl_mu.value, targetSlip=+sl_slip.value/100;
+      const hH=H/2;
+      // μ-slip curve
+      ctx.strokeStyle='#C9A84C';ctx.lineWidth=2.5;ctx.beginPath();
+      for(let i=0;i<=200;i++){
+        const slip=i/200;
+        const muS=mu*(1.1*slip/(0.1+slip))*Math.exp(-2*Math.max(0,slip-0.2));
+        const px=50+i*(W-100)/200, py=hH/2-muS*(hH-20)/mu;
+        i===0?ctx.moveTo(px,py):ctx.lineTo(px,Math.max(5,py));
+      } ctx.stroke();
+      // Target slip region
+      const tpx=50+targetSlip*(W-100);
+      ctx.fillStyle='rgba(152,195,121,0.1)';ctx.fillRect(tpx-15,5,30,hH-10);
+      ctx.strokeStyle='#98C379';ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(tpx,5);ctx.lineTo(tpx,hH-5);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='#98C379';ctx.font='10px monospace';ctx.fillText('ABS 목표',tpx-20,hH-10);
+      // ABS control cycle (bottom)
+      ctx.fillStyle='#8A8F98';ctx.font='11px monospace';ctx.fillText('μ(s) 곡선',5,15);ctx.fillText('ABS 제어 사이클',5,hH+15);
+      const states=['가압','유지','감압','유지'];
+      const cols=['#E06C75','#C9A84C','#4A9EBF','#C9A84C'];
+      states.forEach((s,si)=>{
+        const bx=50+si*(W-100)/4, bw=(W-100)/4-5;
+        ctx.fillStyle=cols[si]+'30';ctx.fillRect(bx,hH+30,bw,50);
+        ctx.strokeStyle=cols[si];ctx.strokeRect(bx,hH+30,bw,50);
+        ctx.fillStyle=cols[si];ctx.font='13px sans-serif';ctx.fillText(s,bx+bw/2-15,hH+60);
+      });
+      // Arrow cycle
+      ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1;
+      for(let si=0;si<3;si++){const x=50+(si+1)*(W-100)/4-2;ctx.beginPath();ctx.moveTo(x,hH+55);ctx.lineTo(x+10,hH+55);ctx.stroke();}
+      setMetrics([['노면 μ',mu.toFixed(2)],['최적 슬립률',(targetSlip*100).toFixed(0)+'%'],['사이클','~100 Hz (유압 밸브)']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
+<!-- ══════ QUIZ ══════ -->
+
 <div class="section">
-    <div class="section-label">QUIZ</div>
-    <div class="quiz-section">
-<h3>이해도 확인 퀴즈</h3>
-<div class="quiz-card q1">
-    <h4>Q1: 빈칸 채우기</h4>
-    <p class="q-question">ABS의 제어 목표는 타이어 슬립률을 ___% 범위로 유지하여 최대 ___과 조향 능력을 동시에 확보하는 것이다.</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> 10~20 / 마찰력(μ)<br>
-        <strong>해설:</strong> 슬립률-마찰계수 곡선의 피크가 10~20%에 위치하며, 이 영역에서 횡력도 충분합니다.
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">ABS / ESC 제어 심화</h2>
+
+  <!-- Deep Dive 1 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>💡 ABS 제어 알고리즘 — 슬립률 10~20%를 유지하는 방법</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive1">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">가압-보유-감압 사이클의 실시간 제어</h4>
+        <p>ABS의 핵심 목표는 타이어 슬립률을 최적 μ 영역(10~20%)에 유지하는 것입니다. 슬립률 λ = (V_vehicle - V_wheel) / V_vehicle. 건조 아스팔트에서 μ 최대점은 λ ≈ 15%, 빙판에서는 λ ≈ 5~8%입니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">ABS 목표 슬립률: $\lambda_{opt} \approx 0.10\sim0.20$ (최대 $\mu$ 영역). 슬립률 정의: $\lambda = \frac{V_{vehicle} - \omega R}{V_{vehicle}}$. 가압-보유-감압 사이클 주파수: $8\sim15$ Hz.</p>
+        <p style="margin:10px 0;color:var(--gold-light);"><strong>르노코리아 실무 Tip:</strong> ABS 캘리브레이션은 다양한 노면(아스팔트, 눈, 빙판, 젖은 노면)에서의 실차 시험을 통해 최적화하며, 차종별 약 6개월의 튜닝 기간이 소요됩니다.</p>
+        <p><strong style="color:var(--gold-light);">3단계 사이클:</strong> (1) 가압(pressure build) — 유압 상승, 슬립률 증가, (2) 보유(hold) — 현재 유압 유지, 슬립률 모니터링, (3) 감압(dump) — 유압 감소, 휠 재가속. 이 사이클이 초당 15~20회 반복됩니다.</p>
+        <p>차륜 속도 센서만으로 차량 속도를 정확히 알 수 없으므로, ABS ECU는 4개 휠속의 가중 평균 + 관성 센서(가속도계) + 전진 모델을 결합하여 '추정 차량 속도(reference velocity)'를 산출합니다.</p>
+        <p>ABS 사이클의 유압 진폭이 과도하면 페달 킥백(pedal kick-back)이 발생합니다. 최신 ABS는 밸브 개폐의 PWM 제어로 유압 변화를 부드럽게 하여 이 문제를 최소화합니다.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q2">
-    <h4>Q2: O/X 퀴즈</h4>
-    <p class="q-question">O/X: ESC는 엔진 토크를 증가시켜 차량 자세를 보정한다.</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> X (거짓)<br>
-        <strong>해설:</strong> ESC는 개별 휠 제동과 엔진 토크 감소를 통해 요 모멘트를 보정합니다.
+  </div>
+
+  <!-- Deep Dive 2 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>🔬 ESC(Electronic Stability Control) — 요 모멘트 제어의 물리학</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive2">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">차량이 미끄러지기 전에 개입하는 방법</h4>
+        <p>ESC는 운전자의 조향 의도(핸들 각도)와 차량의 실제 거동(요 레이트, 횡가속도)을 비교하여, 차이가 임계값을 초과하면 개별 휠에 선택적 제동을 걸어 요 모멘트를 교정합니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">ESC 요 모멘트 제어: $M_z = \Delta F_x \times \frac{t_w}{2}$ 여기서 $\Delta F_x$는 좌우 제동력 차이. 목표 요 레이트 $r_{target}$과 실측 $r_{actual}$의 편차를 줄이도록 개별 바퀴 제동.</p>
+        <p style="margin:10px 0;color:var(--gold-light);"><strong>실무 참고:</strong> ESC 개입 임계값은 주관평가와 연계하여 설정합니다. 너무 빠른 개입은 스포티함을 저해하고, 너무 늦은 개입은 안전성을 저해합니다.</p>
+        <p><strong style="color:var(--gold-light);">오버스티어 개입:</strong> 차량 후미가 미끄러질 때, 외측 전륜에 제동 → 차량을 바깥으로 회전시키는 요 모멘트 생성 → 오버스티어 억제. 이 제동력에 의한 요 모멘트 = F_brake × (track width / 2).</p>
+        <p><strong style="color:var(--gold-light);">언더스티어 개입:</strong> 차량 앞부분이 밖으로 밀릴 때, 내측 후륜에 제동 → 차량을 안쪽으로 회전시키는 요 모멘트 생성 → 언더스티어 억제. 동시에 엔진 토크 제한으로 속도를 줄입니다.</p>
+        <p>ESC의 레퍼런스 모델은 2-DOF 자전거 모델 기반의 '목표 요 레이트(target yaw rate)' 생성기입니다. 목표 vs 실측의 오차를 PID 또는 슬라이딩 모드 제어기로 처리하여 각 휠의 목표 제동 압력을 계산합니다.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q3">
-    <h4>Q3: Simpack 적용</h4>
-    <p class="q-question">Simpack에서 ABS 성능을 결정짓는 가장 중요한 센서 모델은?</p>
-    <div class="q-options"><label><input type="radio" name="q3" value="휠 속도 센서"/> 휠 속도 센서</label>
-<label><input type="radio" name="q3" value="온도 센서"/> 온도 센서</label>
-<label><input type="radio" name="q3" value="습도 센서"/> 습도 센서</label>
-<label><input type="radio" name="q3" value="광센서"/> 광센서</label>
-</div>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> 휠 속도 센서<br>
-        <strong>해설:</strong> ABS는 휠 속도 차이로 슬립률을 계산하므로 휠 속도 센서의 정밀도가 핵심입니다.
+  </div>
+
+  <!-- Deep Dive 3 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>⚙️ μ-split 제동과 ABS/ESC의 협조 제어</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive3">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">좌우 노면이 다를 때의 제어 전략</h4>
+        <p>μ-split 노면(예: 좌측은 건조 아스팔트 μ=0.9, 우측은 빙판 μ=0.2)에서 급제동하면 좌우 제동력 차이에 의해 강한 요 모멘트가 발생하여 차량이 μ가 높은 쪽으로 회전합니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">μ-split 제동: 좌우 노면 $\mu$ 차이 시 발생하는 요 모멘트 $M_{yaw} = (\mu_H - \mu_L) \times F_z \times \frac{t_w}{2}$. ABS+ESC 협조 제어로 $M_{yaw}$를 상쇄하여 직진 유지.</p>
+        <p style="margin:10px 0;color:var(--gold-light);"><strong>양산 기준:</strong> μ-split 제동 시험은 ECE R13-H 부속서 6에 규정되어 있으며, 차량이 차선을 유지하는지를 평가합니다.</p>
+        <p><strong style="color:var(--gold-light);">ABS 단독 대응:</strong> 각 휠의 슬립률을 개별 제어하여 좌우 마찰계수에 맞는 제동력을 발생. 하지만 좌우 제동력 차이에 의한 요 모멘트는 완전히 제거할 수 없습니다.</p>
+        <p>ABS + ESC 협조: ESC가 요 레이트를 모니터링하여 과도한 회전이 감지되면, 고μ 쪽 전륜의 제동 압력을 의도적으로 낮추어(select-low 전략) 좌우 요 모멘트 차이를 줄입니다. 제동 거리는 길어지지만 안정성이 확보됩니다.</p>
+        <p>최신 ESC는 'select-high'와 'select-low'를 운전 상황에 따라 동적으로 전환합니다. 직선 제동에서는 select-high(최대 감속)를, 코너링 중 제동에서는 select-low(안정성 우선)를 적용합니다.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-</div>
+  </div>
 
 </div>
 
-<!-- Deep Dives -->
 <div class="section">
-    <div class="section-label">DEEP DIVE</div>
-    <div class="section-title">심화 학습</div>
-    <div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> ABS 세대별 진화
-    </button>
-    <div class="accordion-content">
-        <p><strong>1세대 (1978):</strong> 3채널/3센서, 후축 Select-Low<br><strong>2세대:</strong> 4채널/4센서, 개별 휠 제어<br><strong>3세대:</strong> ABS+TCS(구동력 제어) 통합<br><strong>4세대:</strong> ABS+TCS+ESC+EBD 완전 통합</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 슬립률 추정 기법
-    </button>
-    <div class="accordion-content">
-        <p>차량 기준 속도를 정확히 알 수 없으므로, 4개 휠 속도의 가중 평균이나 비구동륜 속도를 기준으로 사용합니다. GPS 융합이나 가속도계 적분으로 보정합니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> ESC와 토크 벡터링
-    </button>
-    <div class="accordion-content">
-        <p>ESC가 '수동적' 요 제어(제동으로 감속)라면, <strong>토크 벡터링</strong>은 좌우 구동력 차이로 '능동적' 요 모멘트를 생성합니다. BMW M, Honda SH-AWD가 대표적입니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 눈/빙판에서의 ABS 특성
-    </button>
-    <div class="accordion-content">
-        <p>눈길에서는 타이어가 약간 락업되어야 눈을 쌓아올리는(snow-wedge) 효과로 더 짧은 정지거리를 얻을 수 있습니다. 일부 ABS는 눈길 모드에서 슬립 임계를 높입니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 뇌과학: 공포 반응과 페달 힘
-    </button>
-    <div class="accordion-content">
-        <p>비상 상황에서 <strong>교감신경 활성화</strong>로 아드레날린이 분비되면 근력이 증가합니다. 평소 50~80N의 페달 힘이 비상 시 150~200N까지 올라갑니다. ABS는 이 과도한 입력에서도 안정적으로 작동해야 합니다.</p>
-    </div>
-</div>
+  <div class="section-label">QUIZ</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
 
-</div>
-
-<!-- Footer Navigation -->
-<!-- ══════ FORMULA EXPLORER ══════ -->
-<div class="section">
-    <div class="section-label">TOOLS</div>
-    <div class="section-title">수식 탐색기</div>
-    <div class="formula-explorer">
-        <p style="color:var(--text-dim);font-style:italic;">이 섹션의 핵심 수식을 인터랙티브하게 탐색하세요. 각 변수에 마우스를 올리면 설명이 표시됩니다.</p>
+  <!-- Q1 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 01 — 노면 PSD</div>
+    <p class="quiz-q">노면 거칠기 PSD(Power Spectral Density)에서 주파수가 높아질수록 PSD값은?</p>
+    <div class="quiz-options" id="q1">
+      <div class="quiz-opt">A. 감소(높은 주파수 = 짧은 파장 = 작은 진폭)</div>
+      <div class="quiz-opt">B. 증가</div>
+      <div class="quiz-opt">C. 일정</div>
+      <div class="quiz-opt">D. 진동</div>
     </div>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 02 — ISO 분류</div>
+    <p class="quiz-q">ISO 8608 노면 등급에서 A급과 E급의 차이는?</p>
+    <div class="quiz-options" id="q2">
+      <div class="quiz-opt">A. A급이 가장 평탄, E급이 가장 거침</div>
+      <div class="quiz-opt">B. A급이 가장 거침</div>
+      <div class="quiz-opt">C. 같은 수준</div>
+      <div class="quiz-opt">D. 알파벳 순서와 무관</div>
+    </div>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 03 — RMS 가속도</div>
+    <p class="quiz-q">노면 PSD를 Quarter-Car 전달함수와 결합하여 구하는 핵심 출력은?</p>
+    <div class="quiz-options" id="q3">
+      <div class="quiz-opt">A. 차체 수직가속도 RMS (승차감 지표)</div>
+      <div class="quiz-opt">B. 최대 속도</div>
+      <div class="quiz-opt">C. 연료 소비량</div>
+      <div class="quiz-opt">D. 소음 주파수</div>
+    </div>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
 </div>
-
-<!-- ══════ SPACED REPETITION ══════ -->
-
-
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section">
     <a href="Day49_제동력배분하중이동.html" class="nav-btn">← Day 49: 제동력 배분·하중이동</a>
@@ -707,7 +853,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -763,15 +909,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

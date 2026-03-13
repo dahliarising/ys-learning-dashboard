@@ -233,6 +233,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -401,6 +407,40 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 </div>
 </div>
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 랙 & 피니언 기어비</p>
+    <div class="sub-eq">$$i_{steering} = \frac{\delta_{steering\;wheel}}{\delta_{road\;wheel}}$$</div>
+    <div class="sub-eq">$$i_{rack} = \frac{\theta_{pinion}}{x_{rack}} = \frac{1}{r_{pinion}}$$</div>
+    <div class="sub-eq">$$\text{전체: } i_{total} = i_{column} \times i_{rack} \times i_{tie\;rod}$$</div>
+    <p class="sub-note">승용차 기어비: 14-18:1. 스포츠카: 12-14:1 (빠른 응답). SUV: 16-20:1 (조향력 경감)</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 조향 토크 밸런스</p>
+    <div class="sub-eq">$$T_{sw} = \frac{F_y \cdot d_{trail} + M_z}{i_{steering} \cdot \eta_{steering}}$$</div>
+    <div class="sub-eq">$$d_{trail} = d_{mech} + d_{pneumatic}$$</div>
+    <p class="sub-note">뉴매틱 트레일은 속도/슬립각에 따라 변화 → 센터링 토크의 주요 원천</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 애커만 보정율</p>
+    <div class="sub-eq">$$\text{Ackermann \%} = \frac{\delta_{inner} - \delta_{outer}}{\delta_{Ackermann} - \delta_{parallel}} \times 100$$</div>
+    <div class="sub-eq">$$\delta_{Ackermann,inner} = \arctan\frac{L}{R - w/2}$$</div>
+    <div class="sub-eq">$$\delta_{Ackermann,outer} = \arctan\frac{L}{R + w/2}$$</div>
+    <p class="sub-note">저속: 100% 애커만 이상적. 고속: 50-70% (타이어 슬립각 고려). 랙 위치로 조절</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 킥백과 NVH</p>
+    <div class="sub-eq">$$F_{kickback} = k_{mount} \cdot \Delta x_{rack} + c_{mount} \cdot \Delta\dot{x}_{rack}$$</div>
+    <div class="sub-eq">$$\text{저감: } \text{랙 마운트 부싱 강성 최적화 + 댐퍼 밸브 조율}$$</div>
+    <p class="sub-note">포장 이음새 통과 시 핸들 충격 = 킥백. 전동 파워스티어링(EPS)에서 소프트웨어 필터로 저감 가능</p>
+  </div>
+</div>
+
+
 
 </div>
 
@@ -573,131 +613,186 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 </div>
 
+
+<div class="section">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">랙-피니언 조향 역학 심화</h2>
+
+  <!-- Deep Dive 1 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>💡 조향 기어비(Steering Ratio)의 물리적 의미 — 핸들 한 바퀴에 바퀴가 얼마나 도는가?</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive1">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">오버올 기어비 = 조향 컬럼비 × 랙 기어비</h4>
+        <p>오버올 조향 기어비(Overall Steering Ratio)는 핸들 회전각 / 타이어 조향각입니다. 일반 승용차는 14:1 ~ 18:1, 스포츠카는 12:1 ~ 14:1, 트럭은 20:1 ~ 25:1이 일반적입니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">전체 조향 기어비: $G_{overall} = G_{steering\_gear} \times G_{linkage}$. 일반 승용차 $G = 14\sim18:1$, VGR(Variable Gear Ratio)에서는 센터 $14:1$ → 풀록 $11:1$로 변화시켜 주차 편의성과 고속 안정성을 동시에 확보.</p>
+        <p style="margin:10px 0;color:var(--gold-light);"><strong>르노코리아 실무 Tip:</strong> XJB 플랫폼은 VGR 랙을 적용하여 센터 부근 15.5:1, 풀록 부근 12.2:1의 가변 기어비를 구현합니다. 랙 치형 피치 변화로 달성.</p>
+        <p><strong style="color:var(--gold-light);">분해:</strong> 오버올 기어비 = 피니언 회전각/랙 이동량(피니언 기어비) × 랙 이동량/타이어 조향각(스티어링 암 레버비). 피니언 기어비는 피니언 잇수와 모듈로 결정되고, 레버비는 스티어링 암 길이로 결정됩니다.</p>
+        <p>가변 기어비(Variable Gear Ratio, VGR) 랙은 랙의 치형 피치를 중앙과 끝단에서 다르게 하여, 직진 부근에서는 느린 기어비(안정성), 큰 조향각에서는 빠른 기어비(기동성)를 실현합니다.</p>
+        <p>BMW의 Variable Sport Steering이 대표적 VGR 시스템입니다. 중앙부 기어비 ~16:1에서 엔드 기어비 ~10:1까지 연속적으로 변합니다. 시뮬레이션에서는 rack travel vs pinion angle의 비선형 맵으로 모델링합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deep Dive 2 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>🔬 랙 포스(Rack Force)와 킹핀 모멘트 — 운전자가 느끼는 '스티어링 필(feel)'의 근원</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive2">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">타이어 접지면에서 핸들까지의 힘 전달 경로</h4>
+        <p>운전자가 핸들에서 느끼는 토크는 타이어 접지면의 알라이닝 토크(aligning torque)가 킹핀 축 → 너클 → 타이로드 → 랙 → 피니언 → 조향 컬럼을 거쳐 전달된 것입니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">랙 포스: $F_{rack} = \frac{M_{KP} + M_{trail} + M_{aligning}}{r_{pinion} \cdot \eta}$ 여기서 $M_{KP}$는 킹핀 모멘트, $M_{trail}$은 캐스터 트레일 모멘트, $\eta$는 기어 효율($0.85\sim0.95$).</p>
+        <p style="margin:10px 0;color:var(--gold-light);"><strong>실무 참고:</strong> 랙 포스 측정은 스티어링 시스템 벤치 시험에서 핵심 지표이며, EPS 어시스트 맵 튜닝의 입력 데이터로 활용됩니다.</p>
+        <p><strong style="color:var(--gold-light);">킹핀 모멘트:</strong> 타이어 횡력 Fy × 뉴매틱 트레일(pneumatic trail) + 타이어 셀프 얼라이닝 토크 Mz. 뉴매틱 트레일은 슬립각이 커지면 감소하므로, 한계 영역에서 '핸들이 가벼워지는' 느낌의 원인입니다.</p>
+        <p>이 킹핀 모멘트가 스티어링 암을 통해 타이로드 축력(rack force)으로 변환됩니다. 랙 포스 = 킹핀 모멘트 / 스티어링 암 유효 길이. 좌우 타이로드 축력의 합이 랙을 밀고 당기는 힘입니다.</p>
+        <p>EPS 시스템에서는 이 랙 포스를 토크 센서로 측정하여 어시스트 모터의 전류를 제어합니다. 랙 포스가 클수록 → 더 많은 어시스트 → 운전자는 적절한 핸들 무게감을 느낍니다. 이 관계를 '어시스트 맵(assist map)'이라 합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deep Dive 3 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>⚙️ 랙-피니언 시스템의 마찰과 백래시 — 조향 정밀도의 적</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive3">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">기어 맞물림의 비이상적 특성</h4>
+        <p>이상적인 랙-피니언은 입력 회전이 즉시 랙 병진운동으로 변환됩니다. 하지만 실제로는 기어 백래시(backlash), 마찰, 탄성 변형이 존재하여 조향 응답에 '죽은 구간(dead band)'을 만듭니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">백래시 허용 범위: 랙-피니언 치합부 $\leq 0.1$ mm, 타이로드 볼조인트 $\leq 0.05$ mm. 토 각도 환산 시 랙 변위 1 mm ≈ 토 변화 $0.1\sim0.15°$ (차종에 따라 다름).</p>
+        <p style="margin:10px 0;color:var(--gold-light);"><strong>양산 기준:</strong> 스티어링 기어 백래시는 출하 검사에서 전수 검사 항목이며, 주행 중 느끼는 핸들 유격의 주원인입니다.</p>
+        <p><strong style="color:var(--gold-light);">백래시:</strong> 피니언과 랙 치형 사이의 유격. 보통 0.05~0.15mm. 이것이 직진 주행 시 핸들을 미세하게 돌려도 바퀴가 반응하지 않는 '온센터 무감각(on-center dead zone)'의 주요 원인입니다.</p>
+        <p>요크 스프링(yoke spring)은 랙을 피니언 쪽으로 밀어 백래시를 줄이는 장치입니다. 프리로드(preload)를 높이면 백래시는 줄지만 마찰이 증가합니다. 이 트레이드오프가 조향 시스템 튜닝의 핵심입니다.</p>
+        <p>최신 듀얼 피니언 EPS에서는 하나는 수동 입력용, 다른 하나는 모터 구동용으로 분리하여 백래시와 마찰 문제를 구조적으로 개선합니다. 단일 피니언 대비 on-center 응답성이 20~30% 향상됩니다.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
 <!-- ══════ QUIZ SECTION ══════ -->
-<div class="section">
-    <div class="section-label">QUIZ</div>
-    <div class="quiz-section">
-<h3>이해도 확인 퀴즈</h3>
-<div class="quiz-card q1">
-    <h4>Q1: 빈칸 채우기</h4>
-    <p class="q-question">역효율 공식 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">η</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">ba</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;vertical-align:-0.31em;"></span><span class="mord" style="margin-right:0.02778em;">___</span></span></span></span>에서 순방향 효율이 0.90이면 역효율은?</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> 2(0.90)-1 = 0.80<br>
-        <strong>해설:</strong> η_back = 2η_mesh - 1 공식을 적용합니다.
-    </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q2">
-    <h4>Q2: O/X 퀴즈</h4>
-    <p class="q-question">O/X: 피니언 반경이 클수록 같은 토크에서 랙에 더 큰 힘이 전달된다.</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> X (거짓)<br>
-        <strong>해설:</strong> F = T/r이므로 반경이 클수록 힘은 작아지고 속도비가 올라갑니다.
-    </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q3">
-    <h4>Q3: Simpack 적용</h4>
-    <p class="q-question">Simpack에서 스티어링 시스템의 마찰을 모델링하기 위해 사용하는 요소는?</p>
-    <div class="q-options"><label><input type="radio" name="q3" value="Spring-Damper"/> Spring-Damper</label>
-<label><input type="radio" name="q3" value="Force Element: Friction"/> Force Element: Friction</label>
-<label><input type="radio" name="q3" value="Bushing"/> Bushing</label>
-<label><input type="radio" name="q3" value="Contact"/> Contact</label>
-</div>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> Force Element: Friction<br>
-        <strong>해설:</strong> Simpack의 Friction Force Element로 쿨롱+점성 마찰 모델을 적용합니다.
-    </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-</div>
 
-</div>
-
-<!-- ══════ DEEP DIVES ══════ -->
-<div class="section">
-    <div class="section-label">DEEP DIVE</div>
-    <div class="section-title">심화 학습</div>
-    <div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 가변 기어비 (VGR) 시스템
-    </button>
-    <div class="accordion-content">
-        <p>현대 EPS는 차속에 따라 기어비를 전자적으로 조절합니다. 저속에서는 빠른 기어비(GR=12), 고속에서는 느린 기어비(GR=18)로 변환합니다.</p><div class='deriv-equation'><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.00773em;">GR</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal">G</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0315em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.22222em;">V</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></div>
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 랙-피니언 역학</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day42" width="700" height="350"></canvas>
     </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 랙 포스 시뮬레이션
-    </button>
-    <div class="accordion-content">
-        <p>Simpack에서 랙 포스를 분석하면 노면 입력, 타이어 반력, 마찰력의 기여도를 분리할 수 있습니다. 이를 통해 조향감 튜닝의 방향성을 도출합니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> NVH: 스티어링 시스템의 진동
-    </button>
-    <div class="accordion-content">
-        <p>랙-피니언 맞물림에서 발생하는 <strong>기어 소음(gear rattle)</strong>은 백래시(backlash)와 가진 주파수의 관계로 분석합니다.</p><div class='deriv-equation'><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">ttl</span><span class="mord mathnormal mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1634em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8184em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">π</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.5073em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:0em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">ee</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">h</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1512em;"><span></span></span></span></span></span></span><span class="mbin mtight">⋅</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.0359em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">ini</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2819em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></div>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 조향 응답 시간
-    </button>
-    <div class="accordion-content">
-        <p>운전자의 핸들 입력부터 바퀴 조향까지의 시간 지연은 시스템 관성과 감쇠에 의해 결정됩니다.</p><div class='deriv-equation'><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.1132em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">s</span><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">eer</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.528em;vertical-align:-0.5423em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9857em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1645em;"><span style="top:-2.357em;margin-left:0em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2819em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.5073em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.09618em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1645em;"><span style="top:-2.357em;margin-left:-0.0962em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2819em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.5423em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></div>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 뇌과학: 힘-변위 변환의 직관
-    </button>
-    <div class="accordion-content">
-        <p>기어의 토크-힘 변환은 <strong>지렛대 원리</strong>의 연장선입니다. 전두엽의 추상적 사고와 소뇌의 운동 계획이 협력하여 이해됩니다.</p>
-    </div>
-</div>
-
-</div>
-
-
-<!-- ══════ FORMULA EXPLORER ══════ -->
-<div class="section">
-    <div class="section-label">TOOLS</div>
-    <div class="section-title">수식 탐색기</div>
-    <div class="formula-explorer" id="formulaExplorer">
-        <p>핵심 수식들의 관계를 탐색하세요.</p>
-        <pre id="eqData" style="display:none;">
-{
-  "day": 42,
-  "title": "랙피니언 역학",
-  "heroEq": "<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">ini</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">d</span><span class="mord mathnormal">o</span><span class="mord mathnormal">t</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord mathnormal">e</span><span class="mord mathnormal">t</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">m</span><span class="mord mathnormal mtight">es</span><span class="mord mathnormal mtight">h</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>",
-  "derivations": [
-    {
-      "title": "피니언 토크-랙 힘 변환",
-      "eq": "<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">F</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">ini</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span></span>",
-      "explanation": "피니언 반경 r_p에 의해 회전 토크가 직선 힘으로 변환됩니다. 이것이 가장 기본적인 기어 전달 관계입니다."
-    },
-    {
-      "title": "전체 기어비 정의",
-      "eq": "<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.00773em;">GR</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span><span class="mord"><span class="mspace newline"></span><span class="mord mathnormal">t</span><span class="mord mathnormal">h</span><span class="mord mathnormal">e</span><span class="mord mathnormal">t</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">s</span><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span class="mord"><span class="mspace newline"></span><span class="mord mathnormal">d</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">t</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span><span class="mord"><span class="mord">2</span><span class="mspace newline"></span><span class="mord mathnormal">p</span><span class="mord mathnormal">i</span><span class="mspace newline"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">d</span><span class="mord mathnormal">o</span><span class="mord mathnormal">t</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">ini</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span><span class="mord"><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span>",
-      "explanation": "핸들 회전각(θ_sw)과 바퀴 조향각(δ_w)의 비율이 전체 기어비입니다. 보통 14~18 범위입니다."
-    },
-    {
-      "title": "랙 변위-조향각 관계",
-      "eq": "<span class="katex"><span class="katex-html" aria-hidden="true"><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord mathnormal">d</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">t</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span><span class="mspace newline"></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">a</span><span class="mord mathnormal">c</span><span class="mord"><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">c</span><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace newline"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">d</span><span class="mord mathnormal">o</span><span class="mord mathnormal">t</span><span class="mspace newline"></span><span class="mord mathnormal">cos</span><span class="mspace newline"></span><span class="mord mathnormal">p</span><span class="mord mathnormal">hi</span></span></span></span></span>",
-      "explanation": "랙의 직선 변위 x_rack이 타이로드를 통해 너클을 회전시키는 기하학적 관계입니다."
+    <div id="sim-day42-controls" class="sim-controls"></div>
+    <div id="sim-day42-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day42');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day42-controls');
+    const metricBox = document.getElementById('sim-day42-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
     }
-  ]
-}
-        </pre>
-    </div>
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_ratio = addSlider('기어비 (mm/rev)', 30, 60, 42, 1, 'sim42-ratio');
+    const sl_angle = addSlider('핸들 각도 (°)', -540, 540, 180, 10, 'sim42-angle');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const ratio=+sl_ratio.value, angle=+sl_angle.value;
+      const rackDisp=angle/360*ratio;
+      // Pinion gear
+      const gx=W/2, gy=H*0.35, gR=40;
+      ctx.strokeStyle='#C9A84C';ctx.lineWidth=2;ctx.beginPath();ctx.arc(gx,gy,gR,0,2*Math.PI);ctx.stroke();
+      // Teeth
+      const nTeeth=12;
+      for(let i=0;i<nTeeth;i++){const a=i*2*Math.PI/nTeeth+angle*Math.PI/180;ctx.beginPath();ctx.moveTo(gx+gR*Math.cos(a),gy+gR*Math.sin(a));ctx.lineTo(gx+(gR+8)*Math.cos(a),gy+(gR+8)*Math.sin(a));ctx.stroke();}
+      // Rack
+      const rackY=gy+gR+10;
+      ctx.strokeStyle='#4A9EBF';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(50,rackY);ctx.lineTo(W-50,rackY);ctx.stroke();
+      // Rack position marker
+      const rackPx=gx+rackDisp*2;
+      ctx.fillStyle='#E06C75';ctx.beginPath();ctx.arc(rackPx,rackY,6,0,2*Math.PI);ctx.fill();
+      ctx.strokeStyle='#E06C75';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(rackPx,rackY);ctx.lineTo(rackPx,rackY+60);ctx.stroke();
+      // Tie rods
+      ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(rackPx,rackY+60);ctx.lineTo(rackPx-80,H-30);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(rackPx,rackY+60);ctx.lineTo(rackPx+80,H-30);ctx.stroke();
+      ctx.fillStyle='#8A8F98';ctx.font='12px monospace';
+      ctx.fillText('랙 변위: '+rackDisp.toFixed(1)+' mm',10,H-10);
+      setMetrics([['기어비',ratio+' mm/rev'],['핸들각',angle+'°'],['랙 변위',rackDisp.toFixed(1)+' mm'],['조향비','핸들각/바퀴각']]);
+    }
+
+    draw();
+  })();
+  </script>
 </div>
 
-<!-- ══════ SPACED REPETITION ══════ -->
+<!-- ══════ QUIZ ══════ -->
+<div class="section">
+  <div class="section-label">QUIZ</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
 
+  <!-- Q1 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 01 — 조향 기어비</div>
+    <p class="quiz-q">가변 기어비 랙(VGR)의 장점은?</p>
+    <div class="quiz-options" id="q1">
+      <div class="quiz-opt">A. 저속에서 빠른 조향 + 고속에서 안정적 응답</div>
+      <div class="quiz-opt">B. 제조 비용 절감</div>
+      <div class="quiz-opt">C. 타이어 수명 증가</div>
+      <div class="quiz-opt">D. 연비 향상</div>
+    </div>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
 
+  <!-- Q2 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 02 — 토크 스티어</div>
+    <p class="quiz-q">FWD 차량에서 급가속 시 토크 스티어가 발생하는 주원인은?</p>
+    <div class="quiz-options" id="q2">
+      <div class="quiz-opt">A. 좌/우 드라이브샤프트 길이(또는 각도) 불균등</div>
+      <div class="quiz-opt">B. 브레이크 패드 마모 차이</div>
+      <div class="quiz-opt">C. 타이어 공기압 차이</div>
+      <div class="quiz-opt">D. 노면 경사</div>
+    </div>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 03 — EPS 시스템</div>
+    <p class="quiz-q">EPS(전동식 파워스티어링)에서 조향 감각 튜닝의 핵심 파라미터는?</p>
+    <div class="quiz-options" id="q3">
+      <div class="quiz-opt">A. 어시스트 맵(차속 vs 토크 vs 어시스트량)</div>
+      <div class="quiz-opt">B. 배터리 전압</div>
+      <div class="quiz-opt">C. 에어컨 부하</div>
+      <div class="quiz-opt">D. 엔진 RPM</div>
+    </div>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
+</div>
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section">
     <a href="Day41_애커만기하학.html" class="nav-btn prev">← Day 41</a>
@@ -754,14 +849,6 @@ td .katex,th .katex{font-size:0.9em!important}
 .nav-btn { padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; text-align: center; text-decoration: none; color: var(--gold); font-weight: 500; transition: all 0.3s; }
 .nav-btn:hover { background: var(--surface2); border-color: var(--gold); }
 .footer { text-align: center; padding: 40px 0; border-top: 1px solid var(--border); margin-top: 60px; color: var(--text-dim); font-size: 12px; }
-.accordion { margin: 12px 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-.accordion-toggle { width: 100%; padding: 16px 20px; background: var(--surface); border: none; color: var(--text-bright); font-size: 14px; font-weight: 500; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
-.accordion-toggle:hover { background: var(--surface2); }
-.accordion-toggle.active { background: var(--surface2); border-bottom: 1px solid var(--border); }
-.accordion-icon { color: var(--gold); font-size: 12px; transition: transform 0.2s; }
-.accordion-content{display:none;background:var(--surface);padding:0}
-.accordion-content.show { max-height: 2000px; padding: 16px 20px; }
-.accordion-content p { margin: 8px 0; line-height: 1.6; font-size: 14px; }
 .intuition-card { background: var(--surface); border: 1px solid var(--border); padding: 24px; border-radius: 12px; }
 .intuition-card h4 { color: var(--gold); margin-bottom: 12px; }
 .intuition-card p { margin: 8px 0; line-height: 1.6; }
@@ -769,6 +856,26 @@ td .katex,th .katex{font-size:0.9em!important}
     .sp-row { grid-template-columns: 1fr; }
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -797,7 +904,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -853,15 +960,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

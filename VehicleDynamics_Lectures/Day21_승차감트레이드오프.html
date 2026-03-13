@@ -226,6 +226,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -403,6 +409,36 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     </div>
 </div>
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 승차감 지표: Body Acceleration RMS</p>
+    <div class="sub-eq">$$J_{ride} = a_{body,rms} = \sqrt{\frac{1}{T}\int_0^T \ddot{z}_s^2\,dt}$$</div>
+    <p class="sub-note">차체 가속도 RMS가 작을수록 승차감 좋음. ISO 2631 기준으로 평가</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 조종안정성 지표: Dynamic Tire Load</p>
+    <div class="sub-eq">$$J_{handling} = \frac{\Delta F_{z,rms}}{F_{z,static}} = \frac{k_t \cdot z_{us,rms}}{m_s g}$$</div>
+    <p class="sub-note">접지력 변동비가 작을수록 그립 안정. <strong>트레이드오프:</strong> 감쇠↑ → J_ride↓ 하지만 고주파에서 J_handling↑</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 파레토 최적화 수식</p>
+    <div class="sub-eq">$$\min_{c_s} \; [J_{ride}(c_s), \; J_{handling}(c_s)]$$</div>
+    <div class="sub-eq">$$\text{제약조건: } c_{min} \leq c_s \leq c_{max}, \quad z_{s,max} \leq z_{limit}$$</div>
+    <p class="sub-note"><strong>파레토 프론트:</strong> 한 지표를 개선하면 다른 지표가 반드시 악화되는 해의 집합. 엔지니어가 어디서 타협할지 결정</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 최적 감쇠비 근사해 (Hrovat, 1993)</p>
+    <div class="sub-eq">$$\zeta_{opt} \approx \sqrt{\frac{1}{2}\left(\frac{1}{1+\mu}\right)} \quad \text{where } \mu = \frac{m_{us}}{m_s}$$</div>
+    <div class="sub-eq">$$\mu \approx 0.1 \sim 0.15 \;\Rightarrow\; \zeta_{opt} \approx 0.21 \sim 0.24$$</div>
+    <p class="sub-note"><strong>실무 의미:</strong> 질량비 μ가 작을수록(언스프렁 질량↓) 최적 감쇠↓. 경량 서스펜션이 소프트 감쇠와 더 잘 조합</p>
+  </div>
+</div>
+
 <!-- ⑥ 파라미터 테이블 -->
 <div class="section">
   <div class="section-label">PARAMETERS</div>
@@ -554,7 +590,7 @@ td .katex,th .katex{font-size:0.9em!important}
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 OEM 멀티센스(Multi-Sense)와 Skyhook — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -565,7 +601,7 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 Skyhook vs Groundhook — 제어 전략 비교</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -605,42 +641,119 @@ td .katex,th .katex{font-size:0.9em!important}
 <!-- ══════ FORMULA EXPLORER ══════ -->
 
 
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 승차감 트레이드오프 파레토</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day21" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day21-controls" class="sim-controls"></div>
+    <div id="sim-day21-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day21');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day21-controls');
+    const metricBox = document.getElementById('sim-day21-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_ks = addSlider('kₛ (kN/m)', 10, 40, 20, 1, 'sim21-ks');
+    const sl_cs = addSlider('cₛ (Ns/m)', 500, 5000, 1500, 100, 'sim21-cs');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      // Generate Pareto front: ride comfort (body acc RMS) vs handling (susp travel RMS)
+      const ms=300,mu=40,kt=200000;
+      const pts=[];
+      for(let ks=10000;ks<=40000;ks+=2000)for(let cs=500;cs<=5000;cs+=200){
+        const wn=Math.sqrt(ks/ms),z=cs/(2*Math.sqrt(ks*ms));
+        const ride=1/(2*z*wn+0.1); // simplified comfort metric (lower=better)
+        const handle=z*wn; // handling metric (higher=better)
+        pts.push({ks,cs,ride:ride*100,handle});
+      }
+      const maxR=Math.max(...pts.map(p=>p.ride)),maxH=Math.max(...pts.map(p=>p.handle));
+      pts.forEach(p=>{
+        const px=50+p.handle*(W-100)/maxH, py=H-30-p.ride*(H-60)/maxR;
+        ctx.fillStyle='rgba(74,158,191,0.2)';ctx.beginPath();ctx.arc(px,py,2,0,2*Math.PI);ctx.fill();
+      });
+      // Current point
+      const ks0=+sl_ks.value*1000, cs0=+sl_cs.value;
+      const wn0=Math.sqrt(ks0/ms),z0=cs0/(2*Math.sqrt(ks0*ms));
+      const r0=100/(2*z0*wn0+0.1), h0=z0*wn0;
+      const cpx=50+h0*(W-100)/maxH, cpy=H-30-r0*(H-60)/maxR;
+      ctx.fillStyle='#C9A84C';ctx.beginPath();ctx.arc(cpx,cpy,8,0,2*Math.PI);ctx.fill();
+      ctx.strokeStyle='#C9A84C';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cpx,cpy,12,0,2*Math.PI);ctx.stroke();
+      ctx.fillStyle='#8A8F98';ctx.font='12px monospace';
+      ctx.fillText('핸들링 (ζ·ωₙ) →',W-150,H-10);ctx.fillText('↑ 승차감 (1/2ζωₙ)',5,15);
+      ctx.fillStyle='#C9A84C';ctx.fillText('● 현재 설정',cpx+15,cpy+5);
+      setMetrics([['ωₙ',(wn0/2/Math.PI).toFixed(2)+' Hz'],['ζ',z0.toFixed(3)],['Trade-off','승차감↑ ⟺ 핸들링↓']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
 <!-- ⑩ 퀴즈 -->
 <div class="section">
   <div class="section-label">QUIZ</div>
   <h2 class="section-title">즉시 복습 퀴즈</h2>
-  
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 01 — 수식 빈칸 채우기</div>
-      <p class="quiz-q">승차감 최적 감쇠비 범위는 ζ ≈ ___~___이다.</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q1')">정답 확인</button>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 01 — Ride vs Handling</div>
+      <p class="quiz-q">서스펜션 스프링 강성을 높이면 핸들링은 개선되지만 승차감이 악화되는 근본 원인은?</p>
+      <div class="quiz-options" id="q1">
+        <div class="quiz-opt">A. 타이어 접지력 감소</div>
+        <div class="quiz-opt">B. 노면 입력이 차체에 더 크게 전달되므로</div>
+        <div class="quiz-opt">C. 댐퍼 효율 저하</div>
+        <div class="quiz-opt">D. 롤 센터 위치 변화</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q1-fb" style="display:none;margin-top:10px">
-        ✅ 0.2~0.4
-      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 02 — 물리적 의미 연결</div>
-      <p class="quiz-q">Skyhook On/Off 제어에서 c = c_min이 되는 조건의 물리적 의미는?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q2')">정답 확인</button>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 02 — 감쇠비 최적화</div>
+      <p class="quiz-q">승차감 관점에서 최적 감쇠비(ζ)의 일반적 범위는?</p>
+      <div class="quiz-options" id="q2">
+        <div class="quiz-opt">A. 0.05~0.10</div>
+        <div class="quiz-opt">B. 0.20~0.40</div>
+        <div class="quiz-opt">C. 0.60~0.80</div>
+        <div class="quiz-opt">D. 1.00 이상</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q2-fb" style="display:none;margin-top:10px">
-        ✅ 바디 속도와 상대속도의 부호가 반대 — 즉 바디가 위로 가는데 상대적으로 압축되는 상황. 이때 감쇠를 줄여 노면 입력 에너지가 바디로 전달되는 것을 차단한다.
-      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 03 — Simpack 적용</div>
-      <p class="quiz-q">Simpack에서 semi-active 댐퍼의 c_min을 0으로 설정하면 안 되는 이유는?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q3')">정답 확인</button>
+    <div class="quiz-card" data-correct="3">
+      <div class="quiz-num">QUESTION 03 — 실무 트레이드오프</div>
+      <p class="quiz-q">승차감과 조종안정성을 동시에 개선하기 위한 가장 효과적인 접근 방법은?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. 스프링 강성만 최적화</div>
+        <div class="quiz-opt">B. 댐퍼 감쇠만 최적화</div>
+        <div class="quiz-opt">C. 언스프렁 질량 경량화</div>
+        <div class="quiz-opt">D. 타이어 공기압 증가</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q3-fb" style="display:none;margin-top:10px">
-        ✅ 감쇠가 0이면 수치 적분 시 무감쇠 공진이 발생하여 발산 위험이 있다. 최소 잔류 감쇠가 필요하다.
-      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
     </div>
 </div>
 
@@ -668,6 +781,26 @@ td .katex,th .katex{font-size:0.9em!important}
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -696,7 +829,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -752,15 +885,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

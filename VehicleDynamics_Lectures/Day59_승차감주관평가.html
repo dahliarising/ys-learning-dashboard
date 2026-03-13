@@ -233,6 +233,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 <svg style="display:none">
@@ -374,6 +380,38 @@ td .katex,th .katex{font-size:0.9em!important}
             <p>SEAT value < 1이면 시트가 진동을 감쇠하고, > 1이면 증폭합니다. 좋은 시트는 0.6~0.8 범위의 SEAT value를 목표로 합니다.</p>
         </div>
     </div>
+</div>
+
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 승차감 주관 평가 척도</p>
+    <div class="sub-eq">$$\text{VDI 2057: } K_W = a_{rms} \times W_k(\text{주파수 가중})$$</div>
+    <p class="sub-note">ISO 2631-1 기반: 1-2Hz에서 인체 민감도 최대. 수직/수평 방향별 가중 함수 상이</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 주파수 가중 가속도 (ISO 2631)</p>
+    <div class="sub-eq">$$a_w = \sqrt{\sum_{i} (W_i \cdot a_i)^2}$$</div>
+    <div class="sub-eq">$$W_k(f): \text{수직}, \; W_d(f): \text{수평 (전후/좌우)}$$</div>
+    <div class="sub-eq">$$\text{쾌적 기준: } a_w < 0.315 \;\text{m/s}^2 \;(\text{'not uncomfortable'})$$</div>
+    <p class="sub-note">0.5m/s² 이상: 'fairly uncomfortable'. 자동차 목표: < 0.4 m/s² (고급차: < 0.25 m/s²)</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ VDV (Vibration Dose Value)</p>
+    <div class="sub-eq">$$VDV = \left(\int_0^T a_w^4(t) \, dt\right)^{1/4}$$</div>
+    <div class="sub-eq">$$\text{RMS 대비 VDV는 충격성 진동(피크)에 민감}$$</div>
+    <p class="sub-note">RMS는 평균 에너지, VDV는 피크 충격 반영. 포장 이음새, 과속방지턱 평가에 VDV가 더 적합</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 주관-객관 상관 분석</p>
+    <div class="sub-eq">$$R_{subjective} = a_0 + a_1 \cdot a_{w,z} + a_2 \cdot a_{w,pitch} + a_3 \cdot \text{VDV}$$</div>
+    <div class="sub-eq">$$R^2 > 0.85 \;\text{(좋은 상관성 기준)}$$</div>
+    <p class="sub-note"><strong>평가 패널:</strong> 최소 10명의 숙련 평가자. 10점 척도. 통계 처리 후 객관 지표와 회귀 분석</p>
+  </div>
 </div>
 
 <!-- ══════ PARAMETERS SECTION ══════ -->
@@ -597,11 +635,12 @@ td .katex,th .katex{font-size:0.9em!important}
     </table>
 
     <div class="accordion" style="margin-top:20px">
-        <div class="accordion-header" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             <span>측정 장비 사양</span>
-            <span class="accordion-icon">▼</span>
-        </div>
+            <span class="accordion-arrow">▼</span>
+        </button>
         <div class="accordion-content">
+            <div class="accordion-inner">
             <ul>
                 <li><strong>가속도계:</strong> Brüel &amp; Kjær Type 4507 (Class 1, ±490 m/s²)</li>
                 <li><strong>데이터 로거:</strong> NI cDAQ-9178 + AI 모듈 (샘플 레이트 10 kHz)</li>
@@ -609,15 +648,17 @@ td .katex,th .katex{font-size:0.9em!important}
                 <li><strong>필터:</strong> ISO 2631-1 W<sub>d</sub>, W<sub>k</sub> 디지털 필터 (IIR Butterworth)</li>
                 <li><strong>소프트웨어:</strong> MATLAB, HEAD ArtemiS, Simpack</li>
             </ul>
+            </div>
         </div>
     </div>
 
     <div class="accordion">
-        <div class="accordion-header" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             <span>피험자 선정 기준 (ISO 표준)</span>
-            <span class="accordion-icon">▼</span>
-        </div>
+            <span class="accordion-arrow">▼</span>
+        </button>
         <div class="accordion-content">
+            <div class="accordion-inner">
             <ul>
                 <li>나이: 18~65세</li>
                 <li>건강: 척추 질환, 진동 관련 질환 없음</li>
@@ -625,6 +666,7 @@ td .katex,th .katex{font-size:0.9em!important}
                 <li>일반적으로 8~12명의 피험자로 통계적 유의성 확보</li>
                 <li>성별, 체중 분포 균형 (신체특성이 민감도에 영향)</li>
             </ul>
+            </div>
         </div>
     </div>
 </div>
@@ -692,11 +734,12 @@ td .katex,th .katex{font-size:0.9em!important}
     </table>
 
     <div class="accordion" style="margin-top:20px">
-        <div class="accordion-header" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             <span>계산 예시: 가중 RMS 구하기</span>
-            <span class="accordion-icon">▼</span>
-        </div>
+            <span class="accordion-arrow">▼</span>
+        </button>
         <div class="accordion-content">
+            <div class="accordion-inner">
             <p><strong>Step 1:</strong> 원시 가속도 신호 a(t) 수집 (Fs = 10 kHz, T = 60 sec)</p>
             <p><strong>Step 2:</strong> FFT 적용 → 주파수별 스펙트럼 |A(f)|</p>
             <p><strong>Step 3:</strong> ISO 2631 W(f) 필터 적용</p>
@@ -712,37 +755,124 @@ a_v = √(Σ A_weighted²(f) · Δf)<br/>
             <div style="background:rgba(201,168,76,0.1);padding:12px;border-radius:6px;margin:8px 0;font-family:'JetBrains Mono';font-size:12px">
 a_v,total = √(1.4² · a_v,x² + 1.4² · a_v,y² + 1.0² · a_v,z²)
             </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- ══════ QUIZ SECTION ══════ -->
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 승차감 주관평가 지표</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day59" width="700" height="300"></canvas>
+    </div>
+    <div id="sim-day59-controls" class="sim-controls"></div>
+    <div id="sim-day59-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day59');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 300;
+    const ctrlBox = document.getElementById('sim-day59-controls');
+    const metricBox = document.getElementById('sim-day59-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_aw = addSlider('가중 가속도 aw (m/s²)', 0.1, 2.0, 0.6, 0.05, 'sim59-aw');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const aw=+sl_aw.value;
+      // ISO 2631 comfort scale
+      const levels=[
+        {max:0.315,label:'쾌적',color:'#98C379'},
+        {max:0.63,label:'약간 불쾌',color:'#C9A84C'},
+        {max:1.0,label:'불쾌',color:'#D19A66'},
+        {max:1.6,label:'매우 불쾌',color:'#E06C75'},
+        {max:2.5,label:'극도로 불쾌',color:'#BE5046'}
+      ];
+      const barW=W-100, barH=40, by=H/2-20;
+      let px=50;
+      levels.forEach(lv=>{
+        const w=lv.max/2.5*barW-(px-50);
+        ctx.fillStyle=lv.color+'40';ctx.fillRect(px,by,w,barH);
+        ctx.strokeStyle=lv.color;ctx.strokeRect(px,by,w,barH);
+        ctx.fillStyle=lv.color;ctx.font='10px sans-serif';ctx.fillText(lv.label,px+5,by+barH+15);
+        px+=w;
+      });
+      // Current marker
+      const markerX=50+aw/2.5*barW;
+      ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(markerX,by-5);ctx.lineTo(markerX-6,by-15);ctx.lineTo(markerX+6,by-15);ctx.fill();
+      ctx.font='12px monospace';ctx.fillText('aw='+aw.toFixed(2),markerX-20,by-20);
+      let rating='';
+      for(const lv of levels){if(aw<=lv.max){rating=lv.label;break;}} if(!rating)rating='극도로 불쾌';
+      ctx.fillStyle='#8A8F98';ctx.font='13px sans-serif';ctx.fillText('ISO 2631 쾌적도 척도',W/2-80,30);
+      setMetrics([['가중가속도',aw.toFixed(2)+' m/s²'],['평가',rating],['기준','ISO 2631-1'],['주파수 가중','Wk (수직), Wd (수평)']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
+<!-- ══════ QUIZ ══════ -->
 <div class="section">
     <div class="section-label">QUIZ</div>
-    <div class="section-title">지식 확인</div>
+    <h2 class="section-title">즉시 복습 퀴즈</h2>
 
-    <div class="quiz-card">
-        <div class="quiz-num">문제 59-1</div>
-        <div class="quiz-q">ISO 2631 가중 함수 W(f)가 최대 민감도를 보이는 주파수 대역은?</div>
-        <div class="quiz-options">
-            <div class="quiz-opt" onclick="checkAnswer(this, 59, 1, 'B')">A) 1~2 Hz (저주파 공명)</div>
-            <div class="quiz-opt" onclick="checkAnswer(this, 59, 1, 'B')">B) 4~8 Hz (인체 공진 대역)</div>
-            <div class="quiz-opt" onclick="checkAnswer(this, 59, 1, 'B')">C) 12~16 Hz (고주파 민감도)</div>
-            <div class="quiz-opt" onclick="checkAnswer(this, 59, 1, 'B')">D) 20~30 Hz (근육 피로 대역)</div>
-        </div>
-        <div class="quiz-feedback"></div>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 01 — 주관 평가 척도</div>
+      <p class="quiz-q">승차감 주관 평가에서 가장 널리 사용되는 척도는?</p>
+      <div class="quiz-options" id="q1">
+        <div class="quiz-opt">A. SAE J670 등급</div>
+        <div class="quiz-opt">B. ISO 2631 comfort scale</div>
+        <div class="quiz-opt">C. BS 6841 지표</div>
+        <div class="quiz-opt">D. NASA TLX</div>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
     </div>
 
-    <div class="quiz-card">
-        <div class="quiz-num">문제 59-2</div>
-        <div class="quiz-q">시트의 SEAT value가 0.45라면, 이것은 무엇을 의미하는가?</div>
-        <div class="quiz-options">
-            <div class="quiz-opt" onclick="checkAnswer(this, 59, 2, 'C')">A) 시트가 진동을 45% 증폭함</div>
-            <div class="quiz-opt" onclick="checkAnswer(this, 59, 2, 'C')">B) 피험자가 느끼는 주관 점수는 4.5/10</div>
-            <div class="quiz-opt" onclick="checkAnswer(this, 59, 2, 'C')">C) 시트가 바닥 진동을 55% 감쇠함 (고품질 시트)</div>
-            <div class="quiz-opt" onclick="checkAnswer(this, 59, 2, 'C')">D) ISO 기준을 초과하여 불허됨</div>
-        </div>
-        <div class="quiz-feedback"></div>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 02 — 인체 민감 대역</div>
+      <p class="quiz-q">ISO 2631에서 인체가 수직 진동에 가장 민감한 주파수 대역은?</p>
+      <div class="quiz-options" id="q2">
+        <div class="quiz-opt">A. 0.5~1 Hz</div>
+        <div class="quiz-opt">B. 4~8 Hz</div>
+        <div class="quiz-opt">C. 15~20 Hz</div>
+        <div class="quiz-opt">D. 30~50 Hz</div>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 03 — 평가 방법</div>
+      <p class="quiz-q">주관 평가의 재현성을 높이기 위한 핵심 조건은?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. 평가자 1명으로 통일</div>
+        <div class="quiz-opt">B. 표준 노면·속도·평가 프로토콜 확립</div>
+        <div class="quiz-opt">C. 차량 1대만 사용</div>
+        <div class="quiz-opt">D. 야간에만 평가</div>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
     </div>
 </div>
 
@@ -752,25 +882,28 @@ a_v,total = √(1.4² · a_v,x² + 1.4² · a_v,y² + 1.0² · a_v,z²)
     <div class="section-title">심화 학습</div>
 
     <div class="accordion">
-        <div class="accordion-header" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             <span>1️⃣ Absorbed Power (흡수 에너지)</span>
-            <span class="accordion-icon">▼</span>
-        </div>
+            <span class="accordion-arrow">▼</span>
+        </button>
         <div class="accordion-content">
+            <div class="accordion-inner">
             <p>시트가 흡수하는 에너지는 단순 진동 감쇠보다 더 정교한 개념입니다:</p>
             <div style="background:rgba(201,168,76,0.1);padding:12px;border-radius:6px;margin:8px 0;font-family:'JetBrains Mono';font-size:12px">
 P_absorbed = ∫ F(t) · v(t) dt = (m · a_w · v_w)_avg
             </div>
             <p>이는 시트와 인체 사이의 에너지 전달을 직접 측정하며, SEAT value만으로는 포착 불가능한 동적 특성을 드러냅니다.</p>
+            </div>
         </div>
     </div>
 
     <div class="accordion">
-        <div class="accordion-header" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             <span>2️⃣ VDV (Vibration Dose Value) — 장시간 누적 효과</span>
-            <span class="accordion-icon">▼</span>
-        </div>
+            <span class="accordion-arrow">▼</span>
+        </button>
         <div class="accordion-content">
+            <div class="accordion-inner">
             <p>짧은 시간의 RMS는 정상이어도 장시간 노출 시 누적 피로도가 높을 수 있습니다. VDV는 이를 포착합니다:</p>
             <div style="background:rgba(201,168,76,0.1);padding:12px;border-radius:6px;margin:8px 0;font-family:'JetBrains Mono';font-size:12px">
 VDV = (∫₀ᵀ a_w⁴(t) dt)^0.25 — 단위: m/s^1.75
@@ -782,15 +915,17 @@ VDV = (∫₀ᵀ a_w⁴(t) dt)^0.25 — 단위: m/s^1.75
                 <li>VDV &gt; 9.1: 건강상 이상 위험</li>
             </ul>
             <p style="margin-top:8px">RMS와 달리 VDV는 큰 진동 펄스에 가중을 주므로, 산발적 충격이 있는 도로에서 더 정확한 평가를 제공합니다.</p>
+            </div>
         </div>
     </div>
 
     <div class="accordion">
-        <div class="accordion-header" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             <span>3️⃣ 주파수 가중 함수의 물리적 의미</span>
-            <span class="accordion-icon">▼</span>
-        </div>
+            <span class="accordion-arrow">▼</span>
+        </button>
         <div class="accordion-content">
+            <div class="accordion-inner">
             <p>W(f)가 4-8 Hz에서 피크를 가지는 이유는 인체 내장기관의 공진 주파수입니다:</p>
             <ul style="margin-left:20px">
                 <li><strong>2~3 Hz:</strong> 전신 종주 모드 (whole body pitch)</li>
@@ -799,15 +934,17 @@ VDV = (∫₀ᵀ a_w⁴(t) dt)^0.25 — 단위: m/s^1.75
                 <li><strong>&gt;20 Hz:</strong> 미세 진동, 골전도 (bone conduction)</li>
             </ul>
             <p style="margin-top:8px">따라서 같은 에너지의 5 Hz 신호와 15 Hz 신호는 전혀 다른 불편함을 줍니다. W(f)는 이 생물학적 민감도를 수학적으로 모델링한 것입니다.</p>
+            </div>
         </div>
     </div>
 
     <div class="accordion">
-        <div class="accordion-header" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             <span>4️⃣ VDI 2057 vs ISO 2631 비교</span>
-            <span class="accordion-icon">▼</span>
-        </div>
+            <span class="accordion-arrow">▼</span>
+        </button>
         <div class="accordion-content">
+            <div class="accordion-inner">
             <p>국제 표준 외에도 독일의 VDI 2057 기준이 있습니다:</p>
             <table class="param-table" style="margin-top:12px">
                 <thead>
@@ -841,15 +978,17 @@ VDV = (∫₀ᵀ a_w⁴(t) dt)^0.25 — 단위: m/s^1.75
                 </tbody>
             </table>
             <p style="margin-top:12px">최근 EV 차량에서는 ISO 2631이 주로 채택되지만, 유럽 자동차 제조사는 VDI를 보조 기준으로 사용합니다.</p>
+            </div>
         </div>
     </div>
 
     <div class="accordion">
-        <div class="accordion-header" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             <span>5️⃣ 신체특성과 민감도 변동성</span>
-            <span class="accordion-icon">▼</span>
-        </div>
+            <span class="accordion-arrow">▼</span>
+        </button>
         <div class="accordion-content">
+            <div class="accordion-inner">
             <p>모든 인체가 동일하지 않으므로 주관 평가에는 통계적 산포가 불가피합니다:</p>
             <ul style="margin-left:20px">
                 <li><strong>체중:</strong> 경량체(50 kg)는 중체(100 kg) 대비 공진 주파수 ↑ 민감도 ↑</li>
@@ -858,6 +997,7 @@ VDV = (∫₀ᵀ a_w⁴(t) dt)^0.25 — 단위: m/s^1.75
                 <li><strong>의자 자세:</strong> 같은 시트라도 착석 자세(등받이 각도, 머리 지지)에 따라 SEAT value ±10% 변동</li>
             </ul>
             <p style="margin-top:8px">그래서 ISO 2631은 "8~12명의 피험자로 통계적 평가" 권장하는 것입니다. 단일 피험자 평가는 신뢰도가 낮습니다.</p>
+            </div>
         </div>
     </div>
 </div>
@@ -910,11 +1050,12 @@ VDV = (∫₀ᵀ a_w⁴(t) dt)^0.25 — 단위: m/s^1.75
     </table>
 
     <div class="accordion" style="margin-top:20px">
-        <div class="accordion-header" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             <span>실제 구성 예: Brüel &amp; Kjær + MATLAB 워크플로우</span>
-            <span class="accordion-icon">▼</span>
-        </div>
+            <span class="accordion-arrow">▼</span>
+        </button>
         <div class="accordion-content">
+            <div class="accordion-inner">
             <p><strong>하드웨어:</strong> B&amp;K Type 4507 가속도계 (x3) → NI DAQ → Pulse Software</p>
             <p><strong>소프트웨어 파이프라인:</strong></p>
             <ol style="margin-left:20px;margin-top:8px">
@@ -926,6 +1067,7 @@ VDV = (∫₀ᵀ a_w⁴(t) dt)^0.25 — 단위: m/s^1.75
                 <li>통계 유의성 검증 (Pearson r)</li>
             </ol>
             <p style="margin-top:8px"><strong>비용:</strong> 하드웨어 ~USD 5,000 / 소프트웨어 ~USD 8,000~15,000 (Pulse 라이선스)</p>
+            </div>
         </div>
     </div>
 </div>
@@ -984,7 +1126,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -1040,15 +1182,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
@@ -1117,6 +1251,26 @@ document.querySelectorAll('.section').forEach(function(s) { obs.observe(s); });
     0%, 100% { opacity: 1; }
     50% { opacity: 0.8; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 </html>

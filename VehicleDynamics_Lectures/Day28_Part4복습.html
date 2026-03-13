@@ -226,6 +226,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -531,7 +537,7 @@ td .katex,th .katex{font-size:0.9em!important}
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 Python 한 줄 코드: scipy.signal로 PSD/FRF 구하기 — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -542,7 +548,7 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 주파수 영역 해석 워크플로 — 한눈에 보기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -576,23 +582,108 @@ td .katex,th .katex{font-size:0.9em!important}
 
 <!-- ══════ FORMULA EXPLORER ══════ -->
 
-<!-- ══════ QUIZ ══════ -->
-<div class="section">
-    <div class="section-label">QUIZ</div>
-    <h2 class="section-title">퀴즈</h2>
-    <div class="quiz-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin:12px 0;">
-        <p style="color:var(--gold);font-weight:600;margin-bottom:8px;">Q1. Part4복습에서 핵심 개념 확인</p>
-        <p style="color:var(--text-primary);font-size:14px;">오늘 학습한 내용의 핵심 원리를 자신의 말로 설명해 보세요. 수식 없이 물리적 직관만으로 설명할 수 있다면 진정한 이해입니다.</p>
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 Part4 복습 대시보드</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day28" width="700" height="250"></canvas>
     </div>
-    <div class="quiz-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin:12px 0;">
-        <p style="color:var(--gold);font-weight:600;margin-bottom:8px;">Q2. 실무 적용</p>
-        <p style="color:var(--text-primary);font-size:14px;">이 개념이 실제 서스펜션 설계에서 어떤 영향을 미치는지 구체적인 예를 들어 설명해 보세요.</p>
-    </div>
+    <div id="sim-day28-controls" class="sim-controls"></div>
+    <div id="sim-day28-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day28');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 250;
+    const ctrlBox = document.getElementById('sim-day28-controls');
+    const metricBox = document.getElementById('sim-day28-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const items=[
+        {x:20,y:20,w:155,h:90,t:'푸리에 변환',s:'시간↔주파수',c:'#C9A84C'},
+        {x:185,y:20,w:155,h:90,t:'PSD 정의',s:'S(f)=|X(f)|²/T',c:'#4A9EBF'},
+        {x:350,y:20,w:155,h:90,t:'FRF 측정',s:'H=Y/X, γ²',c:'#E06C75'},
+        {x:20,y:125,w:155,h:90,t:'고유치 문제',s:'det([K]-ω²[M])=0',c:'#98C379'},
+        {x:185,y:125,w:155,h:90,t:'모드 중첩',s:'x=[Φ]{q}',c:'#C678DD'},
+        {x:350,y:125,w:155,h:90,t:'SIMPACK매핑',s:'수식→MBS',c:'#D19A66'},
+        {x:515,y:70,w:160,h:90,t:'디지털 트윈',s:'측정↔시뮬레이션',c:'#56B6C2'}
+      ];
+      items.forEach(it=>{ctx.fillStyle='rgba(255,255,255,0.03)';ctx.strokeStyle=it.c;ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(it.x,it.y,it.w,it.h,8);ctx.fill();ctx.stroke();ctx.fillStyle=it.c;ctx.font='bold 12px sans-serif';ctx.fillText(it.t,it.x+8,it.y+22);ctx.fillStyle='#8A8F98';ctx.font='10px monospace';ctx.fillText(it.s,it.x+8,it.y+50);});
+      setMetrics([['Day23-33','신호처리 → MBS → 디지털트윈']]);
+    }
+
+    draw();
+  })();
+  </script>
 </div>
 
+<!-- ══════ QUIZ ══════ -->
+<div class="section">
+  <div class="section-label">QUIZ</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
 
-<!-- ⑩ 퀴즈 -->
+  <!-- QUESTION 01 -->
+  <div class="quiz-card" data-correct="2">
+    <div class="quiz-num">QUESTION 01 — 다자유도 시스템 종합</div>
+    <p class="quiz-q">풀카 모델(Full-car model)의 자유도(DOF) 수는?</p>
+    <div class="quiz-options" id="q1">
+      <div class="quiz-opt">A. 2 DOF</div>
+      <div class="quiz-opt">B. 4 DOF</div>
+      <div class="quiz-opt">C. 7 DOF</div>
+      <div class="quiz-opt">D. 10 DOF</div>
+    </div>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
 
+  <!-- QUESTION 02 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 02 — 상태공간 모델</div>
+    <p class="quiz-q">2DOF 시스템의 상태공간 모델에서 상태변수 벡터의 크기는?</p>
+    <div class="quiz-options" id="q2">
+      <div class="quiz-opt">A. 2×1</div>
+      <div class="quiz-opt">B. 4×1</div>
+      <div class="quiz-opt">C. 6×1</div>
+      <div class="quiz-opt">D. 8×1</div>
+    </div>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- QUESTION 03 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 03 — FRF 해석</div>
+    <p class="quiz-q">2DOF 시스템의 FRF(주파수응답함수)에서 피크가 나타나는 개수는?</p>
+    <div class="quiz-options" id="q3">
+      <div class="quiz-opt">A. 1개</div>
+      <div class="quiz-opt">B. 2개</div>
+      <div class="quiz-opt">C. 3개</div>
+      <div class="quiz-opt">D. 4개</div>
+    </div>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
+</div>
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:40px 0;">
     <a href="Day27_모드중첩법.html" class="nav-btn prev">← Day 27: 모드중첩법</a>
@@ -617,6 +708,26 @@ td .katex,th .katex{font-size:0.9em!important}
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -645,7 +756,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -701,15 +812,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

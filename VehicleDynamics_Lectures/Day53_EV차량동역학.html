@@ -233,6 +233,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -355,6 +361,41 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="checkpoint">
         <strong>✓ 체크포인트:</strong> EV 동역학의 핵심 = <strong>낮은 CG로 롤/피치 감소</strong> + <strong>토크 벡터링으로 요 제어</strong> + <strong>회생제동 블렌딩</strong>
     </div>
+</div>
+
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① EV 종방향 운동방정식</p>
+    <div class="sub-eq">$$m\dot{v} = F_{motor} - F_{aero} - F_{roll} - F_{grade}$$</div>
+    <div class="sub-eq">$$F_{motor} = \frac{T_{motor} \cdot i_g \cdot i_{fd} \cdot \eta_{drivetrain}}{r_{eff}}$$</div>
+    <div class="sub-eq">$$F_{aero} = \frac{1}{2}\rho C_d A v^2, \quad F_{roll} = C_r m g \cos\theta$$</div>
+    <p class="sub-note">EV 감속기 단일 기어비 i_g ≈ 8-10. ICE 대비 파워트레인 관성 모멘트 크게 감소</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 배터리 팩 질량 분포 영향</p>
+    <div class="sub-eq">$$m_{batt} \approx 0.25 \sim 0.35 \times m_{vehicle}$$</div>
+    <div class="sub-eq">$$h_{CG,EV} = \frac{m_{body}h_{body} + m_{batt}h_{batt}}{m_{total}}$$</div>
+    <div class="sub-eq">$$\text{바닥 배치: } h_{batt} \approx 150\text{mm} \Rightarrow h_{CG} \downarrow 15\sim20\%$$</div>
+    <p class="sub-note"><strong>EV 장점:</strong> 낮은 CG → 롤 안정성 ↑, 횡방향 하중이동 ↓. 단점: 총 질량 ↑ → 타이어 마모 ↑</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 토크 벡터링 (듀얼 모터)</p>
+    <div class="sub-eq">$$M_{yaw} = (F_{xR} - F_{xL}) \times \frac{w}{2}$$</div>
+    <div class="sub-eq">$$\Delta T = T_R - T_L = \frac{2 M_{yaw,desired} \cdot r_{eff}}{w \cdot i_g \cdot i_{fd}}$$</div>
+    <div class="sub-eq">$$\dot{\psi}_{target} = \frac{v}{L(1 + Kv^2)} \cdot \delta$$</div>
+    <p class="sub-note">듀얼모터 토크벡터링은 기계적 디퍼런셜 대비 응답속도 10배. <strong>r.s. line:</strong> 르노스포르 전동 토크벡터링</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 에너지 소비 효율</p>
+    <div class="sub-eq">$$\text{Wh/km} = \frac{E_{battery,consumed}}{d_{travel}} = \frac{\int P_{motor}(t)dt - E_{regen}}{d}$$</div>
+    <div class="sub-eq">$$\text{WLTP 효율: } \approx 140\sim180 \;\text{Wh/km (중형 EV 기준)}$$</div>
+    <p class="sub-note">에어컨 사용 시 +20-30%, 고속도로 +40-50%. <strong>르노 메간 E-Tech:</strong> 약 156 Wh/km WLTP</p>
+  </div>
 </div>
 
 <!-- ══════ PARAMETERS SECTION ══════ -->
@@ -518,7 +559,7 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="section-title">심화 학습</div>
 
     <div class="accordion">
-        <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             회생제동 블렌딩 전략 — 직렬 vs 병렬
             <span class="accordion-arrow">▼</span>
         </button>
@@ -532,7 +573,7 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 
     <div class="accordion">
-        <button class="accordion-toggle" onclick="toggleAccordion(this)">
+        <button class="accordion-toggle">
             인휠 모터 vs 센트럴 모터 — 동역학적 비교
             <span class="accordion-arrow">▼</span>
         </button>
@@ -546,12 +587,84 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 </div>
 
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 EV 차량 동역학 특성</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day53" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day53-controls" class="sim-controls"></div>
+    <div id="sim-day53-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day53');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day53-controls');
+    const metricBox = document.getElementById('sim-day53-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_bat = addSlider('배터리 위치 (CG높이 mm)', 300, 600, 380, 10, 'sim53-bat');
+    const sl_mass = addSlider('차량질량 (kg)', 1500, 2500, 2000, 50, 'sim53-mass');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const batH=+sl_bat.value, mass=+sl_mass.value;
+      const L=2.8, fn_ride=Math.sqrt(20000/mass)/(2*Math.PI);
+      const rollInertia=mass*Math.pow(batH/1000,2)*0.3;
+      // Car side view
+      const cx=W/2,cy=H*0.4,sc=80;
+      ctx.fillStyle='rgba(201,168,76,0.15)';ctx.strokeStyle='#C9A84C';ctx.lineWidth=2;
+      ctx.fillRect(cx-L*sc/2,cy-30,L*sc,35);ctx.strokeRect(cx-L*sc/2,cy-30,L*sc,35);
+      // Battery pack (low)
+      const batY=cy+5;
+      ctx.fillStyle='rgba(74,158,191,0.3)';ctx.strokeStyle='#4A9EBF';ctx.lineWidth=1.5;
+      ctx.fillRect(cx-L*sc*0.35,batY,L*sc*0.7,15);ctx.strokeRect(cx-L*sc*0.35,batY,L*sc*0.7,15);
+      ctx.fillStyle='#4A9EBF';ctx.font='10px monospace';ctx.fillText('BATTERY',cx-25,batY+12);
+      // CG marker
+      const cgY=cy-(30-batH/1000*30);
+      ctx.fillStyle='#E06C75';ctx.beginPath();ctx.arc(cx,cgY,5,0,2*Math.PI);ctx.fill();
+      ctx.fillStyle='#E06C75';ctx.font='11px monospace';ctx.fillText('CG (h='+batH+'mm)',cx+10,cgY-5);
+      // ICE vs EV comparison
+      ctx.fillStyle='#8A8F98';ctx.font='12px monospace';
+      const iceH=550;
+      ctx.fillText('ICE CG: ~'+iceH+'mm | EV CG: ~'+batH+'mm',20,H-60);
+      ctx.fillText('질량 증가 → 고유진동수 ↓: f='+fn_ride.toFixed(2)+' Hz',20,H-40);
+      ctx.fillText('낮은 CG → 롤 안정성 ↑',20,H-20);
+      setMetrics([['CG 높이',batH+' mm'],['질량',mass+' kg'],['승차감 주파수',fn_ride.toFixed(2)+' Hz'],['ICE 대비','CG↓ 질량↑']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
 <!-- ══════ QUIZ SECTION ══════ -->
 <div class="section">
     <div class="section-label">QUIZ</div>
     <div class="section-title">확인 문제</div>
 
-    <div class="quiz-card" id="q53-1" data-correct="1">
+    <div class="quiz-card" id="q53-1" data-correct="2">
         <div class="quiz-num">QUIZ 01</div>
         <div class="quiz-q">EV에서 배터리 팩이 바닥에 배치되면 발생하는 동역학적 변화로 <strong>틀린</strong> 것은?</div>
         <div class="quiz-options">
@@ -570,7 +683,7 @@ td .katex,th .katex{font-size:0.9em!important}
         </div>
     </div>
 
-    <div class="quiz-card" id="q53-2" data-correct="2">
+    <div class="quiz-card" id="q53-2" data-correct="3">
         <div class="quiz-num">QUIZ 02</div>
         <div class="quiz-q">토크 벡터링(Torque Vectoring)으로 생성 가능한 것은?</div>
         <div class="quiz-options">
@@ -586,6 +699,18 @@ td .katex,th .katex{font-size:0.9em!important}
             <div class="sol-step"><span class="sol-num">STEP 2</span>M_z = (F_xR - F_xL) × t_w/2</div>
             <div class="sol-insight"><strong>💡 실무 포인트:</strong> 토크 벡터링은 ESP 대비 에너지 손실 없이 요 모멘트를 생성하는 EV의 핵심 장점입니다.</div>
         </div>
+    </div>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 03 — EV 토크벡터링</div>
+      <p class="quiz-q">EV 차량에서 좌우 독립 모터를 활용한 토크 벡터링의 주된 장점은?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. 연비 향상만 가능</div>
+        <div class="quiz-opt">B. 직접 요 모멘트 제어로 조종안정성 향상</div>
+        <div class="quiz-opt">C. 제동 거리 단축만 가능</div>
+        <div class="quiz-opt">D. 승차감만 개선</div>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
     </div>
 </div>
 
@@ -666,6 +791,26 @@ td .katex,th .katex{font-size:0.9em!important}
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -694,7 +839,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -750,15 +895,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

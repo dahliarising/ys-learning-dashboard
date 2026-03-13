@@ -226,6 +226,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -382,6 +388,37 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     </div>
 </div>
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① FRF (Frequency Response Function) 정의</p>
+    <div class="sub-eq">$$H(f) = \frac{S_{xy}(f)}{S_{xx}(f)} \quad (H_1 \text{ estimator})$$</div>
+    <div class="sub-eq">$$H_2(f) = \frac{S_{yy}(f)}{S_{yx}(f)}$$</div>
+    <p class="sub-note">H₁: 입력 노이즈에 강건, H₂: 출력 노이즈에 강건. 실측에서는 보통 H₁ 사용</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 코히어런스 (Coherence)</p>
+    <div class="sub-eq">$$\gamma^2(f) = \frac{|S_{xy}(f)|^2}{S_{xx}(f) \cdot S_{yy}(f)}, \quad 0 \leq \gamma^2 \leq 1$$</div>
+    <p class="sub-note"><strong>판단 기준:</strong> γ² > 0.9 → 신뢰할 수 있는 FRF. γ² < 0.7 → 비선형성, 노이즈, 또는 미측정 입력 존재</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 임팩트 해머 시험 설계</p>
+    <div class="sub-eq">$$f_{max} \approx \frac{1}{\pi \cdot T_{pulse}} \quad (T_{pulse}: \text{임팩트 접촉시간})$$</div>
+    <div class="sub-eq">$$\text{Soft tip: } f_{max} \approx 200\text{Hz}, \quad \text{Hard tip: } f_{max} \approx 5\text{kHz}$$</div>
+    <p class="sub-note"><strong>서스펜션 시험:</strong> 관심 주파수 0-50Hz → 고무팁으로 충분. 차체 NVH → 강성팁 필요</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ FRF에서 모달 파라미터 추출</p>
+    <div class="sub-eq">$$|H(f_{peak})| = \frac{1}{2\zeta k_{eff}} \quad (Q\text{-factor peak})$$</div>
+    <div class="sub-eq">$$\zeta = \frac{f_2 - f_1}{2f_n} \quad (\text{half-power bandwidth method})$$</div>
+    <p class="sub-note">FRF 피크 높이 → 감쇠비 추정. 피크 주파수 → 고유진동수. <strong>르노 실무:</strong> SIMPACK 모델 파라미터 검증의 핵심 데이터!</p>
+  </div>
+</div>
+
 <!-- ⑥ 파라미터 테이블 -->
 <div class="section">
   <div class="section-label">PARAMETERS</div>
@@ -540,7 +577,7 @@ td .katex,th .katex{font-size:0.9em!important}
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 모달 해머링 vs 가진기(Shaker) 테스트 — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -551,7 +588,7 @@ td .katex,th .katex{font-size:0.9em!important}
       </div>
     
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 임팩트 해머 vs 가진기 — 언제 무엇을 쓸까?</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -592,42 +629,109 @@ td .katex,th .katex{font-size:0.9em!important}
 <!-- ══════ FORMULA EXPLORER ══════ -->
 
 
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 FRF 측정 (임팩트 해머)</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day25" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day25-controls" class="sim-controls"></div>
+    <div id="sim-day25-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day25');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day25-controls');
+    const metricBox = document.getElementById('sim-day25-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_z = addSlider('감쇠비 ζ', 0.01, 0.3, 0.05, 0.01, 'sim25-z');
+    const sl_fn = addSlider('고유진동수 fₙ (Hz)', 5, 30, 15, 1, 'sim25-fn');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const z=+sl_z.value, fn=+sl_fn.value, wn=2*Math.PI*fn;
+      const hH=H/2;
+      // FRF magnitude
+      ctx.strokeStyle='#C9A84C';ctx.lineWidth=2;ctx.beginPath();
+      for(let i=1;i<=300;i++){const f=i*50/300;const r=f/fn;const mag=1/Math.sqrt((1-r*r)**2+(2*z*r)**2);const dB=20*Math.log10(mag);const px=i*W/300,py=hH/2-dB*1.5;i===1?ctx.moveTo(px,Math.max(5,py)):ctx.lineTo(px,Math.max(5,Math.min(hH-5,py)));} ctx.stroke();
+      // Coherence (bottom)
+      ctx.strokeStyle='#98C379';ctx.lineWidth=2;ctx.beginPath();
+      for(let i=1;i<=300;i++){const f=i*50/300;const coh=f<2?0.5:f>45?0.7:0.95+0.05*Math.sin(f*0.3);const px=i*W/300,py=hH+10+(1-coh)*(hH-20);i===1?ctx.moveTo(px,py):ctx.lineTo(px,py);} ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.beginPath();ctx.moveTo(0,hH);ctx.lineTo(W,hH);ctx.stroke();
+      ctx.fillStyle='#C9A84C';ctx.font='11px monospace';ctx.fillText('|H(f)| (dB)',5,15);
+      ctx.fillStyle='#98C379';ctx.fillText('코히런스 γ²(f)',5,hH+15);
+      // Coherence threshold
+      ctx.strokeStyle='rgba(224,108,117,0.4)';ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(0,hH+10+0.2*(hH-20));ctx.lineTo(W,hH+10+0.2*(hH-20));ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='#E06C75';ctx.fillText('γ²>0.8 기준',W-100,hH+10+0.2*(hH-20)-5);
+      setMetrics([['fₙ',fn+' Hz'],['ζ',z.toFixed(3)],['H(f)=Y(f)/X(f)','입출력 전달함수'],['γ²>0.8','신뢰구간']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
 <!-- ⑩ 퀴즈 -->
 <div class="section">
   <div class="section-label">QUIZ</div>
   <h2 class="section-title">즉시 복습 퀴즈</h2>
-  
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 01 — 수식 빈칸 채우기</div>
-      <p class="quiz-q">코히어런스 γ²의 범위는 ___≤ γ² ≤ ___이다.</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q1')">정답 확인</button>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 01 — FRF 정의</div>
+      <p class="quiz-q">주파수 응답 함수(FRF) H(f) = X(f)/F(f)에서 X와 F는 각각?</p>
+      <div class="quiz-options" id="q1">
+        <div class="quiz-opt">A. 시간, 주파수</div>
+        <div class="quiz-opt">B. 출력 응답 스펙트럼, 입력 힘 스펙트럼</div>
+        <div class="quiz-opt">C. 변위, 속도</div>
+        <div class="quiz-opt">D. 가속도, 변위</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q1-fb" style="display:none;margin-top:10px">
-        ✅ 0 ≤ γ² ≤ 1
-      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 02 — 물리적 의미 연결</div>
-      <p class="quiz-q">H₁ 추정기와 H₂ 추정기의 차이는?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q2')">정답 확인</button>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 02 — Coherence</div>
+      <p class="quiz-q">FRF 측정에서 코히어런스(Coherence) γ²가 1에 가까울 때 의미는?</p>
+      <div class="quiz-options" id="q2">
+        <div class="quiz-opt">A. 비선형 시스템임</div>
+        <div class="quiz-opt">B. 입출력 간 선형 인과관계가 강함</div>
+        <div class="quiz-opt">C. 노이즈가 많음</div>
+        <div class="quiz-opt">D. 공진 주파수에 도달</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q2-fb" style="display:none;margin-top:10px">
-        ✅ H₁ = S_xf/S_ff로 출력 노이즈에 강건하고, H₂ = S_xx/S_fx로 입력 노이즈에 강건하다. 이상적 측정에서는 동일하다.
-      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 03 — Simpack 적용</div>
-      <p class="quiz-q">Simpack 시뮬레이션에서 FRF의 코히어런스가 1이 아닌 경우 의미하는 바는?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q3')">정답 확인</button>
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 03 — 임팩트 해머</div>
+      <p class="quiz-q">해머 팁(tip) 재질이 단단할수록 가진 에너지의 주파수 특성은?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. 저주파 에너지 증가</div>
+        <div class="quiz-opt">B. 고주파 에너지 증가</div>
+        <div class="quiz-opt">C. 전 대역 균일</div>
+        <div class="quiz-opt">D. 특정 주파수에 집중</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q3-fb" style="display:none;margin-top:10px">
-        ✅ 시뮬레이션은 노이즈가 없으므로 γ² &lt; 1이면 모델에 비선형 요소가 있거나 분석 설정(윈도우, 평균)에 문제가 있다는 신호다
-      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
     </div>
 </div>
 
@@ -655,6 +759,26 @@ td .katex,th .katex{font-size:0.9em!important}
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -683,7 +807,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -739,15 +863,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

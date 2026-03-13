@@ -226,6 +226,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -384,6 +390,36 @@ s76,-153,76,-153s77,-151,77,-151c0.7,0.7,35.7,202,105,604c67.3,400.7,102,602.7,1
       </div>
     </div>
 </div>
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① PSD의 정의</p>
+    <div class="sub-eq">$$S_{xx}(f) = \lim_{T\to\infty} \frac{|X_T(f)|^2}{T} \quad [\text{단위}^2/\text{Hz}]$$</div>
+    <p class="sub-note">단위 주파수당 파워(분산). 랜덤 신호의 주파수별 에너지 분포를 나타냄</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② Welch 방법 (실용적 PSD 추정)</p>
+    <div class="sub-eq">$$\hat{S}_{xx}(f) = \frac{1}{K}\sum_{i=1}^{K} \frac{|X_i(f)|^2}{f_s \cdot N \cdot U}$$</div>
+    <div class="sub-eq">$$U = \frac{1}{N}\sum_{n=0}^{N-1}w^2[n] \quad (\text{윈도우 보정계수})$$</div>
+    <p class="sub-note">신호를 K개 세그먼트로 분할 → 각각 FFT → 평균. 세그먼트 수↑ → 분산↓ but 주파수 분해능↓</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ RMS 값과 PSD의 관계</p>
+    <div class="sub-eq">$$x_{rms}^2 = \sigma_x^2 = \int_0^{\infty} S_{xx}(f)\,df \approx \sum_{k} S_{xx}(f_k) \cdot \Delta f$$</div>
+    <p class="sub-note"><strong>핵심:</strong> PSD 아래 면적 = 신호의 분산(파워). 특정 주파수 대역의 기여도 분석 가능</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 차량 응용: 노면→차체 PSD 변환</p>
+    <div class="sub-eq">$$S_{body}(f) = |H(f)|^2 \cdot S_{road}(f)$$</div>
+    <div class="sub-eq">$$a_{rms,weighted} = \sqrt{\int_0^{\infty} W^2(f) \cdot (2\pi f)^4 \cdot S_{body,disp}(f)\,df}$$</div>
+    <p class="sub-note"><strong>실무 플로우:</strong> 노면 PSD 측정 → 전달함수 곱 → 차체 응답 PSD → ISO 가중 → 승차감 수치화</p>
+  </div>
+</div>
+
 <!-- ⑥ 파라미터 테이블 -->
 <div class="section">
   <div class="section-label">PARAMETERS</div>
@@ -526,7 +562,7 @@ s76,-153,76,-153s77,-151,77,-151c0.7,0.7,35.7,202,105,604c67.3,400.7,102,602.7,1
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 양면 PSD vs 단면 PSD: 차이와 변환 — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -537,7 +573,7 @@ s76,-153,76,-153s77,-151,77,-151c0.7,0.7,35.7,202,105,604c67.3,400.7,102,602.7,1
       </div>
     
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 양면 vs 단면 PSD — 실수 방지 가이드</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -576,42 +612,114 @@ s76,-153,76,-153s77,-151,77,-151c0.7,0.7,35.7,202,105,604c67.3,400.7,102,602.7,1
 <!-- ══════ FORMULA EXPLORER ══════ -->
 
 
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 PSD 추정 시뮬레이터</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day24" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day24-controls" class="sim-controls"></div>
+    <div id="sim-day24-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day24');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day24-controls');
+    const metricBox = document.getElementById('sim-day24-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_f1 = addSlider('주요 주파수 f₁ (Hz)', 1, 10, 3, 0.5, 'sim24-f1');
+    const sl_f2 = addSlider('2차 주파수 f₂ (Hz)', 5, 25, 12, 0.5, 'sim24-f2');
+    const sl_noise = addSlider('노이즈 레벨', 0, 1, 0.3, 0.05, 'sim24-noise');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const f1=+sl_f1.value, f2=+sl_f2.value, nl=+sl_noise.value;
+      const hH=H/2;
+      // Generate time signal (top)
+      const N=512; const sig=[];
+      for(let i=0;i<N;i++){const t=i/100;sig.push(Math.sin(2*Math.PI*f1*t)+0.5*Math.sin(2*Math.PI*f2*t)+nl*(Math.random()-0.5)*2);}
+      ctx.strokeStyle='#4A9EBF';ctx.lineWidth=1;ctx.beginPath();
+      sig.forEach((s,i)=>{const px=i*W/N,py=hH/2-s*(hH-20)/4;i?ctx.lineTo(px,py):ctx.moveTo(px,py);});ctx.stroke();
+      // Simple PSD estimate (bottom) - magnitude of FFT approximation
+      ctx.strokeStyle='#C9A84C';ctx.lineWidth=2;ctx.beginPath();
+      for(let fi=1;fi<=50;fi++){
+        const f=fi; let power=0;
+        for(let i=0;i<N;i++){const t=i/100;power+=sig[i]*Math.sin(2*Math.PI*f*t/N*100);}
+        power=Math.abs(power)/N*10;
+        const px=fi*W/50, py=H-20-power*(hH-20)/2;
+        fi===1?ctx.moveTo(px,Math.max(hH+5,py)):ctx.lineTo(px,Math.max(hH+5,py));
+      } ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.beginPath();ctx.moveTo(0,hH);ctx.lineTo(W,hH);ctx.stroke();
+      ctx.fillStyle='#8A8F98';ctx.font='11px monospace';ctx.fillText('시간 신호 x(t)',5,15);ctx.fillText('PSD S(f)',5,hH+15);
+      setMetrics([['f₁ 피크',f1+' Hz'],['f₂ 피크',f2+' Hz'],['PSD = |X(f)|²/T','파워 스펙트럼 밀도']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
 <!-- ⑩ 퀴즈 -->
 <div class="section">
   <div class="section-label">QUIZ</div>
   <h2 class="section-title">즉시 복습 퀴즈</h2>
-  
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 01 — 수식 빈칸 채우기</div>
-      <p class="quiz-q">PSD의 단위는 [신호단위²/___]이다.</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q1')">정답 확인</button>
+
+    <div class="quiz-card" data-correct="2">
+      <div class="quiz-num">QUESTION 01 — PSD 물리적 의미</div>
+      <p class="quiz-q">PSD(Power Spectral Density)의 단위가 [단위²/Hz]인 이유는?</p>
+      <div class="quiz-options" id="q1">
+        <div class="quiz-opt">A. 주파수 대역별 진폭을 나타내므로</div>
+        <div class="quiz-opt">B. 주파수 대역별 파워(에너지율)를 나타내므로</div>
+        <div class="quiz-opt">C. 위상 정보를 포함하므로</div>
+        <div class="quiz-opt">D. 확률밀도함수이므로</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q1-fb" style="display:none;margin-top:10px">
-        ✅ Hz
-      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 02 — 물리적 의미 연결</div>
-      <p class="quiz-q">Welch 방법에서 세그먼트 수 K를 늘리면 어떤 효과가 있는가?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q2')">정답 확인</button>
+    <div class="quiz-card" data-correct="3">
+      <div class="quiz-num">QUESTION 02 — RMS와 PSD</div>
+      <p class="quiz-q">PSD 곡선 아래 면적(적분)의 물리적 의미는?</p>
+      <div class="quiz-options" id="q2">
+        <div class="quiz-opt">A. 최대 진폭</div>
+        <div class="quiz-opt">B. 평균 주파수</div>
+        <div class="quiz-opt">C. 신호의 분산(RMS²)</div>
+        <div class="quiz-opt">D. 위상각 합계</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q2-fb" style="display:none;margin-top:10px">
-        ✅ PSD 추정의 통계적 분산이 줄어들어 곡선이 매끄러워진다. 대신 각 세그먼트 길이가 줄어 주파수 해상도가 나빠지는 트레이드오프가 있다.
-      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
     </div>
 
-    <div class="quiz-card">
-      <div class="quiz-num">QUESTION 03 — Simpack 적용</div>
-      <p class="quiz-q">Simpack PSD 분석에서 양면/단면 PSD 구분이 중요한 이유는?</p>
-      <div style="margin-top:12px">
-        <button class="quiz-opt" style="background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700;text-align:center" onclick="toggleAnswer('q3')">정답 확인</button>
+    <div class="quiz-card" data-correct="3">
+      <div class="quiz-num">QUESTION 03 — 노면 PSD</div>
+      <p class="quiz-q">노면 프로파일 PSD가 공간 주파수(cycle/m) 기준으로 어떤 형태를 갖는가?</p>
+      <div class="quiz-options" id="q3">
+        <div class="quiz-opt">A. 일정한 백색잡음</div>
+        <div class="quiz-opt">B. 고주파에서 증가</div>
+        <div class="quiz-opt">C. 저주파에서 크고 고주파에서 감소 (1/f^n 형태)</div>
+        <div class="quiz-opt">D. 공진 피크 형태</div>
       </div>
-      <div class="quiz-feedback correct-fb" id="q3-fb" style="display:none;margin-top:10px">
-        ✅ 단면 PSD는 양면의 2배이므로, 외부 데이터와 비교 시 구분하지 않으면 에너지가 2배 차이 나는 오류가 발생한다
-      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
     </div>
 </div>
 
@@ -639,6 +747,26 @@ s76,-153,76,-153s77,-151,77,-151c0.7,0.7,35.7,202,105,604c67.3,400.7,102,602.7,1
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -667,7 +795,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -723,15 +851,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

@@ -226,6 +226,12 @@ td .katex,th .katex{font-size:0.9em!important}
 /* 수식 에러 폴백 */
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -380,6 +386,37 @@ Simulink output: u = [F_damper, P_air] (\text{제어명령})
         <p><span class="label">이전 단계와의 연결:</span> Day 21의 승차감 vs 조종안정성 트레이드오프가 Co-Sim으로 정량 평가됩니다.</p>
       </div>
     </div>
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① Co-Simulation 인터페이스</p>
+    <div class="sub-eq">$$\text{SIMPACK} \xleftrightarrow[\Delta t_{comm}]{\text{FMI/FMU}} \text{MATLAB/Simulink}$$</div>
+    <div class="sub-eq">$$\text{통신 주기: } \Delta t_{comm} = n \times \Delta t_{solver}$$</div>
+    <p class="sub-note">FMI 2.0 표준으로 이기종 솔버 간 데이터 교환. Co-sim 안정성: ΔT_comm ≤ 1/10 × 최소 고유주기</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 입출력 변수 매핑</p>
+    <div class="sub-eq">$$\text{SIMPACK }\to\text{ Simulink: } F_{susp}, z_{body}, \dot{z}_{body}, a_{body}$$</div>
+    <div class="sub-eq">$$\text{Simulink }\to\text{ SIMPACK: } F_{actuator}, T_{motor}, P_{brake}$$</div>
+    <p class="sub-note">기계 시스템(SIMPACK)과 제어 시스템(Simulink) 분리. 각자 최적 솔버 사용 가능</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 통신 지연 보상</p>
+    <div class="sub-eq">$$\hat{y}(t+\Delta t) = y(t) + \dot{y}(t) \cdot \Delta t \quad (\text{외삽})$$</div>
+    <p class="sub-note">영차 유지(ZOH) vs 1차 외삽. 고주파 현상에서는 외삽 필수. 불안정 시 ΔT_comm 축소</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 실시간 요구사항 (HiL)</p>
+    <div class="sub-eq">$$\text{실시간 비율: } RT_{ratio} = \frac{t_{wall}}{t_{sim}} \leq 1.0$$</div>
+    <div class="sub-eq">$$\text{Step size: } \Delta t \leq 1\text{ms (서스펜션)}, \leq 0.1\text{ms (타이어)}$$</div>
+    <p class="sub-note"><strong>HiL 테스트:</strong> ECU 실물 + 가상 차량 모델. SIMPACK RT 솔버로 실시간 달성</p>
+  </div>
+</div>
+
+
 </div>
 <!-- ⑥ 파라미터 테이블 -->
 <div class="section">
@@ -502,7 +539,7 @@ Simulink output: u = [F_damper, P_air] (\text{제어명령})
   <h2 class="section-title">심화 학습</h2>
   
     <div class="accordion">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 FMI 2.0 vs 직접 인터페이스 — 클릭하여 펼치기</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -513,7 +550,7 @@ Simulink output: u = [F_damper, P_air] (\text{제어명령})
       </div>
     
     <div class="accordion" style="margin-top:12px">
-      <button class="accordion-toggle" onclick="toggleAccordion(this)">
+      <button class="accordion-toggle">
         <span>💡 FMI/FMU 표준 — 도구 간 연동의 핵심</span>
         <span class="accordion-arrow">▼</span>
       </button>
@@ -552,23 +589,121 @@ Simulink output: u = [F_damper, P_air] (\text{제어명령})
 
 <!-- ══════ FORMULA EXPLORER ══════ -->
 
-<!-- ══════ QUIZ ══════ -->
-<div class="section">
-    <div class="section-label">QUIZ</div>
-    <h2 class="section-title">퀴즈</h2>
-    <div class="quiz-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin:12px 0;">
-        <p style="color:var(--gold);font-weight:600;margin-bottom:8px;">Q1. CoSimulation에서 핵심 개념 확인</p>
-        <p style="color:var(--text-primary);font-size:14px;">오늘 학습한 내용의 핵심 원리를 자신의 말로 설명해 보세요. 수식 없이 물리적 직관만으로 설명할 수 있다면 진정한 이해입니다.</p>
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 Co-Simulation 타이밍</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day32" width="700" height="300"></canvas>
     </div>
-    <div class="quiz-card" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin:12px 0;">
-        <p style="color:var(--gold);font-weight:600;margin-bottom:8px;">Q2. 실무 적용</p>
-        <p style="color:var(--text-primary);font-size:14px;">이 개념이 실제 서스펜션 설계에서 어떤 영향을 미치는지 구체적인 예를 들어 설명해 보세요.</p>
-    </div>
+    <div id="sim-day32-controls" class="sim-controls"></div>
+    <div id="sim-day32-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day32');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 300;
+    const ctrlBox = document.getElementById('sim-day32-controls');
+    const metricBox = document.getElementById('sim-day32-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_dt1 = addSlider('MBS Δt (ms)', 0.1, 2, 0.5, 0.1, 'sim32-dt1');
+    const sl_dt2 = addSlider('제어 Δt (ms)', 0.5, 10, 1, 0.5, 'sim32-dt2');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const dt1=+sl_dt1.value, dt2=+sl_dt2.value;
+      const y1=100, y2=200, xStart=80, xEnd=W-30;
+      ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(xStart,y1);ctx.lineTo(xEnd,y1);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(xStart,y2);ctx.lineTo(xEnd,y2);ctx.stroke();
+      ctx.fillStyle='#C9A84C';ctx.font='13px sans-serif';ctx.fillText('MBS (SIMPACK)',5,y1+5);
+      ctx.fillStyle='#4A9EBF';ctx.fillText('Control (Matlab)',5,y2+5);
+      // MBS steps
+      const nMBS=Math.floor(20/dt1);
+      for(let i=0;i<Math.min(nMBS,60);i++){const px=xStart+i*(xEnd-xStart)/60;ctx.fillStyle='#C9A84C';ctx.beginPath();ctx.arc(px,y1,3,0,2*Math.PI);ctx.fill();}
+      // Control steps
+      const nCtrl=Math.floor(20/dt2);
+      for(let i=0;i<Math.min(nCtrl,30);i++){const px=xStart+i*(xEnd-xStart)/30;ctx.fillStyle='#4A9EBF';ctx.beginPath();ctx.arc(px,y2,3,0,2*Math.PI);ctx.fill();}
+      // Exchange arrows
+      const nExch=Math.min(10,nCtrl);
+      for(let i=1;i<=nExch;i++){
+        const px=xStart+i*(xEnd-xStart)/nExch;
+        ctx.strokeStyle='#E06C75';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(px,y1+10);ctx.lineTo(px,y2-10);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(px-4,y2-16);ctx.lineTo(px,y2-10);ctx.lineTo(px+4,y2-16);ctx.fill();
+      }
+      ctx.fillStyle='#E06C75';ctx.fillText('↕ 데이터 교환',W/2-40,155);
+      setMetrics([['MBS Δt',dt1+' ms'],['Control Δt',dt2+' ms'],['교환주기',Math.max(dt1,dt2)+' ms'],['안정성','Δt_exchange ≤ min(T)/10']]);
+    }
+
+    draw();
+  })();
+  </script>
 </div>
 
+<!-- ══════ QUIZ ══════ -->
+<div class="section">
+  <div class="section-label">QUIZ</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
 
-<!-- ⑩ 퀴즈 -->
+  <!-- QUESTION 01 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 01 — Co-Simulation 기본</div>
+    <p class="quiz-q">Co-Simulation에서 두 솔버 간 데이터 교환 주기를 무엇이라 하는가?</p>
+    <div class="quiz-options" id="q1">
+      <div class="quiz-opt">A. Time step</div>
+      <div class="quiz-opt">B. Communication interval (매크로 스텝)</div>
+      <div class="quiz-opt">C. Sampling rate</div>
+      <div class="quiz-opt">D. Baud rate</div>
+    </div>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
 
+  <!-- QUESTION 02 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 02 — 안정성</div>
+    <p class="quiz-q">Co-Simulation이 발산하는 가장 흔한 원인은?</p>
+    <div class="quiz-options" id="q2">
+      <div class="quiz-opt">A. Communication interval이 시스템 동특성 대비 너무 큼</div>
+      <div class="quiz-opt">B. 두 솔버의 프로그래밍 언어가 다름</div>
+      <div class="quiz-opt">C. 모델의 자유도가 홀수</div>
+      <div class="quiz-opt">D. 결과 파일의 저장 형식이 다름</div>
+    </div>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- QUESTION 03 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 03 — FMI 표준</div>
+    <p class="quiz-q">FMI(Functional Mock-up Interface) 표준에서 Co-Simulation용 FMU의 유형은?</p>
+    <div class="quiz-options" id="q3">
+      <div class="quiz-opt">A. FMI for Model Exchange</div>
+      <div class="quiz-opt">B. FMI for Co-Simulation</div>
+      <div class="quiz-opt">C. FMI for Real-Time</div>
+      <div class="quiz-opt">D. FMI for Validation</div>
+    </div>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
+</div>
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:40px 0;">
     <a href="Day31_FRF상관성.html" class="nav-btn prev">← Day 31: FRF상관성</a>
@@ -593,6 +728,26 @@ Simulink output: u = [F_damper, P_air] (\text{제어명령})
 @media (max-width: 640px) {
     .nav-section { grid-template-columns: 1fr; }
 }
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
 
@@ -621,7 +776,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -677,15 +832,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

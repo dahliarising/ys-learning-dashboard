@@ -245,7 +245,33 @@ td .katex,th .katex{font-size:0.9em!important}
 .nav-btn{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;text-decoration:none;color:var(--gold);font-weight:500;transition:all 0.3s}
 .nav-btn:hover{background:var(--surface2);border-color:var(--gold)}
 @media(max-width:600px){.nav-section{grid-template-columns:1fr}}
+
+/* === Enhanced: Simulation & Sub-step Styles === */
+.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
+.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
+.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
+.sim-canvas-wrap canvas{display:block;margin:0 auto}
+.sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
+.sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
+.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
+.sim-metric strong{color:var(--gold,#C9A84C)}
+.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-btn:hover{filter:brightness(1.15)}
+.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+</script>
 </head>
 <body>
 
@@ -398,6 +424,37 @@ td .katex,th .katex{font-size:0.9em!important}
 </div>
 </div>
 
+</div>
+
+
+
+<!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
+  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+  <div class="sub-step">
+    <p class="sub-label">① 디스크 브레이크 열 방정식</p>
+    <div class="sub-eq">$$Q_{input} = \mu_{pad} \cdot P_{brake} \cdot A_{pad} \cdot v_{disc}$$</div>
+    <div class="sub-eq">$$m_{disc} c_p \frac{dT}{dt} = Q_{input} - Q_{conv} - Q_{rad}$$</div>
+    <p class="sub-note">제동 에너지의 ~90%가 열로 변환. 고속 급제동 시 디스크 온도 600-800°C 도달 가능</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">② 대류 냉각</p>
+    <div class="sub-eq">$$Q_{conv} = h \cdot A_{disc} \cdot (T_{disc} - T_{air})$$</div>
+    <div class="sub-eq">$$h = h_0 + h_1 \cdot V^{0.8} \quad (\text{차속에 따른 대류 계수})$$</div>
+    <p class="sub-note">주행 중 냉각은 주로 대류. 벤틸레이티드 디스크: 냉각 면적 2배 → h 약 40% 향상</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">③ 온도 분포 (1D 근사)</p>
+    <div class="sub-eq">$$T(x,t) = T_0 + \frac{q''}{k}\left[\sqrt{\frac{4\alpha t}{\pi}} \exp\left(-\frac{x^2}{4\alpha t}\right) - x \cdot \text{erfc}\left(\frac{x}{2\sqrt{\alpha t}}\right)\right]$$</div>
+    <div class="sub-eq">$$\alpha = \frac{k}{\rho c_p} \quad (\text{열확산계수})$$</div>
+    <p class="sub-note">표면 온도가 가장 높고 내부로 갈수록 감소. <strong>열균열:</strong> 표면-내부 온도차 → 열응력 → 크래킹</p>
+  </div>
+  <div class="sub-step">
+    <p class="sub-label">④ 페이드 현상</p>
+    <div class="sub-eq">$$\mu_{pad}(T) = \mu_0 \cdot e^{-\beta(T - T_0)} \quad (T > T_{fade})$$</div>
+    <p class="sub-note"><strong>페이드:</strong> 패드 온도↑ → 마찰계수↓ → 제동력 감소. T_fade ≈ 300-400°C(일반 패드). 레이싱 패드: T_fade > 600°C</p>
+  </div>
 </div>
 
 <!-- Parameters Table -->
@@ -568,106 +625,177 @@ td .katex,th .katex{font-size:0.9em!important}
 </div>
 
 <!-- Quiz Section -->
+
+<!-- ══════ INTERACTIVE SIMULATION ══════ -->
+<div class="section-card" style="margin-top:32px">
+  <div class="section-label">INTERACTIVE SIMULATION</div>
+  <h2 class="section-title">🎮 디스크 브레이크 열역학</h2>
+  <div class="sim-container">
+    <div class="sim-canvas-wrap">
+      <canvas id="sim-day47" width="700" height="350"></canvas>
+    </div>
+    <div id="sim-day47-controls" class="sim-controls"></div>
+    <div id="sim-day47-metrics" class="sim-metrics"></div>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('sim-day47');
+    const ctx = canvas.getContext('2d');
+    const W = 700, H = 350;
+    const ctrlBox = document.getElementById('sim-day47-controls');
+    const metricBox = document.getElementById('sim-day47-metrics');
+    
+    function addSlider(label, min, max, value, step, id) {
+      const g = document.createElement('div');
+      g.className = 'sim-slider-group';
+      g.innerHTML = '<label>' + label + '</label><input type="range" min="'+min+'" max="'+max+'" value="'+value+'" step="'+step+'" id="'+id+'"><div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+      ctrlBox.appendChild(g);
+      const inp = document.getElementById(id);
+      inp.oninput = function(){ document.getElementById(id+'-val').textContent = this.value; draw(); };
+      return inp;
+    }
+    function addBtn(label, fn) {
+      const b = document.createElement('button');
+      b.className = 'sim-btn'; b.textContent = label; b.onclick = fn;
+      ctrlBox.appendChild(b);
+    }
+    function setMetrics(arr) {
+      metricBox.innerHTML = arr.map(m => '<div class="sim-metric"><strong>'+m[0]+':</strong>&nbsp;'+m[1]+'</div>').join('');
+    }
+    
+    const sl_v0 = addSlider('초기속도 (km/h)', 60, 200, 120, 10, 'sim47-v0');
+    const sl_mu = addSlider('패드 마찰계수 μ', 0.3, 0.5, 0.4, 0.01, 'sim47-mu');
+    function draw() {
+      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      const v0=+sl_v0.value/3.6, mu=+sl_mu.value;
+      const m=1500, r_eff=0.15, A_pad=0.003; // m²
+      const E=0.5*m*v0*v0; // kinetic energy
+      const P_brake=mu*20000; // brake pressure 20 kN
+      const heat_rate=P_brake*v0*0.3; // simplified
+      const T_disc_max=E/(10*0.5)+100; // very simplified
+      // Temperature rise over time
+      ctx.strokeStyle='#E06C75';ctx.lineWidth=2;ctx.beginPath();
+      for(let i=0;i<=300;i++){const t=i*10/300;const T=100+T_disc_max*(1-Math.exp(-t/3))*(1-t/12);const px=i*W/300,py=H-30-Math.max(0,T-100)*(H-60)/(T_disc_max);i===0?ctx.moveTo(px,py):ctx.lineTo(px,Math.max(10,py));}ctx.stroke();
+      // Cooling curve
+      ctx.strokeStyle='#4A9EBF';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();
+      for(let i=0;i<=300;i++){const t=i*10/300;const T=100+(T_disc_max*0.8)*Math.exp(-t/8);const px=i*W/300,py=H-30-Math.max(0,T-100)*(H-60)/(T_disc_max);i===0?ctx.moveTo(px,py):ctx.lineTo(px,Math.max(10,py));}ctx.stroke();ctx.setLineDash([]);
+      ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.beginPath();ctx.moveTo(0,H-30);ctx.lineTo(W,H-30);ctx.stroke();
+      ctx.fillStyle='#E06C75';ctx.font='12px monospace';ctx.fillText('— 제동 가열',10,20);
+      ctx.fillStyle='#4A9EBF';ctx.fillText('--- 냉각',10,36);
+      ctx.fillStyle='#8A8F98';ctx.fillText('시간 (s) →',W-80,H-10);ctx.fillText('디스크 온도 (°C) ↑',5,55);
+      setMetrics([['운동에너지',(E/1000).toFixed(0)+' kJ'],['최대온도',T_disc_max.toFixed(0)+'°C'],['페이드 위험',T_disc_max>400?'⚠ 높음':'정상']]);
+    }
+
+    draw();
+  })();
+  </script>
+</div>
+
+<!-- ══════ QUIZ ══════ -->
+
 <div class="section">
-    <div class="section-label">QUIZ</div>
-    <div class="quiz-section">
-<h3>이해도 확인 퀴즈</h3>
-<div class="quiz-card q1">
-    <h4>Q1: 빈칸 채우기</h4>
-    <p class="q-question">디스크 브레이크에서 운동에너지는 ___에너지로 변환되며, 이를 효과적으로 방출하는 것이 제동 내구성의 핵심이다.</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> 열(Heat)<br>
-        <strong>해설:</strong> 마찰열이 디스크와 패드에 축적되며, 대류와 복사로 방출됩니다.
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">디스크 브레이크 열역학 심화</h2>
+
+  <!-- Deep Dive 1 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>💡 브레이크 페이드(Brake Fade) — 왜 반복 제동하면 브레이크가 약해지는가?</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive1">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">마찰재 온도와 마찰계수의 비선형 관계</h4>
+        <p>브레이크 페이드(brake fade)는 반복 제동으로 디스크와 패드 온도가 상승하면 마찰계수(μ)가 급격히 떨어지는 현상입니다. 일반 승용차 패드는 300°C 이상에서 페이드가 시작되고, 레이싱 패드는 600°C까지 견딥니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">제동 에너지 → 열 변환: $Q = \frac{1}{2} m V^2 \cdot \frac{f_{brake}}{1}$. 120 km/h → 0 제동 시 1500 kg 차량: $Q = \frac{1}{2} \times 1500 \times 33.3^2 \approx 833$ kJ. 이 중 전축 70%가 전방 디스크에 집중.</p>
+        <p><strong style="color:var(--gold-light);">물리적 원인:</strong> 패드 바인더(binder) 수지가 열분해되면서 가스가 발생하고, 이 가스가 패드와 디스크 사이에 '가스 막(gas film)'을 형성하여 마찰력을 떨어뜨립니다. 이것을 '그린 페이드(green fade)'라 합니다.</p>
+        <p>디스크 표면 온도가 700°C를 넘으면 주철의 세멘타이트(Fe₃C) 상변태가 시작되어 디스크 자체의 마찰 특성이 변합니다. 이것이 '디스크 크래킹(disc cracking)'과 'judder(진동)'의 원인이 됩니다.</p>
+        <p>실무에서 페이드 시험은 SAE J2522 (AK-Master) 규격으로 수행합니다. 100km/h → 0km/h 제동을 15회 연속 수행하며, 10번째 제동에서의 마찰계수 감소율이 핵심 평가 기준입니다.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q2">
-    <h4>Q2: O/X 퀴즈</h4>
-    <p class="q-question">O/X: 벤틸레이티드 디스크는 솔리드 디스크 대비 냉각 성능이 떨어진다.</p>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> X (거짓)<br>
-        <strong>해설:</strong> 벤틸레이티드 디스크는 내부 핀 구조로 대류 면적을 크게 증가시켜 냉각 성능이 훨씬 우수합니다.
+  </div>
+
+  <!-- Deep Dive 2 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>🔬 열확산 방정식과 디스크 두께 설계 — 열용량의 물리학</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive2">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">왜 디스크를 두껍게 만드는가?</h4>
+        <p>1회 긴급 제동에서 흡수해야 할 에너지: E = ½mv². 1,500kg 차량이 100km/h에서 정지하면 E ≈ 580kJ. 이 에너지의 약 90%가 디스크에 열로 전환됩니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">1차원 열확산 방정식: $\frac{\partial T}{\partial t} = \alpha \frac{\partial^2 T}{\partial x^2} + \frac{\dot{q}}{\rho c_p}$ 여기서 열확산계수 $\alpha = k / (\rho c_p)$. 주철(GCI) 디스크: $\alpha \approx 12.5 \times 10^{-6}$ m²/s.</p>
+        <p><strong style="color:var(--gold-light);">열용량 설계:</strong> 디스크 온도 상승 ΔT = E / (m_disc × c_p). 주철의 비열 c_p ≈ 500 J/(kg·K)이므로, 5kg 디스크에 290kJ이 흡수되면 ΔT ≈ 116°C. 실제로는 디스크 표면만 가열되므로 표면 온도는 이보다 훨씬 높습니다.</p>
+        <p>벤틸레이티드 디스크(ventilated disc)는 내부에 방사형 핀(vane)을 두어 공냉 효과를 극대화합니다. 방열률은 디스크 회전속도에 비례하며, 120km/h 주행 시 약 10~15kW의 열을 방출할 수 있습니다.</p>
+        <p>1D 열확산 방정식: ∂T/∂t = α(∂²T/∂x²) + q̇/(ρc_p). 여기서 α는 열확산율, q̇는 마찰면 열유속입니다. 이 PDE를 풀면 디스크 두께 방향의 온도 분포를 예측할 수 있으며, 이를 통해 최소 디스크 두께를 결정합니다.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-<div class="quiz-card q3">
-    <h4>Q3: Simpack 적용</h4>
-    <p class="q-question">Simpack에서 제동 열해석을 위해 반드시 활성화해야 하는 모듈은?</p>
-    <div class="q-options"><label><input type="radio" name="q3" value="Thermal Brake Model"/> Thermal Brake Model</label>
-<label><input type="radio" name="q3" value="Static Equilibrium"/> Static Equilibrium</label>
-<label><input type="radio" name="q3" value="Modal Analysis"/> Modal Analysis</label>
-<label><input type="radio" name="q3" value="Kinematic Driver"/> Kinematic Driver</label>
-</div>
-    <div class="q-answer" style="display:none;">
-        <strong>정답:</strong> Thermal Brake Model<br>
-        <strong>해설:</strong> 열모델을 활성화해야 디스크 온도, 패드 마찰 변화, 냉각 특성을 시뮬레이션할 수 있습니다.
+  </div>
+
+  <!-- Deep Dive 3 -->
+  <div class="accordion">
+    <button class="accordion-toggle">
+      <span>⚙️ 디스크 열변형과 DTV(Disc Thickness Variation) — 브레이크 진동의 주범</span>
+      <span class="accordion-arrow">▼</span>
+    </button>
+    <div class="accordion-content" id="deepdive3">
+      <div class="accordion-inner">
+        <h4 style="color:var(--gold-light);margin-bottom:12px;">미크론 단위의 두께 편차가 만드는 체감 불량</h4>
+        <p>DTV(Disc Thickness Variation)는 디스크 원주 방향의 두께 편차입니다. 10μm 이상의 DTV가 발생하면 제동 시 유압 맥동 → 페달 진동 → 핸들 떨림으로 이어집니다. 이것이 소비자 불만 1위인 '브레이크 judder'입니다.</p>
+        <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">DTV(Disc Thickness Variation): 허용치 일반적으로 $\Delta t < 10\sim15$ μm. DTV가 제동 토크 변동 $\Delta T_{brake} = \mu \cdot \Delta F_n$을 유발하여 저더(judder) 주파수 = 차속/바퀴 둘레.</p>
+        <p><strong style="color:var(--gold-light);">원인:</strong> (1) 반복 제동 시 열 불균일 → 디스크 열변형 → 국부적 마찰 집중 → 재료 전이(material transfer) → DTV 고착. (2) 정차 중 패드가 디스크에 밀착된 상태에서 패드 재료가 고온 부위에 불균일하게 전이.</p>
+        <p>DTV 방지 설계: (1) 디스크 런아웃(lateral runout) 관리 — 허브 장착면 정밀 가공으로 20μm 이내, (2) 패드 성분 최적화 — 전이층(transfer layer)의 균일성 확보, (3) 디스크 재질 — 고탄소 주철(GCI)로 열전도율 확보.</p>
+        <p>르노코리아에서는 DTV 평가를 '드래그 모드 시험'으로 수행합니다: 저압 제동 상태에서 100km 주행 후 DTV를 다이얼 게이지로 측정하며, 신품 디스크의 DTV ≤ 5μm이 기준입니다.</p>
+      </div>
     </div>
-    <button class="q-btn" onclick="toggleAnswer(this)">정답 보기</button>
-</div>
-</div>
+  </div>
 
 </div>
 
-<!-- Deep Dives -->
 <div class="section">
-    <div class="section-label">DEEP DIVE</div>
-    <div class="section-title">심화 학습</div>
-    <div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 디스크 재질 비교
-    </button>
-    <div class="accordion-content">
-        <p><strong>주철 GCI:</strong> 가성비 우수, Tfade ~550°C</p><p><strong>카본 세라믹 (CSiC):</strong> 경량, Tfade ~900°C, 고가</p><p><strong>카본-카본 (C/C):</strong> F1/항공용, 2000°C 이상 내열</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 열균열(Heat Crack) 메커니즘
-    </button>
-    <div class="accordion-content">
-        <p>반복적인 열팽창-수축으로 디스크 표면에 열균열이 발생합니다. 크래킹 패턴이 방사상(radial)이면 정상, 원주방향(circumferential)이면 위험 신호입니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 베이퍼 락(Vapor Lock)
-    </button>
-    <div class="accordion-content">
-        <p>브레이크 오일이 비점을 넘으면 기포가 생겨 페달이 깊이 들어가고 제동력이 급감합니다.</p><div class='deriv-equation'><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">b</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">i</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">D</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">O</span><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span><span class="mord mtight">4</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">230°</span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span> (건식), <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord">155°</span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span> (흡습 후)</div>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 제동 NVH: 스퀼(Squeal)
-    </button>
-    <div class="accordion-content">
-        <p>브레이크 스퀼은 패드-디스크 마찰 시스템의 자여진 불안정 진동입니다. 주파수는 보통 1~16kHz이며, 복소 고유값 해석으로 예측합니다.</p>
-    </div>
-</div>
-<div class="accordion">
-    <button class="accordion-toggle" onclick="this.classList.toggle('active');this.nextElementSibling.classList.toggle('show');">
-        <span class="accordion-icon">▶</span> 뇌과학: 비상 제동 반응
-    </button>
-    <div class="accordion-content">
-        <p>비상 상황에서 <strong>편도체</strong>가 위험을 감지하면 약 150ms 만에 발을 브레이크 페달로 옮기는 <strong>공포 반사(startle response)</strong>가 발동됩니다. 그러나 인지-판단 시간(cognitive processing)을 포함하면 평균 반응시간은 0.7~1.5초입니다.</p>
-    </div>
-</div>
+  <div class="section-label">QUIZ</div>
+  <h2 class="section-title">즉시 복습 퀴즈</h2>
 
-</div>
-
-<!-- Footer Navigation -->
-<!-- ══════ FORMULA EXPLORER ══════ -->
-<div class="section">
-    <div class="section-label">TOOLS</div>
-    <div class="section-title">수식 탐색기</div>
-    <div class="formula-explorer">
-        <p style="color:var(--text-dim);font-style:italic;">이 섹션의 핵심 수식을 인터랙티브하게 탐색하세요. 각 변수에 마우스를 올리면 설명이 표시됩니다.</p>
+  <!-- Q1 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 01 — 횡방향 하중이동</div>
+    <p class="quiz-q">코너링 시 횡방향 하중이동이 발생하면 총 횡력이 감소하는 이유는?</p>
+    <div class="quiz-options" id="q1">
+      <div class="quiz-opt">A. 타이어 Fy-Fz 관계가 degressive(하중 증가 시 횡력 증가폭 감소)이기 때문</div>
+      <div class="quiz-opt">B. 타이어 온도가 떨어져서</div>
+      <div class="quiz-opt">C. 공기저항이 증가해서</div>
+      <div class="quiz-opt">D. 서스펜션이 잠겨서</div>
     </div>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 02 — 롤 강성 분배</div>
+    <p class="quiz-q">전륜 롤 강성 비율을 높이면?</p>
+    <div class="quiz-options" id="q2">
+      <div class="quiz-opt">A. 전륜 하중이동 ↑ → 전륜 접지력 ↓ → 언더스티어 증가</div>
+      <div class="quiz-opt">B. 오버스티어 증가</div>
+      <div class="quiz-opt">C. 롤이 증가</div>
+      <div class="quiz-opt">D. 피치 감소</div>
+    </div>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-card" data-correct="1">
+    <div class="quiz-num">QUESTION 03 — 종방향 하중이동</div>
+    <p class="quiz-q">급제동 시 전륜 하중이 증가하는 계산식에서 핵심 파라미터는?</p>
+    <div class="quiz-options" id="q3">
+      <div class="quiz-opt">A. 무게중심 높이(h)와 휠베이스(L)</div>
+      <div class="quiz-opt">B. 트레드 폭만</div>
+      <div class="quiz-opt">C. 타이어 사이즈만</div>
+      <div class="quiz-opt">D. 에어컨 작동 여부</div>
+    </div>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
 </div>
-
-<!-- ══════ SPACED REPETITION ══════ -->
-
-
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section">
     <a href="Day46_요응답전달함수.html" class="nav-btn">← Day 46: 요응답 전달함수</a>
@@ -711,7 +839,7 @@ document.addEventListener('click', function(e) {
         var card = opt.closest('.quiz-card');
         if (card && card.dataset.correct) {
             var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct);
+            var correctIdx = parseInt(card.dataset.correct) - 1;
             var clickedIdx = Array.from(options).indexOf(opt);
             var isCorrect = clickedIdx === correctIdx;
             options.forEach(function(o, i) {
@@ -767,15 +895,7 @@ function toggleAnswer(arg) {
         ansDiv.style.display = ansDiv.style.display === 'none' ? 'block' : 'none';
     }
 }
-/* toggleAccordion for onclick handlers */
-function toggleAccordion(btn) {
-    var c = btn.nextElementSibling;
-    if (c) {
-        c.classList.toggle('open');
-        var arrow = btn.querySelector('.accordion-arrow');
-        if (arrow) arrow.style.transform = c.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
-}
+
 /* Intersection Observer for fade-in */
 var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
