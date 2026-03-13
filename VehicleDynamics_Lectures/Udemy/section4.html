@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Section 4: Linear State-Space System</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async id="MathJax-script"></script>
+<script>MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]]},chtml:{scale:0.92}};</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Noto Sans KR","Segoe UI",sans-serif;background:#f4f4f4;color:#222;line-height:1.75}
+.wrap{max-width:860px;margin:30px auto;background:#fff;border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,.10);overflow:hidden}
+.banner{background:linear-gradient(135deg,#e67e22 0%,#f39c12 60%,#d35400 100%);color:#fff;padding:38px 36px 28px}
+.banner h1{font-size:1.65em;margin-bottom:6px}
+.banner p{font-size:.97em;opacity:.92}
+.body{padding:30px 36px 40px}
+h2{color:#e67e22;font-size:1.35em;margin:38px 0 12px;padding-bottom:6px;border-bottom:3px solid #e67e22}
+h3{color:#d35400;font-size:1.13em;margin:22px 0 8px}
+p{margin:8px 0;font-size:.97em}
+.eq{background:#fef5e7;border-left:4px solid #e67e22;padding:14px 18px;margin:14px 0;border-radius:6px;overflow-x:auto;max-width:100%}
+.eq.fn{background:#fdf2e9;border-left-color:#d35400}
+.nt{background:#fef9e7;border-left:4px solid #f39c12;padding:12px 16px;margin:14px 0;border-radius:6px;font-size:.93em}
+.wn{background:#fdedec;border-left:4px solid #e74c3c;padding:12px 16px;margin:14px 0;border-radius:6px;font-size:.93em}
+.kp{background:#fef5e7;border-left:4px solid #e67e22;padding:12px 16px;margin:14px 0;border-radius:6px;font-size:.93em}
+.ds{background:#f5f5f5;padding:12px 16px;margin:12px 0;border-radius:6px;font-size:.93em}
+.lg{margin-bottom:36px}
+.tag{display:inline-block;background:#e67e22;color:#fff;font-size:.78em;padding:2px 10px;border-radius:10px;margin-bottom:8px}
+.toc{background:#fef5e7;padding:18px 24px;border-radius:8px;margin-bottom:28px}
+.toc h3{color:#e67e22;margin-top:0}
+.toc ul{list-style:none;padding-left:0}
+.toc li{padding:3px 0;font-size:.93em}
+.toc a{color:#d35400;text-decoration:none}
+.toc a:hover{text-decoration:underline}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.92em}
+th,td{border:1px solid #ccc;padding:8px 12px;text-align:center}
+th{background:#e67e22;color:#fff}
+svg{display:block;margin:16px auto;max-width:100%}
+hr{border:none;border-top:1px solid #e0e0e0;margin:30px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="banner">
+<h1>Section 4: Linear State-Space System</h1>
+<p>Result: Linear State-Space Form &mdash; 5 Lectures (25min)</p>
+<p>Linear 2nd Order ODE &#8594; State-Space &#8594; Linearized State-Space</p>
+</div>
+<div class="body">
+<div class="toc">
+<h3>&#128218; Table of Contents</h3>
+<ul>
+<li><a href="#lec69">Lecture 69: Assignment Instructions</a></li>
+<li><a href="#lec70">Lecture 70: Linear 2nd Order ODE &#8594; LTI State-Space</a></li>
+<li><a href="#lec71">Lecture 71: Nonlinear ODE &#8594; Nonlinear State-Space</a></li>
+<li><a href="#lec7273">Lectures 72-73: Linearizing State-Space (Taylor 1st &amp; 2nd Term)</a></li>
+</ul>
+</div>
+<div class="lg" id="lec69">
+<span class="tag">Lecture 69</span>
+<h2>Assignment Instructions</h2>
+<p>이 섹션의 목표는 Section 3에서 얻은 <b>선형 2차 ODE</b>를 <b>상태공간(state-space)</b> 형태로 변환하는 것입니다.</p>
+<div class="ds">Section 3의 결과: $\mathbf{M}\ddot{\mathbf{q}} + \mathbf{C}\dot{\mathbf{q}} + \mathbf{K}\mathbf{q} = \mathbf{B}\mathbf{u}$</div>
+<p>이것을 1차 미분방정식 시스템인 <b>state-space form</b>으로 바꿔야 합니다. 왜? 컴퓨터 시뮬레이션과 현대 제어이론에서 표준 형식이기 때문입니다.</p>
+</div>
+<hr>
+<div class="lg" id="lec70">
+<span class="tag">Lecture 70</span>
+<h2>From Linear 2nd Order ODE to LTI State-Space</h2>
+<h3>State Vector 정의</h3>
+<p>2차 ODE를 1차로 변환하려면, <b>상태 변수(state variables)</b>를 정의합니다:</p>
+<div class="eq">$$\mathbf{x} = \begin{bmatrix} \delta z \\ \delta\theta \\ \delta\dot{z} \\ \delta\dot{\theta} \end{bmatrix} = \begin{bmatrix} x_1 \\ x_2 \\ x_3 \\ x_4 \end{bmatrix}$$</div>
+<p>즉, 변위와 속도를 하나의 벡터로 묶습니다.</p>
+<h3>State-Space 형태 유도</h3>
+<p>상태 벡터의 미분을 구하면:</p>
+<div class="eq">$$\dot{\mathbf{x}} = \begin{bmatrix} \delta\dot{z} \\ \delta\dot{\theta} \\ \delta\ddot{z} \\ \delta\ddot{\theta} \end{bmatrix}$$</div>
+<p>처음 두 행은 자명합니다: $\dot{x}_1 = x_3$, $\dot{x}_2 = x_4$</p>
+<p>나머지 두 행은 Section 3의 선형 EOM에서:</p>
+<div class="eq">$$\mathbf{M}\begin{bmatrix} \delta\ddot{z} \\ \delta\ddot{\theta} \end{bmatrix} = -\mathbf{C}\begin{bmatrix} \delta\dot{z} \\ \delta\dot{\theta} \end{bmatrix} - \mathbf{K}\begin{bmatrix} \delta z \\ \delta\theta \end{bmatrix} + \mathbf{B}_u\begin{bmatrix} \delta u_f \\ \delta u_r \end{bmatrix}$$</div>
+<p>$\mathbf{M}$을 역행렬로 넘기면:</p>
+<div class="eq fn">$$\begin{bmatrix} \delta\ddot{z} \\ \delta\ddot{\theta} \end{bmatrix} = -\mathbf{M}^{-1}\mathbf{K}\begin{bmatrix} \delta z \\ \delta\theta \end{bmatrix} - \mathbf{M}^{-1}\mathbf{C}\begin{bmatrix} \delta\dot{z} \\ \delta\dot{\theta} \end{bmatrix} + \mathbf{M}^{-1}\mathbf{B}_u\begin{bmatrix} \delta u_f \\ \delta u_r \end{bmatrix}$$</div>
+<h3>표준 State-Space Form</h3>
+<p>모든 것을 합치면 <b>LTI state-space</b> 표준형이 됩니다:</p>
+<div class="eq">$$\dot{\mathbf{x}} = \mathbf{A}\mathbf{x} + \mathbf{B}\mathbf{u}$$</div>
+<p>여기서:</p>
+<div class="eq fn">$$\mathbf{A} = \begin{bmatrix} \mathbf{0}_{2\times 2} & \mathbf{I}_{2\times 2} \\ -\mathbf{M}^{-1}\mathbf{K} & -\mathbf{M}^{-1}\mathbf{C} \end{bmatrix}, \quad \mathbf{B} = \begin{bmatrix} \mathbf{0}_{2\times 2} \\ \mathbf{M}^{-1}\mathbf{B}_u \end{bmatrix}$$</div>
+<svg viewBox="0 0 500 180" width="480">
+<defs><marker id="ah4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#333"/></marker></defs>
+<rect x="200" y="50" width="120" height="60" rx="8" fill="#e67e22" opacity="0.9"/>
+<text x="260" y="78" text-anchor="middle" font-size="14" fill="#fff" font-weight="bold">System</text>
+<text x="260" y="98" text-anchor="middle" font-size="11" fill="#fff">A, B matrices</text>
+<line x1="60" y1="80" x2="200" y2="80" stroke="#333" stroke-width="1.5" marker-end="url(#ah4)"/>
+<text x="130" y="70" text-anchor="middle" font-size="12" fill="#333" font-weight="bold">u(t)</text>
+<line x1="320" y1="80" x2="460" y2="80" stroke="#333" stroke-width="1.5" marker-end="url(#ah4)"/>
+<text x="390" y="70" text-anchor="middle" font-size="12" fill="#333" font-weight="bold">x(t)</text>
+<text x="130" y="100" font-size="10" fill="#666">Control Input</text>
+<text x="380" y="100" font-size="10" fill="#666">State Vector</text>
+<text x="260" y="145" text-anchor="middle" font-size="12" fill="#d35400" font-weight="bold">x&#775; = Ax + Bu</text>
+</svg>
+<table>
+<tr><th>행렬</th><th>크기</th><th>구성</th></tr>
+<tr><td>$\mathbf{A}$</td><td>$4 \times 4$</td><td>시스템 동역학 (M, C, K에서 유도)</td></tr>
+<tr><td>$\mathbf{B}$</td><td>$4 \times 2$</td><td>입력 분배 (M, B_u에서 유도)</td></tr>
+<tr><td>$\mathbf{x}$</td><td>$4 \times 1$</td><td>[$\delta z$, $\delta\theta$, $\delta\dot{z}$, $\delta\dot{\theta}$]</td></tr>
+<tr><td>$\mathbf{u}$</td><td>$2 \times 1$</td><td>[$\delta u_f$, $\delta u_r$]</td></tr>
+</table>
+<div class="kp"><b>핵심:</b> 2차 ODE 시스템이 <b>1차 ODE 시스템</b>으로 변환되었습니다. 상태 변수 수가 2배(변위+속도)가 되지만, 미분 차수가 1로 낮아집니다.</div>
+</div>
+<hr>
+<div class="lg" id="lec71">
+<span class="tag">Lecture 71</span>
+<h2>From Nonlinear ODE to Nonlinear State-Space</h2>
+<h3>비선형 2차 ODE의 State-Space 변환</h3>
+<p>Section 1의 원래 <b>비선형</b> 운동방정식도 state-space로 변환할 수 있습니다. 상태 변수를 같은 방식으로 정의:</p>
+<div class="eq">$$\mathbf{x} = \begin{bmatrix} z \\ \theta \\ \dot{z} \\ \dot{\theta} \end{bmatrix}$$</div>
+<p>비선형 EOM: $m\ddot{z} = g_1(z, \theta, \dot{z}, \dot{\theta}, u_f, u_r)$, $I\ddot{\theta} = g_2(z, \theta, \dot{z}, \dot{\theta}, u_f, u_r)$</p>
+<p>이를 state-space 형태로 쓰면:</p>
+<div class="eq fn">$$\dot{\mathbf{x}} = \begin{bmatrix} x_3 \\ x_4 \\ \frac{1}{m}g_1(\mathbf{x}, \mathbf{u}) \\ \frac{1}{I}g_2(\mathbf{x}, \mathbf{u}) \end{bmatrix} = \mathbf{f}(\mathbf{x}, \mathbf{u})$$</div>
+<div class="nt"><b>차이점:</b> 선형의 경우 $\dot{\mathbf{x}} = \mathbf{A}\mathbf{x} + \mathbf{B}\mathbf{u}$ (행렬 곱), 비선형의 경우 $\dot{\mathbf{x}} = \mathbf{f}(\mathbf{x}, \mathbf{u})$ (일반 함수). A, B 행렬이 존재하지 않습니다.</div>
+</div>
+<hr>
+<div class="lg" id="lec7273">
+<span class="tag">Lectures 72-73</span>
+<h2>Linearizing the State-Space Form</h2>
+<h3>State-Space에서 직접 선형화</h3>
+<p>비선형 state-space $\dot{\mathbf{x}} = \mathbf{f}(\mathbf{x}, \mathbf{u})$를 operating point $(\mathbf{x}_0, \mathbf{u}_0)$ 주변에서 Taylor 전개합니다.</p>
+<h3>1st Taylor Term: Operating Point 값</h3>
+<div class="eq">$$\mathbf{f}(\mathbf{x}_0, \mathbf{u}_0) = \mathbf{0}$$</div>
+<p>정적 평형에서 모든 상태의 시간 변화율이 0이므로, 0차 항은 사라집니다.</p>
+<h3>2nd Taylor Term: 야코비안</h3>
+<p>1차 항을 구하면:</p>
+<div class="eq">$$\mathbf{f}(\mathbf{x}, \mathbf{u}) \approx \underbrace{\mathbf{f}(\mathbf{x}_0, \mathbf{u}_0)}_{= \mathbf{0}} + \frac{\partial \mathbf{f}}{\partial \mathbf{x}}\bigg|_0 \delta\mathbf{x} + \frac{\partial \mathbf{f}}{\partial \mathbf{u}}\bigg|_0 \delta\mathbf{u}$$</div>
+<p>따라서 선형화된 state-space는:</p>
+<div class="eq fn">$$\delta\dot{\mathbf{x}} = \underbrace{\frac{\partial \mathbf{f}}{\partial \mathbf{x}}\bigg|_0}_{\mathbf{A}} \delta\mathbf{x} + \underbrace{\frac{\partial \mathbf{f}}{\partial \mathbf{u}}\bigg|_0}_{\mathbf{B}} \delta\mathbf{u}$$</div>
+<h3>A 행렬과 B 행렬의 의미</h3>
+<div class="eq">$$\mathbf{A} = \frac{\partial \mathbf{f}}{\partial \mathbf{x}}\bigg|_0 = \begin{bmatrix} \frac{\partial f_1}{\partial x_1} & \cdots & \frac{\partial f_1}{\partial x_4} \\ \vdots & \ddots & \vdots \\ \frac{\partial f_4}{\partial x_1} & \cdots & \frac{\partial f_4}{\partial x_4} \end{bmatrix}_{\text{at equilibrium}}$$</div>
+<div class="eq">$$\mathbf{B} = \frac{\partial \mathbf{f}}{\partial \mathbf{u}}\bigg|_0 = \begin{bmatrix} \frac{\partial f_1}{\partial u_1} & \frac{\partial f_1}{\partial u_2} \\ \vdots & \vdots \\ \frac{\partial f_4}{\partial u_1} & \frac{\partial f_4}{\partial u_2} \end{bmatrix}_{\text{at equilibrium}}$$</div>
+<svg viewBox="0 0 520 120" width="500">
+<rect x="10" y="30" width="130" height="55" rx="8" fill="#e74c3c" opacity="0.9"/>
+<text x="75" y="55" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">Nonlinear EOM</text>
+<text x="75" y="73" text-anchor="middle" font-size="9" fill="#fff">Section 1</text>
+<line x1="140" y1="57" x2="175" y2="57" stroke="#333" stroke-width="1.5" marker-end="url(#ah4)"/>
+<rect x="175" y="30" width="130" height="55" rx="8" fill="#27ae60" opacity="0.9"/>
+<text x="240" y="55" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">Linear 2nd ODE</text>
+<text x="240" y="73" text-anchor="middle" font-size="9" fill="#fff">Section 3</text>
+<line x1="305" y1="57" x2="340" y2="57" stroke="#333" stroke-width="1.5" marker-end="url(#ah4)"/>
+<rect x="340" y="30" width="160" height="55" rx="8" fill="#e67e22" opacity="0.9"/>
+<text x="420" y="55" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">LTI State-Space</text>
+<text x="420" y="73" text-anchor="middle" font-size="9" fill="#fff">Section 4 (This!)</text>
+<text x="260" y="110" text-anchor="middle" font-size="11" fill="#d35400" font-weight="bold">Complete Pipeline: Nonlinear &#8594; Linear ODE &#8594; State-Space</text>
+</svg>
+<div class="kp"><b>Section 4 핵심 요약:</b><br>
+1. 상태 변수 $\mathbf{x} = [\delta z, \delta\theta, \delta\dot{z}, \delta\dot{\theta}]^T$ 정의<br>
+2. 2차 ODE → 1차 state-space: $\dot{\mathbf{x}} = \mathbf{A}\mathbf{x} + \mathbf{B}\mathbf{u}$<br>
+3. $\mathbf{A}$, $\mathbf{B}$ 행렬은 야코비안으로 구함<br>
+4. 비선형 시스템도 같은 state-space 형태, 단 $\mathbf{f}(\mathbf{x},\mathbf{u})$는 일반 함수<br>
+5. 이 형태가 현대 제어이론(LQR, 관측기 설계 등)의 출발점</div>
+</div>
+</div></div>
+<div style="text-align:center;padding:20px;color:#999;font-size:13px">
+<p>Vehicle Suspension Control 1: Linearize Nonlinear Systems</p>
+<p>Section 4 Study Document | Generated with MathJax</p></div>
+</body>
+</html>

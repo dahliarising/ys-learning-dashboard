@@ -1,0 +1,342 @@
+================================================================================
+  VEHICLE DYNAMICS LECTURES - HTML/JS PATTERNS QUICK REFERENCE
+================================================================================
+
+SECTION 1: ACCORDION (심화 학습)
+────────────────────────────────────────────────────────────────────────────────
+
+HTML Structure:
+┌─ .accordion
+│  ├─ .accordion-toggle (button)
+│  │  ├─ <span>💡 Title</span>
+│  │  └─ <span class="accordion-arrow">▼</span>
+│  └─ .accordion-content (hidden by default)
+│     └─ .accordion-inner
+│        ├─ <h4 style="color:var(--gold-light);">
+│        └─ <p>content</p>
+
+✓ CORRECT IDs:
+  - Button: class="accordion-toggle" (NOT accordion-btn)
+  - Content: id="deepdive1", id="deepdive2", etc.
+  - Arrow: ▼ symbol (rotates 180° on toggle)
+
+✗ AVOID:
+  - button class="accordion-btn"
+  - <div> between button and content
+  - Styled boxes (gradients) inside accordion-inner
+  - Extra wrappers around accordion-content
+
+Event Handler:
+  document.addEventListener('click', function(e) {
+    var hdr = e.target.closest('.accordion-toggle');
+    if (hdr) {
+      var content = hdr.nextElementSibling;
+      content.classList.toggle('open');
+      // Arrow rotation handled by CSS
+    }
+  });
+
+CSS Classes:
+  .accordion          → border, border-radius, overflow
+  .accordion-toggle   → flex layout, padding 18px 24px
+  .accordion-arrow    → transition: transform 0.3s
+  .accordion-content  → display:none | display:block (.open)
+  .accordion-inner    → padding: 0 24px 24px
+
+
+SECTION 2: CANVAS SIMULATION
+────────────────────────────────────────────────────────────────────────────────
+
+HTML Structure:
+┌─ .sim-container
+│  ├─ .sim-canvas-wrap
+│  │  └─ <canvas id="sim-day01" width="700" height="350">
+│  ├─ <div id="sim-day01-controls" class="sim-controls">
+│  │   (populated by JavaScript)
+│  └─ <div id="sim-day01-metrics" class="sim-metrics">
+│      (populated by JavaScript)
+
+✓ CORRECT Patterns:
+  - Canvas ID: sim-day{N} (day01, day02, etc.)
+  - Controls ID: sim-day{N}-controls
+  - Metrics ID: sim-day{N}-metrics
+  - Canvas size: width="700" height="350"
+  - Sliders created via addSlider() JavaScript function
+  - Metrics as array: [['Label', 'Value'], ['Label2', 'Value2']]
+
+✗ AVOID:
+  - HTML sliders (create in JavaScript instead)
+  - Canvas without explicit width/height
+  - Controls without {N} pattern
+  - draw() not called on slider input
+
+JavaScript Setup:
+  const canvas = document.getElementById('sim-day01');
+  const ctx = canvas.getContext('2d');
+  const W = 700, H = 350;
+  const ctrlBox = document.getElementById('sim-day01-controls');
+  const metricBox = document.getElementById('sim-day01-metrics');
+
+  function addSlider(label, min, max, value, step, id) {
+    const g = document.createElement('div');
+    g.className = 'sim-slider-group';
+    g.innerHTML = '<label>' + label + '</label>' +
+                  '<input type="range" min="'+min+'" ... id="'+id+'">' +
+                  '<div class="sim-readout" id="'+id+'-val">'+value+'</div>';
+    ctrlBox.appendChild(g);
+    const inp = document.getElementById(id);
+    inp.oninput = function(){ /* update readout */ draw(); };
+  }
+
+  function setMetrics(arr) {
+    metricBox.innerHTML = arr.map(m =>
+      '<div class="sim-metric"><strong>'+m[0]+':</strong> '+m[1]+'</div>'
+    ).join('');
+  }
+
+  function draw() {
+    ctx.fillStyle = '#0a0c10';
+    ctx.fillRect(0, 0, W, H);
+    // ... draw simulation ...
+    ctx.strokeStyle = '#C9A84C';
+    ctx.beginPath();
+    // ... line drawing ...
+    ctx.stroke();
+  }
+
+
+SECTION 3: STYLED BOXES
+────────────────────────────────────────────────────────────────────────────────
+
+MEMORY HOOK BOX:
+┌─────────────────────────────────────────────────────────────┐
+│ 🧠 기억 앵커: "Title"                                        │
+│ ─────────────────────────────────────────────────────────── │
+│ Memory text and images in 2-3 column grid                    │
+└─────────────────────────────────────────────────────────────┘
+
+Gradient: rgba(138,106,191,.08), rgba(138,106,191,.02)  [PURPLE]
+Class: .memory-hook
+Padding: 24px
+Border-radius: 16px
+Margin: 20px 0
+
+VEHICLE EXAMPLE BOX:
+┌─────────────────────────────────────────────────────────────┐
+│ 🚗 레퍼런스 C-SUV — 프론트 1/4 차량                            │
+│ ─────────────────────────────────────────────────────────── │
+│ Parameter    │ Value      │ Notes                             │
+│ ─────────────────────────────────────────────────────────── │
+│ Spring Mass  │ 340 kg     │ Based on vehicle specs            │
+└─────────────────────────────────────────────────────────────┘
+
+Gradient: rgba(201,168,76,.04), rgba(74,158,191,.04)  [BLUE/GOLD]
+Class: .vehicle-example
+Padding: 24px
+Border-radius: 16px
+Title color: var(--gold-light)
+
+✗ AVOID:
+  - Styled boxes INSIDE accordion sections
+  - Wrong gradients (gold in memory hook, etc.)
+  - Missing border, radius, or padding
+  - No inline style attribute
+
+
+SECTION 4: QUIZ
+────────────────────────────────────────────────────────────────────────────────
+
+HTML Structure:
+┌─ .quiz-card (data-correct="1")
+│  ├─ .quiz-num → "QUESTION 01 — Topic"
+│  ├─ .quiz-q → "Question text?"
+│  ├─ .quiz-options (id="q1")
+│  │  ├─ .quiz-opt → "A. Option 1"
+│  │  ├─ .quiz-opt → "B. Option 2"
+│  │  └─ ...
+│  ├─ .quiz-feedback (id="q1-fb") → hidden until answered
+│  └─ .solution-panel (id="q1-sol") → hidden by default
+│     ├─ .sol-header → "SOLUTION"
+│     ├─ .sol-step → "Step 1 text"
+│     └─ .sol-step → "Step 2 text"
+
+✓ CORRECT Patterns:
+  - data-correct: 0-based index (0 = first option)
+  - Quiz number: "QUESTION {N} — {Topic}" format
+  - Options ID: q{N}
+  - Feedback ID: q{N}-fb
+  - Solution ID: q{N}-sol
+  - Solution steps have .sol-num span with emoji
+
+✗ AVOID:
+  - data-correct="{N}" (use 0-based indexing)
+  - Quiz number: "Q1:" or "1번 문제"
+  - Feedback visible by default
+  - Solution panel with inline display:block
+
+Event Handler:
+  document.addEventListener('click', function(e) {
+    var opt = e.target.closest('.quiz-opt');
+    if (opt) {
+      var card = opt.closest('.quiz-card');
+      var correctIdx = parseInt(card.dataset.correct);
+      var selectedIdx = Array.from(card.querySelectorAll('.quiz-opt')).indexOf(opt);
+
+      if (selectedIdx === correctIdx) {
+        // Show correct feedback
+        // Mark option as correct
+      } else {
+        // Show wrong feedback
+        // Mark option as wrong
+        // Show correct option
+      }
+
+      // Show solution panel
+      card.querySelector('.solution-panel').classList.add('show');
+    }
+  });
+
+
+SECTION 5: ID NAMING PATTERNS
+────────────────────────────────────────────────────────────────────────────────
+
+Canvas Simulations:
+  sim-day01, sim-day02, ..., sim-day60
+  sim-day01-controls, sim-day02-controls
+  sim-day01-metrics, sim-day02-metrics
+
+Accordion Sections:
+  deepdive1, deepdive2, deepdive3, deepdive4, ...
+
+Quiz Questions:
+  q1, q2, q3, ... (options container)
+  q1-fb, q2-fb, q3-fb, ... (feedback)
+  q1-sol, q2-sol, q3-sol, ... (solution)
+
+
+SECTION 6: QUICK FIND-REPLACE
+────────────────────────────────────────────────────────────────────────────────
+
+Find: class="accordion-btn"
+Replace: class="accordion-toggle"
+
+Find: <div id="controls"
+Replace: <div id="sim-day{N}-controls"
+
+Find: <div id="metrics"
+Replace: <div id="sim-day{N}-metrics"
+
+Find: QUESTION 01:
+Replace: QUESTION 01 —
+
+Find: <div class="quiz-options" id="q1">
+Replace: <div class="quiz-options" id="q1">
+(just ensure IDs match pattern)
+
+
+SECTION 7: CSS COLOR GRADIENTS
+────────────────────────────────────────────────────────────────────────────────
+
+Memory Hook (PURPLE):
+  background: linear-gradient(135deg,
+    rgba(138,106,191,.08),
+    rgba(138,106,191,.02));
+  border: 1px solid rgba(138,106,191,.2);
+
+Vehicle Example (BLUE/GOLD):
+  background: linear-gradient(135deg,
+    rgba(201,168,76,.04),
+    rgba(74,158,191,.04));
+  border: 1px solid rgba(201,168,76,.15);
+
+Canvas (GOLD):
+  ctx.strokeStyle = '#C9A84C';
+
+Canvas (BLUE):
+  ctx.strokeStyle = '#4A9EBF';
+
+Background (DARK):
+  #0A0C10 or #0a0c10
+
+
+SECTION 8: VALIDATION CHECKLIST
+────────────────────────────────────────────────────────────────────────────────
+
+Accordion:
+  ☐ Button: class="accordion-toggle"
+  ☐ Content: id="deepdive{N}"
+  ☐ Arrow: ▼ symbol
+  ☐ Listener: .closest('.accordion-toggle')
+  ☐ No gradient boxes inside
+
+Canvas:
+  ☐ ID: sim-day{N}
+  ☐ Width/height: 700 x 350
+  ☐ Controls ID: sim-day{N}-controls
+  ☐ Metrics ID: sim-day{N}-metrics
+  ☐ draw() called on input
+  ☐ IIFE wrapper: (function(){...})()
+
+Styled Boxes:
+  ☐ Memory hook: purple gradient
+  ☐ Vehicle example: blue/gold gradient
+  ☐ Border-radius: 16px
+  ☐ Padding: 24px
+  ☐ NOT inside accordion
+
+Quiz:
+  ☐ data-correct: 0-based index
+  ☐ Number: "QUESTION {N} — {Topic}"
+  ☐ Options ID: q{N}
+  ☐ Feedback ID: q{N}-fb
+  ☐ Solution ID: q{N}-sol
+  ☐ Solution hidden by default
+
+
+SECTION 9: FILE LOCATIONS
+────────────────────────────────────────────────────────────────────────────────
+
+Documentation Files:
+  /sessions/dreamy-busy-brown/mnt/VehicleDynamics_Lectures/
+    ├── PATTERNS_AUDIT_REPORT.md (21KB) - Detailed analysis
+    ├── JAVASCRIPT_PATTERNS.md (13KB) - Code reference
+    ├── AUDIT_CHECKLIST.md (11KB) - Quick validation
+    ├── README_PATTERNS.md (11KB) - Overview guide
+    └── QUICK_REFERENCE.txt (this file)
+
+HTML Files Analyzed:
+  ├── Day01_운동방정식유도.html (58KB)
+  ├── Day15_Part2복습.html
+  └── Day30_QuarterCar구현.html
+
+
+SECTION 10: ERROR QUICK-FIX
+────────────────────────────────────────────────────────────────────────────────
+
+Accordion doesn't open:
+  → Check: button class="accordion-toggle"
+  → Check: content is nextElementSibling
+  → Check: JavaScript listener exists
+
+Canvas doesn't show:
+  → Check: Canvas has id="sim-day{N}"
+  → Check: Canvas has width="700" height="350"
+  → Check: draw() is called at end of IIFE
+
+Sliders don't update canvas:
+  → Check: inp.oninput calls draw()
+  → Check: draw() uses +sl_m.value (string to number)
+
+Quiz answer doesn't work:
+  → Check: data-correct="{index}" (0-based)
+  → Check: Feedback ID matches q{N}-fb
+  → Check: Solution ID matches q{N}-sol
+
+Canvas looks cut off:
+  → Check: Canvas width/height attributes (not CSS)
+  → Check: Canvas wrapper doesn't have max-width
+
+================================================================================
+  REFERENCE GENERATED: 2026-03-13
+  STATUS: Ready for Quick Lookup
+================================================================================
