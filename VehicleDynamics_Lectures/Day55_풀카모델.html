@@ -167,7 +167,8 @@ table.param-table tr:last-child td{border-bottom:none}
 <style id="math-enhanced-style">
 /* ══════ KaTeX Pre-rendered Math Styling ══════ */
 /* Hero equation - 메인 수식 */
-.hero-equation .katex-display{margin:0!important;padding:0!important}
+.hero-equation .katex-display{margin:0!important;padding:0!important;overflow:hidden!important}
+.katex-display::-webkit-scrollbar{display:none}.katex-display{scrollbar-width:none}
 .hero-equation .katex{font-size:1.5em!important;color:#E8C96A!important}
 .hero-equation .katex .mord{color:#E8C96A!important}
 .hero-equation .katex .mbin{color:#4A9EBF!important}
@@ -237,10 +238,23 @@ td .katex,th .katex{font-size:0.9em!important}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+  onload="renderMathInElement(document.body,{ignoredTags:["script","noscript","style","textarea","pre","code"],delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
 </script>
 </head>
 <body>
+
+<!-- ① STICKY HEADER -->
+<header class="sticky-header">
+  <div class="header-inner">
+    <div class="header-brand"><a href="index.html" style="color:inherit;text-decoration:none;">YS · 진동학 마스터</a> / Day 55</div>
+    <div class="header-progress-wrap">
+      <span>55 / 60</span>
+      <div class="header-progress-bar"><div class="header-progress-fill" style="width:92%"></div></div>
+      <span>92%</span>
+    </div>
+  </div>
+</header>
+
     <!-- Sticky Header -->
     <div class="sticky-header">
         <span>DAY 55/60</span>
@@ -572,7 +586,7 @@ td .katex,th .katex{font-size:0.9em!important}
                 <div class="code-header">SIMPACK 7-DOF 모델 설정 스크립트</div>
 <pre>! === 7-DOF Full-Vehicle Model Setup ===
 ! Body: Sprung Mass
-$body sprung_mass
+&#36;body sprung_mass
   mass = 1400.0          ! [kg]
   Ixx  = 600.0           ! [kg*m^2] Roll inertia
   Iyy  = 2200.0          ! [kg*m^2] Pitch inertia
@@ -580,7 +594,7 @@ $body sprung_mass
   Ixz  = 120.0           ! [kg*m^2] Roll-Pitch coupling
 
 ! Suspension corners
-$force_element spring_damper_FL
+&#36;force_element spring_damper_FL
   type     = parallel_spring_damper
   stiffness = 25000.0    ! [N/m]
   damping   = 2000.0     ! [Ns/m]
@@ -590,14 +604,14 @@ $force_element spring_damper_FL
   marker2  = m_wheel_FL
 
 ! Anti-Roll Bar (Front)
-$force_element arb_front
+&#36;force_element arb_front
   type     = torsion_spring
   stiffness = 28000.0    ! [Nm/rad]
   body_L   = unsprung_FL
   body_R   = unsprung_FR
 
 ! 4-Post Rig Excitation
-$excitation four_post_FL
+&#36;excitation four_post_FL
   type   = time_history
   file   = "road_profile_FL.dat"
   column = 2</pre>
@@ -774,6 +788,8 @@ $excitation four_post_FL
                 <div class="accordion-content">
                     <div class="accordion-inner">
                     <p>7-DOF에 Yaw, Lateral, Longitudinal, 그리고 4바퀴 회전(ω)을 추가하면 14-DOF가 됩니다. 이 모델은 <strong>조향 응답</strong>과 <strong>제동 안정성</strong>까지 해석할 수 있어 실제 차량 개발에서 가장 많이 사용됩니다. 특히 ESC(Electronic Stability Control) 알고리즘 개발에 필수적인 모델입니다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">풀카 DOF: 바디 $6$ DOF ($x, y, z, \phi, \theta, \psi$) + 휠 $4 \times 1$ DOF (바운스) + 스티어링 $= 11\text{~}14$ DOF</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">질량 행렬: $[M]_{14\times14}$, &nbsp; 강성 행렬: $[K]_{14\times14}$ → 고유치 $14$개</p>
                     <p>추가 자유도: Yaw(ψ), Lateral(y), Longitudinal(x), ω<sub>FL</sub>, ω<sub>FR</sub>, ω<sub>RL</sub>, ω<sub>RR</sub></p>
                     </div>
                 </div>
@@ -787,6 +803,8 @@ $excitation four_post_FL
                 <div class="accordion-content">
                     <div class="accordion-inner">
                     <p>실제 서스펜션에서 스프링은 Progressive Rate(하중에 따라 강성 증가), 댐퍼는 속도 의존 비선형 특성을 가집니다. 7-DOF 모델에 이 비선형성을 추가하면:</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">비선형 스프링: $F_s = k_1 x + k_3 x^3$ → 진폭 의존 고유진동수: $\omega_n(A) = \omega_0\sqrt{1 + \frac{3k_3 A^2}{4k_1}}$</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">비대칭 댐퍼: $c(\dot{x}) = \begin{cases} c_b & \dot{x} > 0 \\ c_r & \dot{x} < 0 \end{cases}$ → $c_r/c_b \approx 2\text{~}3$</p>
                     <p>• <strong>Bump Stop</strong>: 큰 변위에서 급격한 강성 증가 → Jounce/Rebound 리미트</p>
                     <p>• <strong>댐퍼 Blow-off</strong>: 고속 영역에서 밸브가 열려 감쇠력 포화</p>
                     <p>• <strong>부시 히스테리시스</strong>: 고무 부시의 에너지 흡수로 추가 감쇠 발생</p>
@@ -803,6 +821,9 @@ $excitation four_post_FL
                 <div class="accordion-content">
                     <div class="accordion-inner">
                     <p>풀카 모델의 가장 큰 가치는 <strong>Ride(승차감)</strong>와 <strong>Handling(조종성)</strong> 간의 트레이드오프를 정량적으로 분석할 수 있다는 점입니다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">승차감 지표: $a_w = \sqrt{\int W^2(f) \cdot S_a(f) \, df}$ → ISO 2631</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">핸들링 지표: $\Delta F_z/F_z$ (접지 하중 변동률) → $< 0.3$이면 양호</p>
+<p style="margin:10px 0;color:var(--gold-light);"><strong>르노코리아 실무 Tip:</strong> 풀카 모델에서 Ride와 Handling을 동시에 평가하려면 Sine Sweep + Step Steer를 순차 실행합니다.</p>
                     <p><strong>전략 1: 전후 Roll 강성 배분</strong><br>전륜 ARB 강성↑ → Understeer 증가, Roll 감소. 후륜 ARB 강성↑ → Oversteer 경향, 후축 Ride 악화. 일반적으로 전:후 = 60:40 ~ 65:35 배분.</p>
                     <p><strong>전략 2: Bounce/Pitch 주파수 분리</strong><br>f<sub>pitch</sub>/f<sub>bounce</sub> ≈ 1.0~1.2일 때 최적. 비율이 1보다 크면 "Flat Ride"(갤럽 없는 주행감), 1보다 작으면 "Pitching" 발생.</p>
                     <p><strong>전략 3: 감쇠비 최적화</strong><br>Bounce ζ = 0.2~0.4, Roll ζ = 0.3~0.5가 일반적. 세미 액티브 댐퍼(CDC)를 사용하면 Comfort/Sport 모드 전환이 가능합니다.</p>
@@ -818,6 +839,8 @@ $excitation four_post_FL
                 <div class="accordion-content">
                     <div class="accordion-inner">
                     <p>실제 4-Post Rig 시험과 7-DOF 시뮬레이션을 비교하면 일반적으로:</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">4-Post 입력: $z_i(t) = A\sin(2\pi f t + \phi_i)$, &nbsp; $i = FL, FR, RL, RR$</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">상관성: $\frac{|H_{sim}(f) - H_{test}(f)|}{H_{test}(f)} < 10\%$ (주파수 $1\text{~}30$ Hz 대역)</p>
                     <p>• <strong>Bounce 주파수</strong>: ±3% 이내 일치 (가장 정확)</p>
                     <p>• <strong>Roll 주파수</strong>: ±5% (ARB 부시 강성 불확실성)</p>
                     <p>• <strong>Pitch 주파수</strong>: ±4% (CG 위치 정확도 의존)</p>
@@ -835,6 +858,8 @@ $excitation four_post_FL
                 <div class="accordion-content">
                     <div class="accordion-inner">
                     <p>7-DOF 풀카 모델은 디지털 트윈의 <strong>물리 코어</strong> 역할을 합니다. 실시간 센서 데이터(가속도계, 자이로, 서스펜션 스트로크)를 입력받아 <strong>칼만 필터</strong>로 상태를 추정하고, 머신러닝으로 비선형 파라미터를 온라인 업데이트합니다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">실시간 요건: $t_{compute} < \Delta t_{step}$ → ROM: $n_{mode} \approx 20\text{~}50$개로 축소</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">칼만 필터: $\hat{x}_{k+1} = A\hat{x}_k + Bu_k + K(y_k - C\hat{x}_k)$ → 센서 데이터로 상태 보정</p>
                     <p><strong>구현 파이프라인:</strong></p>
                     <p>1. 7-DOF 물리 모델 → State-Space 표현 (A, B, C, D 행렬)</p>
                     <p>2. Extended Kalman Filter → 실시간 상태 추정</p>

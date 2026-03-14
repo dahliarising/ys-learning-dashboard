@@ -160,7 +160,8 @@ table.param-table tr:last-child td{border-bottom:none}
 <style id="math-enhanced-style">
 /* ══════ KaTeX Pre-rendered Math Styling ══════ */
 /* Hero equation - 메인 수식 */
-.hero-equation .katex-display{margin:0!important;padding:0!important}
+.hero-equation .katex-display{margin:0!important;padding:0!important;overflow:hidden!important}
+.katex-display::-webkit-scrollbar{display:none}.katex-display{scrollbar-width:none}
 .hero-equation .katex{font-size:1.5em!important;color:#E8C96A!important}
 .hero-equation .katex .mord{color:#E8C96A!important}
 .hero-equation .katex .mbin{color:#4A9EBF!important}
@@ -230,7 +231,7 @@ td .katex,th .katex{font-size:0.9em!important}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+  onload="renderMathInElement(document.body,{ignoredTags:["script","noscript","style","textarea","pre","code"],delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
 </script>
 </head>
 <body>
@@ -597,6 +598,8 @@ td .katex,th .katex{font-size:0.9em!important}
       <div class="accordion-content">
         <div class="accordion-inner">
         <p>OEM의 멀티센스 시스템은 Comfort/Sport/개인설정 모드에서 댐퍼 감쇠, 스티어링 어시스트, 엔진 맵을 종합 제어한다. 댐퍼 부분은 CDC(연속 가변 댐퍼)로, 내부적으로 Modified Skyhook + Groundhook 혼합 알고리즘을 사용한다. Groundhook: F_gh = c_gh · ẋ_wheel은 접지력 최적화를 위한 보완 제어다. Simpack에서 이를 구현하려면 Matlab/Simulink Co-simulation이 필요하며, PART 5에서 상세히 다룬다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">Skyhook: $F_d = -c_{sky} \cdot \dot{x}_s$ → 이상적 바디 속도 비례 감쇠</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">실현 조건: $c_{semi} = \begin{cases} c_{sky}\frac{\dot{x}_s}{\dot{x}_s - \dot{x}_u} & \dot{x}_s(\dot{x}_s - \dot{x}_u) > 0 \\ c_{min} & \text{otherwise} \end{cases}$</p>
         </div>
       </div>
     
@@ -608,6 +611,9 @@ td .katex,th .katex{font-size:0.9em!important}
       <div class="accordion-content" id="deepdive2">
         <div class="accordion-inner">
         <p><strong>■ Skyhook (하늘 고리)</strong></p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">Groundhook: $F_d = -c_{gnd} \cdot \dot{x}_u$ → 타이어 접지력 최적화</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">하이브리드: $F = \alpha \cdot F_{sky} + (1-\alpha) \cdot F_{gnd}$, &nbsp; $\alpha \in [0,1]$로 승차감/접지력 밸런스</p>
+<p style="margin:10px 0;color:var(--gold-light);"><strong>르노코리아 실무 Tip:</strong> Multi-Sense Comfort 모드: $\alpha \approx 0.8$ (Skyhook 우세), Sport 모드: $\alpha \approx 0.3$ (Groundhook 우세)</p>
 <p>가상의 관성 기준점(하늘)에 댐퍼를 연결한 개념</p>
 <p>목적: 차체(sprung mass) 진동 최소화 → 승차감↑</p>
 <p>제어 법칙: c = c_max if ẋₛ·(ẋₛ−ẋᵤ) > 0, else c_min</p>

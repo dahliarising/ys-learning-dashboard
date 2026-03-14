@@ -160,7 +160,8 @@ table.param-table tr:last-child td{border-bottom:none}
 <style id="math-enhanced-style">
 /* ══════ KaTeX Pre-rendered Math Styling ══════ */
 /* Hero equation - 메인 수식 */
-.hero-equation .katex-display{margin:0!important;padding:0!important}
+.hero-equation .katex-display{margin:0!important;padding:0!important;overflow:hidden!important}
+.katex-display::-webkit-scrollbar{display:none}.katex-display{scrollbar-width:none}
 .hero-equation .katex{font-size:1.5em!important;color:#E8C96A!important}
 .hero-equation .katex .mord{color:#E8C96A!important}
 .hero-equation .katex .mbin{color:#4A9EBF!important}
@@ -230,7 +231,7 @@ td .katex,th .katex{font-size:0.9em!important}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+  onload="renderMathInElement(document.body,{ignoredTags:["script","noscript","style","textarea","pre","code"],delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
 </script>
 </head>
 <body>
@@ -585,6 +586,8 @@ td .katex,th .katex{font-size:0.9em!important}
       <div class="accordion-content">
         <div class="accordion-inner">
         <p>Simpack에서 유연 차체(flex body)를 사용할 때 Craig-Bampton 방법이 적용된다. 이 방법은 (1) 경계 자유도(마운트 포인트)의 정적 모드와 (2) 고정 경계 내부의 동적 모드를 합성한다. FE 모델에서 수만 자유도를 수십 개의 모드로 축소하여 MBD 해석에 사용한다. OEM에서는 NASTRAN → Craig-Bampton → Simpack fbi 파일 workflow가 표준이다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">모드 중첩: $\{x\} = [\Phi]\{q\}$ → 대각화: $[\Phi]^T[M][\Phi]\{\ddot{q}\} + [\Phi]^T[K][\Phi]\{q\} = [\Phi]^T\{F\}$</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">모달 좌표: $\ddot{q}_i + 2\zeta_i\omega_i\dot{q}_i + \omega_i^2 q_i = \phi_i^T F / m_i$ (비연성 SDOF 집합)</p>
         </div>
       </div>
     
@@ -596,6 +599,9 @@ td .katex,th .katex{font-size:0.9em!important}
       <div class="accordion-content" id="deepdive2">
         <div class="accordion-inner">
         <p><strong>■ Craig-Bampton (CB) 축소법</strong></p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">CB 변환: $\{x\} = [\Phi_{CMS} | \Phi_{static}] \begin{Bmatrix} q_{modal} \\ u_{boundary} \end{Bmatrix}$</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">모드 절단 기준: $f_{cutoff} \geq 3 \times f_{max,interest}$ → 관심 주파수의 3배까지 모드 포함</p>
+<p style="margin:10px 0;color:var(--gold-light);"><strong>르노코리아 실무 Tip:</strong> Simpack FlexBody 설정 시 모드 수가 너무 적으면 강성이 과대평가됩니다. 수렴성 검토(모드 수 ↑ → 응답 변화 < 5%)를 권장합니다.</p>
 <p>구조물의 DOF를 대폭 줄이면서 동적 특성 보존</p>
 <p>경계 DOF(인터페이스) + 내부 모드(고정경계 모드) 조합</p>
 <p><strong>■ Simpack에서의 활용</strong></p>

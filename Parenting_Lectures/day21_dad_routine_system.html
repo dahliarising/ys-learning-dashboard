@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Day 21 — 아빠 루틴 시스템 완성 (21일 과정 최종 마무리)</title>
+<title>Day 21 — 아빠 루틴 시스템 완성</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════
@@ -33,8 +33,12 @@ html { font-size: 16px; scroll-behavior: smooth; }
 /* ═══════════════════════════════════════
    CUSTOM SCROLLBAR
    ═══════════════════════════════════════ */
-::-webkit-scrollbar { width: 12px; }
-::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, var(--green), var(--gold));
   border-radius: 6px;
@@ -58,496 +62,945 @@ a:hover { text-decoration: underline; }
    FADE UP ANIMATION
    ═══════════════════════════════════════ */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+
+.fade-up {
+  opacity: 0;
+  animation: fadeUp 0.8s ease-out forwards;
 }
-.fade-up { opacity: 0; animation: fadeUp 0.8s ease-out forwards; }
-.pulse { animation: pulse 2s ease-in-out infinite; }
 
 /* ═══════════════════════════════════════
-   ① STICKY HEADER
+   MAIN CONTAINER
    ═══════════════════════════════════════ */
-.sticky-header {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(10,12,16,0.92);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(74,191,138,0.15);
-  padding: 12px 24px;
-  display: flex; align-items: center; justify-content: space-between;
-  font-family: var(--mono);
-  font-size: 0.8rem;
+.container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 24px 120px;
 }
-.sticky-header .series-tag { color: var(--gold); letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
-.sticky-header .day-tag { background: linear-gradient(135deg, var(--gold), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
-.sticky-header .timer-display { display: flex; align-items: center; gap: 8px; }
-.sticky-header .timer-btn { background: var(--gold); color: var(--bg); padding: 6px 14px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 0.75rem; }
-.sticky-header .timer-btn:hover { background: var(--gold-dim); }
 
 /* ═══════════════════════════════════════
-   ② HERO SECTION (CELEBRATION)
+   ② HERO SECTION (GRADUATION)
    ═══════════════════════════════════════ */
 .hero {
-  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-alt) 100%);
-  border-bottom: 2px solid var(--gold);
-  padding: 4rem 2rem;
-  margin-bottom: 2rem;
+  padding: 64px 0 48px;
   text-align: center;
+  position: relative;
 }
-.hero .part-badge { display: inline-block; background: var(--gold); color: var(--bg); padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; margin-bottom: 1rem; letter-spacing: 1px; }
-.hero h1 { font-family: var(--serif); font-size: 3.5rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--gold), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.hero .subtitle { font-size: 1.3rem; color: var(--text-dim); margin-bottom: 1.5rem; }
-.hero .celebration-badge {
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; left: 50%; transform: translateX(-50%);
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero .series-info {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.hero .graduation-badge {
   display: inline-block;
-  background: rgba(201,168,76,0.15);
-  border: 2px solid var(--gold);
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  color: var(--gold);
+  background: linear-gradient(135deg, var(--gold), var(--green));
+  color: var(--bg);
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-family: var(--mono);
+  font-size: 0.75rem;
   font-weight: 700;
-  margin-bottom: 1.5rem;
-  animation: pulse 2s ease-in-out infinite;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
 }
-.hero .oneliner { font-size: 1.1rem; color: var(--green); font-style: italic; font-weight: 500; margin-bottom: 1.5rem; }
+.hero .part-label {
+  font-family: var(--mono);
+  color: var(--green);
+  font-size: 0.85rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1.25;
+  margin-bottom: 16px;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--gold);
+}
+.hero .subtitle {
+  font-size: 1.05rem;
+  color: var(--text-dim);
+  max-width: 560px;
+  margin: 0 auto 24px;
+  line-height: 1.7;
+}
+.hero .one-liner {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(74,191,138,0.12));
+  border: 1px solid rgba(201,168,76,0.3);
+  padding: 12px 28px;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+.badges {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+}
+.badge {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.badge.first { background: rgba(74,191,138,0.15); color: var(--green); border: 1px solid rgba(74,191,138,0.3); }
+.badge.second { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
 
-/* LAYOUT */
-.container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
-.section { margin-bottom: 3.5rem; }
-.section-label { font-family: var(--mono); font-size: 0.75rem; color: var(--green); letter-spacing: 2px; text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem; }
-.section-title { font-family: var(--serif); font-size: 2.2rem; font-weight: 700; color: var(--text-bright); margin-bottom: 1.5rem; border-left: 4px solid var(--gold); padding-left: 1rem; }
+/* ═══════════════════════════════════════
+   SECTION TITLES
+   ═══════════════════════════════════════ */
+.section-label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+.section-title {
+  font-family: var(--serif);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 24px;
+  line-height: 1.3;
+}
 
-/* ③ LEARNING STRATEGY -->
-.learning-strategy { background: var(--bg-card); border: 1px solid rgba(201,168,76,0.15); border-left: 4px solid var(--gold); border-radius: var(--radius); padding: 2rem; margin-bottom: 2rem; }
-.learning-strategy h3 { color: var(--gold); font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; }
-.learning-strategy p { color: var(--text-dim); margin-bottom: 1rem; line-height: 1.8; }
-.time-table { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
-.time-block { background: var(--bg-card-alt); border: 1px solid rgba(201,168,76,0.2); border-radius: var(--radius-sm); padding: 1rem; text-align: center; }
-.time-block .time { font-family: var(--mono); color: var(--gold); font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; }
-.time-block .label { font-size: 0.85rem; color: var(--text-dim); }
+/* ═══════════════════════════════════════
+   ③ 학습 전략 박스
+   ═══════════════════════════════════════ */
+.strategy-box {
+  background: var(--bg-card);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin-bottom: 48px;
+}
+.strategy-box h3 {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.strategy-box p {
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  margin-bottom: 20px;
+}
 
-/* ④ ROUTINE SYSTEM CARDS -->
-.routine-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-.routine-card { background: var(--bg-card); border: 1px solid rgba(201,168,76,0.15); border-top: 3px solid var(--gold); border-radius: var(--radius); padding: 2rem; transition: all 0.3s ease; }
-.routine-card:hover { border-color: var(--gold); box-shadow: 0 8px 24px rgba(201,168,76,0.1); }
-.card-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem; }
-.card-icon { font-size: 2.2rem; flex-shrink: 0; }
-.card-header h4 { font-size: 1.1rem; font-weight: 600; color: var(--gold); line-height: 1.4; }
-.card-body p { color: var(--text); margin-bottom: 1rem; line-height: 1.8; }
-.routine-checklist { list-style: none; padding: 0; margin-top: 1rem; }
-.routine-checklist li { padding: 0.6rem 0 0.6rem 1.8rem; position: relative; color: var(--text-dim); font-size: 0.95rem; }
-.routine-checklist li::before { content: "→"; position: absolute; left: 0; color: var(--gold); font-weight: 700; }
+/* ═══════════════════════════════════════
+   과정 요약 카드
+   ═══════════════════════════════════════ */
+.summary-cards {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+.summary-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 24px;
+  transition: all 0.3s;
+}
+.summary-card:hover {
+  border-color: rgba(74,191,138,0.3);
+  background: rgba(74,191,138,0.02);
+}
+.summary-card .part-num {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.summary-card h4 {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  color: var(--text-bright);
+  margin-bottom: 12px;
+}
+.summary-card p {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 0;
+}
 
-/* ⑤ DEEP DIVE SECTIONS -->
-.deep-dive-toggle { cursor: pointer; display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(201,168,76,0.1); color: var(--gold); font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; }
-.deep-dive-toggle .chevron { display: inline-block; transition: transform 0.3s ease; }
-.deep-dive-toggle:hover { color: var(--green); }
-.deep-dive-toggle.open .chevron { transform: rotate(180deg); }
-.deep-dive-content { display: none; background: rgba(201,168,76,0.08); border-left: 3px solid var(--gold); padding: 1rem; border-radius: var(--radius-sm); margin-top: 1rem; color: var(--text-dim); font-size: 0.95rem; }
-.deep-dive-content.open { display: block; }
-.deep-dive-content p { margin-bottom: 0.8rem; line-height: 1.7; }
+/* ═══════════════════════════════════════
+   루틴 박스
+   ═══════════════════════════════════════ */
+.routine-section {
+  margin-bottom: 48px;
+}
+.routine-title {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  color: var(--text-bright);
+  margin-bottom: 20px;
+}
+.routine-card {
+  background: linear-gradient(135deg, rgba(74,191,138,0.08), rgba(201,168,76,0.04));
+  border: 1px solid rgba(74,191,138,0.2);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 20px;
+}
+.routine-card h4 {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 14px;
+}
+.routine-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.routine-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.routine-step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--green), var(--green-dim));
+  border-radius: 50%;
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--bg);
+}
+.routine-step-content {
+  flex: 1;
+}
+.routine-step-content strong {
+  color: var(--text-bright);
+  font-size: 0.95rem;
+}
+.routine-step-content p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
 
-/* ⑥ SAMPLE ROUTINES -->
-.sample-routine { background: var(--bg-card-alt); border: 1px solid rgba(201,168,76,0.1); border-radius: var(--radius-sm); padding: 1.5rem; margin-bottom: 1.5rem; }
-.sample-routine h5 { color: var(--gold); margin-bottom: 1rem; font-weight: 600; }
-.routine-item { display: flex; gap: 1rem; margin-bottom: 0.8rem; padding: 0.8rem; background: rgba(10,12,16,0.4); border-radius: var(--radius-sm); border-left: 3px solid var(--gold); }
-.routine-time { font-family: var(--mono); color: var(--gold); font-weight: 700; min-width: 60px; flex-shrink: 0; }
-.routine-activity { color: var(--text); flex: 1; }
-.routine-note { color: var(--text-dim); font-size: 0.85rem; font-style: italic; margin-top: 0.3rem; }
+/* ═══════════════════════════════════════
+   지속성 로드맵
+   ═══════════════════════════════════════ */
+.roadmap-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.roadmap-period {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.roadmap-card h5 {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  color: var(--text-bright);
+  margin-bottom: 12px;
+}
+.roadmap-tasks {
+  list-style: none;
+}
+.roadmap-tasks li {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  padding-left: 20px;
+  position: relative;
+}
+.roadmap-tasks li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--green);
+  font-weight: 700;
+}
 
-/* ⑦ JOURNEY SUMMARY -->
-.journey-section { background: var(--bg-card); border: 1px solid rgba(74,191,138,0.15); border-radius: var(--radius); padding: 2rem; margin-bottom: 2rem; }
-.journey-title { font-size: 1.3rem; color: var(--green); margin-bottom: 1.5rem; font-weight: 600; }
-.journey-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
-.journey-item { background: var(--bg-card-alt); border: 1px solid rgba(74,191,138,0.15); padding: 1.5rem; border-radius: var(--radius-sm); border-left: 3px solid var(--green); }
-.journey-item-title { color: var(--green); font-weight: 600; margin-bottom: 0.8rem; font-size: 0.95rem; }
-.journey-item-desc { color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; }
+/* ═══════════════════════════════════════
+   SVG 다이어그램
+   ═══════════════════════════════════════ */
+.diagram-section {
+  margin-bottom: 48px;
+}
+.diagram-wrap {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 32px 24px;
+  overflow-x: auto;
+}
+.diagram-wrap svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+.diagram-caption {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
 
-/* ⑧ FINAL MESSAGE -->
-.final-message { background: linear-gradient(135deg, rgba(74,191,138,0.1) 0%, rgba(201,168,76,0.1) 100%); border: 2px solid var(--gold); border-radius: var(--radius); padding: 3rem 2rem; margin: 3rem 0; text-align: center; }
-.final-message h2 { font-family: var(--serif); font-size: 2rem; color: var(--gold); margin-bottom: 1rem; }
-.final-message p { font-size: 1.1rem; color: var(--text); margin-bottom: 1rem; line-height: 1.8; }
-.final-message .signature { font-family: var(--serif); font-size: 1.3rem; color: var(--green); font-style: italic; margin-top: 2rem; }
+/* ═══════════════════════════════════════
+   DEEP DIVE COLLAPSIBLE
+   ═══════════════════════════════════════ */
+.deep-dive-toggle {
+  background: rgba(74,191,138,0.08);
+  border: 1px solid rgba(74,191,138,0.2);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin-top: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: var(--green);
+  font-weight: 600;
+  transition: all 0.3s;
+}
+.deep-dive-toggle:hover {
+  background: rgba(74,191,138,0.15);
+  border-color: rgba(74,191,138,0.4);
+}
+.deep-dive-toggle .chevron {
+  display: inline-block;
+  transition: transform 0.3s;
+  font-size: 0.9rem;
+}
+.deep-dive-toggle.open .chevron {
+  transform: rotate(180deg);
+}
+.deep-dive-content {
+  display: none;
+  background: rgba(74,191,138,0.04);
+  border: 1px solid rgba(74,191,138,0.15);
+  border-top: none;
+  padding: 16px;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.7;
+}
+.deep-dive-content.open {
+  display: block;
+}
 
-/* ⑨ CONTINUATION TIPS -->
-.continuation-section { background: var(--bg-card); border: 1px solid rgba(74,191,138,0.15); border-radius: var(--radius); padding: 2rem; margin-bottom: 2rem; }
-.continuation-title { font-size: 1.3rem; color: var(--green); margin-bottom: 1.5rem; font-weight: 600; }
-.tip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-.tip-box { background: var(--bg-card-alt); border: 1px solid rgba(74,191,138,0.15); padding: 1.5rem; border-radius: var(--radius-sm); border-left: 3px solid var(--green); }
-.tip-box h5 { color: var(--green); margin-bottom: 1rem; font-weight: 600; }
-.tip-box p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.7; }
+/* ═══════════════════════════════════════
+   축하 메시지
+   ═══════════════════════════════════════ */
+.celebration-section {
+  background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(74,191,138,0.1));
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: var(--radius);
+  padding: 40px 32px;
+  text-align: center;
+  margin-bottom: 48px;
+}
+.celebration-section h2 {
+  font-family: var(--serif);
+  font-size: 2rem;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.celebration-section p {
+  font-size: 1rem;
+  color: var(--text-dim);
+  max-width: 600px;
+  margin: 0 auto 24px;
+  line-height: 1.8;
+}
+.graduation-quote {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--green);
+  margin: 20px 0;
+  padding: 20px;
+  border-left: 3px solid var(--gold);
+}
 
-/* FOOTER -->
-.footer { text-align: center; padding: 3rem 2rem; color: var(--text-dim); font-size: 0.9rem; border-top: 1px solid rgba(74,191,138,0.1); margin-top: 3rem; }
-.footer p { margin-bottom: 0.5rem; }
-.footer .celebration { color: var(--gold); font-size: 1.2rem; margin: 1rem 0; }
+/* ═══════════════════════════════════════
+   ⑦ 퀴즈 & 간격 반복 트래커
+   ═══════════════════════════════════════ */
+.quiz-section {
+  margin-bottom: 48px;
+}
+.quiz-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.quiz-card .q-num {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--green);
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+.quiz-card .question {
+  font-size: 1rem;
+  color: var(--text-bright);
+  font-weight: 500;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.quiz-opt {
+  background: var(--bg-card-alt);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text);
+  transition: all 0.3s;
+}
+.quiz-opt:hover {
+  border-color: var(--green);
+  background: rgba(74,191,138,0.06);
+}
+.quiz-opt.correct {
+  border-color: var(--green);
+  background: rgba(74,191,138,0.12);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  border-color: var(--danger);
+  background: rgba(232,93,93,0.08);
+  color: var(--danger);
+}
+.quiz-explanation {
+  display: none;
+  margin-top: 14px;
+  padding: 14px 18px;
+  background: rgba(74,191,138,0.06);
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+  border-left: 3px solid var(--green);
+}
+.quiz-explanation.show { display: block; }
 
-@media (max-width: 768px) {
-  .hero h1 { font-size: 2.5rem; }
-  .section-title { font-size: 1.6rem; }
-  .routine-cards { grid-template-columns: 1fr; }
-  .sticky-header { flex-wrap: wrap; gap: 1rem; }
+.tracker {
+  background: var(--bg-card);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.tracker h4 {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.tracker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+}
+.tracker-day {
+  text-align: center;
+  padding: 10px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card-alt);
+  border: 1px solid rgba(255,255,255,0.04);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.tracker-day.today {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201,168,76,0.08);
+}
+.tracker-day.completed {
+  background: rgba(74,191,138,0.15);
+  color: var(--green);
+  border-color: var(--green-dim);
+}
+.tracker-day .day-label { display: block; font-weight: 700; font-size: 0.8rem; margin-bottom: 2px; }
+.tracker-day .day-desc { font-size: 0.6rem; color: inherit; opacity: 0.7; }
+
+/* ═══════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════ */
+.footer {
+  text-align: center;
+  padding: 40px 0;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════ */
+@media (max-width: 600px) {
+  .container { padding: 0 16px 80px; }
+  .hero { padding: 40px 0 32px; }
+  .hero h1 { font-size: 1.8rem; }
+  .celebration-section { padding: 28px 20px; }
+  .celebration-section h2 { font-size: 1.6rem; }
+  .routine-card { padding: 20px; }
+  .routine-step-num { width: 28px; height: 28px; font-size: 0.9rem; }
 }
 </style>
 </head>
 <body>
 
-<!-- ① STICKY HEADER -->
-<div class="sticky-header">
-  <div>
-    <span class="series-tag">PART 4: 대화법 & 관계 (최종)</span>
-    <span class="day-tag"> · DAY 21</span>
-  </div>
-  <div class="timer-display">
-    <span id="timerDisplay" style="font-family: var(--mono); color: var(--gold); font-weight: 700;">25:00</span>
-    <button class="timer-btn" onclick="openTimer()">타이머</button>
-  </div>
-</div>
-
-<!-- ② HERO (CELEBRATION) -->
-<div class="hero">
-  <span class="part-badge">🎓 최종 마무리</span>
-  <h1>아빠 루틴 시스템 완성</h1>
-  <p class="subtitle">21일 과정을 마치고 지속 가능한 일상 루틴 구축하기</p>
-  <div class="celebration-badge">
-    축하합니다! 🎉 21일 과정을 완수하셨습니다!
-  </div>
-  <p class="oneliner">"일관된 루틴 속에서, 아이의 뇌는 예측 가능성을 배우고, 안정감을 느낀다."</p>
-</div>
-
 <div class="container">
 
-<!-- ③ LEARNING STRATEGY -->
-<section class="fade-up">
-  <div class="learning-strategy">
-    <h3>📚 오늘의 학습 전략</h3>
-    <p>지난 21일 동안 아이의 뇌 발달, 애착, 놀이, 형제 관계, 감정 코칭 등을 배웠습니다. 이제 가장 중요한 것: 이 모든 학습을 어떻게 일상에 '지속 가능하게' 적용할 것인가입니다. 오늘은 아침, 저녁, 주말, 월간 루틴을 설계하고, 앞으로 6개월, 1년, 3년 뒤를 대비하는 로드맵을 그립니다.</p>
-    <div class="time-table">
-      <div class="time-block">
-        <div class="time">0-5분</div>
-        <div class="label">21일 회고</div>
-      </div>
-      <div class="time-block">
-        <div class="time">5-8분</div>
-        <div class="label">아침 루틴</div>
-      </div>
-      <div class="time-block">
-        <div class="time">8-13분</div>
-        <div class="label">저녁 루틴</div>
-      </div>
-      <div class="time-block">
-        <div class="time">13-18분</div>
-        <div class="label">주말 & 월간 시스템</div>
-      </div>
-      <div class="time-block">
-        <div class="time">18-25분</div>
-        <div class="label">격려 메시지 & 로드맵</div>
-      </div>
-    </div>
+<!-- ═══════════ ② HERO SECTION - GRADUATION ═══════════ -->
+<section class="hero fade-up">
+  <div class="series-info">과학적 아빠 육아 · 포모도로 완결</div>
+  <div class="graduation-badge">🎓 최종 졸업</div>
+  <div class="part-label">PART 4 — 아빠 루틴 시스템</div>
+  <h1><em>아빠 루틴 시스템</em> 완성</h1>
+  <p class="subtitle">21일의 여정. 뇌과학, 애착 이론, 발달심리학, 감정 코칭을 아버지의 일상으로 녹여낸 최종 루틴 시스템. 이제 시작입니다.</p>
+  <div class="one-liner">💡 아버지는 아이의 뇌를 형성하는 가장 중요한 환경입니다. 당신의 루틴이 당신의 자녀입니다.</div>
+  <div class="badges">
+    <span class="badge first">👧 5-7세</span>
+    <span class="badge second">👶 2-4세</span>
   </div>
 </section>
 
-<!-- ④ ROUTINE CARDS -->
+<!-- ═══════════ 🎯 21일 여정 요약 ═══════════ -->
 <section class="fade-up">
-  <div class="section-label">DAILY SYSTEM</div>
-  <div class="section-title">지속 가능한 아빠 루틴 설계</div>
-  <div class="routine-cards">
-
-    <div class="routine-card">
-      <div class="card-header">
-        <div class="card-icon">🌅</div>
-        <h4>아침 루틴 (15-20분)</h4>
-      </div>
-      <div class="card-body">
-        <p>아침은 하루를 결정하는 시간입니다. 아이의 신경계가 예측 가능성을 경험하면, 온종일 안정감을 유지합니다.</p>
-        <ul class="routine-checklist">
-          <li>깨웠을 때 피부 접촉 + 눈 맞춤 (2분)</li>
-          <li>"오늘 뭐 하고 싶어?" 한 가지 질문 (2분)</li>
-          <li>함께 아침 식사 또는 준비 단계 돕기 (5분)</li>
-          <li>출발 전 짧은 신체 놀이 또는 터치 (3-5분)</li>
-          <li>등원/등교 시 감정 인정 문구 ("오늘도 파이팅!")</li>
-        </ul>
-        <div class="deep-dive-toggle" onclick="toggleDeepDive(this)">
-          <span class="chevron">▼</span> 더 알아보기
-        </div>
-        <div class="deep-dive-content">
-          <p><strong>왜 아침이 중요한가?</strong></p>
-          <p>아침에 받는 신체적 자극(스킨십)과 긍정적인 상호작용은 아이의 스트레스 호르몬(코르티솔)을 낮추고 안정성 호르몬(옥시토신)을 높입니다. 이것이 하루종일 지속됩니다.</p>
-          <p><strong>5-7세 vs 2-4세 차이:</strong> 5-7세는 "오늘 뭐 배울까?"라는 질문이 효과적입니다. 2-4세는 "함께한다"는 신체적 경험이 먼저입니다.</p>
-        </div>
-      </div>
+  <div class="section-label">JOURNEY RECAP</div>
+  <div class="section-title">지난 21일, 우리가 배운 것</div>
+  <div class="summary-cards">
+    
+    <div class="summary-card">
+      <div class="part-num">PART 1 — 발달심리 기초</div>
+      <h4>뇌과학으로 아이를 이해하기</h4>
+      <p>5-7세와 2-4세의 뇌 발달 차이를 이해하면서 시작했습니다. 전두엽, 수초화, 시냅스 가지치기 — 이 세 가지 신경학적 개념이 당신의 아이의 행동을 설명합니다. "말이 안 통한다"는 건 반항이 아니라 뇌 구조의 차이였습니다.</p>
     </div>
 
-    <div class="routine-card">
-      <div class="card-header">
-        <div class="card-icon">🌙</div>
-        <h4>저녁 루틴 (30-45분)</h4>
-      </div>
-      <div class="card-body">
-        <p>저녁 루틴은 하루를 마무리하고, 아이의 뇌가 낮의 학습을 통합(consolidation)하는 시간입니다. 특히 취침 전 3시간의 루틴이 수면 질을 결정합니다.</p>
-        <ul class="routine-checklist">
-          <li>귀가 후 15분 자유 놀이 시간 (2번의 뇌 리셋)</li>
-          <li>저녁 식사 중 '오늘의 하이라이트' 공유 (5분)</li>
-          <li>함께 씻기 또는 목욕 놀이 (15-20분)</li>
-          <li>자기 전 책 읽기 또는 느린 이야기 (10-15분)</li>
-          <li>잠들기 전 마지막 포옹 & 감정 확인 (3-5분)</li>
-        </ul>
-        <div class="deep-dive-toggle" onclick="toggleDeepDive(this)">
-          <span class="chevron">▼</span> 더 알아보기
-        </div>
-        <div class="deep-dive-content">
-          <p><strong>저녁 루틴의 신경과학:</strong></p>
-          <p>저녁 식사 후의 느린 활동은 아이의 신경계를 부교감신경 우위로 전환시킵니다. 이것이 수면 문제를 70% 감소시킵니다. 특히 취침 1시간 전부터의 '낮은 자극' 환경이 핵심입니다.</p>
-          <p><strong>중요:</strong> 저녁 루틴 중 스마트폰이나 높은 자극 활동은 금지합니다. 이것이 렘수면(기억 통합)을 방해합니다.</p>
-        </div>
-      </div>
+    <div class="summary-card">
+      <div class="part-num">PART 2 — 애착과 신뢰</div>
+      <h4>안정 애착의 힘과 아빠의 역할</h4>
+      <p>Bowlby와 Ainsworth의 애착 이론. 아버지의 안정적인 존재가 아이의 뇌에 "세상은 안전하다"는 신호를 보냅니다. 당신의 일관된 반응이 아이의 신경계를 규제하고, 그것이 정서 안정성으로 이어집니다.</p>
     </div>
 
-    <div class="routine-card">
-      <div class="card-header">
-        <div class="card-icon">🎯</div>
-        <h4>주말 & 월간 체크</h4>
-      </div>
-      <div class="card-body">
-        <p>주말 루틴과 월간 체크는 미시적 루틴(매일)과 거시적 성장(큰 그림)을 연결합니다.</p>
-        <ul class="routine-checklist">
-          <li>주 1회 '아빠와의 특별한 시간' (30-60분)</li>
-          <li>5-7세와의 1:1 시간은 '학습 또는 도전' 중심</li>
-          <li>2-4세와의 1:1 시간은 '함께함' 또는 '신체 놀이' 중심</li>
-          <li>월 1회 가족 회의 (15분) - 지난달 잘한 것과 이번 달 목표</li>
-          <li>월 1회 부부 회의 (30분) - 육아 전략 재조정 + 감정 나눔</li>
-        </ul>
-        <div class="deep-dive-toggle" onclick="toggleDeepDive(this)">
-          <span class="chevron">▼</span> 더 알아보기
-        </div>
-        <div class="deep-dive-content">
-          <p><strong>1:1 시간의 중요성:</strong></p>
-          <p>연구에 따르면, 주 1회 30분의 일관된 1:1 부모-자식 시간이 아이의 정서 안정도를 가장 크게 높입니다. 이것이 형제 관계도 개선합니다(형/누나가 "나도 아빠시간 있어"라고 느낄 때).</p>
-          <p><strong>월간 가족 회의:</strong> "우리가 뭘 잘했어?", "다음 달에 뭘 함께하고 싶어?"라는 질문이 아이들에게 주체성과 예측 가능성을 줍니다.</p>
-        </div>
-      </div>
+    <div class="summary-card">
+      <div class="part-num">PART 3 — 훈육과 뇌</div>
+      <h4>처벌이 아닌 지도로 뇌를 교육하기</h4>
+      <p>아이가 실수할 때 편도체가 활성화됩니다. 그 순간 소리치는 건 신경계를 더 자극하는 것입니다. 하지만 침착함과 일관성으로 전두엽을 깨우면, 아이는 배우기 시작합니다. 훈육은 뇌를 다시 연결하는 과정입니다.</p>
+    </div>
+
+    <div class="summary-card">
+      <div class="part-num">PART 4 — 아빠 루틴 시스템</div>
+      <h4>지식을 행동으로 옮기는 루틴</h4>
+      <p>20일간의 학습을 당신의 일상에 녹여낼 시간입니다. 아침 루틴, 저녁 루틴, 주말 루틴, 월간 점검 — 이것들이 아이의 뇌를 형성합니다. 루틴이 곧 양육입니다.</p>
     </div>
 
   </div>
 </section>
 
-<!-- ⑤ SAMPLE ROUTINES -->
-<section class="fade-up">
-  <div class="section-label">EXAMPLE</div>
-  <div class="section-title">실제 루틴 예시</div>
-
-  <div class="sample-routine">
-    <h5>📅 평일 하루의 흐름 (아침 7시-저녁 9시)</h5>
-    <div class="routine-item">
-      <span class="routine-time">7:00-7:20</span>
-      <div>
-        <div class="routine-activity"><strong>아침 루틴</strong> - 눈 맞춤 & 스킨십</div>
-        <div class="routine-note">"오늘도 좋은 하루 될 거야. 뭐하고 싶어?"</div>
+<!-- ═══════════ 아빠의 하루 루틴 ═══════════ -->
+<section class="routine-section fade-up">
+  <h2 class="routine-title">🌅 아침 루틴 (30분)</h2>
+  <p style="color:var(--text-dim);margin-bottom:20px;">목표: 아이의 신경계를 "안전 상태"로 활성화하기 (Polyvagal Theory)</p>
+  
+  <div class="routine-card">
+    <h4>1️⃣ 아이가 깨어나는 순간 — 따뜻한 인사</h4>
+    <div class="routine-steps">
+      <div class="routine-step">
+        <div class="routine-step-num">1</div>
+        <div class="routine-step-content">
+          <strong>아이가 깨자마자 가서 눈맞춤하기</strong>
+          <p>"안녕, 우리 아기. 잘 잤어?" — 한 문장, 따뜻한 목소리. 이 순간이 아이의 하루 신경 상태를 결정합니다.</p>
+        </div>
       </div>
-    </div>
-
-    <div class="routine-item">
-      <span class="routine-time">7:20-8:00</span>
-      <div>
-        <div class="routine-activity"><strong>함께 준비</strong> - 아침 식사 & 등원/등교 준비</div>
-        <div class="routine-note">간단한 대화: "오늘 뭐가 재미있을 것 같아?"</div>
+      <div class="routine-step">
+        <div class="routine-step-num">2</div>
+        <div class="routine-step-content">
+          <strong>신체적 접촉 (5분)</strong>
+          <p>포옹, 안아주기, 등 쓸어주기. 신체 접촉은 아이의 코르티솔(스트레스 호르몬)을 낮추고 옥시토신(신뢰 호르몬)을 높입니다.</p>
+        </div>
       </div>
-    </div>
-
-    <div class="routine-item">
-      <span class="routine-time">8:00-8:10</span>
-      <div>
-        <div class="routine-activity"><strong>출발 전 놀이</strong> - 3-5분 신체 놀이 또는 포옹</div>
-        <div class="routine-note">아이의 신경계를 안정시키는 최종 터치</div>
-      </div>
-    </div>
-
-    <div class="routine-item">
-      <span class="routine-time">17:00-17:30</span>
-      <div>
-        <div class="routine-activity"><strong>귀가 후 자유 놀이</strong> - 아이가 주도하는 놀이 (스마트폰 금지)</div>
-        <div class="routine-note">뇌의 신경전달물질 리셋. 아이가 원하는 놀이를 15분</div>
-      </div>
-    </div>
-
-    <div class="routine-item">
-      <span class="routine-time">17:30-18:00</span>
-      <div>
-        <div class="routine-activity"><strong>저녁 식사 준비 & 함께 먹기</strong></div>
-        <div class="routine-note">"오늘 하루 중에 제일 재미있었던 게 뭐야?" → 아이의 이야기 경청</div>
-      </div>
-    </div>
-
-    <div class="routine-item">
-      <span class="routine-time">18:00-18:30</span>
-      <div>
-        <div class="routine-activity"><strong>함께 씻기 또는 목욕 놀이</strong></div>
-        <div class="routine-note">물의 촉감, 거품 게임, 부드러운 노래 (부교감신경 활성화)</div>
-      </div>
-    </div>
-
-    <div class="routine-item">
-      <span class="routine-time">20:00-20:15</span>
-      <div>
-        <div class="routine-activity"><strong>책 읽기 또는 느린 이야기</strong></div>
-        <div class="routine-note">목소리의 톤이 중요. 서두르지 말기. 아이 페이스에 맞추기</div>
-      </div>
-    </div>
-
-    <div class="routine-item">
-      <span class="routine-time">20:15-20:20</span>
-      <div>
-        <div class="routine-activity"><strong>마지막 포옹 & 감정 확인</strong></div>
-        <div class="routine-note">"오늘 하루 어땠어? 무섭거나 슬픈 건 없었어?" → 즉시 해결하지 말고 경청만</div>
+      <div class="routine-step">
+        <div class="routine-step-num">3</div>
+        <div class="routine-step-content">
+          <strong>함께 아침 먹기 (20분)</strong>
+          <p>휴대폰 멀리하고, 아이와 눈맞춤. 5-7세는 "오늘 뭘 하고 싶어?"를 물어주기. 2-4세는 "맛있니?"라며 따뜻한 반응만 해주기.</p>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="sample-routine">
-    <h5>🎯 주말 루틴 (토요일 또는 일요일)</h5>
-    <div class="routine-item">
-      <span class="routine-time">10:00-11:00</span>
-      <div>
-        <div class="routine-activity"><strong>첫째(5-7세)와의 1:1 시간</strong> - "탐험하기" 또는 "배우기" 중심</div>
-        <div class="routine-note">박물관, 도서관, 함께 요리하기, 또는 "왜?"에 대한 깊은 대화</div>
+  <h2 class="routine-title" style="margin-top:40px;">🌙 저녁 루틴 (45분)</h2>
+  <p style="color:var(--text-dim);margin-bottom:20px;">목표: 아이의 신경계를 "수면 모드"로 전환하기 (Circadian Rhythm)</p>
+  
+  <div class="routine-card">
+    <h4>1️⃣ 귀가 후 10분 — 연결 시간</h4>
+    <div class="routine-steps">
+      <div class="routine-step">
+        <div class="routine-step-num">1</div>
+        <div class="routine-step-content">
+          <strong>아이가 당신을 볼 수 있는 장소에서 일과 풀기</strong>
+          <p>아이 옆에 앉아서 "오늘 뭘 했어?"를 듣기. 아이의 말을 완전히 들어주는 것만으로도 아이의 신경계가 안정됩니다.</p>
+        </div>
       </div>
-    </div>
-
-    <div class="routine-item">
-      <span class="routine-time">11:00-12:00</span>
-      <div>
-        <div class="routine-activity"><strong>둘째(2-4세)와의 1:1 시간</strong> - "함께함" 또는 "신체 놀이" 중심</div>
-        <div class="routine-note">공원에서 뛰어놀기, 블록 함께 쌓기, 또는 느린 산책</div>
+      <div class="routine-step">
+        <div class="routine-step-num">2</div>
+        <div class="routine-step-content">
+          <strong>함께 놀이 (15분)</strong>
+          <p>아이가 주도하게 하기. 5-7세와는 규칙 있는 게임(보드게임, 블록), 2-4세와는 감각 놀이(블록 쌓기, 물 뿌리기).</p>
+        </div>
       </div>
-    </div>
-
-    <div class="routine-item">
-      <span class="routine-time">18:00-18:15</span>
-      <div>
-        <div class="routine-activity"><strong>월간 가족 회의</strong> (월 1회, 주간으로는 더 자주)</div>
-        <div class="routine-note">"지난주 뭐가 제일 좋았어?", "다음주에 뭐 할까?", "아빠는 너희가 이런 부분이 좋더라"</div>
+      <div class="routine-step">
+        <div class="routine-step-num">3</div>
+        <div class="routine-step-content">
+          <strong>저녁 식사 (20분)</strong>
+          <p>가족과 함께. 하루를 나누는 시간. 아이가 말할 수 있게 기다려주기.</p>
+        </div>
       </div>
     </div>
   </div>
 
-</section>
-
-<!-- ⑥ JOURNEY SUMMARY -->
-<section class="fade-up">
-  <div class="journey-section">
-    <h2 class="journey-title">📖 21일 여정 회고: 당신이 배운 것들</h2>
-    <div class="journey-grid">
-      <div class="journey-item">
-        <div class="journey-item-title">🧠 PART 1: 뇌 발달의 기초</div>
-        <div class="journey-item-desc">5-7세와 2-4세의 뇌가 다르다는 것을 알았습니다. 같은 행동도 다른 이유로 발생한다는 깨달음이 당신의 인내심을 70% 높였습니다.</div>
+  <div class="routine-card">
+    <h4>2️⃣ 취침 1시간 전 — 차단 및 진정</h4>
+    <div class="routine-steps">
+      <div class="routine-step">
+        <div class="routine-step-num">1</div>
+        <div class="routine-step-content">
+          <strong>스크린 차단하기</strong>
+          <p>아이의 스크린 뿐 아니라 부모의 스크린도 치우기. 블루라이트는 멜라토닌을 억제합니다.</p>
+        </div>
       </div>
-
-      <div class="journey-item">
-        <div class="journey-item-title">💝 PART 2: 형제 관계의 과학</div>
-        <div class="journey-item-desc">자매 갈등이 "나쁜 것"이 아니라 "배우는 과정"이라는 것을 이해했습니다. 공정성과 형평성의 차이, 그리고 한 아이씩 다른 육아 방식이 필요함을 배웠습니다.</div>
+      <div class="routine-step">
+        <div class="routine-step-num">2</div>
+        <div class="routine-step-content">
+          <strong>따뜻한 물로 목욕 (15분)</strong>
+          <p>목욕은 신체 온도를 올렸다 떨어뜨려 수면을 유도합니다. 아이를 따뜻하게 감싸주기.</p>
+        </div>
       </div>
-
-      <div class="journey-item">
-        <div class="journey-item-title">🎮 PART 3: 놀이의 힘</div>
-        <div class="journey-item-desc">놀이가 단순한 "시간 때우기"가 아니라 아이의 뇌 발달, 정서 안정, 그리고 부모-자식 관계의 핵심이라는 것을 깨달았습니다.</div>
+      <div class="routine-step">
+        <div class="routine-step-num">3</div>
+        <div class="routine-step-content">
+          <strong>조용한 독서 또는 명상</strong>
+          <p>아이와 함께 그림책을 읽거나 천천히 말해주기. 목소리의 주파수가 아이의 신경계를 진정시킵니다.</p>
+        </div>
       </div>
+    </div>
+  </div>
 
-      <div class="journey-item">
-        <div class="journey-item-title">💬 PART 4: 대화의 신경과학</div>
-        <div class="journey-item-desc">Gottman의 감정 코칭으로 아이의 정서지능을 키우고, 당신과 아내의 부부 관계도 깊어지는 경험을 했습니다.</div>
+  <div class="routine-card">
+    <h4>3️⃣ 잠들기 전 — 감정 연결</h4>
+    <div class="routine-steps">
+      <div class="routine-step">
+        <div class="routine-step-num">1</div>
+        <div class="routine-step-content">
+          <strong>오늘을 돌아보는 대화</strong>
+          <p>"오늘 뭐가 제일 좋았어?" "혹시 화난 거 있어?" — 감정을 정리하게 하기.</p>
+        </div>
       </div>
-
-      <div class="journey-item">
-        <div class="journey-item-title">🎯 최중요 깨달음</div>
-        <div class="journey-item-desc">"완벽한 아빠"가 아니라 "일관된 아빠"가 되는 것이 가장 중요합니다. 매일 작은 루틴이 아이의 뇌를 바꿉니다.</div>
-      </div>
-
-      <div class="journey-item">
-        <div class="journey-item-title">🚀 앞으로의 도전</div>
-        <div class="journey-item-desc">이제 배운 것을 "습관"으로 만드는 단계입니다. 처음 6개월은 어렵지만, 6개월 후 당신과 아이는 완전히 달라집니다.</div>
+      <div class="routine-step">
+        <div class="routine-step-num">2</div>
+        <div class="routine-step-content">
+          <strong>신뢰의 말 나누기</strong>
+          <p>"내일 또 만나, 사랑해" — 안정적인 언어로 내일의 재결합을 약속하기.</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ⑦ CONTINUATION TIPS -->
-<section class="fade-up">
-  <div class="continuation-section">
-    <h3 class="continuation-title">🌱 21일 이후: 지속 가능성을 위한 팁</h3>
-    <div class="tip-grid">
-      <div class="tip-box">
-        <h5>매주 1회: 자기점검 (10분)</h5>
-        <p>"이번 주 아침 루틴을 몇 번 제대로 했나?", "저녁에 아이와 얼마나 진정한 시간을 보냈나?", "화낼 뻔한 순간을 얼마나 잘 넘겼나?"</p>
+<!-- ═══════════ 주말 & 월간 루틴 ═══════════ -->
+<section class="routine-section fade-up">
+  <h2 class="routine-title">📅 주말 루틴 (2시간)</h2>
+  <p style="color:var(--text-dim);margin-bottom:20px;">목표: 평일과는 다른 깊이 있는 연결</p>
+  
+  <div class="routine-card">
+    <h4>토요일 아침 — "아빠와 나" 시간</h4>
+    <div class="routine-steps">
+      <div class="routine-step">
+        <div class="routine-step-num">1</div>
+        <div class="routine-step-content">
+          <strong>아이가 고른 활동 함께하기</strong>
+          <p>공원, 박물관, 집 근처 산책 — 아이가 주도. 이 시간은 아이가 "나는 아빠에게 중요하다"고 느끼게 합니다.</p>
+        </div>
       </div>
+    </div>
+  </div>
 
-      <div class="tip-box">
-        <h5>매달 1회: 배우자와 동기화 (30분)</h5>
-        <p>배우자와 함께 "이 달에 아이들의 변화를 봤어?", "우리가 뭘 더 잘할 수 있을까?", "이 달의 승리는 뭐였어?"를 나눕니다.</p>
+  <div class="routine-card">
+    <h4>월간 1회 — "점검 회의"</h4>
+    <div class="routine-steps">
+      <div class="routine-step">
+        <div class="routine-step-num">1</div>
+        <div class="routine-step-content">
+          <strong>아빠-엄마 함께 15분 체크인</strong>
+          <p>"이번 달 아이의 변화가 뭐 있었어?" "우리 대화법이 잘 통하고 있어?" — 일관성 유지하기.</p>
+        </div>
       </div>
-
-      <div class="tip-box">
-        <h5>3개월마다: 아이의 성장 기록 (20분)</h5>
-        <p>사진, 비디오, 또는 글로 아이의 변화를 기록합니다. "3개월 전 아이가 이렇게 화내고 있었어?"라는 깨달음이 당신의 노력을 증명합니다.</p>
-      </div>
-
-      <div class="tip-box">
-        <h5>실패했을 때의 원칙</h5>
-        <p>"하루, 사흘, 일주일을 놓쳤다"고 실패하지 말기. 다음 날 아침 다시 시작합니다. 뇌 발달은 일관성의 누적이지, 완벽함이 아닙니다.</p>
-      </div>
-
-      <div class="tip-box">
-        <h5>6개월 이후의 변화 예상</h5>
-        <p>6개월 후: 아이의 자제력 +30%, 형제 갈등 -40%. 1년 후: 아이의 정서지능과 당신의 육아 스트레스가 획기적으로 개선됩니다.</p>
-      </div>
-
-      <div class="tip-box">
-        <h5>3년 뒤 로드맵</h5>
-        <p>3년 뒤, 당신은 이 21일 동안 배운 원칙들을 자동으로 적용하고 있을 것입니다. 그때는 새로운 도전(사춘기 준비, 학교 적응 등)을 배울 시간입니다.</p>
+      <div class="routine-step">
+        <div class="routine-step-num">2</div>
+        <div class="routine-step-content">
+          <strong>아이와 함께 "이번 달 되돌아보기"</strong>
+          <p>5-7세: "이번 달에 뭐가 제일 기억나?" 2-4세: "요즘 뭐를 가장 좋아해?"</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ⑧ FINAL MESSAGE -->
-<section class="fade-up final-message">
-  <h2>🎓 축하합니다!</h2>
-  <p>21일의 긴 여정을 함께해주셨습니다.</p>
-  <p>당신이 이 과정을 시작했다는 것 자체가 당신의 아이들에게는 이미 가장 큰 선물입니다. 왜냐하면, 당신이 "더 나은 아빠가 되고 싶다"고 생각했기 때문입니다.</p>
-  <p style="margin-top:1.5rem; font-size:1rem;">앞으로의 여정은 이제 시작입니다.</p>
-  <p style="margin-top:1.5rem;">매일 아침, 그리고 매일 저녁, 당신이 아이들과 나누는 작은 루틴들이 모여서, 10년 후 당신의 아이들은:</p>
-  <ul style="list-style: none; padding: 1rem 0; color: var(--text-dim); font-size:0.95rem; text-align:left; max-width:600px; margin: 1rem auto;">
-    <li style="padding:0.5rem 0; border-bottom: 1px solid rgba(74,191,138,0.1);">✓ 감정을 잘 이해하고 표현할 수 있고</li>
-    <li style="padding:0.5rem 0; border-bottom: 1px solid rgba(74,191,138,0.1);">✓ 형제(또는 친구)와 갈등을 건강하게 해결할 수 있고</li>
-    <li style="padding:0.5rem 0; border-bottom: 1px solid rgba(74,191,138,0.1);">✓ 어려운 순간에도 아빠의 안정감을 기억하며</li>
-    <li style="padding:0.5rem 0; border-bottom: 1px solid rgba(74,191,138,0.1);">✓ 자신의 뇌와 감정을 이해하는 어른으로 자라있을 것입니다.</li>
-  </ul>
-  <p style="margin-top:1.5rem; font-size:1rem;">이것이 당신이 21일간 배운 모든 것의 가치입니다.</p>
-  <div class="signature">— 과학적 아빠 육아 스터디 전체 팀 일동</div>
+<!-- ═══════════ SVG 완전한 루틴 시스템 시각화 ═══════════ -->
+<section class="diagram-section fade-up">
+  <div class="section-label">COMPLETE SYSTEM</div>
+  <div class="section-title">아빠 루틴 시스템 — 전체 맥락</div>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg" font-family="'Noto Sans KR', sans-serif">
+      <defs>
+        <linearGradient id="gGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#4ABF8A" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#2A7A56" stop-opacity="0.9"/>
+        </linearGradient>
+        <linearGradient id="gGold" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#C9A84C" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#8A7333" stop-opacity="0.9"/>
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <rect width="800" height="520" rx="16" fill="#12151B"/>
+
+      <!-- 중심: 아이 -->
+      <circle cx="400" cy="260" r="50" fill="url(#gGreen)" opacity="0.3" filter="url(#glow)"/>
+      <circle cx="400" cy="260" r="40" fill="url(#gGreen)" opacity="0.5"/>
+      <text x="400" y="270" text-anchor="middle" fill="#fff" font-size="28" font-weight="700">👶👧</text>
+      <text x="400" y="305" text-anchor="middle" fill="#E8E6E1" font-size="10" font-weight="700">아이의 뇌</text>
+
+      <!-- 아침 루틴 (상단 좌) -->
+      <rect x="30" y="30" width="140" height="100" rx="8" fill="rgba(74,191,138,0.15)" border="1px solid rgba(74,191,138,0.3)"/>
+      <circle cx="100" cy="60" r="18" fill="url(#gGreen)" opacity="0.6"/>
+      <text x="100" y="68" text-anchor="middle" fill="#fff" font-size="16">🌅</text>
+      <text x="100" y="95" text-anchor="middle" fill="#E8E6E1" font-size="10" font-weight="700">아침 루틴</text>
+      <text x="100" y="108" text-anchor="middle" fill="#9A9890" font-size="8">따뜻한 시작</text>
+      <path d="M170,80 L330,240" fill="none" stroke="#4ABF8A" stroke-width="2" stroke-dasharray="4,3" opacity="0.5"/>
+
+      <!-- 저녁 루틴 (상단 우) -->
+      <rect x="630" y="30" width="140" height="100" rx="8" fill="rgba(74,191,138,0.15)" border="1px solid rgba(74,191,138,0.3)"/>
+      <circle cx="700" cy="60" r="18" fill="url(#gGreen)" opacity="0.6"/>
+      <text x="700" y="68" text-anchor="middle" fill="#fff" font-size="16">🌙</text>
+      <text x="700" y="95" text-anchor="middle" fill="#E8E6E1" font-size="10" font-weight="700">저녁 루틴</text>
+      <text x="700" y="108" text-anchor="middle" fill="#9A9890" font-size="8">진정한 종료</text>
+      <path d="M630,80 L470,240" fill="none" stroke="#4ABF8A" stroke-width="2" stroke-dasharray="4,3" opacity="0.5"/>
+
+      <!-- 주말 활동 (좌하) -->
+      <rect x="30" y="390" width="140" height="100" rx="8" fill="rgba(201,168,76,0.15)" border="1px solid rgba(201,168,76,0.3)"/>
+      <circle cx="100" cy="420" r="18" fill="url(#gGold)" opacity="0.6"/>
+      <text x="100" y="428" text-anchor="middle" fill="#0A0C10" font-size="16">🎯</text>
+      <text x="100" y="455" text-anchor="middle" fill="#E8E6E1" font-size="10" font-weight="700">주말 루틴</text>
+      <text x="100" y="468" text-anchor="middle" fill="#9A9890" font-size="8">깊은 연결</text>
+      <path d="M170,420 L330,280" fill="none" stroke="#C9A84C" stroke-width="2" stroke-dasharray="4,3" opacity="0.5"/>
+
+      <!-- 월간 점검 (우하) -->
+      <rect x="630" y="390" width="140" height="100" rx="8" fill="rgba(201,168,76,0.15)" border="1px solid rgba(201,168,76,0.3)"/>
+      <circle cx="700" cy="420" r="18" fill="url(#gGold)" opacity="0.6"/>
+      <text x="700" y="428" text-anchor="middle" fill="#0A0C10" font-size="16">📋</text>
+      <text x="700" y="455" text-anchor="middle" fill="#E8E6E1" font-size="10" font-weight="700">월간 점검</text>
+      <text x="700" y="468" text-anchor="middle" fill="#9A9890" font-size="8">일관성 유지</text>
+      <path d="M630,420 L470,280" fill="none" stroke="#C9A84C" stroke-width="2" stroke-dasharray="4,3" opacity="0.5"/>
+
+      <!-- 중앙 텍스트 -->
+      <text x="400" y="330" text-anchor="middle" fill="#C9A84C" font-size="9" font-weight="700">당신의 루틴 = 아이의 뇌</text>
+      <text x="400" y="343" text-anchor="middle" fill="#9A9890" font-size="8">일관된 반복이 신경회로를 형성합니다</text>
+    </svg>
+  </div>
+  <div class="diagram-caption">모든 루틴이 아이의 뇌 발달로 수렴합니다</div>
 </section>
 
-<!-- ⑨ RESOURCE SUMMARY -->
+<!-- ═══════════ 지속성 로드맵 ═══════════ -->
 <section class="fade-up">
-  <div class="section-label">TOOLKIT</div>
-  <div class="section-title">당신이 배운 21가지 도구</div>
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
-    <div style="background: var(--bg-card); border: 1px solid rgba(74,191,138,0.15); border-radius: var(--radius-sm); padding: 1.5rem; border-left: 3px solid var(--green);">
-      <h5 style="color: var(--green); margin-bottom: 0.5rem; font-weight: 600;">DAY 1-5</h5>
-      <p style="color: var(--text-dim); font-size: 0.9rem;">뇌 발달의 기초와 애착의 신경과학</p>
+  <div class="section-label">SUSTAINABILITY</div>
+  <div class="section-title">21일 이후 — 지속성 로드맵</div>
+
+  <div class="roadmap-card">
+    <div class="roadmap-period">1개월 (Day 22-31)</div>
+    <h5>습관 공고화</h5>
+    <ul class="roadmap-tasks">
+      <li>아침/저녁 루틴을 의식 없이 자동 수행하기</li>
+      <li>아이의 행동 변화 관찰하기 (감정 표현 증가, 분노 반응 감소)</li>
+      <li>배운 감정 코칭과 훈육 기술을 새로운 상황에 적용해보기</li>
+      <li>아내와 주 1회 "양육 회의" 진행하기</li>
+    </ul>
+  </div>
+
+  <div class="roadmap-card">
+    <div class="roadmap-period">3개월 (Month 1-3)</div>
+    <h5>신경적응</h5>
+    <ul class="roadmap-tasks">
+      <li>아이의 뇌 구조 변화가 눈에 보이기 시작 (편도체 반응 진정)</li>
+      <li>아이가 스스로 감정을 말로 표현하기 시작</li>
+      <li>선택권 제공에 대한 더 나은 반응</li>
+      <li>또래 관계 개선 관찰</li>
+      <li>새로운 도전에 대한 회복력 증가</li>
+    </ul>
+  </div>
+
+  <div class="roadmap-card">
+    <div class="roadmap-period">6개월 (Month 4-6)</div>
+    <h5>내재화</h5>
+    <ul class="roadmap-tasks">
+      <li>루틴이 더 이상 "해야 할 일"이 아니라 "자연스러운 일" 되기</li>
+      <li>학교 선생님의 긍정적 피드백 (사회성, 감정 조절 능력)</li>
+      <li>형제 간 갈등이 자연스럽게 해결되는 모습 관찰</li>
+      <li>아이가 다른 아이들에게 감정 코칭 기술 사용하는 모습 보기</li>
+    </ul>
+  </div>
+
+  <div class="roadmap-card">
+    <div class="roadmap-period">1년 (Month 7-12)</div>
+    <h5>장기 뇌 발달</h5>
+    <ul class="roadmap-tasks">
+      <li>아이의 자존감과 회복력이 눈에 띄게 향상됨</li>
+      <li>학업 성취 동반 증가 (감정 조절이 학습의 기초)</li>
+      <li>또래 관계에서의 리더십 역할 수행</li>
+      <li>아버지와의 관계가 평생의 신뢰 자산으로 형성됨</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════ 축하 메시지 ═══════════ -->
+<section class="celebration-section fade-up">
+  <h2>🎓 축하합니다</h2>
+  <p>당신은 단순히 21일의 강의를 완료하지 않았습니다. 당신은 아버지로서의 신경 기초를 다시 정렬했습니다. 당신은 과학을 배웠고, 그것을 사랑으로 변환하는 방법을 배웠습니다.</p>
+  
+  <div class="graduation-quote">
+    "당신이 아이에게 줄 수 있는 가장 큰 선물은 당신의 일관된 존재입니다.<br>
+    당신의 루틴이 당신의 약속이고, 당신의 약속이 아이의 안정입니다."
+  </div>
+
+  <p>앞으로 아이가 어려운 상황에 부딪혔을 때, 당신은 알 것입니다:<br>
+  이건 반항이 아니라 뇌의 발달 단계입니다. 이건 실패가 아니라 학습의 신호입니다. 그리고 당신은 차분함으로 응답할 것입니다.</p>
+
+  <p style="margin-top:24px;font-style:italic;color:var(--green);">당신의 아버지 여정은 지금 시작됩니다.</p>
+</section>
+
+<!-- ═══════════ 최종 퀴즈 ═══════════ -->
+<section class="quiz-section fade-up">
+  <div class="section-label">FINAL QUIZ</div>
+  <div class="section-title">최종 점검 — 지난 21일을 기억하셨나요?</div>
+
+  <!-- 퀴즈 1 -->
+  <div class="quiz-card" id="quiz1">
+    <div class="q-num">QUESTION 01</div>
+    <div class="question">21일 동안 배운 4가지 PART의 순서는?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkAnswer(this,'quiz1',true)">① 발달심리 기초 → 애착과 신뢰 → 훈육과 뇌 → 아빠 루틴 시스템</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'quiz1',false)">② 애착과 신뢰 → 훈육과 뇌 → 발달심리 기초 → 아빠 루틴 시스템</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'quiz1',false)">③ 아빠 루틴 시스템 → 발달심리 기초 → 훈육과 뇌 → 애착과 신뢰</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'quiz1',false)">④ 훈육과 뇌 → 발달심리 기초 → 애착과 신뢰 → 아빠 루틴 시스템</div>
     </div>
-    <div style="background: var(--bg-card); border: 1px solid rgba(74,191,138,0.15); border-radius: var(--radius-sm); padding: 1.5rem; border-left: 3px solid var(--green);">
-      <h5 style="color: var(--green); margin-bottom: 0.5rem; font-weight: 600;">DAY 6-10</h5>
-      <p style="color: var(--text-dim); font-size: 0.9rem;">형제 관계의 과학과 자매 갈등 관리</p>
+    <div class="quiz-explanation" id="quiz1-exp">
+      <strong>정답: ①</strong> — 과학적 아빠 육아는 기초(뇌과학)부터 관계(애착), 실행(훈육), 그리고 마지막으로 일상화(루틴)로 진행됩니다. 이 순서가 중요한 이유는 이해가 행동을 뒷받침하기 때문입니다.
     </div>
-    <div style="background: var(--bg-card); border: 1px solid rgba(74,191,138,0.15); border-radius: var(--radius-sm); padding: 1.5rem; border-left: 3px solid var(--green);">
-      <h5 style="color: var(--green); margin-bottom: 0.5rem; font-weight: 600;">DAY 11-17</h5>
-      <p style="color: var(--text-dim); font-size: 0.9rem;">아빠의 일상 루틴과 놀이 설계</p>
+  </div>
+
+  <!-- 퀴즈 2 -->
+  <div class="quiz-card" id="quiz2">
+    <div class="q-num">QUESTION 02</div>
+    <div class="question">아이의 루틴이 아이의 뇌를 형성한다는 것은 신경학적으로 무엇을 의미하는가?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkAnswer(this,'quiz2',false)">① 좋은 루틴이면 IQ가 높아진다</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'quiz2',true)">② 반복된 경험이 시냅스를 강화하고, 일관된 상호작용이 신경 회로를 형성한다</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'quiz2',false)">③ 루틴이 많을수록 아이가 똑똑해진다</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'quiz2',false)">④ 루틴은 아이의 행동만 조절하고 뇌와는 무관하다</div>
     </div>
-    <div style="background: var(--bg-card); border: 1px solid rgba(201,168,76,0.15); border-radius: var(--radius-sm); padding: 1.5rem; border-left: 3px solid var(--gold);">
-      <h5 style="color: var(--gold); margin-bottom: 0.5rem; font-weight: 600;">DAY 18-21</h5>
-      <p style="color: var(--text-dim); font-size: 0.9rem;">부부 관계, 감정 코칭, 루틴 시스템</p>
+    <div class="quiz-explanation" id="quiz2-exp">
+      <strong>정답: ②</strong> — 신경가소성(neuroplasticity)의 핵심입니다. "Use it or lose it" — 반복 사용되는 신경 회로는 강화되고, 사용되지 않는 회로는 약화됩니다. 당신의 일관된 루틴이 아이의 편도체-전두엽 회로를 강화합니다.
+    </div>
+  </div>
+
+  <!-- 최종 점검 트래커 -->
+  <div class="tracker">
+    <h4>🏁 21일 완주 기념</h4>
+    <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:16px;">축하합니다! 당신은 모든 21일을 완료했습니다. 이제 시작입니다.</p>
+    <div class="tracker-grid">
+      <div class="tracker-day completed">
+        <span class="day-label">D01</span>
+        <span class="day-desc">뇌 발달</span>
+      </div>
+      <div class="tracker-day completed">
+        <span class="day-label">D02-D07</span>
+        <span class="day-desc">애착 & 신뢰</span>
+      </div>
+      <div class="tracker-day completed">
+        <span class="day-label">D08-D19</span>
+        <span class="day-desc">훈육 & 기술</span>
+      </div>
+      <div class="tracker-day completed">
+        <span class="day-label">D20</span>
+        <span class="day-desc">감정 코칭</span>
+      </div>
+      <div class="tracker-day today completed">
+        <span class="day-label">D21</span>
+        <span class="day-desc">🎓 졸업!</span>
+      </div>
     </div>
   </div>
 </section>
@@ -556,29 +1009,18 @@ a:hover { text-decoration: underline; }
 
 <!-- FOOTER -->
 <footer class="footer">
-  <p>과학적 아빠 육아 스터디 · Day 21 of 21 · PART 4: 대화법 & 관계 (최종)</p>
-  <div class="celebration">🎉 축하합니다! 21일 과정 완수! 🎉</div>
-  <p style="margin-top:1rem;">이제부터는 매일의 작은 루틴이 당신의 최고의 학습입니다.</p>
-  <p style="margin-top:0.5rem; font-size:0.85rem;">다음 과정: 학령기 자녀를 위한 고급 과정 (6개월 후 오픈 예정)</p>
+  <p>과학적 아빠 육아 스터디 · Day 21 of 21 · PART 4: 아빠 루틴 시스템</p>
+  <p style="margin-top:6px;">모든 여정의 끝이 새로운 시작입니다. 당신의 아버지로서의 지혜는 지금부터입니다. 화이팅! 💚</p>
 </footer>
 
-<!-- TIMER MODAL -->
-<div id="timerModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:200; flex-direction:column; align-items:center; justify-content:center;">
-  <div style="background:var(--bg-card); padding:3rem; border-radius:16px; border:2px solid var(--gold); text-align:center;">
-    <h2 style="font-family:var(--serif); color:var(--gold); margin-bottom:1.5rem;">포모도로 타이머</h2>
-    <div style="font-family:var(--mono); font-size:3rem; color:var(--gold); font-weight:700; margin:2rem 0;" id="timerDisplay">25:00</div>
-    <div style="display:flex; gap:1rem; justify-content:center;">
-      <button onclick="startTimer()" style="padding:12px 24px; background:var(--gold); color:var(--bg); border:none; border-radius:8px; font-weight:700; cursor:pointer;">시작</button>
-      <button onclick="pauseTimer()" style="padding:12px 24px; background:var(--green); color:var(--bg); border:none; border-radius:8px; font-weight:700; cursor:pointer;">일시정지</button>
-      <button onclick="resetTimer()" style="padding:12px 24px; background:var(--text-dim); color:var(--bg); border:none; border-radius:8px; font-weight:700; cursor:pointer;">초기화</button>
-    </div>
-    <button onclick="closeTimer()" style="margin-top:1.5rem; padding:10px 20px; background:var(--bg-card-alt); color:var(--text); border:1px solid var(--text-dim); border-radius:6px; cursor:pointer;">닫기</button>
-  </div>
-</div>
-
+<!-- ═══════════ JAVASCRIPT ═══════════ -->
 <script>
-// Intersection Observer
-const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+// === Intersection Observer for fadeUp animations ===
+const observerOptions = {
+  threshold: 0.1,
+  rootMargin: '0px 0px -50px 0px'
+};
+
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
@@ -587,39 +1029,30 @@ const observer = new IntersectionObserver((entries) => {
     }
   });
 }, observerOptions);
-document.querySelectorAll('.fade-up').forEach((el) => { observer.observe(el); });
 
-// Timer
-let timerInterval = null;
-let timeLeft = 25 * 60;
-function openTimer() { document.getElementById('timerModal').style.display = 'flex'; }
-function closeTimer() { document.getElementById('timerModal').style.display = 'none'; }
-function updateDisplay() {
-  const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-  const s = (timeLeft % 60).toString().padStart(2, '0');
-  document.getElementById('timerDisplay').textContent = m + ':' + s;
-}
-function startTimer() {
-  if (timerInterval) return;
-  timerInterval = setInterval(() => {
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-      document.getElementById('timerDisplay').textContent = "✅ 완료!";
-      return;
-    }
-    timeLeft--;
-    updateDisplay();
-  }, 1000);
-}
-function pauseTimer() { clearInterval(timerInterval); timerInterval = null; }
-function resetTimer() { clearInterval(timerInterval); timerInterval = null; timeLeft = 25 * 60; updateDisplay(); }
+document.querySelectorAll('.fade-up').forEach((el) => {
+  observer.observe(el);
+});
 
-// Deep Dive Toggle
+// === Deep Dive Collapsible ===
 function toggleDeepDive(el) {
   el.classList.toggle('open');
   const content = el.nextElementSibling;
   content.classList.toggle('open');
+}
+
+// === 퀴즈 ===
+function checkAnswer(el, quizId, isCorrect) {
+  const card = document.getElementById(quizId);
+  if (card.dataset.answered) return;
+  card.dataset.answered = 'true';
+
+  if (isCorrect) {
+    el.classList.add('correct');
+  } else {
+    el.classList.add('wrong');
+  }
+  document.getElementById(quizId + '-exp').classList.add('show');
 }
 </script>
 

@@ -549,6 +549,15 @@ section { padding: 3rem 0; }
   .voice-selector { flex-direction: column; align-items: stretch; }
   .voice-selector button { width: 100%; }
 }
+
+/* 인라인 재생 버튼 */
+.shadow-btn { display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;border:1px solid rgba(191,106,74,0.3);background:rgba(191,106,74,0.08);cursor:pointer;margin-left:6px;vertical-align:middle;transition:all 0.2s;flex-shrink:0; }
+.shadow-btn:hover { background:rgba(191,106,74,0.3);border-color:#BF6A4A;transform:scale(1.1); }
+.shadow-btn.playing { background:#BF6A4A;border-color:#BF6A4A;animation:pulse-glow 1.2s infinite; }
+.shadow-btn svg { width:14px;height:14px;fill:#BF6A4A; }
+.shadow-btn.playing svg { fill:#fff; }
+@keyframes pulse-glow { 0%,100%{box-shadow:0 0 0 0 rgba(191,106,74,0.4);} 50%{box-shadow:0 0 12px 4px rgba(191,106,74,0.25);} }
+
 </style>
 </head>
 <body>
@@ -1145,6 +1154,13 @@ section { padding: 3rem 0; }
   </div>
 </section>
 
+
+    <!-- 26일 학습 트래커 -->
+    <section class="card" id="trackerSection">
+      <h2>📊 26일 학습 트래커</h2>
+      <div id="trackerGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:6px;margin-top:1rem;"></div>
+    </section>
+
 </main>
 
 <script>
@@ -1197,6 +1213,25 @@ section { padding: 3rem 0; }
     }, { once: true });
   }
   // ─── End Voice Engine ───
+
+  // ─── speakFr: 프랑스어 TTS 재생 ───
+  function speakFr(text, btn, rate) {
+    if (!text) return;
+    window.speechSynthesis.cancel();
+    var clean = text.replace(/[\[\]\(\)]/g, '').trim();
+    var utter = new SpeechSynthesisUtterance(clean);
+    utter.lang = 'fr-FR';
+    utter.rate = rate || parseFloat(document.getElementById('shadowSpeed')?.value || 0.85);
+    var voice = getFrenchVoice();
+    if (voice) utter.voice = voice;
+    if (btn) {
+      btn.classList.add('playing');
+      utter.onend = function() { btn.classList.remove('playing'); };
+      utter.onerror = function() { btn.classList.remove('playing'); };
+    }
+    window.speechSynthesis.speak(utter);
+  }
+  window.speakFr = speakFr;
 
 let timerInterval = null;
 let timeLeft = 25 * 60;
@@ -1265,7 +1300,37 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
   // ─── Shadowing Practice ───
-  function buildShadowingSection() {
+  
+  // ─── 인라인 재생 버튼 (각 프랑스어 문장 옆 ▶) ───
+  var SPEAKER_SVG = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:var(--terracotta,#BF6A4A);"><polygon points="6,3 20,12 6,21"/></svg>';
+
+  function addInlinePlayButtons() {
+    document.querySelectorAll('.fr-word, .hero-sentence .fr, .fr-line, td:first-child, .french, .fr').forEach(function(el) {
+      if (el.querySelector('.shadow-btn')) return;
+      if (el.closest('thead')) return;
+      var text = el.textContent.trim();
+      if (!text || text.length < 2) return;
+      if (!/[a-zA-Z\u00C0-\u024F]/.test(text)) return;
+      var btn = document.createElement('span');
+      btn.className = 'shadow-btn';
+      btn.innerHTML = SPEAKER_SVG;
+      btn.title = '클릭하여 발음 듣기';
+      btn.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;border:1px solid rgba(191,106,74,0.3);background:rgba(191,106,74,0.08);cursor:pointer;margin-left:6px;vertical-align:middle;transition:all 0.2s;flex-shrink:0;';
+      btn.addEventListener('mouseenter', function() { this.style.background = 'rgba(191,106,74,0.3)'; this.style.borderColor = '#BF6A4A'; this.style.transform = 'scale(1.1)'; });
+      btn.addEventListener('mouseleave', function() { this.style.background = 'rgba(191,106,74,0.08)'; this.style.borderColor = 'rgba(191,106,74,0.3)'; this.style.transform = 'scale(1)'; });
+      btn.addEventListener('click', function(e) { e.stopPropagation(); speakFr(text, this); });
+      el.style.display = el.style.display || '';
+      if (window.getComputedStyle(el).display === 'table-cell') {
+        el.style.position = 'relative';
+        btn.style.position = 'relative';
+        btn.style.float = 'right';
+        btn.style.marginLeft = '4px';
+      }
+      el.appendChild(btn);
+    });
+  }
+
+function buildShadowingSection() {
     if (document.getElementById('shadowingPractice')) return;
     var phrases = [];
     document.querySelectorAll('.fr-word, td:first-child').forEach(function(el) {
@@ -1346,7 +1411,32 @@ document.addEventListener('DOMContentLoaded', function() {
   // ─── End Shadowing ───
 
   // Auto-init shadowing
-  waitForVoices(function() { initFrenchVoice(); buildShadowingSection(); });
+  waitForVoices(function() { initFrenchVoice(); addInlinePlayButtons(); buildShadowingSection(); });
+
+  // ─── 26-Day Tracker ───
+  (function initTracker() {
+    var grid = document.getElementById('trackerGrid');
+    if (!grid) return;
+    var key = 'fr-eng-tracker';
+    var data = {};
+    try { data = JSON.parse(localStorage.getItem(key)) || {}; } catch(e) { data = {}; }
+    var today = parseInt(document.title.match(/Day\s*(\d+)/i)?.[1] || '0');
+    if (today > 0) { data['day' + today] = { completed: true, date: new Date().toISOString().slice(0,10) }; }
+    try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {}
+    for (var d = 1; d <= 26; d++) {
+      var cell = document.createElement('div');
+      var done = data['day' + d] && data['day' + d].completed;
+      cell.style.cssText = 'width:38px;height:38px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;cursor:default;' +
+        (d === today ? 'background:var(--terracotta,#BF6A4A);color:#fff;box-shadow:0 0 8px rgba(191,106,74,0.5);' :
+         done ? 'background:var(--gold,#C9A84C);color:#000;' :
+         'background:var(--bg,#0A0C10);color:var(--text-dim,#666);border:1px solid #333;');
+      cell.textContent = d;
+      cell.title = 'Day ' + d + (done ? ' ✅' : '') + (d === today ? ' (오늘)' : '');
+      grid.appendChild(cell);
+    }
+  })();
+  // ─── End Tracker ───
+
 </script>
 </body>
 </html>

@@ -778,12 +778,67 @@ footer {
 
 </div>
 
+
+    <!-- 26일 학습 트래커 -->
+    <section class="card" id="trackerSection">
+      <h2>📊 26일 학습 트래커</h2>
+      <div id="trackerGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:6px;margin-top:1rem;"></div>
+    </section>
+
 <footer>
   <p>🇫🇷 Renault Korea Engineering | Day 16 — Passé Composé | 복합과거</p>
   <p style="margin-top: 0.5rem; font-size: 0.75rem;">Last updated: 2026-03-08</p>
 </footer>
 
 <script>
+
+  // ─── French Voice Engine (Full) ───
+  var selectedFrVoice = null;
+  var PREFERRED_VOICES = [
+    'Thomas', 'Amelie', 'Amélie', 'Audrey', 'Aurélie', 'Marie',
+    'Google français', 'Google French',
+    'Microsoft Paul', 'Microsoft Hortense', 'Microsoft Julie',
+    'Virginie', 'Siri', 'Chloe', 'Chloé', 'Léa', 'Nicolas'
+  ];
+  function getAllFrenchVoices() {
+    return window.speechSynthesis.getVoices().filter(function(v) {
+      return v.lang === 'fr-FR' || v.lang === 'fr_FR' || v.lang === 'fr';
+    });
+  }
+  function initFrenchVoice() {
+    var frVoices = getAllFrenchVoices();
+    if (frVoices.length === 0) return;
+    for (var i = 0; i < PREFERRED_VOICES.length; i++) {
+      var match = frVoices.find(function(v) {
+        return v.name.indexOf(PREFERRED_VOICES[i]) !== -1;
+      });
+      if (match) { selectedFrVoice = match; break; }
+    }
+    if (!selectedFrVoice) selectedFrVoice = frVoices[0];
+  }
+  function getFrenchVoice() {
+    if (!selectedFrVoice) initFrenchVoice();
+    return selectedFrVoice;
+  }
+  function waitForVoices(cb) {
+    var voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) { cb(); return; }
+    var tries = 0;
+    var interval = setInterval(function() {
+      voices = window.speechSynthesis.getVoices();
+      tries++;
+      if (voices.length > 0 || tries > 20) { clearInterval(interval); cb(); }
+    }, 100);
+    if (window.speechSynthesis.addEventListener) {
+      window.speechSynthesis.addEventListener('voiceschanged', function() {
+        clearInterval(interval); cb();
+      }, { once: true });
+    }
+  }
+  waitForVoices(function() { initFrenchVoice(); addInlinePlayButtons(); });
+  // ─── End Voice Engine ───
+
+
 /* ═══════════════════ TEXT-TO-SPEECH ENGINE ═══════════════════ */
 var selectedFrVoice = null;
 function getAllFrenchVoices() {
@@ -839,6 +894,36 @@ function collectPhrases() {
   });
   return phrases;
 }
+
+
+  // ─── 인라인 재생 버튼 (각 프랑스어 문장 옆 ▶) ───
+  var SPEAKER_SVG = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:var(--terracotta,#BF6A4A);"><polygon points="6,3 20,12 6,21"/></svg>';
+
+  function addInlinePlayButtons() {
+    document.querySelectorAll('.fr-word, .hero-sentence .fr, .fr-line, td:first-child, .french, .fr').forEach(function(el) {
+      if (el.querySelector('.shadow-btn')) return;
+      if (el.closest('thead')) return;
+      var text = el.textContent.trim();
+      if (!text || text.length < 2) return;
+      if (!/[a-zA-Z\u00C0-\u024F]/.test(text)) return;
+      var btn = document.createElement('span');
+      btn.className = 'shadow-btn';
+      btn.innerHTML = SPEAKER_SVG;
+      btn.title = '클릭하여 발음 듣기';
+      btn.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;border:1px solid rgba(191,106,74,0.3);background:rgba(191,106,74,0.08);cursor:pointer;margin-left:6px;vertical-align:middle;transition:all 0.2s;flex-shrink:0;';
+      btn.addEventListener('mouseenter', function() { this.style.background = 'rgba(191,106,74,0.3)'; this.style.borderColor = '#BF6A4A'; this.style.transform = 'scale(1.1)'; });
+      btn.addEventListener('mouseleave', function() { this.style.background = 'rgba(191,106,74,0.08)'; this.style.borderColor = 'rgba(191,106,74,0.3)'; this.style.transform = 'scale(1)'; });
+      btn.addEventListener('click', function(e) { e.stopPropagation(); speakFr(text, this); });
+      el.style.display = el.style.display || '';
+      if (window.getComputedStyle(el).display === 'table-cell') {
+        el.style.position = 'relative';
+        btn.style.position = 'relative';
+        btn.style.float = 'right';
+        btn.style.marginLeft = '4px';
+      }
+      el.appendChild(btn);
+    });
+  }
 
 function buildShadowingSection() {
   shadowPhrases = collectPhrases();
@@ -943,6 +1028,31 @@ function updateShadowProgress(current) {
 }
 
 document.addEventListener('DOMContentLoaded', buildShadowingSection);
+
+  // ─── 26-Day Tracker ───
+  (function initTracker() {
+    var grid = document.getElementById('trackerGrid');
+    if (!grid) return;
+    var key = 'fr-eng-tracker';
+    var data = {};
+    try { data = JSON.parse(localStorage.getItem(key)) || {}; } catch(e) { data = {}; }
+    var today = parseInt(document.title.match(/Day\s*(\d+)/i)?.[1] || '0');
+    if (today > 0) { data['day' + today] = { completed: true, date: new Date().toISOString().slice(0,10) }; }
+    try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {}
+    for (var d = 1; d <= 26; d++) {
+      var cell = document.createElement('div');
+      var done = data['day' + d] && data['day' + d].completed;
+      cell.style.cssText = 'width:38px;height:38px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;cursor:default;' +
+        (d === today ? 'background:var(--terracotta,#BF6A4A);color:#fff;box-shadow:0 0 8px rgba(191,106,74,0.5);' :
+         done ? 'background:var(--gold,#C9A84C);color:#000;' :
+         'background:var(--bg,#0A0C10);color:var(--text-dim,#666);border:1px solid #333;');
+      cell.textContent = d;
+      cell.title = 'Day ' + d + (done ? ' ✅' : '') + (d === today ? ' (오늘)' : '');
+      grid.appendChild(cell);
+    }
+  })();
+  // ─── End Tracker ───
+
 </script>
 </body>
 </html>

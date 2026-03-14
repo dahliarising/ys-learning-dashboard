@@ -168,28 +168,6 @@
             justify-content: center;
         }
 
-        .timer-btn {
-            background: var(--green);
-            border: none;
-            color: var(--bg-primary);
-            padding: 0.8rem 1.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.3s;
-        }
-
-        .timer-btn:hover {
-            background: #3BA075;
-        }
-
-        .timer-btn.stop {
-            background: var(--danger);
-        }
-
-        .timer-btn.stop:hover {
-            background: #D74444;
-        }
 
         .modal-close {
             position: absolute;
@@ -837,9 +815,6 @@
             <div class="modal-title">Pomodoro</div>
             <div class="timer-display" id="timerDisplay">25:00</div>
             <div class="timer-buttons">
-                <button class="timer-btn" id="startBtn" onclick="startTimer()">시작</button>
-                <button class="timer-btn stop" id="stopBtn" onclick="stopTimer()" style="display:none;">중지</button>
-                <button class="timer-btn" onclick="resetTimer()">리셋</button>
             </div>
         </div>
     </div>
@@ -1429,65 +1404,21 @@
             fadeUpObserver.observe(element);
         });
 
-        let timerInterval = null;
-        let timeLeft = 25 * 60;
-
+                
         function openPomodoroModal() {
             document.getElementById('pomodoroModal').classList.add('active');
         }
 
         function closePomodoroModal() {
             document.getElementById('pomodoroModal').classList.remove('active');
-            if (timerInterval) clearInterval(timerInterval);
             timeLeft = 25 * 60;
-            updateTimerDisplay();
             document.getElementById('startBtn').style.display = 'block';
             document.getElementById('stopBtn').style.display = 'none';
         }
 
-        function startTimer() {
-            if (timerInterval) return;
-            document.getElementById('startBtn').style.display = 'none';
-            document.getElementById('stopBtn').style.display = 'block';
-
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
-
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    timerInterval = null;
-                    alert('25분 완료! 수고하셨습니다.');
-                    document.getElementById('startBtn').style.display = 'block';
-                    document.getElementById('stopBtn').style.display = 'none';
-                    timeLeft = 25 * 60;
-                    updateTimerDisplay();
-                }
-            }, 1000);
+        }, 1000);
         }
 
-        function stopTimer() {
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = null;
-            document.getElementById('startBtn').style.display = 'block';
-            document.getElementById('stopBtn').style.display = 'none';
-        }
-
-        function resetTimer() {
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = null;
-            timeLeft = 25 * 60;
-            updateTimerDisplay();
-            document.getElementById('startBtn').style.display = 'block';
-            document.getElementById('stopBtn').style.display = 'none';
-        }
-
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            document.getElementById('timerDisplay').textContent =
-                String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-        }
 
         function switchTab(event, tabId) {
             event.preventDefault();

@@ -160,7 +160,8 @@ table.param-table tr:last-child td{border-bottom:none}
 <style id="math-enhanced-style">
 /* ══════ KaTeX Pre-rendered Math Styling ══════ */
 /* Hero equation - 메인 수식 */
-.hero-equation .katex-display{margin:0!important;padding:0!important}
+.hero-equation .katex-display{margin:0!important;padding:0!important;overflow:hidden!important}
+.katex-display::-webkit-scrollbar{display:none}.katex-display{scrollbar-width:none}
 .hero-equation .katex{font-size:1.5em!important;color:#E8C96A!important}
 .hero-equation .katex .mord{color:#E8C96A!important}
 .hero-equation .katex .mbin{color:#4A9EBF!important}
@@ -230,7 +231,7 @@ td .katex,th .katex{font-size:0.9em!important}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+  onload="renderMathInElement(document.body,{ignoredTags:["script","noscript","style","textarea","pre","code"],delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
 </script>
 </head>
 <body>
@@ -544,6 +545,8 @@ td .katex,th .katex{font-size:0.9em!important}
       <div class="accordion-content">
         <div class="accordion-inner">
         <p>from scipy.signal import welch, csd; f, Sxx = welch(x, fs=1024, nperseg=2048); f, Sxf = csd(x, force, fs=1024, nperseg=2048); f, Sff = welch(force, fs=1024, nperseg=2048); H1 = Sxf / Sff; gamma2 = np.abs(Sxf)**2 / (Sxx * Sff). 이 5줄이면 PSD, FRF, 코히어런스를 모두 구할 수 있다. Simpack 출력을 CSV로 내보내서 이 코드로 검증하는 습관을 기르자.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">PSD: $G_{xx} = \frac{2|X(f)|^2}{f_s \cdot N \cdot W}$ ($W$: 윈도우 보정계수, Hanning = 1.5)</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">Python: <code>f, Pxx = signal.welch(x, fs, nperseg=1024)</code> → Welch 평균 PSD</p>
         </div>
       </div>
     
@@ -555,6 +558,8 @@ td .katex,th .katex{font-size:0.9em!important}
       <div class="accordion-content" id="deepdive2">
         <div class="accordion-inner">
         <p><strong>■ 단계별 흐름</strong></p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">워크플로: 시간신호 $x(t)$ → FFT → $X(f)$ → PSD/FRF → 모달 파라미터 ($f_n, \zeta, \phi$)</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">핵심 관계: $a_{rms} = \sqrt{\int_0^\infty G_{aa}(f) \, df}$, &nbsp; $H(f) = \frac{G_{xy}}{G_{xx}}$</p>
 <p>1️⃣ 시간 데이터 x(t) → FFT → X(f): 스펙트럼</p>
 <p>2️⃣ X(f) → PSD: S_xx(f) = |X(f)|²/T: 에너지 밀도</p>
 <p>3️⃣ 입출력 비교 → FRF: H(f) = Y(f)/X(f): 시스템 특성</p>

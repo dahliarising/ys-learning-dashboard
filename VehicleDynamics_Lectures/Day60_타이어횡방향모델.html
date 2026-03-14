@@ -166,7 +166,8 @@ table.param-table tr:last-child td{border-bottom:none}
     <style id="math-enhanced-style">
 /* ══════ KaTeX Pre-rendered Math Styling ══════ */
 /* Hero equation - 메인 수식 */
-.hero-equation .katex-display{margin:0!important;padding:0!important}
+.hero-equation .katex-display{margin:0!important;padding:0!important;overflow:hidden!important}
+.katex-display::-webkit-scrollbar{display:none}.katex-display{scrollbar-width:none}
 .hero-equation .katex{font-size:1.5em!important;color:#E8C96A!important}
 .hero-equation .katex .mord{color:#E8C96A!important}
 .hero-equation .katex .mbin{color:#4A9EBF!important}
@@ -236,7 +237,7 @@ td .katex,th .katex{font-size:0.9em!important}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+  onload="renderMathInElement(document.body,{ignoredTags:["script","noscript","style","textarea","pre","code"],delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
 </script>
 </head>
 <body>
@@ -743,6 +744,8 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="accordion-content">
             <div class="accordion-inner">
                 <p><strong>MF 5.2 (PAC2002):</strong> 가장 널리 사용되는 버전으로, 순수 슬립과 복합 슬립을 별도의 가중 함수로 처리합니다. 계수 약 80~90개, 대부분의 상용 MBS 소프트웨어에서 지원합니다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">Magic Formula: $F_y = D\sin\{C\arctan[B\alpha - E(B\alpha - \arctan B\alpha)]\}$</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">$B$: Stiffness Factor, $C$: Shape, $D$: Peak, $E$: Curvature → $B \cdot C \cdot D = C_\alpha$ (코너링 강성)</p>
                 <p><strong>MF 6.2 (PAC2006+):</strong> 턴슬립(Turn Slip), 대변형(Large Camber), 파킹/저속 특성을 추가로 모델링합니다. 계수 약 120~150개로 늘어나며, 특히 EV의 저속 파킹 시뮬레이션에 유리합니다.</p>
                 <p><span class="highlight">실무 선택 기준:</span> 일반 핸들링 해석은 MF 5.2면 충분하며, 파킹/극저속 해석이 필요하면 MF 6.2를 사용합니다. 데이터 피팅 비용도 MF 6.2가 약 1.5배 더 높습니다.</p>
             </div>
@@ -757,6 +760,9 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="accordion-content">
             <div class="accordion-inner">
                 <p>타이어 횡력은 슬립앵글 변화에 즉시 반응하지 않습니다. 접지면 길이만큼의 구름 거리가 필요하며, 이를 <strong>Relaxation Length (σ<sub>y</sub>)</strong>라 합니다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">복합 슬립: $\sigma = \sqrt{\sigma_x^2 + \tan^2\alpha}$ → 마찰원: $\sqrt{F_x^2 + F_y^2} \leq \mu F_z$</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">가중함수: $F_y' = F_{y0}(\alpha) \cdot G_{y\kappa}(\alpha, \kappa)$ → 종방향 슬립에 의한 횡력 감소</p>
+<p style="margin:10px 0;color:var(--gold-light);"><strong>르노코리아 실무 Tip:</strong> MF-Tyre 피팅 시 복합 슬립 영역 데이터가 부족하면 $G$ 함수가 부정확합니다. 시험 매트릭스에 복합 조건을 반드시 포함하세요.</p>
                 <p>1차 지연 모델: F<sub>y</sub>(s) = F<sub>y,ss</sub>(α) · (1 − e<sup>−s/σ<sub>y</sub></sup>)</p>
                 <p>일반적으로 σ<sub>y</sub> = 0.3~0.6m (승용차), 레이싱 타이어는 0.15~0.3m 수준입니다. 고속 레인체인지나 장애물 회피에서 이 지연이 핸들링 응답성에 큰 영향을 미칩니다.</p>
                 <p><span class="highlight">Relaxation Length의 하중 의존성:</span> σ<sub>y</sub> = C<sub>α</sub> / C<sub>lat</sub> (C<sub>lat</sub>: 접지면 횡강성). 하중이 증가하면 C<sub>α</sub>와 C<sub>lat</sub> 모두 증가하지만 비율이 달라 σ<sub>y</sub>도 변합니다.</p>
@@ -772,6 +778,8 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="accordion-content">
             <div class="accordion-inner">
                 <p>타이어 온도는 그립에 직접적 영향을 미칩니다. 최적 온도(60~100°C)에서 μ가 최대이며, 이보다 낮거나 높으면 그립이 감소합니다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">$M_z = -t_p \cdot F_y + M_{zr}$ → $t_p$: 뉴매틱 트레일, $M_{zr}$: 잔류 토크</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">뉴매틱 트레일: $t_p = \frac{D_t\cos[C_t\arctan(B_t\alpha)]}{\cos\alpha}$ → 슬립각 증가 시 트레일 감소</p>
                 <p><strong>Thermal Model 구성:</strong> 타이어를 트레드 표면, 트레드 벌크, 카카스, 내부 공기의 4-Layer로 모델링합니다. 각 레이어 간 열전도와 외부 대류/복사를 고려합니다.</p>
                 <p>D 계수의 온도 보정: D(T) = D<sub>ref</sub> · (1 + κ<sub>T</sub> · (T − T<sub>ref</sub>)²) 형태의 포물선 모델이 일반적입니다.</p>
                 <p><span class="highlight">Tire Warm-up 시뮬레이션:</span> 콜드 스타트 후 3~5 랩(서킷) 동안의 그립 변화를 예측하여, 아웃랩 전략이나 타이어 예열 프로토콜을 최적화합니다.</p>
@@ -842,8 +850,8 @@ td .katex,th .katex{font-size:0.9em!important}
             </button>
             <div class="accordion-content">
                 <div class="accordion-inner">
-                    <p><strong>Optimum T (ChassisSim):</strong> 타이어 데이터 후처리 및 MF 피팅 전용 도구. F&T 시험 데이터에서 자동으로 B,C,D,E를 추출하고, TIR 파일을 생성합니다. 가격: ~$2,000/년</p>
-                    <p><strong>MF-Tool (TNO):</strong> Pacejka 본인의 연구소(TNO)에서 개발한 공식 피팅 도구. MF 5.2 / 6.2 모두 지원하며 산업 표준입니다. 가격: ~$5,000~$10,000</p>
+                    <p><strong>Optimum T (ChassisSim):</strong> 타이어 데이터 후처리 및 MF 피팅 전용 도구. F&T 시험 데이터에서 자동으로 B,C,D,E를 추출하고, TIR 파일을 생성합니다. 가격: ~&#36;2,000/년</p>
+                    <p><strong>MF-Tool (TNO):</strong> Pacejka 본인의 연구소(TNO)에서 개발한 공식 피팅 도구. MF 5.2 / 6.2 모두 지원하며 산업 표준입니다. 가격: ~&#36;5,000~&#36;10,000</p>
                     <p><strong>MATLAB Curve Fitting Toolbox:</strong> lsqcurvefit 함수로 직접 피팅 가능합니다. 초기값 설정이 중요하며, 경계 조건(B>0, C>1, D>0 등)을 반드시 설정해야 합니다.</p>
                     <p><strong>TYDEX Format:</strong> 타이어 시험 데이터의 표준 교환 형식. .tdx 파일 구조: 채널 정의 → 데이터 블록 → 메타데이터. 모든 상용 도구에서 입력 가능합니다.</p>
                 </div>

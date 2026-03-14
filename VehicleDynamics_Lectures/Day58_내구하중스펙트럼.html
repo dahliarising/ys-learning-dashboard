@@ -159,7 +159,8 @@ table.param-table tr:last-child td{border-bottom:none}
     <style id="math-enhanced-style">
 /* ══════ KaTeX Pre-rendered Math Styling ══════ */
 /* Hero equation - 메인 수식 */
-.hero-equation .katex-display{margin:0!important;padding:0!important}
+.hero-equation .katex-display{margin:0!important;padding:0!important;overflow:hidden!important}
+.katex-display::-webkit-scrollbar{display:none}.katex-display{scrollbar-width:none}
 .hero-equation .katex{font-size:1.5em!important;color:#E8C96A!important}
 .hero-equation .katex .mord{color:#E8C96A!important}
 .hero-equation .katex .mbin{color:#4A9EBF!important}
@@ -229,7 +230,7 @@ td .katex,th .katex{font-size:0.9em!important}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+  onload="renderMathInElement(document.body,{ignoredTags:["script","noscript","style","textarea","pre","code"],delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
 </script>
 </head>
 <body>
@@ -823,6 +824,8 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="accordion-content">
             <div class="accordion-inner">
                 <p><strong>PSD(Power Spectral Density)</strong>는 정상(stationary) 랜덤 하중의 주파수 특성을 나타내며, 노면 프로파일 분류(ISO 8608)나 진동 스펙 정의에 사용됩니다. 반면 <strong>레인플로우</strong>는 비정상(non-stationary) 하중 포함 모든 시계열에서 피로 사이클을 추출합니다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">PSD 기반: $\sigma_{eq} = \sqrt{\int_0^\infty G_{\sigma\sigma}(f) \, df}$ → 정상 랜덤 하중에 적합</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">레인플로우: $D = \sum_i \frac{n_i}{N_i}$ (Miner 법칙) → $N_i = C / S_i^m$ (S-N 곡선)</p>
                 <p>고속도로 순항처럼 정상 랜덤에 가까운 경우 PSD 기반 Dirlik 법이 효율적이지만, 도심 + 고속 + 험로 복합 주행에서는 반드시 Rainflow를 사용해야 합니다. 르노의 내구 프로세스는 항상 Rainflow 기반입니다.</p>
             </div>
         </div>
@@ -836,6 +839,8 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="accordion-content">
             <div class="accordion-inner">
                 <p>실제 서스펜션 부품은 단축이 아닌 <strong>다축 응력 상태</strong>에 놓입니다. 너클의 경우 수직 하중(Fz)과 횡방향 하중(Fy)이 동시에 작용하여 복합 응력이 발생합니다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">누적 손상: $D = \sum_{i=1}^{k} \frac{n_i}{N_i} \leq 1$ → Palmgren-Miner 선형 누적 손상</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">등가 하중: $F_{eq} = \left(\sum_i \frac{n_i F_i^m}{\sum n_i}\right)^{1/m}$ → SN 기울기 $m$에 의존</p>
                 <p><strong>Critical Plane Method</strong>는 모든 평면(각도)에서 전단 응력과 법선 응력의 조합을 검토하여, 가장 큰 손상을 일으키는 <span class="highlight">임계면(Critical Plane)</span>을 찾습니다. FEMFAT에서는 이 방법이 기본 옵션입니다.</p>
                 <div class="deriv-equation"><code>τ_a,max + k·σ_n,max ≤ f (Findley Criterion)</code></div>
             </div>
@@ -850,6 +855,9 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="accordion-content">
             <div class="accordion-inner">
                 <p>실차 30만km 내구를 실제로 달릴 수 없으므로, <strong>등가 가속 시험</strong>을 설계합니다. 핵심 원리: 벨기 블록, 급커브, 과속방지턱 등 가혹 노면만 조합하여 단위 시간당 손상(D/hour)을 극대화합니다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">가속 계수: $AF = \frac{D_{accel}}{D_{field}} = \frac{t_{field}}{t_{accel}}$ → 통상 $AF = 5\text{~}20$</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">시험 시간: $t_{test} = \frac{t_{target}}{AF}$ → 10만 km → 가속 $5000\text{~}20000$ km 등가</p>
+<p style="margin:10px 0;color:var(--gold-light);"><strong>르노코리아 실무 Tip:</strong> Simpack 가상 내구 시험에서 하중 스펙트럼을 추출한 뒤 레인플로우 카운팅으로 부품 수명을 예측합니다.</p>
                 <p><strong>가속 배수</strong> 계산: 실도로 1km당 D_road와 시험장 1km당 D_test를 비교. 예: 벨기 블록 D_test/D_road ≈ 1,000~1,200배. 따라서 벨기 블록 300시간 ≈ 실도로 30만km.</p>
                 <p>르노/닛산 얼라이언스에서는 CERAM(프랑스) 및 Hokkaido PG(일본) 시험장의 표준 내구 코스를 운영합니다.</p>
             </div>
