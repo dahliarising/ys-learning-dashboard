@@ -916,7 +916,7 @@ footer {
 <!-- ═══════════════════ 6. 발음 연습 ═══════════════════ -->
 <section>
   <div class="section-label">섹션 6</div>
-  <h2 class="section-title">🔊 발음 연습 — 5가지 문제 보고 문구</h2>
+  <h2 class="section-title">▶ 발음 연습 — 5가지 문제 보고 문구</h2>
   
   <div class="pron-drill">
     <div class="pron-item">
@@ -1065,7 +1065,7 @@ footer {
   'use strict';
 
   // ═══════════════════ SVG 아이콘 상수 ═══════════════════
-  const SPEAKER_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a7 7 0 0 1 0 9.9M19.07 4.93a11 11 0 0 1 0 15.66"></path></svg>';
+  const SPEAKER_SVG = '<svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>';
   const PLAY_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
   const STOP_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16"></rect></svg>';
 
@@ -1191,7 +1191,7 @@ footer {
           ${p.ipa ? '<div class="phrase-ipa">' + p.ipa + '</div>' : ''}
           ${p.ko ? '<div class="phrase-ko">' + p.ko + '</div>' : ''}
         </div>
-        <span class="shadow-btn" onclick="speakFr('${p.fr.replace(/'/g, "\'")}', this)">
+        <span class="shadow-btn" data-speak="${p.fr.replace(/"/g, '&quot;')}">
           ${SPEAKER_SVG}
         </span>
       </div>
@@ -1284,7 +1284,7 @@ footer {
     if (fill) fill.style.width = ((idx + 1) / shadowPhrases.length * 100) + '%';
     if (text) text.textContent = (idx + 1) + '/' + shadowPhrases.length;
 
-    document.getElementById('shadowStatus').textContent = '🔊 듣기: ' + phrase.fr;
+    document.getElementById('shadowStatus').textContent = '▶ 듣기: ' + phrase.fr;
 
     const utter = new SpeechSynthesisUtterance(phrase.fr);
     utter.lang = 'fr-FR';
@@ -1386,6 +1386,16 @@ footer {
   })();
   // ─── End Tracker ───
 
+
+  // Event delegation for data-speak play buttons
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-speak]');
+    if (btn) {
+      e.stopPropagation();
+      var text = btn.getAttribute('data-speak').replace(/&quot;/g, '"');
+      speakFr(text, btn);
+    }
+  });
 </script>
 
 </body>

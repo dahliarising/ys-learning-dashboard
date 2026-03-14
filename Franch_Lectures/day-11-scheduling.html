@@ -1090,9 +1090,7 @@ footer a { font-weight: 600; }
     document.querySelectorAll('.expr-table tbody tr').forEach(row => {
       const cells = row.querySelectorAll('td');
       if (cells.length >= 2) {
-        const frText = cells[0]?.textContent?.trim().replace(/[
-
-]/g, ' ').replace(/\s+/g, ' ');
+        const frText = cells[0]?.textContent?.trim().replace(/\n/g, ' ').replace(/\s+/g, ' ');
         const koText = cells[cells.length - 1]?.textContent?.trim();
         let ipaText = cells[1]?.textContent?.trim() || '';
         if (frText && /[a-zA-Zéèêëàâäùûüôöîïçœæ]/.test(frText)) {
@@ -1111,7 +1109,7 @@ footer a { font-weight: 600; }
 
   
   // ─── 인라인 재생 버튼 (각 프랑스어 문장 옆 ▶) ───
-  var SPEAKER_SVG = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:var(--terracotta,#BF6A4A);"><polygon points="6,3 20,12 6,21"/></svg>';
+  // SPEAKER_SVG already defined
 
   function addInlinePlayButtons() {
     document.querySelectorAll('.fr-word, .hero-sentence .fr, .fr-line, td:first-child, .french, .fr').forEach(function(el) {
@@ -1152,7 +1150,7 @@ function buildShadowingSection() {
           ${p.ipa ? '<div class="phrase-ipa">' + p.ipa + '</div>' : ''}
           ${p.ko ? '<div class="phrase-ko">' + p.ko + '</div>' : ''}
         </div>
-        <span class="shadow-btn" onclick="speakFr('${p.fr.replace(/'/g, "\'")}', this)">
+        <span class="shadow-btn" data-speak="${p.fr.replace(/"/g, '&quot;')}">
           ${SPEAKER_SVG}
         </span>
       </div>
@@ -1204,7 +1202,7 @@ function buildShadowingSection() {
     const text = document.getElementById('shadowProgressText');
     if (fill) fill.style.width = ((idx + 1) / shadowPhrases.length * 100) + '%';
     if (text) text.textContent = (idx + 1) + '/' + shadowPhrases.length;
-    document.getElementById('shadowStatus').textContent = '🔊 듣기: ' + phrase.fr;
+    document.getElementById('shadowStatus').textContent = '▶ 듣기: ' + phrase.fr;
     const utter = new SpeechSynthesisUtterance(phrase.fr);
     utter.lang = 'fr-FR';
     utter.rate = parseFloat(document.getElementById('shadowSpeed')?.value || '0.8');
@@ -1313,6 +1311,16 @@ function initTracker() {
 }
 
 window.addEventListener('load', initTracker);
+
+  // Event delegation for data-speak play buttons
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-speak]');
+    if (btn) {
+      e.stopPropagation();
+      var text = btn.getAttribute('data-speak').replace(/&quot;/g, '"');
+      speakFr(text, btn);
+    }
+  });
 </script>
 
 </body>

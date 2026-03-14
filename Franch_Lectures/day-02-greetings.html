@@ -1053,7 +1053,7 @@ function checkQuiz(n) {
         (p.ipa ? '<div class="phrase-ipa">' + p.ipa + '</div>' : '') +
         (p.ko ? '<div class="phrase-ko">' + p.ko + '</div>' : '') +
         '</div>' +
-        '<span class="shadow-btn" onclick="speakFr('' + p.fr.replace(/'/g, "\\'") + '', this)">' + SPEAKER_SVG + '</span>' +
+        '<span class="shadow-btn" data-speak="' + p.fr.replace(/"/g, '&quot;') + '">' + SPEAKER_SVG + '</span>' +
         '</div>';
     }).join('');
     section.innerHTML = '<h3>🎙️ 쉐도잉 연습 — Shadowing Practice</h3>' +
@@ -1125,7 +1125,7 @@ function checkQuiz(n) {
     var text = document.getElementById('shadowProgressText');
     if (fill) fill.style.width = ((idx + 1) / shadowPhrases.length * 100) + '%';
     if (text) text.textContent = (idx + 1) + '/' + shadowPhrases.length;
-    document.getElementById('shadowStatus').textContent = '🔊 듣기: ' + phrase.fr;
+    document.getElementById('shadowStatus').textContent = '▶ 듣기: ' + phrase.fr;
     var utter = new SpeechSynthesisUtterance(phrase.fr);
     utter.lang = 'fr-FR';
     utter.rate = parseFloat(document.getElementById('shadowSpeed')?.value || '0.8');
@@ -1159,6 +1159,16 @@ function checkQuiz(n) {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
+
+  // Event delegation for data-speak play buttons
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-speak]');
+    if (btn) {
+      e.stopPropagation();
+      var text = btn.getAttribute('data-speak').replace(/&quot;/g, '"');
+      speakFr(text, btn);
+    }
+  });
 </script>
 </body>
 </html>

@@ -870,7 +870,7 @@ window.speakFr = function(text, element, speed) {
 /* ═══════════════════ SHADOWING ENGINE ═══════════════════ */
 var PLAY_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M5 3v18l15-9z"/></svg>';
 var STOP_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="4" y="4" width="16" height="16"/></svg>';
-var SPEAKER_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.3-2.5-4.04v8.08c1.48-.74 2.5-2.27 2.5-4.04zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
+var SPEAKER_SVG = '<svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>';
 var shadowPhrases = [];
 var shadowIndex = 0;
 var shadowPlaying = false;
@@ -897,7 +897,7 @@ function collectPhrases() {
 
 
   // ─── 인라인 재생 버튼 (각 프랑스어 문장 옆 ▶) ───
-  var SPEAKER_SVG = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:var(--terracotta,#BF6A4A);"><polygon points="6,3 20,12 6,21"/></svg>';
+  // SPEAKER_SVG already defined above
 
   function addInlinePlayButtons() {
     document.querySelectorAll('.fr-word, .hero-sentence .fr, .fr-line, td:first-child, .french, .fr').forEach(function(el) {
@@ -941,7 +941,7 @@ function buildShadowingSection() {
       (p.ipa ? '<div class="phrase-ipa">' + p.ipa + '</div>' : '') +
       (p.ko ? '<div class="phrase-ko">' + p.ko + '</div>' : '') +
       '</div>' +
-      '<span class="shadow-btn" onclick="speakFr('' + p.fr.replace(/'/g, "\'") + '', this)">' + SPEAKER_SVG + '</span>' +
+      '<span class="shadow-btn" data-speak="' + p.fr.replace(/"/g, '&quot;') + '">' + SPEAKER_SVG + '</span>' +
       '</div>';
   }).join('');
   section.innerHTML = '<h3>&#127911; 쉐도잉 연습 &mdash; Shadowing Practice</h3>' +
@@ -1053,6 +1053,16 @@ document.addEventListener('DOMContentLoaded', buildShadowingSection);
   })();
   // ─── End Tracker ───
 
+
+  // Event delegation for data-speak play buttons
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-speak]');
+    if (btn) {
+      e.stopPropagation();
+      var text = btn.getAttribute('data-speak').replace(/&quot;/g, '"');
+      speakFr(text, btn);
+    }
+  });
 </script>
 </body>
 </html>

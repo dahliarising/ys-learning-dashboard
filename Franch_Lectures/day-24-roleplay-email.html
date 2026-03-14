@@ -750,7 +750,7 @@ Renault Korea – Engineering Centre</div>
 
     <div class="shadow-controls">
       <button class="shadow-ctrl-btn" id="shadowPlayAll" onclick="shadowStartAll()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
         전체 쉐도잉 시작
       </button>
       <button class="shadow-ctrl-btn" id="shadowStop" onclick="shadowStopAll()">
@@ -960,8 +960,8 @@ Renault Korea – Engineering Centre</div>
 var selectedFrVoice = null;
 var currentUtterance = null;
 var currentBtn = null;
-var SPEAKER_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a7 7 0 0 1 0 9.9M17.7 5.3a11 11 0 0 1 0 15.4"></path></svg>';
-var PLAY_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+var SPEAKER_SVG = '<svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>';
+var PLAY_SVG = '<svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>';
 var STOP_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>';
 
 function initFrenchVoice() {
@@ -1006,7 +1006,7 @@ function collectPhrases() {
 
 
   // ─── 인라인 재생 버튼 (각 프랑스어 문장 옆 ▶) ───
-  var SPEAKER_SVG = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:var(--terracotta,#BF6A4A);"><polygon points="6,3 20,12 6,21"/></svg>';
+  // SPEAKER_SVG already defined above
 
   function addInlinePlayButtons() {
     document.querySelectorAll('.fr-word, .hero-sentence .fr, .fr-line, td:first-child, .french, .fr').forEach(function(el) {
@@ -1047,7 +1047,7 @@ function buildShadowingSection() {
       (p.ipa ? '<div class="phrase-ipa">' + p.ipa + '</div>' : '') +
       (p.ko ? '<div class="phrase-ko">' + p.ko + '</div>' : '') +
       '</div>' +
-      '<span class="shadow-btn" onclick="speakFr('' + p.fr.replace(/'/g, "\\'") + '', this)">' + SPEAKER_SVG + '</span>' +
+      '<span class="shadow-btn" data-speak="' + p.fr.replace(/"/g, '&quot;') + '">' + SPEAKER_SVG + '</span>' +
       '</div>';
   }).join('');
 
@@ -1164,6 +1164,16 @@ window.clearPracticeEmail = clearPracticeEmail;
   })();
   // ─── End Tracker ───
 
+
+  // Event delegation for data-speak play buttons
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-speak]');
+    if (btn) {
+      e.stopPropagation();
+      var text = btn.getAttribute('data-speak').replace(/&quot;/g, '"');
+      speakFr(text, btn);
+    }
+  });
 </script>
 
 

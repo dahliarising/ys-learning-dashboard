@@ -1597,7 +1597,7 @@ function toggleAnswer(btn) {
         '<div class="phrase-fr">' + p.fr + '</div>' +
         (p.ko ? '<div class="phrase-ko">' + p.ko + '</div>' : '') +
         '</div>' +
-        '<span class="shadow-btn" onclick="speakFr('' + p.fr.replace(/'/g, "\'") + '', this)" title="발음 듣기">' + SPEAKER_SVG + '</span>' +
+        '<span class="shadow-btn" data-speak="' + p.fr.replace(/"/g, '&quot;') + '">' + SPEAKER_SVG + '</span>' +
         '</div>';
     }).join('');
     section.innerHTML = '<p class="section-label">Shadowing Practice</p>' +
@@ -1703,6 +1703,16 @@ function toggleAnswer(btn) {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
+
+  // Event delegation for data-speak play buttons
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-speak]');
+    if (btn) {
+      e.stopPropagation();
+      var text = btn.getAttribute('data-speak').replace(/&quot;/g, '"');
+      speakFr(text, btn);
+    }
+  });
 </script>
 </body>
 </html>
