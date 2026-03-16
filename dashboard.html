@@ -156,9 +156,17 @@ a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;b
 .fav-btn:hover,.fav-btn.active{color:var(--gold)}
 @media(max-width:480px){.tab-btn{font-size:9px;letter-spacing:2px;padding:12px 4px 10px}.tab-btn span{font-size:8px}.stat-box .sv{font-size:28px}.timer-time{font-size:48px}.course-grid{gap:8px}.course-card{padding:16px 12px}.tab-content{padding:20px 16px 40px}}
 @media(min-width:768px){.course-grid{grid-template-columns:repeat(3,1fr)}}
+.sync-indicator{position:fixed;top:var(--st,0);right:12px;padding:6px 12px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);z-index:300;pointer-events:none;opacity:0;transition:opacity .3s}
+.sync-indicator.show{opacity:1}
+.sync-indicator.synced{color:#4a8b5c}
+.sync-indicator.error{color:#c23b22}
+.sync-setup-banner{background:var(--surface2);border:1px solid var(--gold-dim);border-radius:2px;padding:16px;margin-bottom:20px;font-size:12px;color:var(--text-dim);line-height:1.6;display:none}
+.sync-setup-banner input{width:100%;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;margin:8px 0;outline:none}
+.sync-setup-banner button{padding:8px 16px;border:1px solid var(--gold);border-radius:2px;background:transparent;color:var(--gold);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:4px}
 </style>
 </head>
 <body>
+<div class="sync-indicator" id="syncIndicator"></div>
 <header class="site-header"><h1>MAISON DE SAVOIR</h1><div class="header-rule"></div></header>
 <nav class="tab-nav">
 <button class="tab-btn active" data-tab="today">AUJOURD'HUI<span>오늘</span></button>
@@ -217,14 +225,28 @@ a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;b
 <div class="gold-rule"></div>
 <div class="section-label"><span class="label-fr">PARAMÈTRES</span><span class="label-kr">— 설정</span></div>
 <div>
+<button class="settings-btn" id="syncSetupBtn">CLOUD SYNC 설정</button>
+<div class="sync-setup-banner" id="syncSetupBanner">
+<div style="margin-bottom:8px;color:var(--gold);letter-spacing:2px;font-size:10px;text-transform:uppercase">FIREBASE CLOUD SYNC</div>
+<div>기기 간 학습 진도를 자동 동기화합니다.</div>
+<div style="margin-top:8px;font-size:11px;color:var(--text-muted)">Firebase 콘솔에서 프로젝트 생성 후 아래 정보를 입력하세요:</div>
+<input type="text" id="fbApiKey" placeholder="API Key">
+<input type="text" id="fbProjectId" placeholder="Project ID (예: my-project-12345)">
+<button id="fbSaveBtn">저장 및 동기화 시작</button>
+<button id="fbClearBtn" style="border-color:var(--text-muted);color:var(--text-muted);margin-left:8px">연결 해제</button>
+<div id="fbStatus" style="margin-top:8px;font-size:10px;color:var(--text-muted)"></div>
+</div>
+<button class="settings-btn" id="syncNowBtn" style="display:none">SYNC NOW</button>
 <button class="settings-btn" id="exportBtn">EXPORT DATA</button>
 <button class="settings-btn" id="importBtn">IMPORT DATA</button>
 <button class="settings-btn" id="resetBtn" style="color:#8b4040">RESET ALL DATA</button>
 <input type="file" id="importFile" accept=".json" style="display:none">
 </div>
-<div class="version-info">MAISON DE SAVOIR v4.0</div>
+<div class="version-info">MAISON DE SAVOIR v4.1</div>
 </div>
 <div class="milestone-overlay" id="milestoneModal"><div class="milestone-box"><div class="milestone-icon" id="milestoneIcon"></div><div class="milestone-pct" id="milestonePct"></div><div class="milestone-course" id="milestoneCourse"></div><div class="milestone-msg" id="milestoneMsg"></div></div></div>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script>
 "use strict";
 const C=[{id:'vd',name:'차량동역학',icon:'\u2694',color:'#c23b22',folder:'VehicleDynamics_Lectures',lessons:[{d:1,f:'Day01_운동방정식유도.html',t:'운동방정식 유도'},{d:2,f:'Day02_비감쇠자유진동.html',t:'비감쇠 자유진동'},{d:3,f:'Day03_감쇠비정의.html',t:'감쇠비 정의'},{d:4,f:'Day04_부족감쇠자유진동.html',t:'부족감쇠 자유진동'},{d:5,f:'Day05_강제조화진동.html',t:'강제조화 진동'},{d:6,f:'Day06_위상각유도.html',t:'위상각 유도'},{d:7,f:'Day07_공진조건분석.html',t:'공진조건 분석'},{d:8,f:'Day08_쿼터카모델.html',t:'쿼터카 모델'},{d:9,f:'Day09_쿼터카고유진동수.html',t:'쿼터카 고유진동수'},{d:10,f:'Day10_하프카모델.html',t:'하프카 모델'},{d:11,f:'Day11_하프카모드해석.html',t:'하프카 모드해석'},{d:12,f:'Day12_전달함수유도.html',t:'전달함수 유도'},{d:13,f:'Day13_전달률방진설계.html',t:'전달률 방진설계'},{d:14,f:'Day14_노면스펙트럼승차감.html',t:'노면스펙트럼 승차감'},{d:15,f:'Day15_Part2복습.html',t:'Part2 복습'},{d:16,f:'Day16_스프링특성.html',t:'스프링 특성'},{d:17,f:'Day17_댐퍼모델.html',t:'댐퍼 모델'},{d:18,f:'Day18_부싱복소강성.html',t:'부싱 복소강성'},{d:19,f:'Day19_타이어수직동특성.html',t:'타이어 수직동특성'},{d:20,f:'Day20_TireHop.html',t:'Tire Hop'},{d:21,f:'Day21_승차감트레이드오프.html',t:'승차감 트레이드오프'},{d:22,f:'Day22_Part3복습.html',t:'Part3 복습'},{d:23,f:'Day23_푸리에변환.html',t:'푸리에 변환'},{d:24,f:'Day24_PSD정의.html',t:'PSD 정의'},{d:25,f:'Day25_FRF측정.html',t:'FRF 측정'},{d:26,f:'Day26_고유치문제.html',t:'고유치 문제'},{d:27,f:'Day27_모드중첩법.html',t:'모드중첩법'},{d:28,f:'Day28_Part4복습.html',t:'Part4 복습'},{d:29,f:'Day29_수식Simpack매핑.html',t:'수식-Simpack 매핑'},{d:30,f:'Day30_QuarterCar구현.html',t:'QuarterCar 구현'},{d:31,f:'Day31_FRF상관성.html',t:'FRF 상관성'},{d:32,f:'Day32_CoSimulation.html',t:'Co-Simulation'},{d:33,f:'Day33_디지털트윈완성.html',t:'디지털트윈 완성'},{d:34,f:'Day34_서스펜션기구학기초.html',t:'서스펜션 기구학 기초'},{d:35,f:'Day35_캠버기하학.html',t:'캠버 기하학'},{d:36,f:'Day36_토기하학.html',t:'토 기하학'},{d:37,f:'Day37_킹핀기하학.html',t:'킹핀 기하학'},{d:38,f:'Day38_롤센터안티지오메트리.html',t:'롤센터 안티지오메트리'},{d:39,f:'Day39_순간중심롤스티어.html',t:'순간중심 롤스티어'},{d:40,f:'Day40_KC시뮬레이션통합.html',t:'KC 시뮬레이션 통합'},{d:41,f:'Day41_애커만기하학.html',t:'애커만 기하학'},{d:42,f:'Day42_랙피니언역학.html',t:'랙피니언 역학'},{d:43,f:'Day43_전동파워스티어링.html',t:'전동 파워스티어링'},{d:44,f:'Day44_코너링포스슬립각.html',t:'코너링포스 슬립각'},{d:45,f:'Day45_언더오버스티어.html',t:'언더/오버스티어'},{d:46,f:'Day46_요응답전달함수.html',t:'요응답 전달함수'},{d:47,f:'Day47_디스크브레이크열역학.html',t:'디스크브레이크 열역학'},{d:48,f:'Day48_유압제동시스템.html',t:'유압 제동시스템'},{d:49,f:'Day49_제동력배분하중이동.html',t:'제동력배분 하중이동'},{d:50,f:'Day50_ABS_ESC제어.html',t:'ABS/ESC 제어'},{d:51,f:'Day51_회생제동시스템.html',t:'회생제동 시스템'},{d:52,f:'Day52_통합브레이크시스템.html',t:'통합 브레이크 시스템'},{d:53,f:'Day53_EV차량동역학.html',t:'EV 차량동역학'},{d:54,f:'Day54_안티롤바설계.html',t:'안티롤바 설계'},{d:55,f:'Day55_풀카모델.html',t:'풀카 모델'},{d:56,f:'Day56_능동반능동서스펜션.html',t:'능동/반능동 서스펜션'},{d:57,f:'Day57_컴플라이언스스티어.html',t:'컴플라이언스 스티어'},{d:58,f:'Day58_내구하중스펙트럼.html',t:'내구 하중 스펙트럼'},{d:59,f:'Day59_승차감주관평가.html',t:'승차감 주관평가'},{d:60,f:'Day60_타이어횡방향모델.html',t:'타이어 횡방향 모델'},{d:61,f:'Udemy/section1.html',t:'[Udemy] Suspension Modeling'},{d:62,f:'Udemy/section2.html',t:'[Udemy] Differential Equations'},{d:63,f:'Udemy/section3.html',t:'[Udemy] Linearization'},{d:64,f:'Udemy/section4.html',t:'[Udemy] State-Space System'},{d:65,f:'Udemy/section5.html',t:'[Udemy] Last Words'}]},{id:'en',name:'에너지관리',icon:'\u26A1',color:'#4a8b5c',folder:'Energy_Lectures',lessons:[{d:1,f:'day01_energy_systems.html',t:'에너지 시스템'},{d:2,f:'day02_mitochondria.html',t:'미토콘드리아'},{d:3,f:'day03_hormones.html',t:'호르몬'},{d:4,f:'day04_autonomic.html',t:'자율신경계'},{d:5,f:'day05_review.html',t:'Part1 복습'},{d:6,f:'day06_sleep_architecture.html',t:'수면 구조'},{d:7,f:'day07_sleep_hormones.html',t:'수면 호르몬'},{d:8,f:'day08_sleep_environment.html',t:'수면 환경'},{d:9,f:'day09_sleep_debt.html',t:'수면 부채'},{d:10,f:'day10_sleep_tracking.html',t:'수면 추적'},{d:11,f:'day11_nutrition_basics.html',t:'영양 기초'},{d:12,f:'day12_protein.html',t:'단백질'},{d:13,f:'day13_carbs.html',t:'탄수화물'},{d:14,f:'day14_fats_micros.html',t:'지방·미량영양소'},{d:15,f:'day15_hydration_caffeine.html',t:'수분·카페인'},{d:16,f:'day16_meal_timing.html',t:'식사 타이밍'},{d:17,f:'day17_nutrition_review.html',t:'영양 복습'},{d:18,f:'day18_hypertrophy_science.html',t:'근비대 과학'},{d:19,f:'day19_big_three.html',t:'빅3 운동'},{d:20,f:'day20_upper_body.html',t:'상체 운동'},{d:21,f:'day21_lower_core.html',t:'하체·코어'},{d:22,f:'day22_periodization.html',t:'주기화'},{d:23,f:'day23_injury_mobility.html',t:'부상·모빌리티'},{d:24,f:'day24_recovery.html',t:'회복'},{d:25,f:'day25_weight_review.html',t:'웨이트 복습'},{d:26,f:'day26_vo2max_lactate.html',t:'VO2max·젖산'},{d:27,f:'day27_running_form.html',t:'러닝 폼'},{d:28,f:'day28_interval_training.html',t:'인터벌 트레이닝'},{d:29,f:'day29_zone_training.html',t:'존 트레이닝'},{d:30,f:'day30_concurrent_training.html',t:'동시 트레이닝'},{d:31,f:'day31_running_review.html',t:'러닝 복습'},{d:32,f:'day32_hrv.html',t:'HRV'},{d:33,f:'day33_immune_energy.html',t:'면역·에너지'},{d:34,f:'day34_fatigue_overtraining.html',t:'피로·과훈련'},{d:35,f:'day35_travel_seasonal.html',t:'여행·시즌'},{d:36,f:'day36_condition_review.html',t:'컨디션 복습'},{d:37,f:'day37_morning_routine.html',t:'아침 루틴'},{d:38,f:'day38_evening_routine.html',t:'저녁 루틴'},{d:39,f:'day39_weekend_routine.html',t:'주말 루틴'},{d:40,f:'day40_routine_review.html',t:'루틴 복습'},{d:41,f:'day41_stress_neuroscience.html',t:'스트레스 신경과학'},{d:42,f:'day42_meditation_breathwork.html',t:'명상·호흡'},{d:43,f:'day43_flow_state.html',t:'몰입 상태'},{d:44,f:'day44_emotional_regulation.html',t:'감정 조절'},{d:45,f:'day45_mental_review.html',t:'멘탈 복습'},{d:46,f:'day46_biohacking_tech.html',t:'바이오해킹'},{d:47,f:'day47_supplementation.html',t:'보충제'},{d:48,f:'day48_social_energy.html',t:'사회적 에너지'},{d:49,f:'day49_digital_detox.html',t:'디지털 디톡스'},{d:50,f:'day50_final_integration.html',t:'최종 통합'}]},{id:'hu',name:'인간학',icon:'\uD83E\uDDE0',color:'#8a6abf',folder:'Human_Lectures',lessons:[{d:1,f:'day01_감정이란_무엇인가.html',t:'감정이란 무엇인가'},{d:2,f:'day02_스트레스_호르몬_회로.html',t:'스트레스 호르몬 회로'},{d:3,f:'day03_INFP_감정처리_패턴.html',t:'INFP 감정처리 패턴'},{d:4,f:'day04_인지적_재평가.html',t:'인지적 재평가'},{d:5,f:'day05_메타인지_훈련.html',t:'메타인지 훈련'},{d:6,f:'day06_감정조절_실전_직장.html',t:'감정조절 실전 직장'},{d:7,f:'day07_신뢰의_신경과학.html',t:'신뢰의 신경과학'},{d:8,f:'day08_공감의_두_종류.html',t:'공감의 두 종류'},{d:9,f:'day09_어서티브_커뮤니케이션.html',t:'어서티브 커뮤니케이션'},{d:10,f:'day10_갈등의_신경과학.html',t:'갈등의 신경과학'},{d:11,f:'day11_피드백_주고받기.html',t:'피드백 주고받기'},{d:12,f:'day12_통합복습_Part1_2.html',t:'통합복습 Part1-2'},{d:13,f:'day13_스토아_통제의_이분법.html',t:'스토아 통제의 이분법'},{d:14,f:'day14_아우렐리우스_실천.html',t:'아우렐리우스 실천'},{d:15,f:'day15_불교적_무상관.html',t:'불교적 무상관'},{d:16,f:'day16_프랭클_의미치료.html',t:'프랭클 의미치료'},{d:17,f:'day17_흐름_상태.html',t:'흐름 상태'},{d:18,f:'day18_철학_프레임_통합.html',t:'철학 프레임 통합'},{d:19,f:'day19_가치관_명료화.html',t:'가치관 명료화'},{d:20,f:'day20_정체성과_역할_통합.html',t:'정체성과 역할 통합'},{d:21,f:'day21_결정의_철학.html',t:'결정의 철학'},{d:22,f:'day22_나만의_감정관리_시스템.html',t:'나만의 감정관리 시스템'}]},{id:'fr',name:'프랑스어',icon:'\uD83C\uDDEB\uD83C\uDDF7',color:'#bf8a4a',folder:'Franch_Lectures',lessons:[{d:1,f:'day-01-pronunciation.html',t:'발음'},{d:2,f:'day-02-greetings.html',t:'인사'},{d:3,f:'day-03-vocab-partA.html',t:'어휘 A'},{d:4,f:'day-04-vocab-partB.html',t:'어휘 B'},{d:5,f:'day-05-numbers-units.html',t:'숫자·단위'},{d:6,f:'day-06-email-expressions.html',t:'이메일 표현'},{d:7,f:'day-07-review-part1.html',t:'Part1 복습'},{d:8,f:'day-08-meeting-expressions.html',t:'회의 표현'},{d:9,f:'day-09-technical-explanation.html',t:'기술 설명'},{d:10,f:'day-10-problem-reporting.html',t:'문제 보고'},{d:11,f:'day-11-scheduling.html',t:'일정 조율'},{d:12,f:'day-12-presentation.html',t:'프레젠테이션'},{d:13,f:'day-13-negotiation.html',t:'협상'},{d:14,f:'day-14-review-part2.html',t:'Part2 복습'},{d:15,f:'day-15-present-tense.html',t:'현재시제'},{d:16,f:'day-16-passe-compose.html',t:'복합과거'},{d:17,f:'day-17-conditionnel.html',t:'조건법'},{d:18,f:'day-18-passive-impersonal.html',t:'수동·비인칭'},{d:19,f:'day-19-questions-negation.html',t:'의문·부정'},{d:20,f:'day-20-review-part3.html',t:'Part3 복습'},{d:21,f:'day-21-french-culture.html',t:'프랑스 문화'},{d:22,f:'day-22-email-correction.html',t:'이메일 교정'},{d:23,f:'day-23-roleplay-meeting.html',t:'롤플레이 회의'},{d:24,f:'day-24-roleplay-email.html',t:'롤플레이 이메일'},{d:25,f:'day-25-self-intro-presentation.html',t:'자기소개 PT'},{d:26,f:'day-26-final-review.html',t:'최종 복습'}]},{id:'pa',name:'육아·부학',icon:'\uD83D\uDC76',color:'#4abfbf',folder:'Parenting_Lectures',lessons:[{d:1,f:'day01_brain_development.html',t:'뇌 발달'},{d:2,f:'day02_attachment_theory.html',t:'애착 이론'},{d:3,f:'day03_dad_play_neuroscience.html',t:'아빠 놀이 신경과학'},{d:4,f:'day04_self_regulation.html',t:'자기 조절'},{d:5,f:'day05_cognitive_development.html',t:'인지 발달'},{d:6,f:'day06_language_explosion.html',t:'언어 폭발'},{d:7,f:'day07_part1_review.html',t:'Part1 복습'},{d:8,f:'day08_sibling_jealousy.html',t:'형제 질투'},{d:9,f:'day09_fairness_equity.html',t:'공정·형평'},{d:10,f:'day10_sibling_cooperation.html',t:'형제 협력'},{d:11,f:'day11_one_on_one_time.html',t:'1:1 시간'},{d:12,f:'day12_part2_review.html',t:'Part2 복습'},{d:13,f:'day13_parenting_stress.html',t:'양육 스트레스'},{d:14,f:'day14_gottman_marriage_science.html',t:'가트만 부부과학'},{d:15,f:'day15_dual_income_communication.html',t:'맞벌이 소통'},{d:16,f:'day16_coparenting_alignment.html',t:'공동양육 정렬'},{d:17,f:'day17_part3_review.html',t:'Part3 복습'},{d:18,f:'day18_focused_play_design.html',t:'집중놀이 설계'},{d:19,f:'day19_bedtime_routine.html',t:'취침 루틴'},{d:20,f:'day20_emotion_coaching.html',t:'감정 코칭'},{d:21,f:'day21_dad_routine_system.html',t:'아빠 루틴 시스템'}]},{id:'ec',name:'재테크',icon:'\uD83D\uDCB0',color:'#c9a84c',folder:'Economics_Lectures',lessons:[{d:1,f:'day01_financial_goal_setting.html',t:'재무 목표 설정'},{d:2,f:'day02_compound_interest.html',t:'복리의 힘'},{d:3,f:'day03_asset_pipeline.html',t:'자산 파이프라인'},{d:4,f:'day04_mortgage_optimization.html',t:'대출 최적화'},{d:5,f:'day05_risk_assessment.html',t:'리스크 평가'},{d:6,f:'day06_behavioral_finance.html',t:'행동재무학'},{d:7,f:'day07_part1_review.html',t:'Part1 복습'},{d:8,f:'day08_valuation_basics.html',t:'밸류에이션 기초'},{d:9,f:'day09_semiconductor_analysis.html',t:'반도체 분석'},{d:10,f:'day10_financial_statements.html',t:'재무제표'},{d:11,f:'day11_technical_analysis.html',t:'기술적 분석'},{d:12,f:'day12_timing_principles.html',t:'타이밍 원칙'},{d:13,f:'day13_kospi_discount.html',t:'KOSPI 디스카운트'},{d:14,f:'day14_part2_review.html',t:'Part2 복습'},{d:15,f:'day15_real_estate_cycle.html',t:'부동산 사이클'},{d:16,f:'day16_house_swap_simulation.html',t:'갈아타기 시뮬레이션'},{d:17,f:'day17_rebalancing.html',t:'리밸런싱'},{d:18,f:'day18_global_diversification.html',t:'글로벌 분산투자'},{d:19,f:'day19_part3_review.html',t:'Part3 복습'},{d:20,f:'day20_tax_optimization.html',t:'절세 전략'},{d:21,f:'day21_financial_income_tax.html',t:'금융소득세'},{d:22,f:'day22_financial_automation.html',t:'재무 자동화'},{d:23,f:'day23_final_roadmap.html',t:'최종 로드맵'}]}];
@@ -294,10 +316,77 @@ const SCENARIOS=[
 
 const TIPS=['뇌는 수면 중 단기기억을 장기기억으로 전환합니다 — 학습 후 충분한 수면이 핵심','간격반복(Spaced Repetition)은 벼락치기 대비 기억 유지율 200% 향상','운동 직후 30분이 학습 효율 최고 구간 — BDNF 분비 피크','포모도로(25분 집중 + 5분 휴식)가 90분 연속 공부보다 효율적','새벽보다 오전 10-12시가 인지 능력 피크 타임','멀티태스킹은 IQ를 15포인트 낮추는 효과 — 하나에 집중하세요','학습 직후 10분 회상(recall)이 1시간 재독보다 효과적','적절한 스트레스(각성)는 학습을 촉진합니다 — 여키스-도드슨 법칙','손글씨 노트가 타이핑보다 기억 정착에 29% 더 효과적','가르치면 90% 기억 — 학습 피라미드의 정점','카페인은 섭취 후 30분-2시간이 피크 — 학습 30분 전 섭취 최적','자연광 노출이 집중력과 기분을 동시에 개선합니다','뇌의 디폴트 모드 네트워크는 멍때릴 때 창의적 연결을 만듭니다','학습 전 5분 명상이 집중력을 40% 향상시킵니다','물을 500ml 마시면 인지 수행이 15% 개선됩니다'];
 
-// ═══ STORAGE ═══
-const SK='learn_data_v3',SRI=[1,3,7,14,30,60];
+// ═══ STORAGE + CLOUD SYNC ═══
+const SK='learn_data_v3',SRI=[1,3,7,14,30,60],SYNC_KEY='savoir_firebase_config';
+let _fbDb=null,_syncDebounce=null,_syncing=false;
+
 function gs(){try{const r=localStorage.getItem(SK);return r?JSON.parse(r):{}}catch(e){return{}}}
-function ss(d){localStorage.setItem(SK,JSON.stringify(d))}
+function ss(d){d._ts=Date.now();localStorage.setItem(SK,JSON.stringify(d));scheduleCloudPush()}
+
+// ── Firebase 초기화 ──
+function getFbConfig(){try{return JSON.parse(localStorage.getItem(SYNC_KEY))}catch(e){return null}}
+function saveFbConfig(cfg){localStorage.setItem(SYNC_KEY,JSON.stringify(cfg))}
+
+function initFirebase(){
+  const cfg=getFbConfig();if(!cfg||!cfg.apiKey||!cfg.projectId)return false;
+  if(_fbDb)return true;
+  try{
+    const app=firebase.initializeApp({apiKey:cfg.apiKey,databaseURL:'https://'+cfg.projectId+'-default-rtdb.firebaseio.com',projectId:cfg.projectId});
+    _fbDb=firebase.database();
+    _fbDb.ref('savoir/data').on('value',function(snap){
+      if(_syncing)return;
+      const remote=snap.val();
+      if(!remote)return;
+      const local=gs(),localTs=local._ts||0,remoteTs=remote._ts||0;
+      if(remoteTs>localTs){
+        localStorage.setItem(SK,JSON.stringify(remote));
+        if(typeof renderAll==='function')renderAll();
+        showSyncStatus('synced','SYNCED');
+      }
+    });
+    showSyncStatus('synced','CONNECTED');
+    return true;
+  }catch(e){showSyncStatus('error','SYNC ERROR');return false}
+}
+
+function scheduleCloudPush(){
+  if(!_fbDb)return;
+  clearTimeout(_syncDebounce);
+  _syncDebounce=setTimeout(function(){
+    _syncing=true;
+    const d=gs();
+    _fbDb.ref('savoir/data').set(d).then(function(){
+      _syncing=false;
+      showSyncStatus('synced','SYNCED');
+    }).catch(function(){
+      _syncing=false;
+      showSyncStatus('error','SYNC FAIL');
+    });
+  },1000);
+}
+
+function forcePull(){
+  if(!_fbDb)return;
+  _fbDb.ref('savoir/data').once('value').then(function(snap){
+    const remote=snap.val();
+    if(remote){localStorage.setItem(SK,JSON.stringify(remote));renderAll();showSyncStatus('synced','PULLED')}
+  });
+}
+
+function forcePush(){
+  if(!_fbDb)return;
+  const d=gs();d._ts=Date.now();
+  _fbDb.ref('savoir/data').set(d).then(function(){showSyncStatus('synced','PUSHED')}).catch(function(){showSyncStatus('error','PUSH FAIL')});
+}
+
+function showSyncStatus(cls,txt){
+  const el=document.getElementById('syncIndicator');
+  el.className='sync-indicator show '+cls;el.textContent=txt;
+  setTimeout(function(){el.classList.remove('show')},2500);
+}
+
+// ── 초기화 시도 ──
+var _fbReady=initFirebase();
 function getProgress(cid){const d=gs();return(d[cid]&&d[cid].done)?d[cid].done:[]}
 function markDone(cid,day){const d=gs();if(!d[cid])d[cid]={done:[],reviews:{}};if(!d[cid].done.includes(day)){d[cid].done.push(day);const n=Date.now();d[cid].reviews[day]={stage:0,next:n+SRI[0]*864e5,last:n};ss(d);checkMilestone(cid)}else{ss(d)}}
 function unmarkDone(cid,day){const d=gs();if(!d[cid])return;d[cid].done=d[cid].done.filter(x=>x!==day);if(d[cid].reviews)delete d[cid].reviews[day];ss(d)}
@@ -519,11 +608,33 @@ function renderStats(){document.getElementById('streakCount').textContent=calcSt
 document.getElementById('exportBtn').addEventListener('click',function(){const b=new Blob([JSON.stringify(gs(),null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='savoir_backup_'+fmtDate(new Date())+'.json';a.click();URL.revokeObjectURL(u)});
 document.getElementById('importBtn').addEventListener('click',function(){document.getElementById('importFile').click()});
 document.getElementById('importFile').addEventListener('change',function(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){try{ss(JSON.parse(ev.target.result));renderAll();alert('\uB370\uC774\uD130\uB97C \uAC00\uC838\uC654\uC2B5\uB2C8\uB2E4.')}catch(err){alert('\uC720\uD6A8\uD558\uC9C0 \uC54A\uC740 \uD30C\uC77C\uC785\uB2C8\uB2E4.')}};r.readAsText(f);e.target.value=''});
-document.getElementById('resetBtn').addEventListener('click',function(){if(confirm('\uBAA8\uB4E0 \uD559\uC2B5 \uB370\uC774\uD130\uB97C \uCD08\uAE30\uD654\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C? \uC774 \uC791\uC5C5\uC740 \uB418\uB3CC\uB9B4 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.')){localStorage.removeItem(SK);renderAll()}});
+document.getElementById('resetBtn').addEventListener('click',function(){if(confirm('\uBAA8\uB4E0 \uD559\uC2B5 \uB370\uC774\uD130\uB97C \uCD08\uAE30\uD654\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C? \uC774 \uC791\uC5C5\uC740 \uB418\uB3CC\uB9B4 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.')){localStorage.removeItem(SK);if(_fbDb)_fbDb.ref('savoir/data').remove();renderAll()}});
+
+// ═══ CLOUD SYNC UI ═══
+document.getElementById('syncSetupBtn').addEventListener('click',function(){
+  var b=document.getElementById('syncSetupBanner'),cfg=getFbConfig();
+  b.style.display=b.style.display==='block'?'none':'block';
+  if(cfg){document.getElementById('fbApiKey').value=cfg.apiKey||'';document.getElementById('fbProjectId').value=cfg.projectId||'';document.getElementById('fbStatus').textContent='연결됨'}
+});
+document.getElementById('fbSaveBtn').addEventListener('click',function(){
+  var ak=document.getElementById('fbApiKey').value.trim(),pid=document.getElementById('fbProjectId').value.trim();
+  if(!ak||!pid){document.getElementById('fbStatus').textContent='API Key와 Project ID를 모두 입력하세요';return}
+  saveFbConfig({apiKey:ak,projectId:pid});_fbDb=null;
+  if(initFirebase()){document.getElementById('fbStatus').textContent='연결 성공! 동기화 시작됨';document.getElementById('syncNowBtn').style.display='';forcePush()}
+  else{document.getElementById('fbStatus').textContent='연결 실패 — 설정을 확인하세요'}
+});
+document.getElementById('fbClearBtn').addEventListener('click',function(){
+  localStorage.removeItem(SYNC_KEY);_fbDb=null;
+  document.getElementById('fbApiKey').value='';document.getElementById('fbProjectId').value='';
+  document.getElementById('fbStatus').textContent='연결 해제됨';document.getElementById('syncNowBtn').style.display='none';
+});
+document.getElementById('syncNowBtn').addEventListener('click',function(){forcePush()});
+if(_fbReady)document.getElementById('syncNowBtn').style.display='';
 
 // ═══ INIT ═══
 function renderAll(){renderStats();renderTotalStats();renderDaily();renderTip();renderReviewQueue();renderCourseGrid();renderCatTabs();renderScenarioList();renderWeeklyGoal();renderWeekly();renderHeatmap();renderAllProgress();updTimer()}
 renderAll();
+if(_fbReady){_fbDb.ref('savoir/data').once('value').then(function(snap){var remote=snap.val();if(remote){var local=gs(),lt=local._ts||0,rt=remote._ts||0;if(rt>lt){localStorage.setItem(SK,JSON.stringify(remote));renderAll();showSyncStatus('synced','CLOUD DATA LOADED')}}})}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
 </script>
 </body>
