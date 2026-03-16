@@ -222,7 +222,6 @@ a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;b
 <div class="gold-rule"></div>
 <div class="section-label"><span class="label-fr">PARAMÈTRES</span><span class="label-kr">— 설정</span></div>
 <div>
-<button class="settings-btn" id="syncNowBtn">SYNC NOW</button>
 <button class="settings-btn" id="exportBtn">EXPORT DATA</button>
 <button class="settings-btn" id="importBtn">IMPORT DATA</button>
 <button class="settings-btn" id="resetBtn" style="color:#8b4040">RESET ALL DATA</button>
@@ -593,8 +592,9 @@ document.getElementById('importBtn').addEventListener('click',function(){documen
 document.getElementById('importFile').addEventListener('change',function(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){try{ss(JSON.parse(ev.target.result));renderAll();alert('\uB370\uC774\uD130\uB97C \uAC00\uC838\uC654\uC2B5\uB2C8\uB2E4.')}catch(err){alert('\uC720\uD6A8\uD558\uC9C0 \uC54A\uC740 \uD30C\uC77C\uC785\uB2C8\uB2E4.')}};r.readAsText(f);e.target.value=''});
 document.getElementById('resetBtn').addEventListener('click',function(){if(confirm('\uBAA8\uB4E0 \uD559\uC2B5 \uB370\uC774\uD130\uB97C \uCD08\uAE30\uD654\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C? \uC774 \uC791\uC5C5\uC740 \uB418\uB3CC\uB9B4 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.')){localStorage.removeItem(SK);if(_fbDb)_fbDb.ref('savoir/data').remove();renderAll()}});
 
-// ═══ CLOUD SYNC UI ═══
-document.getElementById('syncNowBtn').addEventListener('click',function(){forcePush()});
+// ═══ CLOUD SYNC — AUTO ═══
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&_fbDb)forcePull()});
+window.addEventListener('focus',function(){if(_fbDb)forcePull()});
 
 // ═══ INIT ═══
 function renderAll(){renderStats();renderTotalStats();renderDaily();renderTip();renderReviewQueue();renderCourseGrid();renderCatTabs();renderScenarioList();renderWeeklyGoal();renderWeekly();renderHeatmap();renderAllProgress();updTimer()}
