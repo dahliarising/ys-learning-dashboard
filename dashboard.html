@@ -394,7 +394,7 @@ function saveNote(cid,day,text){var d=gs();if(!d._notes)d._notes={};if(text)d._n
 // ═══ WEEKLY GOAL ═══
 function getWeeklyGoal(){var d=gs();return d._weeklyGoal||{target:10}}
 function setWeeklyGoal(t){var d=gs();d._weeklyGoal={target:t};ss(d)}
-function getWeeklyDoneLectures(){var now=new Date(),dow=now.getDay(),ws=new Date(now);ws.setDate(now.getDate()-dow);ws.setHours(0,0,0,0);var wst=ws.getTime(),count=0;C.forEach(function(c){var rv=getReviews(c.id);Object.keys(rv).forEach(function(k){if(rv[k].last>=wst)count++})});return count}
+function getWeeklyDoneLectures(){var now=new Date(),dow=now.getDay(),ws=new Date(now);ws.setDate(now.getDate()-dow);ws.setHours(0,0,0,0);var wst=ws.getTime(),count=0;C.forEach(function(c){var rv=getReviews(c.id);Object.keys(rv).forEach(function(k){var e=rv[k];if(e&&e.last&&e.last>=wst)count++})});return count}
 
 // ═══ MILESTONES ═══
 function checkMilestone(cid){var c=findCourse(cid);if(!c)return;var done=getProgress(cid).length,total=c.lessons.length,pct=Math.round(done/total*100),ms=[25,50,75,100];var d=gs();if(!d._milestones)d._milestones={};var prev=d._milestones[cid]||0;for(var i=0;i<ms.length;i++){if(pct>=ms[i]&&prev<ms[i]){d._milestones[cid]=ms[i];ss(d);showMilestone(c,ms[i]);return}}}
@@ -461,7 +461,7 @@ function renderDailyScenario(sc){
 
 function renderReviewQueue(){
   const el=document.getElementById('reviewQueue'),now=Date.now(),revs=[];
-  C.forEach(function(c){const rv=getReviews(c.id);Object.keys(rv).forEach(function(ds){const day=parseInt(ds),r=rv[ds];if(r.next<=now){const l=findLesson(c.id,day);if(l)revs.push({course:c,lesson:l,day:day,stage:r.stage})}})});
+  C.forEach(function(c){const rv=getReviews(c.id);Object.keys(rv).forEach(function(ds){const day=parseInt(ds),r=rv[ds];if(r&&r.next&&r.next<=now){const l=findLesson(c.id,day);if(l)revs.push({course:c,lesson:l,day:day,stage:r.stage})}})});
   if(!revs.length){el.innerHTML='<div style="font-size:12px;color:var(--text-muted);padding:12px 0">\uC624\uB298 \uBCF5\uC2B5\uD560 \uD56D\uBAA9\uC774 \uC5C6\uC2B5\uB2C8\uB2E4</div>';return}
   let h='';revs.forEach(function(r){h+='<div class="review-item" data-cid="'+r.course.id+'" data-day="'+r.day+'"><div class="review-stage">'+(r.stage+1)+'/'+SRI.length+'</div><div class="daily-dot" style="background:'+r.course.color+'"></div><div class="daily-meta"><div class="daily-day">DAY '+String(r.day).padStart(2,'0')+'</div><div class="daily-title">'+esc(r.lesson.t)+'</div><div class="daily-subject">'+esc(r.course.name)+'</div></div></div>'});
   el.innerHTML=h;
@@ -616,7 +616,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden&&_fb
 window.addEventListener('focus',function(){if(_fbDb)forcePull()});
 
 // ═══ INIT ═══
-function renderAll(){renderStats();renderTotalStats();renderDaily();renderTip();renderReviewQueue();renderCourseGrid();renderAllLessons();renderCatTabs();renderScenarioList();renderWeeklyGoal();renderWeekly();renderHeatmap();renderAllProgress();updTimer()}
+function renderAll(){[renderStats,renderTotalStats,renderDaily,renderTip,renderReviewQueue,renderCourseGrid,renderAllLessons,renderCatTabs,renderScenarioList,renderWeeklyGoal,renderWeekly,renderHeatmap,renderAllProgress,updTimer].forEach(function(fn){try{fn()}catch(e){console.error(fn.name,e)}})}
 renderAll();
 if(_fbReady){_fbDb.ref('savoir/data').once('value').then(function(snap){var remote=snap.val();if(remote){var local=gs(),lt=local._ts||0,rt=remote._ts||0;if(rt>lt){localStorage.setItem(SK,JSON.stringify(remote));renderAll();showSyncStatus('synced','CLOUD DATA LOADED')}}})}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
