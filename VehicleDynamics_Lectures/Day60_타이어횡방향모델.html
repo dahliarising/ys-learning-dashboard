@@ -234,11 +234,32 @@ td .katex,th .katex{font-size:0.9em!important}
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{ignoredTags:["script","noscript","style","textarea","pre","code"],delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+<!-- KaTeX Auto-Render -->
+<script>
+(function() {
+  var katexJS = document.createElement('script');
+  katexJS.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js';
+  katexJS.onload = function() {
+    var autoRender = document.createElement('script');
+    autoRender.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js';
+    autoRender.onload = function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false},
+          {left: "\\[", right: "\\]", display: true}
+        ],
+        ignoredTags: ["script","noscript","style","textarea","pre","code"],
+        throwOnError: false
+      });
+    };
+    document.head.appendChild(autoRender);
+  };
+  document.head.appendChild(katexJS);
+})();
 </script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 </head>
 <body>
 
@@ -263,7 +284,7 @@ td .katex,th .katex{font-size:0.9em!important}
   <div class="hero-day">— DAY 60 · FINAL —</div>
   <h1 class="hero-title">타이어 횡방향 모델</h1>
   <p class="hero-title-en">Tire Lateral Model — Pacejka Magic Formula</p>
-  <div class="hero-equation"><code style="font-size:17px;color:#E8C96A;">F<sub>y</sub> = D · sin(C · arctan(B·α − E·(B·α − arctan(B·α))))</code></div>
+  <div class="hero-equation"><code style="font-size:17px;color:#E8C96A;">F<sub>y</sub> = D · sin(C · arctan(B·$\alpha$ − E·(B·$\alpha$ − arctan(B·$\alpha$))))</code></div>
   <div class="gauge-wrap">
     <svg class="gauge-svg" viewBox="0 0 100 100">
       <circle class="gauge-bg" cx="50" cy="50" r="40"/>
@@ -292,7 +313,7 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="brain-box">
         <h3>💡 타이어는 어떻게 횡력을 만드는가?</h3>
         <p>타이어의 횡력(Lateral Force) 발생 메커니즘은 직관적이지 않습니다. 타이어가 진행 방향과 다른 각도로 회전하면, 접지면(Contact Patch)의 고무 요소들이 <span class="highlight">탄성 변형</span>을 일으킵니다. 이 변형이 복원력을 만들어내고, 그 합력이 바로 <strong>횡력 F<sub>y</sub></strong>입니다.</p>
-        <p><span class="highlight">슬립앵글(Slip Angle, α)</span>은 타이어 휠 평면의 방향과 실제 진행 방향 사이의 각도입니다. 브러시 모델(Brush Model)로 비유하면: 빗질할 때 빗을 비스듬히 밀면 털이 옆으로 휘는 것과 같습니다. 접지면 앞쪽은 아직 변형이 작고, 뒤쪽으로 갈수록 변형이 커져 결국 슬립이 시작됩니다.</p>
+        <p><span class="highlight">슬립앵글(Slip Angle, $\alpha$)</span>은 타이어 휠 평면의 방향과 실제 진행 방향 사이의 각도입니다. 브러시 모델(Brush Model)로 비유하면: 빗질할 때 빗을 비스듬히 밀면 털이 옆으로 휘는 것과 같습니다. 접지면 앞쪽은 아직 변형이 작고, 뒤쪽으로 갈수록 변형이 커져 결국 슬립이 시작됩니다.</p>
         <p>Pacejka의 <strong>Magic Formula</strong>는 이 비선형 관계를 단 하나의 수식으로 모사합니다. 4개의 계수(B, C, D, E)로 거의 모든 타이어의 힘-슬립 특성을 표현할 수 있어, 차량 동역학 시뮬레이션의 산업 표준이 되었습니다.</p>
         <div class="time-split">
             <div class="time-block"><span class="t-range">0-6m</span><span class="t-desc">횡력 발생 원리</span></div>
@@ -313,8 +334,8 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="deriv-explain">
             <p>Pacejka Magic Formula의 일반 형태는 다음과 같습니다:</p>
             <div class="deriv-equation"><code style="font-size:16px;color:#E8C96A;">Y(x) = D · sin(C · arctan(B·x − E·(B·x − arctan(B·x))))</code></div>
-            <p>여기서 Y는 출력(F<sub>y</sub> 또는 M<sub>z</sub>), x는 입력(슬립앵글 α 또는 슬립비 κ)입니다.</p>
-            <p><span class="label">물리적 의미:</span> arctan 함수의 중첩으로 S-커브를 만들어, 선형 영역 → 포화 영역 → 감소 영역(E에 의해)을 하나의 수식으로 표현합니다.</p>
+            <p>여기서 Y는 출력(F<sub>y</sub> 또는 M<sub>z</sub>), x는 입력(슬립앵글 $\alpha$ 또는 슬립비 κ)입니다.</p>
+            <p><span class="label">물리적 의미:</span> arctan 함수의 중첩으로 S-커브를 만들어, 선형 영역 $\rightarrow$ 포화 영역 $\rightarrow$ 감소 영역(E에 의해)을 하나의 수식으로 표현합니다.</p>
         </div>
     </div>
 
@@ -323,10 +344,10 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="deriv-card">
         <div class="deriv-step-num">STEP 02 — 4개 계수의 물리적 의미</div>
         <div class="deriv-explain">
-            <p><span class="label">B (Stiffness Factor):</span> 초기 기울기를 결정합니다. Cornering Stiffness C<sub>α</sub>와 관련: <code style="color:#E8C96A;">C<sub>α</sub> = B · C · D</code>. B가 클수록 작은 슬립앵글에서 빠르게 횡력이 증가합니다.</p>
-            <p><span class="label">C (Shape Factor):</span> 곡선의 전체적 형상을 제어합니다. 순수 횡력은 C ≈ 1.3~1.65, 종방향은 C ≈ 1.5~1.8이 일반적입니다.</p>
-            <p><span class="label">D (Peak Value):</span> 횡력의 최대값으로, <code style="color:#E8C96A;">D = μ · F<sub>z</sub></code>에 비례합니다. 하중이 커지면 최대 횡력도 증가하지만, 마찰계수는 감소합니다(하중 감도).</p>
-            <p><span class="label">E (Curvature Factor):</span> 피크 이후 곡선 형태를 조절합니다. E &lt; 1이면 점진적 감소, E ≈ 0이면 피크 유지, E &gt; 1이면 급격한 감소를 보입니다.</p>
+            <p><span class="label">B (Stiffness Factor):</span> 초기 기울기를 결정합니다. Cornering Stiffness C<sub>$\alpha$</sub>와 관련: <code style="color:#E8C96A;">C<sub>$\alpha$</sub> = B · C · D</code>. B가 클수록 작은 슬립앵글에서 빠르게 횡력이 증가합니다.</p>
+            <p><span class="label">C (Shape Factor):</span> 곡선의 전체적 형상을 제어합니다. 순수 횡력은 C $\approx$ 1.3~1.65, 종방향은 C $\approx$ 1.5~1.8이 일반적입니다.</p>
+            <p><span class="label">D (Peak Value):</span> 횡력의 최대값으로, <code style="color:#E8C96A;">D = $\mu$ · F<sub>z</sub></code>에 비례합니다. 하중이 커지면 최대 횡력도 증가하지만, 마찰계수는 감소합니다(하중 감도).</p>
+            <p><span class="label">E (Curvature Factor):</span> 피크 이후 곡선 형태를 조절합니다. E &lt; 1이면 점진적 감소, E $\approx$ 0이면 피크 유지, E &gt; 1이면 급격한 감소를 보입니다.</p>
         </div>
     </div>
 
@@ -337,8 +358,8 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="deriv-explain">
             <p>실제 타이어에서 B, C, D, E는 모두 수직하중 F<sub>z</sub>의 함수입니다:</p>
             <div class="deriv-equation"><code style="font-size:15px;color:#E8C96A;">D(F<sub>z</sub>) = a₁·F<sub>z</sub>² + a₂·F<sub>z</sub></code></div>
-            <p>특히 <span class="highlight">μ-F<sub>z</sub> 관계</span>가 중요합니다: 하중이 증가하면 절대 횡력은 증가하지만 마찰계수(μ = F<sub>y</sub>/F<sub>z</sub>)는 감소합니다. 이것이 바로 <strong>하중 이동이 총 그립을 감소</strong>시키는 근본 이유입니다.</p>
-            <div class="deriv-equation"><code style="font-size:15px;color:#E8C96A;">μ<sub>eff</sub> = (F<sub>y,inner</sub> + F<sub>y,outer</sub>) / (F<sub>z,inner</sub> + F<sub>z,outer</sub>) &lt; μ<sub>0</sub></code></div>
+            <p>특히 <span class="highlight">$\mu$-F<sub>z</sub> 관계</span>가 중요합니다: 하중이 증가하면 절대 횡력은 증가하지만 마찰계수($\mu$ = F<sub>y</sub>/F<sub>z</sub>)는 감소합니다. 이것이 바로 <strong>하중 이동이 총 그립을 감소</strong>시키는 근본 이유입니다.</p>
+            <div class="deriv-equation"><code style="font-size:15px;color:#E8C96A;">$\mu$<sub>eff</sub> = (F<sub>y,inner</sub> + F<sub>y,outer</sub>) / (F<sub>z,inner</sub> + F<sub>z,outer</sub>) &lt; $\mu$<sub>0</sub></code></div>
         </div>
     </div>
 
@@ -347,12 +368,12 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="deriv-card">
         <div class="deriv-step-num">STEP 04 — Combined Slip (복합 슬립)</div>
         <div class="deriv-explain">
-            <p>실제 주행에서는 종슬립(κ)과 횡슬립(α)이 동시에 발생합니다. 이때 마찰원(Friction Circle) 제약이 적용됩니다:</p>
-            <div class="deriv-equation"><code style="font-size:15px;color:#E8C96A;">√(F<sub>x</sub>² + F<sub>y</sub>²) ≤ μ · F<sub>z</sub></code></div>
+            <p>실제 주행에서는 종슬립(κ)과 횡슬립($\alpha$)이 동시에 발생합니다. 이때 마찰원(Friction Circle) 제약이 적용됩니다:</p>
+            <div class="deriv-equation"><code style="font-size:15px;color:#E8C96A;">$\sqrt{\cdot}$(F<sub>x</sub>² + F<sub>y</sub>²) $\leq \mu$ · F<sub>z</sub></code></div>
             <p>종력이 사용되면 그만큼 횡력 여유가 줄어듭니다. Combined Slip 모델에서는 합성 슬립을 정의합니다:</p>
-            <div class="deriv-equation"><code style="font-size:15px;color:#E8C96A;">σ = √(κ² + tan²α)</code></div>
+            <div class="deriv-equation"><code style="font-size:15px;color:#E8C96A;">$\sigma$ = $\sqrt{\cdot}$(κ² + tan²$\alpha$)</code></div>
             <p>그리고 가중 함수(Weighting Function)로 종·횡력을 분배합니다:</p>
-            <div class="deriv-equation"><code style="font-size:14px;color:#E8C96A;">F<sub>y,combined</sub> = F<sub>y,pure</sub> · G<sub>yκ</sub>(κ) · cos(arctan(κ/tanα))</code></div>
+            <div class="deriv-equation"><code style="font-size:14px;color:#E8C96A;">F<sub>y,combined</sub> = F<sub>y,pure</sub> · G<sub>yκ</sub>(κ) · cos(arctan(κ/tan$\alpha$))</code></div>
         </div>
     </div>
 
@@ -361,9 +382,9 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="deriv-card">
         <div class="deriv-step-num">STEP 05 — 캠버 스러스트 추가</div>
         <div class="deriv-explain">
-            <p>캠버각(γ)에 의한 추가 횡력(Camber Thrust)을 MF에 포함합니다:</p>
-            <div class="deriv-equation"><code style="font-size:15px;color:#E8C96A;">F<sub>y,total</sub> = F<sub>y</sub>(α) + S<sub>Vy</sub> + F<sub>y,camber</sub>(γ)</code></div>
-            <p>여기서 S<sub>Vy</sub>는 수직 오프셋(Ply Steer, Conicity), F<sub>y,camber</sub>는 캠버 스러스트입니다. 캠버 스러스트 계수 C<sub>γ</sub>는 타이어 구조에 따라 200~500 N/deg 범위입니다.</p>
+            <p>캠버각($\gamma$)에 의한 추가 횡력(Camber Thrust)을 MF에 포함합니다:</p>
+            <div class="deriv-equation"><code style="font-size:15px;color:#E8C96A;">F<sub>y,total</sub> = F<sub>y</sub>($\alpha$) + S<sub>Vy</sub> + F<sub>y,camber</sub>($\gamma$)</code></div>
+            <p>여기서 S<sub>Vy</sub>는 수직 오프셋(Ply Steer, Conicity), F<sub>y,camber</sub>는 캠버 스러스트입니다. 캠버 스러스트 계수 C<sub>$\gamma$</sub>는 타이어 구조에 따라 200~500 N/deg 범위입니다.</p>
         </div>
     </div>
 
@@ -387,7 +408,7 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="sub-eq">$$\sigma_x = \frac{s}{1+s}, \quad \sigma_y = \frac{\tan\alpha}{1+s}$$</div>
     <div class="sub-eq">$$\sigma = \sqrt{\sigma_x^2 + \sigma_y^2}$$</div>
     <div class="sub-eq">$$F_x = \frac{\sigma_x}{\sigma} F(\sigma), \quad F_y = \frac{\sigma_y}{\sigma} F(\sigma)$$</div>
-    <p class="sub-note">마찰원(friction circle/ellipse) 개념: 종+횡 합력이 μFz 이내. 제동 중 조향 시 횡력 감소!</p>
+    <p class="sub-note">마찰원(friction circle/ellipse) 개념: 종+횡 합력이 $\mu$Fz 이내. 제동 중 조향 시 횡력 감소!</p>
   </div>
   <div class="sub-step">
     <p class="sub-label">③ 하중 감도 (Load Sensitivity)</p>
@@ -416,20 +437,20 @@ td .katex,th .katex{font-size:0.9em!important}
             <tbody>
                 <tr><td class="sym">B</td><td>Stiffness Factor</td><td>6 ~ 25</td><td>12.5</td><td>초기 기울기 — Cornering Stiffness 결정</td></tr>
                 <tr><td class="sym">C</td><td>Shape Factor</td><td>1.3 ~ 1.65</td><td>1.45</td><td>곡선 형상 — 승용차 vs 레이싱</td></tr>
-                <tr><td class="sym">D</td><td>Peak Value [N]</td><td>μ·F<sub>z</sub></td><td>4,800</td><td>최대 횡력 = 마찰계수 × 수직하중</td></tr>
+                <tr><td class="sym">D</td><td>Peak Value [N]</td><td>$\mu$·F<sub>z</sub></td><td>4,800</td><td>최대 횡력 = 마찰계수 $\times$ 수직하중</td></tr>
                 <tr><td class="sym">E</td><td>Curvature Factor</td><td>−2 ~ 1</td><td>−0.8</td><td>피크 이후 감소율 (E &lt; 0: 안정적)</td></tr>
-                <tr><td class="sym">C<sub>α</sub></td><td>Cornering Stiffness [N/rad]</td><td>40k ~ 120k</td><td>83,520</td><td>= B·C·D, 선형 영역 기울기</td></tr>
-                <tr><td class="sym">α<sub>peak</sub></td><td>Peak Slip Angle [deg]</td><td>6° ~ 14°</td><td>8.5°</td><td>최대 횡력 발생 슬립앵글</td></tr>
-                <tr><td class="sym">C<sub>γ</sub></td><td>Camber Stiffness [N/deg]</td><td>200 ~ 500</td><td>320</td><td>캠버각 1° 당 추가 횡력</td></tr>
+                <tr><td class="sym">C<sub>$\alpha$</sub></td><td>Cornering Stiffness [N/rad]</td><td>40k ~ 120k</td><td>83,520</td><td>= B·C·D, 선형 영역 기울기</td></tr>
+                <tr><td class="sym">$\alpha$<sub>peak</sub></td><td>Peak Slip Angle [deg]</td><td>6° ~ 14°</td><td>8.5°</td><td>최대 횡력 발생 슬립앵글</td></tr>
+                <tr><td class="sym">C<sub>$\gamma$</sub></td><td>Camber Stiffness [N/deg]</td><td>200 ~ 500</td><td>320</td><td>캠버각 1° 당 추가 횡력</td></tr>
             </tbody>
         </table>
     </div>
     <div class="vehicle-example">
         <h4>🚗 Renault Mégane 205/55R16 — Pacejka Fitting 결과</h4>
         <p>하중 4,500N 기준 측정값:</p>
-        <p class="calc">F<sub>y,peak</sub> = 4,800N at α = 8.5° → μ<sub>peak</sub> = 4800/4500 = 1.07</p>
-        <p class="calc">C<sub>α</sub> = B·C·D = 12.5 × 1.45 × 4800 = 87,000 N/rad</p>
-        <p>하중 감도: F<sub>z</sub>가 50% 증가하면 μ<sub>peak</sub>는 약 12% 감소 (1.07 → 0.94)</p>
+        <p class="calc">F<sub>y,peak</sub> = 4,800N at $\alpha$ = 8.5° $\rightarrow \mu$<sub>peak</sub> = 4800/4500 = 1.07</p>
+        <p class="calc">C<sub>$\alpha$</sub> = B·C·D = 12.5 $\times$ 1.45 $\times$ 4800 = 87,000 N/rad</p>
+        <p>하중 감도: F<sub>z</sub>가 50% 증가하면 $\mu$<sub>peak</sub>는 약 12% 감소 (1.07 $\rightarrow$ 0.94)</p>
     </div>
 </div>
 
@@ -464,14 +485,14 @@ td .katex,th .katex{font-size:0.9em!important}
             <line x1="80" y1="350" x2="180" y2="190" stroke="#4A9EBF" stroke-width="2" stroke-dasharray="6,3"/>
             <text x="140" y="255" fill="#4A9EBF" font-size="13" font-family="JetBrains Mono" transform="rotate(-50,140,255)">slope = B·C·D</text>
             <!-- alpha_peak -->
-            <text x="260" y="370" fill="#E8C96A" font-size="12" font-family="JetBrains Mono" text-anchor="middle">α_peak</text>
+            <text x="260" y="370" fill="#E8C96A" font-size="12" font-family="JetBrains Mono" text-anchor="middle">$\alpha_{peak}$</text>
             <!-- E effect region -->
             <path d="M 380 75 Q 440 100 500 115" fill="none" stroke="rgba(191,106,74,0.5)" stroke-width="8"/>
             <text x="460" y="62" fill="#BF6A4A" font-size="12" font-family="JetBrains Mono">E 영역 (피크 후)</text>
             <!-- C effect label -->
             <text x="200" y="155" fill="#8A6ABF" font-size="12" font-family="JetBrains Mono">C: 형상 결정</text>
             <!-- Axis labels -->
-            <text x="325" y="395" fill="#7A7A8A" font-size="13" font-family="Noto Sans KR" text-anchor="middle">Slip Angle α [deg]</text>
+            <text x="325" y="395" fill="#7A7A8A" font-size="13" font-family="Noto Sans KR" text-anchor="middle">Slip Angle $\alpha$ [deg]</text>
             <text x="25" y="200" fill="#7A7A8A" font-size="13" font-family="Noto Sans KR" text-anchor="middle" transform="rotate(-90,25,200)">Lateral Force F_y [N]</text>
             <!-- Axis ticks -->
             <text x="80" y="368" fill="#7A7A8A" font-size="10" font-family="JetBrains Mono">0°</text>
@@ -482,7 +503,7 @@ td .katex,th .katex{font-size:0.9em!important}
             <!-- Legend -->
             <rect x="400" y="130" width="160" height="85" rx="8" fill="rgba(18,21,28,0.9)" stroke="#252A38"/>
             <line x1="415" y1="148" x2="440" y2="148" stroke="#C9A84C" stroke-width="2"/>
-            <text x="448" y="152" fill="#D8D3C8" font-size="11" font-family="Noto Sans KR">F_y (α)</text>
+            <text x="448" y="152" fill="#D8D3C8" font-size="11" font-family="Noto Sans KR">F_y ($\alpha$)</text>
             <circle cx="427" cy="168" r="4" fill="#4A9EBF"/>
             <text x="448" y="172" fill="#4A9EBF" font-size="11" font-family="Noto Sans KR">B: Stiffness</text>
             <circle cx="427" cy="188" r="4" fill="#4ABF8A"/>
@@ -522,13 +543,13 @@ td .katex,th .katex{font-size:0.9em!important}
             <!-- Fy component -->
             <text x="230" y="115" fill="#4ABF8A" font-size="11" font-family="JetBrains Mono" text-anchor="end">F_y</text>
             <!-- Friction limit label -->
-            <text x="345" y="400" fill="#C9A84C" font-size="12" font-family="Noto Sans KR">μ·F_z (마찰 한계)</text>
+            <text x="345" y="400" fill="#C9A84C" font-size="12" font-family="Noto Sans KR">$\mu$·F_z (마찰 한계)</text>
             <!-- Actual friction ellipse -->
             <ellipse cx="250" cy="250" rx="175" ry="165" fill="none" stroke="#8A6ABF" stroke-width="1.5" stroke-dasharray="4,4"/>
             <text x="100" y="395" fill="#8A6ABF" font-size="11" font-family="Noto Sans KR">실제 타이어: 타원형</text>
             <!-- Angle arc -->
             <path d="M 290 250 A 40 40 0 0 0 275 218" fill="none" stroke="#E8C96A" stroke-width="1.5"/>
-            <text x="300" y="225" fill="#E8C96A" font-size="11" font-family="JetBrains Mono">θ</text>
+            <text x="300" y="225" fill="#E8C96A" font-size="11" font-family="JetBrains Mono">$\theta$</text>
             <!-- Center point -->
             <circle cx="250" cy="250" r="3" fill="#E8C96A"/>
             <defs>
@@ -536,8 +557,8 @@ td .katex,th .katex{font-size:0.9em!important}
             </defs>
             <!-- Key insight -->
             <rect x="30" y="420" width="440" height="55" rx="8" fill="rgba(74,191,138,0.06)" stroke="rgba(74,191,138,0.2)"/>
-            <text x="250" y="443" text-anchor="middle" fill="#4ABF8A" font-size="12" font-family="Noto Sans KR">√(F_x² + F_y²) ≤ μ·F_z  →  제동 중 코너링 시 횡력 여유 감소</text>
-            <text x="250" y="463" text-anchor="middle" fill="#7A7A8A" font-size="11" font-family="Noto Sans KR">보라색 타원: 실제 타이어는 종/횡 마찰 한계가 다름 (μ_x ≠ μ_y)</text>
+            <text x="250" y="443" text-anchor="middle" fill="#4ABF8A" font-size="12" font-family="Noto Sans KR">$\sqrt{\cdot}$(F_x² + F_y²) $\leq \mu$·F_z  $\rightarrow$  제동 중 코너링 시 횡력 여유 감소</text>
+            <text x="250" y="463" text-anchor="middle" fill="#7A7A8A" font-size="11" font-family="Noto Sans KR">보라색 타원: 실제 타이어는 종/횡 마찰 한계가 다름 ($\mu_x$ ≠ $\mu_y$)</text>
         </svg>
     </div>
 </div>
@@ -590,19 +611,19 @@ td .katex,th .katex{font-size:0.9em!important}
         <p><strong>📝 예제: 205/55R16 Pacejka 피팅 — F&T 시험 데이터로부터 계수 추출</strong></p>
         <p>측정 조건: 수직하중 F<sub>z</sub> = 4,500N, 캠버 0°, 슬립앵글 −12° ~ +12° 스위프</p>
         <p><strong>Step 1.</strong> 초기 기울기에서 Cornering Stiffness 추출:</p>
-        <div class="calc">C<sub>α</sub> = ΔF<sub>y</sub>/Δα |<sub>α→0</sub> = 3,200N / 2.2° = 83,520 N/rad</div>
+        <div class="calc">C<sub>$\alpha$</sub> = $\Delta$F<sub>y</sub>/$\Delta \alpha$ |<sub>$\alpha \rightarrow$0</sub> = 3,200N / 2.2° = 83,520 N/rad</div>
         <p><strong>Step 2.</strong> 피크값에서 D 결정:</p>
-        <div class="calc">D = F<sub>y,max</sub> = 4,800N at α = 8.5° → μ = 4800/4500 = 1.067</div>
+        <div class="calc">D = F<sub>y,max</sub> = 4,800N at $\alpha$ = 8.5° $\rightarrow \mu$ = 4800/4500 = 1.067</div>
         <p><strong>Step 3.</strong> Shape Factor C 추정 (경험적):</p>
-        <div class="calc">C = 1 + (1 − 2/π · arcsin(F<sub>y</sub>(20°)/D)) ≈ 1.45</div>
+        <div class="calc">C = 1 + (1 − 2/$\pi$ · arcsin(F<sub>y</sub>(20°)/D)) $\approx$ 1.45</div>
         <p><strong>Step 4.</strong> Stiffness Factor B 계산:</p>
-        <div class="calc">B = C<sub>α</sub> / (C · D) = 83,520 / (1.45 × 4800) = 12.0</div>
+        <div class="calc">B = C<sub>$\alpha$</sub> / (C · D) = 83,520 / (1.45 $\times$ 4800) = 12.0</div>
         <p><strong>Step 5.</strong> Curvature Factor E 최적화 (Least-squares fit):</p>
         <div class="calc">E = −0.80 (MSE minimization, R² = 0.998)</div>
     </div>
     <div class="ride-criteria">
         <h4>🔧 검증: 피팅 품질 평가</h4>
-        <p>R² ≥ 0.995: 우수 | 0.990~0.995: 양호 | &lt; 0.990: 재피팅 필요</p>
+        <p>R² $\geq$ 0.995: 우수 | 0.990~0.995: 양호 | &lt; 0.990: 재피팅 필요</p>
         <p>피크 오차 &lt; 2%: 필수 | 초기 기울기 오차 &lt; 3%: 핸들링에 직결</p>
     </div>
 </div>
@@ -684,17 +705,17 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="quiz-num">QUIZ 01</div>
         <div class="quiz-q">Pacejka Magic Formula에서 <strong>초기 기울기(Cornering Stiffness)</strong>를 결정하는 조합은?</div>
         <div class="quiz-options">
-            <div class="quiz-opt">D × E (Peak × Curvature)</div>
-            <div class="quiz-opt">B × C × D (Stiffness × Shape × Peak)</div>
-            <div class="quiz-opt">C × E (Shape × Curvature)</div>
-            <div class="quiz-opt">B × D (Stiffness × Peak)</div>
+            <div class="quiz-opt">D $\times$ E (Peak $\times$ Curvature)</div>
+            <div class="quiz-opt">B $\times$ C $\times$ D (Stiffness $\times$ Shape $\times$ Peak)</div>
+            <div class="quiz-opt">C $\times$ E (Shape $\times$ Curvature)</div>
+            <div class="quiz-opt">B $\times$ D (Stiffness $\times$ Peak)</div>
         </div>
         <div class="quiz-feedback"></div>
         <div class="solution-panel">
             <div class="sol-header">풀이</div>
             <div class="sol-step"><span class="sol-num">STEP 1</span>Magic Formula: Y = D·sin(C·arctan(Bx − E(Bx − arctan(Bx))))</div>
-            <div class="sol-step"><span class="sol-num">STEP 2</span>x → 0 에서 테일러 전개: Y ≈ B·C·D·x (선형근사)</div>
-            <div class="sol-step highlight-step"><span class="sol-num">정답</span>②번 — C<sub>α</sub> = B·C·D이 Cornering Stiffness</div>
+            <div class="sol-step"><span class="sol-num">STEP 2</span>x $\rightarrow$ 0 에서 테일러 전개: Y $\approx$ B·C·D·x (선형근사)</div>
+            <div class="sol-step highlight-step"><span class="sol-num">정답</span>②번 — C<sub>$\alpha$</sub> = B·C·D이 Cornering Stiffness</div>
             <div class="sol-insight"><strong>💡 실무 포인트:</strong> Cornering Stiffness는 핸들링 선형 영역을 결정하므로, B·C·D 세 계수 모두 정확해야 합니다.</div>
         </div>
     </div>
@@ -704,15 +725,15 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="quiz-q">제동 중 코너링 시 타이어의 횡력이 감소하는 이유를 <strong>마찰원</strong> 관점에서 올바르게 설명한 것은?</div>
         <div class="quiz-options">
             <div class="quiz-opt">타이어 온도가 상승하여 고무의 마찰계수가 떨어진다</div>
-            <div class="quiz-opt">하중 이동으로 수직하중이 변하여 μ가 감소한다</div>
+            <div class="quiz-opt">하중 이동으로 수직하중이 변하여 $\mu$가 감소한다</div>
             <div class="quiz-opt">마찰원의 한계 내에서 종력이 사용되면 횡력 여유가 줄어든다</div>
             <div class="quiz-opt">슬립앵글이 증가하여 자동으로 횡력이 감소한다</div>
         </div>
         <div class="quiz-feedback"></div>
         <div class="solution-panel">
             <div class="sol-header">풀이</div>
-            <div class="sol-step"><span class="sol-num">STEP 1</span>마찰원: √(F_x² + F_y²) ≤ μ·F_z</div>
-            <div class="sol-step"><span class="sol-num">STEP 2</span>제동력 F_x가 증가하면, F_y의 가용 범위 = √((μ·F_z)² − F_x²)</div>
+            <div class="sol-step"><span class="sol-num">STEP 1</span>마찰원: $\sqrt{\cdot}$(F_x² + F_y²) $\leq \mu$·F_z</div>
+            <div class="sol-step"><span class="sol-num">STEP 2</span>제동력 F_x가 증가하면, F_y의 가용 범위 = $\sqrt{\cdot}$(($\mu$·F_z)² − F_x²)</div>
             <div class="sol-step highlight-step"><span class="sol-num">정답</span>③번 — Combined Slip의 핵심: 종·횡력은 마찰원 내에서 트레이드오프</div>
             <div class="sol-insight"><strong>💡 실무 포인트:</strong> ABS/ESP 튜닝에서 제동 시 코너링 그립 확보가 핵심 과제입니다.</div>
         </div>
@@ -745,7 +766,7 @@ td .katex,th .katex{font-size:0.9em!important}
             <div class="accordion-inner">
                 <p><strong>MF 5.2 (PAC2002):</strong> 가장 널리 사용되는 버전으로, 순수 슬립과 복합 슬립을 별도의 가중 함수로 처리합니다. 계수 약 80~90개, 대부분의 상용 MBS 소프트웨어에서 지원합니다.</p>
 <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">Magic Formula: $F_y = D\sin\{C\arctan[B\alpha - E(B\alpha - \arctan B\alpha)]\}$</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">$B$: Stiffness Factor, $C$: Shape, $D$: Peak, $E$: Curvature → $B \cdot C \cdot D = C_\alpha$ (코너링 강성)</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">$B$: Stiffness Factor, $C$: Shape, $D$: Peak, $E$: Curvature $\rightarrow B \cdot C \cdot D = C_\alpha$ (코너링 강성)</p>
                 <p><strong>MF 6.2 (PAC2006+):</strong> 턴슬립(Turn Slip), 대변형(Large Camber), 파킹/저속 특성을 추가로 모델링합니다. 계수 약 120~150개로 늘어나며, 특히 EV의 저속 파킹 시뮬레이션에 유리합니다.</p>
                 <p><span class="highlight">실무 선택 기준:</span> 일반 핸들링 해석은 MF 5.2면 충분하며, 파킹/극저속 해석이 필요하면 MF 6.2를 사용합니다. 데이터 피팅 비용도 MF 6.2가 약 1.5배 더 높습니다.</p>
             </div>
@@ -759,13 +780,13 @@ td .katex,th .katex{font-size:0.9em!important}
         </button>
         <div class="accordion-content">
             <div class="accordion-inner">
-                <p>타이어 횡력은 슬립앵글 변화에 즉시 반응하지 않습니다. 접지면 길이만큼의 구름 거리가 필요하며, 이를 <strong>Relaxation Length (σ<sub>y</sub>)</strong>라 합니다.</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">복합 슬립: $\sigma = \sqrt{\sigma_x^2 + \tan^2\alpha}$ → 마찰원: $\sqrt{F_x^2 + F_y^2} \leq \mu F_z$</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">가중함수: $F_y' = F_{y0}(\alpha) \cdot G_{y\kappa}(\alpha, \kappa)$ → 종방향 슬립에 의한 횡력 감소</p>
+                <p>타이어 횡력은 슬립앵글 변화에 즉시 반응하지 않습니다. 접지면 길이만큼의 구름 거리가 필요하며, 이를 <strong>Relaxation Length ($\sigma$<sub>y</sub>)</strong>라 합니다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">복합 슬립: $\sigma = \sqrt{\sigma_x^2 + \tan^2\alpha} \rightarrow$ 마찰원: $\sqrt{F_x^2 + F_y^2} \leq \mu F_z$</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">가중함수: $F_y' = F_{y0}(\alpha) \cdot G_{y\kappa}(\alpha, \kappa) \rightarrow$ 종방향 슬립에 의한 횡력 감소</p>
 <p style="margin:10px 0;color:var(--gold-light);"><strong>르노코리아 실무 Tip:</strong> MF-Tyre 피팅 시 복합 슬립 영역 데이터가 부족하면 $G$ 함수가 부정확합니다. 시험 매트릭스에 복합 조건을 반드시 포함하세요.</p>
-                <p>1차 지연 모델: F<sub>y</sub>(s) = F<sub>y,ss</sub>(α) · (1 − e<sup>−s/σ<sub>y</sub></sup>)</p>
-                <p>일반적으로 σ<sub>y</sub> = 0.3~0.6m (승용차), 레이싱 타이어는 0.15~0.3m 수준입니다. 고속 레인체인지나 장애물 회피에서 이 지연이 핸들링 응답성에 큰 영향을 미칩니다.</p>
-                <p><span class="highlight">Relaxation Length의 하중 의존성:</span> σ<sub>y</sub> = C<sub>α</sub> / C<sub>lat</sub> (C<sub>lat</sub>: 접지면 횡강성). 하중이 증가하면 C<sub>α</sub>와 C<sub>lat</sub> 모두 증가하지만 비율이 달라 σ<sub>y</sub>도 변합니다.</p>
+                <p>1차 지연 모델: F<sub>y</sub>(s) = F<sub>y,ss</sub>($\alpha$) · (1 − e<sup>−s/$\sigma$<sub>y</sub></sup>)</p>
+                <p>일반적으로 $\sigma$<sub>y</sub> = 0.3~0.6m (승용차), 레이싱 타이어는 0.15~0.3m 수준입니다. 고속 레인체인지나 장애물 회피에서 이 지연이 핸들링 응답성에 큰 영향을 미칩니다.</p>
+                <p><span class="highlight">Relaxation Length의 하중 의존성:</span> $\sigma$<sub>y</sub> = C<sub>$\alpha$</sub> / C<sub>lat</sub> (C<sub>lat</sub>: 접지면 횡강성). 하중이 증가하면 C<sub>$\alpha$</sub>와 C<sub>lat</sub> 모두 증가하지만 비율이 달라 $\sigma$<sub>y</sub>도 변합니다.</p>
             </div>
         </div>
     </div>
@@ -777,9 +798,9 @@ td .katex,th .katex{font-size:0.9em!important}
         </button>
         <div class="accordion-content">
             <div class="accordion-inner">
-                <p>타이어 온도는 그립에 직접적 영향을 미칩니다. 최적 온도(60~100°C)에서 μ가 최대이며, 이보다 낮거나 높으면 그립이 감소합니다.</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">$M_z = -t_p \cdot F_y + M_{zr}$ → $t_p$: 뉴매틱 트레일, $M_{zr}$: 잔류 토크</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">뉴매틱 트레일: $t_p = \frac{D_t\cos[C_t\arctan(B_t\alpha)]}{\cos\alpha}$ → 슬립각 증가 시 트레일 감소</p>
+                <p>타이어 온도는 그립에 직접적 영향을 미칩니다. 최적 온도(60~100°C)에서 $\mu$가 최대이며, 이보다 낮거나 높으면 그립이 감소합니다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">$M_z = -t_p \cdot F_y + M_{zr} \rightarrow t_p$: 뉴매틱 트레일, $M_{zr}$: 잔류 토크</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">뉴매틱 트레일: $t_p = \frac{D_t\cos[C_t\arctan(B_t\alpha)]}{\cos\alpha} \rightarrow$ 슬립각 증가 시 트레일 감소</p>
                 <p><strong>Thermal Model 구성:</strong> 타이어를 트레드 표면, 트레드 벌크, 카카스, 내부 공기의 4-Layer로 모델링합니다. 각 레이어 간 열전도와 외부 대류/복사를 고려합니다.</p>
                 <p>D 계수의 온도 보정: D(T) = D<sub>ref</sub> · (1 + κ<sub>T</sub> · (T − T<sub>ref</sub>)²) 형태의 포물선 모델이 일반적입니다.</p>
                 <p><span class="highlight">Tire Warm-up 시뮬레이션:</span> 콜드 스타트 후 3~5 랩(서킷) 동안의 그립 변화를 예측하여, 아웃랩 전략이나 타이어 예열 프로토콜을 최적화합니다.</p>
@@ -795,8 +816,8 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="accordion-content">
             <div class="accordion-inner">
                 <p>하중 감도는 차량 동역학에서 가장 중요한 타이어 특성 중 하나입니다. 코너링 시 하중 이동이 발생하면:</p>
-                <p>• 바깥쪽 타이어: 하중 증가 → F<sub>y</sub> 증가하지만 μ 감소</p>
-                <p>• 안쪽 타이어: 하중 감소 → F<sub>y</sub> 감소하지만 μ 증가</p>
+                <p>• 바깥쪽 타이어: 하중 증가 $\rightarrow$ F<sub>y</sub> 증가하지만 $\mu$ 감소</p>
+                <p>• 안쪽 타이어: 하중 감소 $\rightarrow$ F<sub>y</sub> 감소하지만 $\mu$ 증가</p>
                 <p>결과적으로 <strong>총 횡력 = F<sub>y,out</sub> + F<sub>y,in</sub></strong>은 하중 이동이 없을 때보다 항상 작습니다. 이것이 Anti-Roll Bar로 롤 강성 배분을 조절하여 전/후축 밸런스를 제어하는 근거입니다.</p>
             </div>
         </div>
@@ -811,7 +832,7 @@ td .katex,th .katex{font-size:0.9em!important}
         <p style="font-size:14px;color:var(--text-dim);margin-bottom:16px;">핵심 수식과 변수의 물리적 의미를 탐색하세요.</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
             <div class="eq-explorer" tabindex="0">
-                <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:JetBrains Mono;color:var(--gold-light);font-size:13px;text-align:center;">F_y = D·sin(C·atan(Bα−E(...)))</div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:JetBrains Mono;color:var(--gold-light);font-size:13px;text-align:center;">F_y = D·sin(C·atan(B$\alpha$−E(...)))</div>
                 <div class="eq-tooltip">
                     <div class="tt-symbol">Magic Formula</div>
                     <div class="tt-name">Pacejka 횡력 모델</div>
@@ -821,9 +842,9 @@ td .katex,th .katex{font-size:0.9em!important}
                 </div>
             </div>
             <div class="eq-explorer" tabindex="0">
-                <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:JetBrains Mono;color:var(--gold-light);font-size:14px;text-align:center;">C_α = B·C·D</div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:JetBrains Mono;color:var(--gold-light);font-size:14px;text-align:center;">C_$\alpha$ = B·C·D</div>
                 <div class="eq-tooltip">
-                    <div class="tt-symbol">C_α</div>
+                    <div class="tt-symbol">C_$\alpha$</div>
                     <div class="tt-name">Cornering Stiffness</div>
                     <div class="tt-unit">Unit: N/rad</div>
                     <div class="tt-ref">205/55R16: ~83,520 N/rad</div>
@@ -831,12 +852,12 @@ td .katex,th .katex{font-size:0.9em!important}
                 </div>
             </div>
             <div class="eq-explorer" tabindex="0">
-                <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:JetBrains Mono;color:var(--gold-light);font-size:14px;text-align:center;">√(F_x²+F_y²) ≤ μ·F_z</div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:JetBrains Mono;color:var(--gold-light);font-size:14px;text-align:center;">$\sqrt{\cdot}$(F_x²+F_y²) $\leq \mu$·F_z</div>
                 <div class="eq-tooltip">
                     <div class="tt-symbol">Friction Circle</div>
                     <div class="tt-name">마찰원 제약 조건</div>
                     <div class="tt-unit">Unit: N</div>
-                    <div class="tt-ref">μ ≈ 1.0~1.1 (dry road)</div>
+                    <div class="tt-ref">$\mu \approx$ 1.0~1.1 (dry road)</div>
                     <div class="tt-meaning">타이어가 발생시킬 수 있는 종·횡 합력의 상한</div>
                 </div>
             </div>
@@ -853,7 +874,7 @@ td .katex,th .katex{font-size:0.9em!important}
                     <p><strong>Optimum T (ChassisSim):</strong> 타이어 데이터 후처리 및 MF 피팅 전용 도구. F&T 시험 데이터에서 자동으로 B,C,D,E를 추출하고, TIR 파일을 생성합니다. 가격: ~&#36;2,000/년</p>
                     <p><strong>MF-Tool (TNO):</strong> Pacejka 본인의 연구소(TNO)에서 개발한 공식 피팅 도구. MF 5.2 / 6.2 모두 지원하며 산업 표준입니다. 가격: ~&#36;5,000~&#36;10,000</p>
                     <p><strong>MATLAB Curve Fitting Toolbox:</strong> lsqcurvefit 함수로 직접 피팅 가능합니다. 초기값 설정이 중요하며, 경계 조건(B>0, C>1, D>0 등)을 반드시 설정해야 합니다.</p>
-                    <p><strong>TYDEX Format:</strong> 타이어 시험 데이터의 표준 교환 형식. .tdx 파일 구조: 채널 정의 → 데이터 블록 → 메타데이터. 모든 상용 도구에서 입력 가능합니다.</p>
+                    <p><strong>TYDEX Format:</strong> 타이어 시험 데이터의 표준 교환 형식. .tdx 파일 구조: 채널 정의 $\rightarrow$ 데이터 블록 $\rightarrow$ 메타데이터. 모든 상용 도구에서 입력 가능합니다.</p>
                 </div>
             </div>
         </div>
@@ -889,8 +910,8 @@ td .katex,th .katex{font-size:0.9em!important}
 
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:40px 0">
-    <a href="Day59_승차감주관평가.html" style="padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;text-decoration:none;color:var(--gold);font-weight:500;transition:all .3s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">← Day 59: 승차감 주관평가</a>
-    <a href="Guide_실무시나리오별학습가이드.html" style="padding:16px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.05));border:1px solid var(--gold);border-radius:8px;text-align:center;text-decoration:none;color:var(--gold);font-weight:500;transition:all .3s" onmouseover="this.style.background='rgba(201,168,76,.15)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.05))'">🎯 실무 시나리오 학습 가이드 →</a>
+    <a href="Day59_승차감주관평가.html" style="padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-align:center;text-decoration:none;color:var(--gold);font-weight:500;transition:all .3s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">$\leftarrow$ Day 59: 승차감 주관평가</a>
+    <a href="Guide_실무시나리오별학습가이드.html" style="padding:16px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.05));border:1px solid var(--gold);border-radius:8px;text-align:center;text-decoration:none;color:var(--gold);font-weight:500;transition:all .3s" onmouseover="this.style.background='rgba(201,168,76,.15)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.05))'">🎯 실무 시나리오 학습 가이드 $\rightarrow$</a>
 </div>
 
 <!-- ══════ FOOTER ══════ -->

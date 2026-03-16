@@ -227,11 +227,32 @@ td .katex,th .katex{font-size:0.9em!important}
 .katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{ignoredTags:["script","noscript","style","textarea","pre","code"],delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+<!-- KaTeX Auto-Render -->
+<script>
+(function() {
+  var katexJS = document.createElement('script');
+  katexJS.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js';
+  katexJS.onload = function() {
+    var autoRender = document.createElement('script');
+    autoRender.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js';
+    autoRender.onload = function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false},
+          {left: "\\[", right: "\\]", display: true}
+        ],
+        ignoredTags: ["script","noscript","style","textarea","pre","code"],
+        throwOnError: false
+      });
+    };
+    document.head.appendChild(autoRender);
+  };
+  document.head.appendChild(katexJS);
+})();
 </script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 </head>
 <body>
 
@@ -279,10 +300,10 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="section-label">INTUITION</div>
     <div class="section-title">왜 하중 스펙트럼이 필요한가?</div>
     <div class="brain-box">
-        <h3>💡 설계 수명 = 하중 × 재료 × 형상</h3>
+        <h3>💡 설계 수명 = 하중 $\times$ 재료 $\times$ 형상</h3>
         <p>실도로 주행 하중은 <span class="highlight">완벽히 불규칙</span>합니다. 신호등 정지, 포트홀 통과, 고속도로 순항, 벨기 블록(Belgian Block) — 모든 순간 서스펜션 부품에는 다른 크기와 방향의 하중이 가해집니다. 정적 해석 한 번으로는 피로 수명을 절대 예측할 수 없습니다.</p>
         <p><span class="highlight">하중 스펙트럼(Load Spectrum)</span>은 이 불규칙 하중 이력을 체계적으로 분류하여 "어떤 크기의 하중이 몇 번 반복되는가"를 정량화한 것입니다. S-N 곡선(재료)과 응력 집중 계수(형상)를 결합하면 피로 수명 예측이 가능해집니다.</p>
-        <p>르노코리아의 서스펜션 개발 현장에서는 프랑스 시험장(CERAM, Mortefontaine)에서 취득한 24채널(4륜 × 6분력) 하중 데이터를 Rainflow 카운팅으로 변환하여 nCode 또는 FEMFAT에 입력하는 것이 표준 프로세스입니다.</p>
+        <p>르노코리아의 서스펜션 개발 현장에서는 프랑스 시험장(CERAM, Mortefontaine)에서 취득한 24채널(4륜 $\times$ 6분력) 하중 데이터를 Rainflow 카운팅으로 변환하여 nCode 또는 FEMFAT에 입력하는 것이 표준 프로세스입니다.</p>
         <div class="time-split">
             <div class="time-block"><span class="t-range">0-5m</span><span class="t-desc">하중 불규칙성</span></div>
             <div class="time-block"><span class="t-range">5-12m</span><span class="t-desc">Rainflow 원리</span></div>
@@ -302,9 +323,9 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="deriv-explain">
             <p>원시 하중 시계열 F(t)에서 극값(peak/valley)만 추출합니다. 중간의 단조 구간은 피로에 기여하지 않으므로 제거합니다:</p>
         </div>
-        <div class="deriv-equation"><code>F(t) → {P₁, V₁, P₂, V₂, ...} where dF/dt = 0</code></div>
+        <div class="deriv-equation"><code>F(t) $\rightarrow$ {P₁, V₁, P₂, V₂, ...} where dF/dt = 0</code></div>
         <div class="deriv-explain">
-            <p><span class="label">의미: </span>24채널 데이터에서 초당 512 샘플 × 3600초 = 약 184만 포인트를 수천 개의 극값으로 압축합니다.</p>
+            <p><span class="label">의미: </span>24채널 데이터에서 초당 512 샘플 $\times$ 3600초 = 약 184만 포인트를 수천 개의 극값으로 압축합니다.</p>
         </div>
     </div>
 
@@ -347,13 +368,13 @@ td .katex,th .katex{font-size:0.9em!important}
         </div>
         <div class="deriv-equation"><code>D = &Sigma;(n<sub>i</sub> / N<sub>i</sub>) &le; 1</code></div>
         <div class="deriv-explain">
-            <p><span class="label">D = 1</span> → 이론적 파괴 시점</p>
+            <p><span class="label">D = 1</span> $\rightarrow$ 이론적 파괴 시점</p>
             <p><span class="label">안전계수 적용:</span> 실무에서는 D &le; 0.3~0.5를 설계 기준으로 사용합니다 (산포, 환경, 부식 고려).</p>
         </div>
     </div>
 
     <div class="checkpoint">
-        <strong>✅ Checkpoint:</strong> 하중 이력 → Peak/Valley → Rainflow 사이클 → S-N 곡선 참조 → Miner 누적 손상 D 계산. D &lt; 1이면 설계 수명 만족!
+        <strong>✅ Checkpoint:</strong> 하중 이력 $\rightarrow$ Peak/Valley $\rightarrow$ Rainflow 사이클 $\rightarrow$ S-N 곡선 참조 $\rightarrow$ Miner 누적 손상 D 계산. D &lt; 1이면 설계 수명 만족!
     </div>
 </div>
 
@@ -374,13 +395,13 @@ td .katex,th .katex{font-size:0.9em!important}
     <p class="sub-label">② Miner의 선형 피로 누적 법칙</p>
     <div class="sub-eq">$$D = \sum_{i=1}^{k} \frac{n_i}{N_i} \leq 1.0$$</div>
     <div class="sub-eq">$$N_i = N_0 \left(\frac{\sigma_0}{\Delta\sigma_i}\right)^m \quad (\text{S-N 곡선})$$</div>
-    <p class="sub-note">D = 1이면 파괴. 실무 안전계수: D ≤ 0.3~0.5 적용. m ≈ 3(강재), 5-8(알루미늄)</p>
+    <p class="sub-note">D = 1이면 파괴. 실무 안전계수: D $\leq$ 0.3~0.5 적용. m $\approx$ 3(강재), 5-8(알루미늄)</p>
   </div>
   <div class="sub-step">
-    <p class="sub-label">③ PSD → 시간 이력 변환</p>
+    <p class="sub-label">③ PSD $\rightarrow$ 시간 이력 변환</p>
     <div class="sub-eq">$$x(t) = \sum_{k=1}^{N} \sqrt{2 S_{xx}(f_k) \Delta f} \cdot \cos(2\pi f_k t + \phi_k)$$</div>
     <div class="sub-eq">$$\phi_k \sim \text{Uniform}(0, 2\pi) \quad (\text{랜덤 위상})$$</div>
-    <p class="sub-note">PSD 기반 가상 노면 생성 → MBD 시뮬레이션 입력. ISO 8608 노면 등급(A~H) 활용</p>
+    <p class="sub-note">PSD 기반 가상 노면 생성 $\rightarrow$ MBD 시뮬레이션 입력. ISO 8608 노면 등급(A~H) 활용</p>
   </div>
   <div class="sub-step">
     <p class="sub-label">④ 등가 손상 하중 (Equivalent Damage Load)</p>
@@ -407,20 +428,20 @@ td .katex,th .katex{font-size:0.9em!important}
                 </tr>
             </thead>
             <tbody>
-                <tr><td>로어 컨트롤 암</td><td>SAPH440 (열연강판)</td><td class="sym">3.5</td><td class="sym">180</td><td class="sym">2×10⁶</td></tr>
+                <tr><td>로어 컨트롤 암</td><td>SAPH440 (열연강판)</td><td class="sym">3.5</td><td class="sym">180</td><td class="sym">2$\times$10⁶</td></tr>
                 <tr><td>너클 (주조)</td><td>GCD450 (구상흑연주철)</td><td class="sym">4.0</td><td class="sym">210</td><td class="sym">10⁷</td></tr>
                 <tr><td>코일 스프링</td><td>SAE9254 (Si-Cr강)</td><td class="sym">5.0</td><td class="sym">680</td><td class="sym">10⁷</td></tr>
-                <tr><td>스태빌라이저 바</td><td>SUP9A (스프링강)</td><td class="sym">4.5</td><td class="sym">520</td><td class="sym">5×10⁶</td></tr>
-                <tr><td>서브프레임 용접부</td><td>STKM13A 용접</td><td class="sym">3.0</td><td class="sym">90</td><td class="sym">2×10⁶</td></tr>
+                <tr><td>스태빌라이저 바</td><td>SUP9A (스프링강)</td><td class="sym">4.5</td><td class="sym">520</td><td class="sym">5$\times$10⁶</td></tr>
+                <tr><td>서브프레임 용접부</td><td>STKM13A 용접</td><td class="sym">3.0</td><td class="sym">90</td><td class="sym">2$\times$10⁶</td></tr>
             </tbody>
         </table>
     </div>
 
     <div class="vehicle-example">
         <h4>🔧 하중 채널 구성 (24채널)</h4>
-        <p>각 휠에 6분력 (Fx, Fy, Fz, Mx, My, Mz) × 4륜 = <span class="highlight">24채널</span></p>
+        <p>각 휠에 6분력 (Fx, Fy, Fz, Mx, My, Mz) $\times$ 4륜 = <span class="highlight">24채널</span></p>
         <p>추가 채널: 조향 토크, 스프링 변위(4), 쇼크 스트로크(4), 서브프레임 가속도(3축) = 총 <span class="highlight">36채널</span></p>
-        <p class="calc">샘플링: 512 Hz × 3600초 = 1,843,200 pts/ch</p>
+        <p class="calc">샘플링: 512 Hz $\times$ 3600초 = 1,843,200 pts/ch</p>
     </div>
 </div>
 
@@ -592,14 +613,14 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="simpack-module">
         <div class="simpack-header">
             <span class="simpack-badge">WORKFLOW</span>
-            <span>SIMPACK → nCode/FEMFAT 연동</span>
+            <span>SIMPACK $\rightarrow$ nCode/FEMFAT 연동</span>
         </div>
         <div class="simpack-body">
             <div class="sp-workflow">
                 <div class="sp-wf-step">
                     <span class="wf-num">1</span>
                     <span class="wf-title">Road Profile</span>
-                    <span class="wf-desc">3D 노면 스캔 → .rdf 파일</span>
+                    <span class="wf-desc">3D 노면 스캔 $\rightarrow$ .rdf 파일</span>
                 </div>
                 <div class="sp-wf-step">
                     <span class="wf-num">2</span>
@@ -614,21 +635,21 @@ td .katex,th .katex{font-size:0.9em!important}
             </div>
 
             <div class="simpack-row">
-                <div class="sp-sym">Road Profile → MBS</div>
-                <div class="sp-path">Submodel → Road.Excitation → Belgian_Block_50kmh.rdf</div>
+                <div class="sp-sym">Road Profile $\rightarrow$ MBS</div>
+                <div class="sp-path">Submodel $\rightarrow$ Road.Excitation $\rightarrow$ Belgian_Block_50kmh.rdf</div>
                 <div class="sp-detail">벨기 블록 노면 프로파일: RMS roughness 약 12mm, 시험 속도 50km/h 기준. SIMPACK의 Road Surface 모듈에서 3D 등고선 데이터를 임포트하여 타이어 접지점에서의 가진 입력으로 사용합니다.</div>
             </div>
 
             <div class="simpack-row">
                 <div class="sp-sym">Joint Force Extraction</div>
-                <div class="sp-path">Result → Force Elements → Lower_Arm_Bushing_Front → Fx, Fy, Fz</div>
+                <div class="sp-path">Result $\rightarrow$ Force Elements $\rightarrow$ Lower_Arm_Bushing_Front $\rightarrow$ Fx, Fy, Fz</div>
                 <div class="sp-detail">각 조인트(부싱, 볼조인트, 서브프레임 마운트)에서의 6분력을 시간 이력으로 추출합니다. 출력 포맷: .csv 또는 .dac (nCode 호환).</div>
             </div>
 
             <div class="simpack-row">
                 <div class="sp-sym">nCode GlyphWorks 연동</div>
-                <div class="sp-path">Import → SIMPACK_forces.csv → Rainflow → Damage Calculation</div>
-                <div class="sp-detail">SIMPACK 하중 이력을 nCode에서 Rainflow 카운팅 → FE 응력 스케일링(Unit Load Method) → Miner 누적 손상 계산. 또는 FEMFAT에서 FE 모델과 직접 매핑하여 부품 전체의 피로 수명 등고선을 출력합니다.</div>
+                <div class="sp-path">Import $\rightarrow$ SIMPACK_forces.csv $\rightarrow$ Rainflow $\rightarrow$ Damage Calculation</div>
+                <div class="sp-detail">SIMPACK 하중 이력을 nCode에서 Rainflow 카운팅 $\rightarrow$ FE 응력 스케일링(Unit Load Method) $\rightarrow$ Miner 누적 손상 계산. 또는 FEMFAT에서 FE 모델과 직접 매핑하여 부품 전체의 피로 수명 등고선을 출력합니다.</div>
             </div>
 
             <div class="sp-warn">⚠️ <strong>주의:</strong> MBS 하중과 실측 하중의 상관도(correlation) 검증 필수. 타이어 모델(MF-Tyre vs FTire), 부싱 비선형 특성이 하중 정확도에 큰 영향. 상관도 R² &gt; 0.85 이상 확보 권장.</div>
@@ -644,7 +665,7 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="vehicle-example">
         <h4>🚗 르노 XJP 플랫폼 — 프론트 로어 컨트롤 암</h4>
         <p><strong>조건:</strong> 벨기 블록 노면, 50km/h, 1시간 주행 데이터</p>
-        <p><strong>재질:</strong> SAPH440, m = 3.5, S_e = 180 MPa, N_e = 2×10⁶</p>
+        <p><strong>재질:</strong> SAPH440, m = 3.5, S_e = 180 MPa, N_e = 2$\times$10⁶</p>
     </div>
 
     <div class="deriv-card" style="margin-top:16px">
@@ -656,10 +677,10 @@ td .katex,th .katex{font-size:0.9em!important}
             <table class="param-table">
                 <thead><tr><th>Level</th><th>S_a [MPa]</th><th>n_i (사이클수)</th><th>N_i (허용수명)</th><th>n_i/N_i</th></tr></thead>
                 <tbody>
-                    <tr><td>1</td><td class="sym">300</td><td class="sym">15</td><td class="sym">1.2×10⁴</td><td class="sym">0.00125</td></tr>
-                    <tr><td>2</td><td class="sym">250</td><td class="sym">85</td><td class="sym">5.8×10⁴</td><td class="sym">0.00147</td></tr>
-                    <tr><td>3</td><td class="sym">200</td><td class="sym">420</td><td class="sym">4.5×10⁵</td><td class="sym">0.00093</td></tr>
-                    <tr><td>4</td><td class="sym">150</td><td class="sym">2,100</td><td class="sym">∞ (S &lt; S_e)</td><td class="sym">0</td></tr>
+                    <tr><td>1</td><td class="sym">300</td><td class="sym">15</td><td class="sym">1.2$\times$10⁴</td><td class="sym">0.00125</td></tr>
+                    <tr><td>2</td><td class="sym">250</td><td class="sym">85</td><td class="sym">5.8$\times$10⁴</td><td class="sym">0.00147</td></tr>
+                    <tr><td>3</td><td class="sym">200</td><td class="sym">420</td><td class="sym">4.5$\times$10⁵</td><td class="sym">0.00093</td></tr>
+                    <tr><td>4</td><td class="sym">150</td><td class="sym">2,100</td><td class="sym">$\infty$ (S &lt; S_e)</td><td class="sym">0</td></tr>
                 </tbody>
             </table>
         </div>
@@ -675,9 +696,9 @@ td .katex,th .katex{font-size:0.9em!important}
 
     <div class="deriv-card">
         <div class="deriv-step-num">STEP 3 — 등가 수명 산출</div>
-        <div class="deriv-equation"><code>설계 수명 = 1/D_1h = 1/0.00365 ≈ 274시간 (벨기 블록 등가)</code></div>
+        <div class="deriv-equation"><code>설계 수명 = 1/D_1h = 1/0.00365 $\approx$ 274시간 (벨기 블록 등가)</code></div>
         <div class="deriv-explain">
-            <p>벨기 블록 274시간 ≈ 실도로 30만 km 등가 (가혹도 배수 약 1,100배). 설계 타겟 D ≤ 0.5 기준: 274 × 2 = <span class="highlight">548시간 이상 확보 필요</span>.</p>
+            <p>벨기 블록 274시간 $\approx$ 실도로 30만 km 등가 (가혹도 배수 약 1,100배). 설계 타겟 D $\leq$ 0.5 기준: 274 $\times$ 2 = <span class="highlight">548시간 이상 확보 필요</span>.</p>
         </div>
     </div>
 
@@ -773,9 +794,9 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="solution-panel">
             <div class="sol-header">SOLUTION</div>
             <div class="sol-step"><span class="sol-num">개념</span> D = Σ(n_i/N_i)는 누적 손상 비율을 의미</div>
-            <div class="sol-step highlight-step"><span class="sol-num">핵심</span> D = 0.6 → 이론적 파괴(D=1) 대비 60% 수명 소진</div>
+            <div class="sol-step highlight-step"><span class="sol-num">핵심</span> D = 0.6 $\rightarrow$ 이론적 파괴(D=1) 대비 60% 수명 소진</div>
             <div class="sol-step"><span class="sol-num">실무</span> 잔여 수명 = 1 - 0.6 = 0.4 (40% 남음)</div>
-            <div class="sol-insight"><strong>핵심:</strong> Miner의 D는 선형 누적 손상 비율이며, D=1이 이론적 파괴 시점입니다. 실무에서는 안전계수를 적용하여 D ≤ 0.3~0.5를 기준으로 합니다.</div>
+            <div class="sol-insight"><strong>핵심:</strong> Miner의 D는 선형 누적 손상 비율이며, D=1이 이론적 파괴 시점입니다. 실무에서는 안전계수를 적용하여 D $\leq$ 0.3~0.5를 기준으로 합니다.</div>
         </div>
     </div>
 
@@ -793,7 +814,7 @@ td .katex,th .katex{font-size:0.9em!important}
             <div class="sol-header">SOLUTION</div>
             <div class="sol-step"><span class="sol-num">정의</span> Rainflow는 ASTM E1049 표준 사이클 카운팅 방법</div>
             <div class="sol-step highlight-step"><span class="sol-num">핵심</span> 불규칙 하중 이력에서 닫힌 히스테리시스 루프(사이클)를 추출</div>
-            <div class="sol-step"><span class="sol-num">출력</span> 각 사이클의 (진폭 S_a, 평균 S_m) 쌍 → Rainflow Matrix</div>
+            <div class="sol-step"><span class="sol-num">출력</span> 각 사이클의 (진폭 S_a, 평균 S_m) 쌍 $\rightarrow$ Rainflow Matrix</div>
             <div class="sol-insight"><strong>핵심:</strong> FFT(주파수 분석)와 혼동 주의! Rainflow는 시간 영역에서 사이클을 세는 방법이지, 주파수 변환이 아닙니다.</div>
         </div>
     </div>
@@ -824,8 +845,8 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="accordion-content">
             <div class="accordion-inner">
                 <p><strong>PSD(Power Spectral Density)</strong>는 정상(stationary) 랜덤 하중의 주파수 특성을 나타내며, 노면 프로파일 분류(ISO 8608)나 진동 스펙 정의에 사용됩니다. 반면 <strong>레인플로우</strong>는 비정상(non-stationary) 하중 포함 모든 시계열에서 피로 사이클을 추출합니다.</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">PSD 기반: $\sigma_{eq} = \sqrt{\int_0^\infty G_{\sigma\sigma}(f) \, df}$ → 정상 랜덤 하중에 적합</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">레인플로우: $D = \sum_i \frac{n_i}{N_i}$ (Miner 법칙) → $N_i = C / S_i^m$ (S-N 곡선)</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">PSD 기반: $\sigma_{eq} = \sqrt{\int_0^\infty G_{\sigma\sigma}(f) \, df} \rightarrow$ 정상 랜덤 하중에 적합</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">레인플로우: $D = \sum_i \frac{n_i}{N_i}$ (Miner 법칙) $\rightarrow N_i = C / S_i^m$ (S-N 곡선)</p>
                 <p>고속도로 순항처럼 정상 랜덤에 가까운 경우 PSD 기반 Dirlik 법이 효율적이지만, 도심 + 고속 + 험로 복합 주행에서는 반드시 Rainflow를 사용해야 합니다. 르노의 내구 프로세스는 항상 Rainflow 기반입니다.</p>
             </div>
         </div>
@@ -839,10 +860,10 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="accordion-content">
             <div class="accordion-inner">
                 <p>실제 서스펜션 부품은 단축이 아닌 <strong>다축 응력 상태</strong>에 놓입니다. 너클의 경우 수직 하중(Fz)과 횡방향 하중(Fy)이 동시에 작용하여 복합 응력이 발생합니다.</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">누적 손상: $D = \sum_{i=1}^{k} \frac{n_i}{N_i} \leq 1$ → Palmgren-Miner 선형 누적 손상</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">등가 하중: $F_{eq} = \left(\sum_i \frac{n_i F_i^m}{\sum n_i}\right)^{1/m}$ → SN 기울기 $m$에 의존</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">누적 손상: $D = \sum_{i=1}^{k} \frac{n_i}{N_i} \leq 1 \rightarrow$ Palmgren-Miner 선형 누적 손상</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">등가 하중: $F_{eq} = \left(\sum_i \frac{n_i F_i^m}{\sum n_i}\right)^{1/m} \rightarrow$ SN 기울기 $m$에 의존</p>
                 <p><strong>Critical Plane Method</strong>는 모든 평면(각도)에서 전단 응력과 법선 응력의 조합을 검토하여, 가장 큰 손상을 일으키는 <span class="highlight">임계면(Critical Plane)</span>을 찾습니다. FEMFAT에서는 이 방법이 기본 옵션입니다.</p>
-                <div class="deriv-equation"><code>τ_a,max + k·σ_n,max ≤ f (Findley Criterion)</code></div>
+                <div class="deriv-equation"><code>$\tau_a$,max + k·$\sigma_n$,max $\leq$ f (Findley Criterion)</code></div>
             </div>
         </div>
     </div>
@@ -855,10 +876,10 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="accordion-content">
             <div class="accordion-inner">
                 <p>실차 30만km 내구를 실제로 달릴 수 없으므로, <strong>등가 가속 시험</strong>을 설계합니다. 핵심 원리: 벨기 블록, 급커브, 과속방지턱 등 가혹 노면만 조합하여 단위 시간당 손상(D/hour)을 극대화합니다.</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">가속 계수: $AF = \frac{D_{accel}}{D_{field}} = \frac{t_{field}}{t_{accel}}$ → 통상 $AF = 5\text{~}20$</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">시험 시간: $t_{test} = \frac{t_{target}}{AF}$ → 10만 km → 가속 $5000\text{~}20000$ km 등가</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">가속 계수: $AF = \frac{D_{accel}}{D_{field}} = \frac{t_{field}}{t_{accel}} \rightarrow$ 통상 $AF = 5\text{~}20$</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">시험 시간: $t_{test} = \frac{t_{target}}{AF} \rightarrow$ 10만 km $\rightarrow$ 가속 $5000\text{~}20000$ km 등가</p>
 <p style="margin:10px 0;color:var(--gold-light);"><strong>르노코리아 실무 Tip:</strong> Simpack 가상 내구 시험에서 하중 스펙트럼을 추출한 뒤 레인플로우 카운팅으로 부품 수명을 예측합니다.</p>
-                <p><strong>가속 배수</strong> 계산: 실도로 1km당 D_road와 시험장 1km당 D_test를 비교. 예: 벨기 블록 D_test/D_road ≈ 1,000~1,200배. 따라서 벨기 블록 300시간 ≈ 실도로 30만km.</p>
+                <p><strong>가속 배수</strong> 계산: 실도로 1km당 D_road와 시험장 1km당 D_test를 비교. 예: 벨기 블록 D_test/D_road $\approx$ 1,000~1,200배. 따라서 벨기 블록 300시간 $\approx$ 실도로 30만km.</p>
                 <p>르노/닛산 얼라이언스에서는 CERAM(프랑스) 및 Hokkaido PG(일본) 시험장의 표준 내구 코스를 운영합니다.</p>
             </div>
         </div>
@@ -886,7 +907,7 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="accordion-content">
             <div class="accordion-inner">
                 <p><strong>디지털 트윈(Digital Twin)</strong>은 실차 센서 데이터를 실시간으로 MBS 모델에 피드백하여, 물리 시험 없이 부품의 피로 수명을 모니터링하는 기술입니다.</p>
-                <p>프로세스: ① 텔레매틱스로 실주행 가속도/GPS 수집 → ② SIMPACK 모델로 하중 재구성(가상 센서) → ③ Rainflow + Miner로 실시간 D 누적 → ④ 잔여 수명 예측 및 정비 알림.</p>
+                <p>프로세스: ① 텔레매틱스로 실주행 가속도/GPS 수집 $\rightarrow$ ② SIMPACK 모델로 하중 재구성(가상 센서) $\rightarrow$ ③ Rainflow + Miner로 실시간 D 누적 $\rightarrow$ ④ 잔여 수명 예측 및 정비 알림.</p>
                 <p>르노에서는 이를 <span class="highlight">"Virtual Proving Ground"</span> 프로젝트로 추진 중이며, 향후 OTA 기반 예지 정비(Predictive Maintenance)로 확장될 전망입니다. 이 분야가 바로 MBD + 머신러닝의 융합 영역입니다.</p>
             </div>
         </div>
@@ -905,12 +926,12 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
     <div class="simpack-row">
         <div class="sp-sym">nCode GlyphWorks</div>
-        <div class="sp-path">HBM/Spectris → Durability Module</div>
+        <div class="sp-path">HBM/Spectris $\rightarrow$ Durability Module</div>
         <div class="sp-detail">산업 표준 내구 해석 소프트웨어. 데이터 전처리(필터링, 리샘플링), Rainflow, 등가 하중 산출, FE 매핑(Unit Load), 다축 피로까지 통합 워크플로우 제공. SIMPACK .dac/.csv 직접 임포트 지원.</div>
     </div>
     <div class="simpack-row">
         <div class="sp-sym">FEMFAT</div>
-        <div class="sp-path">Magna Powertrain → Fatigue Analysis</div>
+        <div class="sp-path">Magna Powertrain $\rightarrow$ Fatigue Analysis</div>
         <div class="sp-detail">FE 기반 피로 해석 전문 도구. Critical Plane Method, 용접부 전용 평가(Structural Stress), 열피로, 볼트 체결부 피로 등 서스펜션 특화 기능이 강점. SIMPACK/NASTRAN 연동이 우수합니다.</div>
     </div>
 </div>
@@ -920,8 +941,8 @@ td .katex,th .katex{font-size:0.9em!important}
 
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section">
-    <a href="Day57_컴플라이언스스티어.html" class="nav-btn prev">← Day 57</a>
-    <a href="Day59_승차감주관평가.html" class="nav-btn next">Day 59 →</a>
+    <a href="Day57_컴플라이언스스티어.html" class="nav-btn prev">$\leftarrow$ Day 57</a>
+    <a href="Day59_승차감주관평가.html" class="nav-btn next">Day 59 $\rightarrow$</a>
 </div>
 
 <!-- ══════ FOOTER ══════ -->

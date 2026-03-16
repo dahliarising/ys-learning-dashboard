@@ -214,11 +214,32 @@ td .katex,th .katex{font-size:0.9em!important}
 .derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
 </style>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body,{ignoredTags:["script","noscript","style","textarea","pre","code"],delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});">
+<!-- KaTeX Auto-Render -->
+<script>
+(function() {
+  var katexJS = document.createElement('script');
+  katexJS.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js';
+  katexJS.onload = function() {
+    var autoRender = document.createElement('script');
+    autoRender.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js';
+    autoRender.onload = function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\(", right: "\\)", display: false},
+          {left: "\\[", right: "\\]", display: true}
+        ],
+        ignoredTags: ["script","noscript","style","textarea","pre","code"],
+        throwOnError: false
+      });
+    };
+    document.head.appendChild(autoRender);
+  };
+  document.head.appendChild(katexJS);
+})();
 </script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 </head>
 <body>
 
@@ -275,8 +296,8 @@ td .katex,th .katex{font-size:0.9em!important}
             이는 승차감과 핸들링 사이에 근본적인 <strong>상충(trade-off)</strong>을 만듭니다:
         </p>
         <ul>
-            <li><strong>부드러운 승차감</strong>을 원하면: 낮은 댐핑 필요 → 몸체 진동 증가 (불편)</li>
-            <li><strong>좋은 핸들링</strong>을 원하면: 높은 댐핑 필요 → 승차감 악화 (거친 느낌)</li>
+            <li><strong>부드러운 승차감</strong>을 원하면: 낮은 댐핑 필요 $\rightarrow$ 몸체 진동 증가 (불편)</li>
+            <li><strong>좋은 핸들링</strong>을 원하면: 높은 댐핑 필요 $\rightarrow$ 승차감 악화 (거친 느낌)</li>
         </ul>
         <p style="margin-top:16px">
             <strong>반능동 서스펜션(Semi-Active)</strong>은 <strong>CDC(Continuous Damping Control)</strong>으로 
@@ -293,7 +314,7 @@ td .katex,th .katex{font-size:0.9em!important}
 <!-- ══════ DERIVATION SECTION ══════ -->
 <div class="section">
     <div class="section-label">DERIVATION</div>
-    <div class="section-title">4단계 유도: 스카이훅 제어 → CDC 구현</div>
+    <div class="section-title">4단계 유도: 스카이훅 제어 $\rightarrow$ CDC 구현</div>
     
     <div class="deriv-card">
         <div class="deriv-step-num">STEP 1: 스카이훅 댐퍼 이론</div>
@@ -329,9 +350,9 @@ td .katex,th .katex{font-size:0.9em!important}
             <p>
                 능동 시스템에서는 <strong>에어스프링 압력</strong>을 조절하여 공진주파수를 변경합니다:
             </p>
-            <div class="deriv-equation"><code style="color:#E8C96A;">k_air = γ · P_air / V_ref</code></div>
+            <div class="deriv-equation"><code style="color:#E8C96A;">k_air = $\gamma$ · P_air / V_ref</code></div>
             <p style="margin-top:12px">
-                <span class="label">γ</span> = 단열 계수, <span class="label">P_air</span> = 공기압, 
+                <span class="label">$\gamma$</span> = 단열 계수, <span class="label">P_air</span> = 공기압, 
                 <span class="label">V_ref</span> = 기준 용적
             </p>
         </div>
@@ -362,13 +383,13 @@ td .katex,th .katex{font-size:0.9em!important}
     <p class="sub-label">① 스카이훅 댐퍼 이상 제어법</p>
     <div class="sub-eq">$$F_{skyhook} = -c_{sky} \dot{z}_s$$</div>
     <div class="sub-eq">$$\text{반능동 구현: } c_{actual} = \begin{cases} c_{sky} \frac{\dot{z}_s}{\dot{z}_s - \dot{z}_u} & \text{if } \dot{z}_s(\dot{z}_s-\dot{z}_u) > 0 \\\\ c_{min} & \text{otherwise} \end{cases}$$</div>
-    <p class="sub-note">스카이훅: 가상 관성 기준으로 차체 감쇠. 에너지 소산만 가능(반능동) → 입력 불가능 영역은 c_min 적용</p>
+    <p class="sub-note">스카이훅: 가상 관성 기준으로 차체 감쇠. 에너지 소산만 가능(반능동) $\rightarrow$ 입력 불가능 영역은 c_min 적용</p>
   </div>
   <div class="sub-step">
     <p class="sub-label">② 그라운드훅 (타이어 접지력 최적화)</p>
     <div class="sub-eq">$$F_{groundhook} = -c_{ground} \dot{z}_u$$</div>
     <div class="sub-eq">$$\text{반능동: } c = \begin{cases} c_{ground} \frac{\dot{z}_u}{\dot{z}_s - \dot{z}_u} & \text{if } \dot{z}_u(\dot{z}_s-\dot{z}_u) < 0 \\\\ c_{min} & \text{otherwise} \end{cases}$$</div>
-    <p class="sub-note">그라운드훅: 타이어 동하중 변동 최소화 → 접지력 유지. <strong>절충안:</strong> α·스카이훅 + (1-α)·그라운드훅</p>
+    <p class="sub-note">그라운드훅: 타이어 동하중 변동 최소화 $\rightarrow$ 접지력 유지. <strong>절충안:</strong> $\alpha$·스카이훅 + (1-$\alpha$)·그라운드훅</p>
   </div>
   <div class="sub-step">
     <p class="sub-label">③ CDC (Continuous Damping Control) MR 댐퍼</p>
@@ -381,7 +402,7 @@ td .katex,th .katex{font-size:0.9em!important}
     <div class="sub-eq">$$P_{active} = F_{actuator} \times \dot{x}_{actuator}$$</div>
     <div class="sub-eq">$$\text{평균 소비: } P_{avg} \approx 1\sim5 \;\text{kW (풀 액티브)}$$</div>
     <div class="sub-eq">$$\text{반능동 소비: } P_{avg} \approx 10\sim50 \;\text{W}$$</div>
-    <p class="sub-note">풀 액티브 대비 반능동은 에너지 효율 100배 이상. EV에서는 에너지 소비가 주행거리 직결 → 반능동 선호</p>
+    <p class="sub-note">풀 액티브 대비 반능동은 에너지 효율 100배 이상. EV에서는 에너지 소비가 주행거리 직결 $\rightarrow$ 반능동 선호</p>
   </div>
 </div>
 
@@ -439,21 +460,21 @@ td .katex,th .katex{font-size:0.9em!important}
                 </tr>
                 <tr>
                     <td>CDC 응답시간</td>
-                    <td class="sym">τ_cdc</td>
+                    <td class="sym">$\tau_{cdc}$</td>
                     <td>ms</td>
                     <td>5 ~ 50</td>
-                    <td>소프트→스티프 전환 시간</td>
+                    <td>소프트$\rightarrow$스티프 전환 시간</td>
                 </tr>
                 <tr>
                     <td>차체 상하 속도</td>
                     <td class="sym">ẋ_body</td>
                     <td>m/s</td>
-                    <td>±0.5</td>
+                    <td>$\pm$0.5</td>
                     <td>스카이훅 제어 입력</td>
                 </tr>
                 <tr>
                     <td>고주파 센서 노이즈</td>
-                    <td class="sym">σ_noise</td>
+                    <td class="sym">$\sigma_{noise}$</td>
                     <td>m/s²</td>
                     <td>0.05 ~ 0.1</td>
                     <td>가속도 센서 고주파 성분 필터링 필요</td>
@@ -464,7 +485,7 @@ td .katex,th .katex{font-size:0.9em!important}
     
     <div class="checkpoint" style="margin-top:20px">
         <strong>센서 구성:</strong> 차체 가속도 센서(4개, 각 코너) + 에어스프링 압력 센서 + 
-        휠 속도 센서(이미 설치) → ECU가 실시간 스카이훅 제어 연산
+        휠 속도 센서(이미 설치) $\rightarrow$ ECU가 실시간 스카이훅 제어 연산
     </div>
 </div>
 
@@ -590,16 +611,16 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="simpack-body">
             <div class="simpack-row">
                 <div class="sp-sym">1. CDC Damper Component</div>
-                <div class="sp-path">Suspension → Damper (Force) → Nonlinear Characteristics</div>
+                <div class="sp-path">Suspension $\rightarrow$ Damper (Force) $\rightarrow$ Nonlinear Characteristics</div>
                 <div class="sp-detail">
-                    입력: 상대 속도 Δv = ẋ_body − ẋ_wheel, 제어신호 u(소프트/스티프)
-                    출력: 댐핑력 F_damp = c(u) · Δv
+                    입력: 상대 속도 $\Delta$v = ẋ_body − ẋ_wheel, 제어신호 u(소프트/스티프)
+                    출력: 댐핑력 F_damp = c(u) · $\Delta$v
                 </div>
             </div>
             
             <div class="simpack-row">
                 <div class="sp-sym">2. 스카이훅 제어 알고리즘 (User Subroutine)</div>
-                <div class="sp-path">Body Accel Input → SKY_CONTROL → Mode Selection Output</div>
+                <div class="sp-path">Body Accel Input $\rightarrow$ SKY_CONTROL $\rightarrow$ Mode Selection Output</div>
                 <div class="sp-detail">
                     조건식: IF (ẋ_body · F_sky_ideal) > 0 THEN c_soft ELSE c_stiff
                     샘플링 주기: 10ms
@@ -608,7 +629,7 @@ td .katex,th .katex{font-size:0.9em!important}
             
             <div class="simpack-row">
                 <div class="sp-sym">3. 에어스프링 압력 모듈</div>
-                <div class="sp-path">Suspension → Spring (Air) → Pressure Control</div>
+                <div class="sp-path">Suspension $\rightarrow$ Spring (Air) $\rightarrow$ Pressure Control</div>
                 <div class="sp-detail">
                     입력: 주행 모드, 차량 속도
                     출력: 역동적 강성 k(t) = f(P_air, V_acc)
@@ -617,7 +638,7 @@ td .katex,th .katex{font-size:0.9em!important}
             
             <div class="simpack-row">
                 <div class="sp-sym">4. 시뮬레이션 결과 비교</div>
-                <div class="sp-path">Output → Charts: Acceleration / Displacement / Force</div>
+                <div class="sp-path">Output $\rightarrow$ Charts: Acceleration / Displacement / Force</div>
                 <div class="sp-detail">
                     지표: 차체 가속도 RMS, 응답시간, 피크값 제어
                 </div>
@@ -647,10 +668,10 @@ td .katex,th .katex{font-size:0.9em!important}
         
         <p style="margin-top:16px;font-weight:600">패시브 시스템 응답:</p>
         <p>
-            공진 주파수 <span class="calc">f_n = √(25e3/1500)/(2π) = 0.65 Hz</span>
-            <br/>감쇠비 <span class="calc">ζ = 5e3/(2·√(25e3·1500)) = 0.32 (부족감쇠)</span>
-            <br/>차체 가속도 피크 <span class="calc">≈ 1.5 m/s² (초기)</span>
-            <br/>정착 시간 (±5%) <span class="calc">≈ 2.5초</span>
+            공진 주파수 <span class="calc">f_n = $\sqrt{\cdot}$(25e3/1500)/(2$\pi$) = 0.65 Hz</span>
+            <br/>감쇠비 <span class="calc">$\zeta$ = 5e3/(2·$\sqrt{\cdot}$(25e3·1500)) = 0.32 (부족감쇠)</span>
+            <br/>차체 가속도 피크 <span class="calc">$\approx$ 1.5 m/s² (초기)</span>
+            <br/>정착 시간 ($\pm$5%) <span class="calc">$\approx$ 2.5초</span>
         </p>
         
         <p style="margin-top:16px;font-weight:600">반능동 (스카이훅) 시스템 응답:</p>
@@ -661,23 +682,23 @@ td .katex,th .katex{font-size:0.9em!important}
         
         <p style="margin-top:16px"><strong>스카이훅 제어 단계:</strong></p>
         <ul style="margin-left:20px;margin-top:8px">
-            <li><strong>t=0~0.1s</strong> (상향 시작): ẋ_body > 0 → c_stiff = 10 kN·s/m 선택</li>
-            <li><strong>t=0.1~0.2s</strong> (상향 최고점): ẋ_body ≈ 0 → c_soft = 3 kN·s/m 전환</li>
+            <li><strong>t=0~0.1s</strong> (상향 시작): ẋ_body > 0 $\rightarrow$ c_stiff = 10 kN·s/m 선택</li>
+            <li><strong>t=0.1~0.2s</strong> (상향 최고점): ẋ_body $\approx$ 0 $\rightarrow$ c_soft = 3 kN·s/m 전환</li>
             <li><strong>t=0.2~0.3s</strong> (하향): ẋ_body < 0 → c_soft 유지</li>
-            <li><strong>t>0.3s</strong> (정착): ẋ_body ≈ 0 → c_soft 유지 (승차감 우선)</li>
+            <li><strong>t>0.3s</strong> (정착): ẋ_body $\approx$ 0 $\rightarrow$ c_soft 유지 (승차감 우선)</li>
         </ul>
         
         <p style="margin-top:16px;font-weight:600">결과:</p>
         <p>
-            차체 가속도 피크 <span class="calc">≈ 0.8 m/s²</span> (패시브 대비 46% 감소)
-            <br/>정착 시간 <span class="calc">≈ 0.8초</span> (패시브 대비 68% 단축)
-            <br/>승차감 개선도 <span class="calc">≈ ISO 2631 기준 쾌적성 +30%</span>
+            차체 가속도 피크 <span class="calc">$\approx$ 0.8 m/s²</span> (패시브 대비 46% 감소)
+            <br/>정착 시간 <span class="calc">$\approx$ 0.8초</span> (패시브 대비 68% 단축)
+            <br/>승차감 개선도 <span class="calc">$\approx$ ISO 2631 기준 쾌적성 +30%</span>
         </p>
         
         <div class="ride-criteria">
             <h4 style="margin-bottom:8px">승차감 평가 기준:</h4>
             <p>차체 가속도 RMS &lt; 0.5 m/s²: 쾌적 | 0.5~1.0: 보통 | &gt; 1.0: 불쾌</p>
-            <p style="margin-top:4px;color:#4ABF8A">반능동 예시 결과: RMS ≈ 0.35 m/s² → 매우 쾌적</p>
+            <p style="margin-top:4px;color:#4ABF8A">반능동 예시 결과: RMS $\approx$ 0.35 m/s² $\rightarrow$ 매우 쾌적</p>
         </div>
     </div>
 </div>
@@ -698,7 +719,7 @@ td .katex,th .katex{font-size:0.9em!important}
                     <strong>Groundhook 제어</strong>는 스카이훅과 상보적인 전략입니다. 
                     노면(wheel) 속도를 기준으로 하는 제어로, 타이어 동적 부하(wheel hop) 감소를 목표로 합니다.
                 </p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">Groundhook: $F_{GH} = -c_{gnd} \cdot \dot{x}_u$ → 타이어 접지력 최적화</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">Groundhook: $F_{GH} = -c_{gnd} \cdot \dot{x}_u \rightarrow$ 타이어 접지력 최적화</p>
 <p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">ADD(Acceleration Driven Damper): $c = \begin{cases} c_{max} & \ddot{x}_s \cdot (\dot{x}_s - \dot{x}_u) > 0 \\ c_{min} & \text{else} \end{cases}$</p>
                 <p style="margin-top:12px">
                     조건식: <code style="color:#E8C96A;">IF (ẋ_wheel · F_ideal_wheel) > 0 THEN stiff ELSE soft</code>
@@ -707,7 +728,7 @@ td .katex,th .katex{font-size:0.9em!important}
                     <strong>효과:</strong>
                 </p>
                 <ul style="padding-left:20px;margin-top:8px">
-                    <li>타이어 접지압 변동 감소 → 접지력 안정화</li>
+                    <li>타이어 접지압 변동 감소 $\rightarrow$ 접지력 안정화</li>
                     <li>브레이킹 안정성 향상 (ABS 상호작용)</li>
                     <li>고속 코너링에서 롤 거동 안정화</li>
                 </ul>
@@ -729,15 +750,15 @@ td .katex,th .katex{font-size:0.9em!important}
                     <strong>MR(Magnetorheological) 댐퍼</strong>는 전자제어 댐퍼의 한 단계 진화입니다. 
                     강자성 입자가 포함된 오일이 전자기장에 반응하여 점도가 연속적으로 변합니다.
                 </p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">Bingham 모델: $F = c\dot{x} + F_y \cdot \text{sgn}(\dot{x})$, &nbsp; $F_y = f(I_{coil})$ → 전류로 항복력 제어</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">응답시간: $\tau_{MR} \approx 1\text{~}5$ ms → 가변 댐퍼 중 가장 빠름</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">Bingham 모델: $F = c\dot{x} + F_y \cdot \text{sgn}(\dot{x})$, &nbsp; $F_y = f(I_{coil}) \rightarrow$ 전류로 항복력 제어</p>
+<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">응답시간: $\tau_{MR} \approx 1\text{~}5$ ms $\rightarrow$ 가변 댐퍼 중 가장 빠름</p>
 <p style="margin:10px 0;color:var(--gold-light);"><strong>르노코리아 실무 Tip:</strong> MR 댐퍼의 Fail-Safe 모드(전류 0)에서도 최소 감쇠가 확보되어야 합니다. 이는 안전 규정 필수 요건입니다.</p>
                 <p style="margin-top:12px">
                     <strong>동작 원리:</strong>
                 </p>
                 <ul style="padding-left:20px;margin-top:8px">
-                    <li>전자기 코일에 통전 → 자기장 발생</li>
-                    <li>강자성 입자 정렬 → 오일 점도 급증 (10배 이상)</li>
+                    <li>전자기 코일에 통전 $\rightarrow$ 자기장 발생</li>
+                    <li>강자성 입자 정렬 $\rightarrow$ 오일 점도 급증 (10배 이상)</li>
                     <li>댐핑력 = 기본 마찰 + 자기장 의존 점성력</li>
                 </ul>
                 <p style="margin-top:12px">
@@ -873,8 +894,8 @@ td .katex,th .katex{font-size:0.9em!important}
 
 <!-- ══════ NAVIGATION ══════ -->
 <div class="nav-section" style="display:flex;justify-content:space-between;gap:1rem;margin:2.5rem 0;">
-    <a href="Day55_풀카모델.html" class="nav-btn" style="flex:1;text-align:center;padding:1rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--gold);text-decoration:none;font-weight:600;transition:all .3s;">← Day 55: 풀카 모델</a>
-    <a href="Day57_컴플라이언스스티어.html" class="nav-btn" style="flex:1;text-align:center;padding:1rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--gold);text-decoration:none;font-weight:600;transition:all .3s;">Day 57: 컴플라이언스 스티어 →</a>
+    <a href="Day55_풀카모델.html" class="nav-btn" style="flex:1;text-align:center;padding:1rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--gold);text-decoration:none;font-weight:600;transition:all .3s;">$\leftarrow$ Day 55: 풀카 모델</a>
+    <a href="Day57_컴플라이언스스티어.html" class="nav-btn" style="flex:1;text-align:center;padding:1rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--gold);text-decoration:none;font-weight:600;transition:all .3s;">Day 57: 컴플라이언스 스티어 $\rightarrow$</a>
 </div>
 
 <!-- ══════ FOOTER ══════ -->
