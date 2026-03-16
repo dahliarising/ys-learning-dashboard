@@ -196,6 +196,7 @@ a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;b
 <div class="section-label"><span class="label-fr" id="lessonCourseLabel"></span><span class="label-kr" id="lessonCourseName"></span></div>
 <div id="lessonList"></div>
 </div>
+<div id="allLessonsView"></div>
 </div>
 <div id="tab-scenarios" class="tab-content">
 <div class="section-label"><span class="label-fr">SCÉNARIOS</span><span class="label-kr">— 실무 시나리오 가이드</span></div>
@@ -494,6 +495,21 @@ function showLessonList(cid){
 }
 document.getElementById('backToCourses').addEventListener('click',function(){document.getElementById('courseGridView').classList.remove('hidden');document.getElementById('lessonListView').classList.remove('active');document.getElementById('lectureSearchResults').style.display='none';document.getElementById('lectureSearch').value=''});
 
+function renderAllLessons(){
+  var el=document.getElementById('allLessonsView'),h='';
+  C.forEach(function(c){
+    var done=getProgress(c.id),total=c.lessons.length,pct=total?Math.round(done.length/total*100):0;
+    h+='<div class="gold-rule" style="margin:24px 0 16px"></div>';
+    h+='<div class="section-label"><span class="label-fr" style="color:'+c.color+'">'+c.icon+' '+esc(c.name).toUpperCase()+'</span><span class="label-kr">\u2014 '+done.length+'/'+total+' ('+pct+'%)</span></div>';
+    c.lessons.forEach(function(l){
+      var isDone=done.includes(l.d);
+      h+='<div class="lesson-item'+(isDone?' di':'')+'" data-cid="'+c.id+'" data-day="'+l.d+'" style="cursor:pointer"><div class="lesson-bullet'+(isDone?' done':'')+'" style="'+(isDone?'background:'+c.color+';border-color:'+c.color:'')+'"></div><div class="lesson-day">D'+String(l.d).padStart(2,'0')+'</div><div class="lesson-title">'+esc(l.t)+'</div></div>';
+    });
+  });
+  el.innerHTML=h;
+  el.querySelectorAll('.lesson-item').forEach(function(item){item.addEventListener('click',function(){openLesson(item.dataset.cid,parseInt(item.dataset.day))})});
+}
+
 // ═══ TAB 3: SCENARIOS ═══
 let curCat='all';
 function renderCatTabs(){
@@ -597,7 +613,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden&&_fb
 window.addEventListener('focus',function(){if(_fbDb)forcePull()});
 
 // ═══ INIT ═══
-function renderAll(){renderStats();renderTotalStats();renderDaily();renderTip();renderReviewQueue();renderCourseGrid();renderCatTabs();renderScenarioList();renderWeeklyGoal();renderWeekly();renderHeatmap();renderAllProgress();updTimer()}
+function renderAll(){renderStats();renderTotalStats();renderDaily();renderTip();renderReviewQueue();renderCourseGrid();renderAllLessons();renderCatTabs();renderScenarioList();renderWeeklyGoal();renderWeekly();renderHeatmap();renderAllProgress();updTimer()}
 renderAll();
 if(_fbReady){_fbDb.ref('savoir/data').once('value').then(function(snap){var remote=snap.val();if(remote){var local=gs(),lt=local._ts||0,rt=remote._ts||0;if(rt>lt){localStorage.setItem(SK,JSON.stringify(remote));renderAll();showSyncStatus('synced','CLOUD DATA LOADED')}}})}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
