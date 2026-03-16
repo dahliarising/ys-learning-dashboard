@@ -160,9 +160,6 @@ a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;b
 .sync-indicator.show{opacity:1}
 .sync-indicator.synced{color:#4a8b5c}
 .sync-indicator.error{color:#c23b22}
-.sync-setup-banner{background:var(--surface2);border:1px solid var(--gold-dim);border-radius:2px;padding:16px;margin-bottom:20px;font-size:12px;color:var(--text-dim);line-height:1.6;display:none}
-.sync-setup-banner input{width:100%;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;margin:8px 0;outline:none}
-.sync-setup-banner button{padding:8px 16px;border:1px solid var(--gold);border-radius:2px;background:transparent;color:var(--gold);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:4px}
 </style>
 </head>
 <body>
@@ -225,18 +222,7 @@ a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;b
 <div class="gold-rule"></div>
 <div class="section-label"><span class="label-fr">PARAMÈTRES</span><span class="label-kr">— 설정</span></div>
 <div>
-<button class="settings-btn" id="syncSetupBtn">CLOUD SYNC 설정</button>
-<div class="sync-setup-banner" id="syncSetupBanner">
-<div style="margin-bottom:8px;color:var(--gold);letter-spacing:2px;font-size:10px;text-transform:uppercase">FIREBASE CLOUD SYNC</div>
-<div>기기 간 학습 진도를 자동 동기화합니다.</div>
-<div style="margin-top:8px;font-size:11px;color:var(--text-muted)">Firebase 콘솔에서 프로젝트 생성 후 아래 정보를 입력하세요:</div>
-<input type="text" id="fbApiKey" placeholder="API Key">
-<input type="text" id="fbProjectId" placeholder="Project ID (예: my-project-12345)">
-<button id="fbSaveBtn">저장 및 동기화 시작</button>
-<button id="fbClearBtn" style="border-color:var(--text-muted);color:var(--text-muted);margin-left:8px">연결 해제</button>
-<div id="fbStatus" style="margin-top:8px;font-size:10px;color:var(--text-muted)"></div>
-</div>
-<button class="settings-btn" id="syncNowBtn" style="display:none">SYNC NOW</button>
+<button class="settings-btn" id="syncNowBtn">SYNC NOW</button>
 <button class="settings-btn" id="exportBtn">EXPORT DATA</button>
 <button class="settings-btn" id="importBtn">IMPORT DATA</button>
 <button class="settings-btn" id="resetBtn" style="color:#8b4040">RESET ALL DATA</button>
@@ -317,21 +303,18 @@ const SCENARIOS=[
 const TIPS=['뇌는 수면 중 단기기억을 장기기억으로 전환합니다 — 학습 후 충분한 수면이 핵심','간격반복(Spaced Repetition)은 벼락치기 대비 기억 유지율 200% 향상','운동 직후 30분이 학습 효율 최고 구간 — BDNF 분비 피크','포모도로(25분 집중 + 5분 휴식)가 90분 연속 공부보다 효율적','새벽보다 오전 10-12시가 인지 능력 피크 타임','멀티태스킹은 IQ를 15포인트 낮추는 효과 — 하나에 집중하세요','학습 직후 10분 회상(recall)이 1시간 재독보다 효과적','적절한 스트레스(각성)는 학습을 촉진합니다 — 여키스-도드슨 법칙','손글씨 노트가 타이핑보다 기억 정착에 29% 더 효과적','가르치면 90% 기억 — 학습 피라미드의 정점','카페인은 섭취 후 30분-2시간이 피크 — 학습 30분 전 섭취 최적','자연광 노출이 집중력과 기분을 동시에 개선합니다','뇌의 디폴트 모드 네트워크는 멍때릴 때 창의적 연결을 만듭니다','학습 전 5분 명상이 집중력을 40% 향상시킵니다','물을 500ml 마시면 인지 수행이 15% 개선됩니다'];
 
 // ═══ STORAGE + CLOUD SYNC ═══
-const SK='learn_data_v3',SRI=[1,3,7,14,30,60],SYNC_KEY='savoir_firebase_config';
+const SK='learn_data_v3',SRI=[1,3,7,14,30,60];
+const FB_CONFIG={apiKey:"AIzaSyDJdmqhSJxuCvNtCoe7EhkNUdjQceRvSMQ",authDomain:"savoir-dashboard.firebaseapp.com",databaseURL:"https://savoir-dashboard-default-rtdb.firebaseio.com",projectId:"savoir-dashboard",storageBucket:"savoir-dashboard.firebasestorage.app",messagingSenderId:"666083969419",appId:"1:666083969419:web:cc3b457813f7a6706c478e"};
 let _fbDb=null,_syncDebounce=null,_syncing=false;
 
 function gs(){try{const r=localStorage.getItem(SK);return r?JSON.parse(r):{}}catch(e){return{}}}
 function ss(d){d._ts=Date.now();localStorage.setItem(SK,JSON.stringify(d));scheduleCloudPush()}
 
 // ── Firebase 초기화 ──
-function getFbConfig(){try{return JSON.parse(localStorage.getItem(SYNC_KEY))}catch(e){return null}}
-function saveFbConfig(cfg){localStorage.setItem(SYNC_KEY,JSON.stringify(cfg))}
-
 function initFirebase(){
-  const cfg=getFbConfig();if(!cfg||!cfg.apiKey||!cfg.projectId)return false;
   if(_fbDb)return true;
   try{
-    const app=firebase.initializeApp({apiKey:cfg.apiKey,databaseURL:'https://'+cfg.projectId+'-default-rtdb.firebaseio.com',projectId:cfg.projectId});
+    firebase.initializeApp(FB_CONFIG);
     _fbDb=firebase.database();
     _fbDb.ref('savoir/data').on('value',function(snap){
       if(_syncing)return;
@@ -346,7 +329,7 @@ function initFirebase(){
     });
     showSyncStatus('synced','CONNECTED');
     return true;
-  }catch(e){showSyncStatus('error','SYNC ERROR');return false}
+  }catch(e){console.error('Firebase init error:',e);showSyncStatus('error','SYNC ERROR');return false}
 }
 
 function scheduleCloudPush(){
@@ -611,25 +594,7 @@ document.getElementById('importFile').addEventListener('change',function(e){cons
 document.getElementById('resetBtn').addEventListener('click',function(){if(confirm('\uBAA8\uB4E0 \uD559\uC2B5 \uB370\uC774\uD130\uB97C \uCD08\uAE30\uD654\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C? \uC774 \uC791\uC5C5\uC740 \uB418\uB3CC\uB9B4 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.')){localStorage.removeItem(SK);if(_fbDb)_fbDb.ref('savoir/data').remove();renderAll()}});
 
 // ═══ CLOUD SYNC UI ═══
-document.getElementById('syncSetupBtn').addEventListener('click',function(){
-  var b=document.getElementById('syncSetupBanner'),cfg=getFbConfig();
-  b.style.display=b.style.display==='block'?'none':'block';
-  if(cfg){document.getElementById('fbApiKey').value=cfg.apiKey||'';document.getElementById('fbProjectId').value=cfg.projectId||'';document.getElementById('fbStatus').textContent='연결됨'}
-});
-document.getElementById('fbSaveBtn').addEventListener('click',function(){
-  var ak=document.getElementById('fbApiKey').value.trim(),pid=document.getElementById('fbProjectId').value.trim();
-  if(!ak||!pid){document.getElementById('fbStatus').textContent='API Key와 Project ID를 모두 입력하세요';return}
-  saveFbConfig({apiKey:ak,projectId:pid});_fbDb=null;
-  if(initFirebase()){document.getElementById('fbStatus').textContent='연결 성공! 동기화 시작됨';document.getElementById('syncNowBtn').style.display='';forcePush()}
-  else{document.getElementById('fbStatus').textContent='연결 실패 — 설정을 확인하세요'}
-});
-document.getElementById('fbClearBtn').addEventListener('click',function(){
-  localStorage.removeItem(SYNC_KEY);_fbDb=null;
-  document.getElementById('fbApiKey').value='';document.getElementById('fbProjectId').value='';
-  document.getElementById('fbStatus').textContent='연결 해제됨';document.getElementById('syncNowBtn').style.display='none';
-});
 document.getElementById('syncNowBtn').addEventListener('click',function(){forcePush()});
-if(_fbReady)document.getElementById('syncNowBtn').style.display='';
 
 // ═══ INIT ═══
 function renderAll(){renderStats();renderTotalStats();renderDaily();renderTip();renderReviewQueue();renderCourseGrid();renderCatTabs();renderScenarioList();renderWeeklyGoal();renderWeekly();renderHeatmap();renderAllProgress();updTimer()}
