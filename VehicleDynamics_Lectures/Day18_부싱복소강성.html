@@ -1508,14 +1508,16 @@ td .katex,th .katex{font-size:0.9em!important}
       ctx.fillStyle='#020510'; ctx.fillRect(0,0,W,H);
       const k0=+sl_k.value, eta=+sl_eta.value, fmax=+sl_freq.value;
       const hH=H/2;
-      // k*(f) = k0*(1 + α*f/10), k*(f)_imag = k0*η*(1+β*f/10) (frequency dependent)
+      // k'(f) = k0*(1 + α*log(f/f0)), k''(f) = k'(f)*η(f) — logarithmic frequency dependency (matches lecture)
+      const f0=1; // reference frequency 1 Hz
+      const alpha=0.35; // frequency stiffening coefficient (typical rubber: 0.2~0.5)
       ctx.strokeStyle='#00e5ff'; ctx.lineWidth=2; ctx.beginPath();
-      for(let i=0;i<=300;i++){const f=i*fmax/300;const kReal=k0*(1+0.3*f/fmax);const px=i*W/300,py=hH/2-(kReal-k0*0.7)*(hH-30)/(k0*0.8);ctx.lineTo(px,Math.max(5,Math.min(hH-5,py)));} ctx.stroke();
+      for(let i=0;i<=300;i++){const f=Math.max(0.1,i*fmax/300);const kReal=k0*(1+alpha*Math.log10(f/f0));const px=i*W/300,py=hH/2-(kReal-k0*0.7)*(hH-30)/(k0*0.8);ctx.lineTo(px,Math.max(5,Math.min(hH-5,py)));} ctx.stroke();
       ctx.strokeStyle='#ff2d78'; ctx.lineWidth=2; ctx.beginPath();
-      for(let i=0;i<=300;i++){const f=i*fmax/300;const kImag=k0*eta*(1+0.5*f/fmax);const px=i*W/300,py=hH/2-(kImag-0)*(hH-30)/(k0*eta*2);ctx.lineTo(px,Math.max(5,Math.min(hH-5,py)));} ctx.stroke();
-      // Loss factor η(f)
+      for(let i=0;i<=300;i++){const f=Math.max(0.1,i*fmax/300);const kR=k0*(1+alpha*Math.log10(f/f0));const kImag=kR*eta*(1+0.15*Math.log10(f/f0));const px=i*W/300,py=hH/2-(kImag-0)*(hH-30)/(k0*eta*2);ctx.lineTo(px,Math.max(5,Math.min(hH-5,py)));} ctx.stroke();
+      // Loss factor η(f) = k''(f)/k'(f) — slowly varying with frequency
       ctx.strokeStyle='#2979ff'; ctx.lineWidth=2; ctx.beginPath();
-      for(let i=1;i<=300;i++){const f=i*fmax/300;const etaF=eta*(1+0.2*f/fmax)/(1+0.3*f/fmax);const px=i*W/300,py=hH+hH/2-etaF*(hH-30)/0.5;ctx.lineTo(px,Math.max(hH+5,Math.min(H-5,py)));} ctx.stroke();
+      for(let i=1;i<=300;i++){const f=Math.max(0.1,i*fmax/300);const etaF=eta*(1+0.15*Math.log10(f/f0));const px=i*W/300,py=hH+hH/2-etaF*(hH-30)/0.5;ctx.lineTo(px,Math.max(hH+5,Math.min(H-5,py)));} ctx.stroke();
       ctx.strokeStyle='rgba(0,229,255,0.06)';ctx.beginPath();ctx.moveTo(0,hH);ctx.lineTo(W,hH);ctx.stroke();
       ctx.fillStyle='#00e5ff';ctx.font='11px Share Tech Mono,monospace';ctx.fillText("— k'(저장강성)",10,15);
       ctx.fillStyle='#ff2d78';ctx.fillText("— k''(손실강성)",10,30);

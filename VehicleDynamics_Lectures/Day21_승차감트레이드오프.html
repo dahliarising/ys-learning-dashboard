@@ -1521,33 +1521,89 @@ td .katex,th .katex{font-size:0.9em!important}
     
     const sl_ks = addSlider('kₛ (kN/m)', 10, 40, 20, 1, 'sim21-ks');
     const sl_cs = addSlider('cₛ (Ns/m)', 500, 5000, 1500, 100, 'sim21-cs');
+    const sl_csky = addSlider('c_sky (Ns/m)', 500, 8000, 3000, 100, 'sim21-csky');
     function draw() {
       ctx.fillStyle='#020510'; ctx.fillRect(0,0,W,H);
-      // Generate Pareto front: ride comfort (body acc RMS) vs handling (susp travel RMS)
-      const ms=300,mu=40,kt=200000;
-      const pts=[];
-      for(let ks=10000;ks<=40000;ks+=2000)for(let cs=500;cs<=5000;cs+=200){
-        const wn=Math.sqrt(ks/ms),z=cs/(2*Math.sqrt(ks*ms));
-        const ride=1/(2*z*wn+0.1); // simplified comfort metric (lower=better)
-        const handle=z*wn; // handling metric (higher=better)
-        pts.push({ks,cs,ride:ride*100,handle});
+      const ms=300,mu=40,kt=200000,g=9.81;
+      // Quarter-car time-domain simulation: compute J_ride(a_rms) and J_handling(ΔFz_rms/Fz_static)
+      function simulate(ks,cs,mode,csky){
+        const dt=0.0005,T=2.0,N=Math.round(T/dt);
+        let xs=0,xsdot=0,xu=0,xudot=0;
+        let sumA2=0,sumDFz2=0;
+        const Fzs=ms*g;
+        for(let i=0;i<N;i++){
+          const t=i*dt;
+          // Road input: 20mm bump at 1Hz + 5mm roughness at 8Hz
+          const zr=0.02*Math.sin(2*Math.PI*1*t)+0.005*Math.sin(2*Math.PI*8*t);
+          const zrdot=0.02*2*Math.PI*1*Math.cos(2*Math.PI*1*t)+0.005*2*Math.PI*8*Math.cos(2*Math.PI*8*t);
+          // Damper force depends on control mode
+          let Fd;
+          if(mode==='passive'){
+            Fd=cs*(xsdot-xudot);
+          } else {
+            // Skyhook on/off: F=c_sky*xsdot if xsdot*(xsdot-xudot)>0, else F=0
+            if(xsdot*(xsdot-xudot)>0){Fd=csky*xsdot;}else{Fd=0;}
+          }
+          const Fs=ks*(xs-xu);
+          const Ft=kt*(xu-zr);
+          const as=(-Fs-Fd)/ms;
+          const au=(Fs+Fd-Ft)/mu;
+          xsdot+=as*dt; xs+=xsdot*dt;
+          xudot+=au*dt; xu+=xudot*dt;
+          if(i>N*0.2){sumA2+=as*as;sumDFz2+=(kt*(xu-zr)-Fzs)*(kt*(xu-zr)-Fzs);}
+        }
+        const cnt=N*0.8;
+        const aRms=Math.sqrt(sumA2/cnt);
+        const dFzRms=Math.sqrt(sumDFz2/cnt)/Fzs;
+        return{aRms,dFzRms};
       }
-      const maxR=Math.max(...pts.map(p=>p.ride)),maxH=Math.max(...pts.map(p=>p.handle));
+      // Generate Pareto front: passive damper sweep
+      const pts=[];
+      const ks0=+sl_ks.value*1000;
+      for(let cs=500;cs<=5000;cs+=150){
+        const r=simulate(ks0,cs,'passive',0);
+        pts.push({cs,ride:r.aRms,handle:r.dFzRms,type:'passive'});
+      }
+      // Skyhook point
+      const cs0=+sl_cs.value, csky0=+sl_csky.value;
+      const skyR=simulate(ks0,cs0,'skyhook',csky0);
+      const pasR=simulate(ks0,cs0,'passive',0);
+      // Plot axes
+      const maxRide=Math.max(...pts.map(p=>p.ride))*1.2;
+      const maxHandle=Math.max(...pts.map(p=>p.handle))*1.2;
+      // Passive Pareto cloud
       pts.forEach(p=>{
-        const px=50+p.handle*(W-100)/maxH, py=H-30-p.ride*(H-60)/maxR;
-        ctx.fillStyle='rgba(41,121,255,0.2)';ctx.beginPath();ctx.arc(px,py,2,0,2*Math.PI);ctx.fill();
+        const px=50+p.handle*(W-100)/maxHandle, py=H-30-p.ride*(H-60)/maxRide;
+        ctx.fillStyle='rgba(41,121,255,0.3)';ctx.beginPath();ctx.arc(px,py,3,0,2*Math.PI);ctx.fill();
       });
-      // Current point
-      const ks0=+sl_ks.value*1000, cs0=+sl_cs.value;
-      const wn0=Math.sqrt(ks0/ms),z0=cs0/(2*Math.sqrt(ks0*ms));
-      const r0=100/(2*z0*wn0+0.1), h0=z0*wn0;
-      const cpx=50+h0*(W-100)/maxH, cpy=H-30-r0*(H-60)/maxR;
-      ctx.fillStyle='#00e5ff';ctx.beginPath();ctx.arc(cpx,cpy,8,0,2*Math.PI);ctx.fill();
-      ctx.strokeStyle='#00e5ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cpx,cpy,12,0,2*Math.PI);ctx.stroke();
-      ctx.fillStyle='#3d6080';ctx.font='12px Share Tech Mono,monospace';
-      ctx.fillText('핸들링 (ζ·ωₙ) →',W-150,H-10);ctx.fillText('↑ 승차감 (1/2ζωₙ)',5,15);
-      ctx.fillStyle='#00e5ff';ctx.fillText('● 현재 설정',cpx+15,cpy+5);
-      setMetrics([['ωₙ',(wn0/2/Math.PI).toFixed(2)+' Hz'],['ζ',z0.toFixed(3)],['Trade-off','승차감↑ ⟺ 핸들링↓']]);
+      // Passive Pareto line
+      ctx.strokeStyle='rgba(41,121,255,0.6)';ctx.lineWidth=1.5;ctx.beginPath();
+      pts.forEach((p,i)=>{const px=50+p.handle*(W-100)/maxHandle,py=H-30-p.ride*(H-60)/maxRide;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);});ctx.stroke();
+      // Current passive point
+      const ppx=50+pasR.dFzRms*(W-100)/maxHandle, ppy=H-30-pasR.aRms*(H-60)/maxRide;
+      ctx.fillStyle='#ff2d78';ctx.beginPath();ctx.arc(ppx,ppy,7,0,2*Math.PI);ctx.fill();
+      ctx.strokeStyle='#ff2d78';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(ppx,ppy,11,0,2*Math.PI);ctx.stroke();
+      // Skyhook point
+      const spx=50+skyR.dFzRms*(W-100)/maxHandle, spy=H-30-skyR.aRms*(H-60)/maxRide;
+      ctx.fillStyle='#00e5ff';ctx.beginPath();ctx.arc(spx,spy,7,0,2*Math.PI);ctx.fill();
+      ctx.strokeStyle='#00e5ff';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(spx,spy,11,0,2*Math.PI);ctx.stroke();
+      // Arrow from passive to skyhook
+      ctx.strokeStyle='rgba(0,229,255,0.4)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+      ctx.beginPath();ctx.moveTo(ppx,ppy);ctx.lineTo(spx,spy);ctx.stroke();ctx.setLineDash([]);
+      // Labels
+      ctx.fillStyle='#3d6080';ctx.font='11px Share Tech Mono,monospace';
+      ctx.fillText('J_handling (ΔFz_rms/Fz_static) →',W-250,H-8);
+      ctx.save();ctx.translate(12,H/2);ctx.rotate(-Math.PI/2);ctx.fillText('← J_ride (a_body_rms, m/s²)',0,0);ctx.restore();
+      ctx.fillStyle='#ff2d78';ctx.fillText('● Passive',ppx+14,ppy+4);
+      ctx.fillStyle='#00e5ff';ctx.fillText('● Skyhook',spx+14,spy+4);
+      ctx.fillStyle='rgba(41,121,255,0.7)';ctx.fillText('— Passive Pareto',W-180,20);
+      const improve=((pasR.aRms-skyR.aRms)/pasR.aRms*100).toFixed(1);
+      setMetrics([
+        ['Passive a_rms',pasR.aRms.toFixed(3)+' m/s²'],
+        ['Skyhook a_rms',skyR.aRms.toFixed(3)+' m/s²'],
+        ['개선율',improve+'%'],
+        ['ωₙ',(Math.sqrt(ks0/ms)/2/Math.PI).toFixed(2)+' Hz']
+      ]);
     }
 
     draw();
