@@ -4,1268 +4,888 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Day 08 — 형제 질투의 신경학</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&family=MedievalSharp&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 :root {
-  --bg: #0A0C10;
-  --bg-card: #12151B;
-  --bg-card-alt: #181C24;
-  --green: #4ABF8A;
-  --green-dim: #2A7A56;
-  --gold: #C9A84C;
-  --gold-dim: #8A7333;
-  --text: #E8E6E1;
-  --text-dim: #9A9890;
-  --text-bright: #FFFFFF;
-  --danger: #E85D5D;
-  --serif: 'Cormorant Garamond', Georgia, serif;
-  --sans: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
-  --mono: 'JetBrains Mono', 'Fira Code', monospace;
-  --radius: 16px;
-  --radius-sm: 10px;
+  --parchment: #F5ECD7; --parchment-dark: #E8DCC6; --parchment-deep: #D4C5A9;
+  --ink: #2C1810; --ink-light: #4A3728; --ink-dim: #7A6B5D;
+  --crimson: #8B1A1A; --crimson-light: #A52A2A;
+  --royal-blue: #1B3A5C; --royal-blue-light: #2A5580;
+  --gold: #B8860B; --gold-light: #DAA520; --gold-dim: #8B6914;
+  --forest: #2D5016; --forest-light: #3A6B1E;
+  --medieval-border: #8B7355;
+  --shadow: rgba(44,24,16,0.12); --shadow-deep: rgba(44,24,16,0.25);
+  --title: 'Cinzel','Times New Roman',serif;
+  --body: 'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
+  --accent: 'MedievalSharp',cursive;
+  --mono: 'JetBrains Mono',monospace;
+  --radius: 12px; --radius-sm: 8px;
 }
-html { font-size: 16px; scroll-behavior: smooth; }
+html { font-size: 17px; scroll-behavior: smooth; }
+::-webkit-scrollbar { width: 14px; }
+::-webkit-scrollbar-track { background: var(--parchment-dark); }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg,var(--gold),var(--medieval-border)); border-radius: 7px; border: 3px solid var(--parchment-dark); }
+body { background: var(--parchment); color: var(--ink); font-family: var(--body); line-height: 1.85; -webkit-font-smoothing: antialiased; }
+body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100%; background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events:none; z-index:0; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+.fade-up { opacity:0; }
+.fade-up.visible { animation: fadeUp 0.7s ease-out forwards; }
+.container { max-width:780px; margin:0 auto; padding:0 24px 100px; position:relative; z-index:1; }
 
-::-webkit-scrollbar { width: 12px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--green), var(--gold));
-  border-radius: 6px;
-  border: 2px solid var(--bg);
-}
-::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, var(--green), var(--green-dim)); }
+.chapter-header { text-align:center; padding:48px 0 40px; border-bottom:2px solid var(--medieval-border); margin-bottom:48px; position:relative; }
+.chapter-header::after { content:'⚜'; position:absolute; bottom:-16px; left:50%; transform:translateX(-50%); background:var(--parchment); padding:0 20px; font-size:1.4rem; color:var(--gold); }
+.series-badge { display:inline-block; font-family:var(--mono); font-size:0.65rem; letter-spacing:4px; text-transform:uppercase; color:var(--ink-dim); margin-bottom:6px; }
+.chapter-number { font-family:var(--title); font-size:0.85rem; font-weight:700; color:var(--crimson); letter-spacing:6px; text-transform:uppercase; margin-bottom:12px; }
+.part-banner { display:inline-block; background:var(--royal-blue); color:var(--parchment); font-family:var(--title); font-size:0.68rem; font-weight:600; letter-spacing:3px; text-transform:uppercase; padding:6px 20px; border-radius:4px; margin-bottom:20px; }
+.chapter-title { font-family:var(--title); font-size:clamp(1.6rem,4.5vw,2.6rem); font-weight:700; color:var(--ink); line-height:1.3; margin-bottom:16px; }
+.chapter-title em { font-style:italic; color:var(--crimson); }
+.chapter-subtitle { font-size:0.95rem; color:var(--ink-dim); max-width:540px; margin:0 auto 20px; line-height:1.75; }
+.aha-moment { display:inline-block; background:linear-gradient(135deg,rgba(139,26,26,0.08),rgba(184,134,11,0.08)); border:2px solid var(--crimson); border-radius:var(--radius-sm); padding:14px 24px; font-size:1rem; font-weight:700; color:var(--crimson); margin-bottom:20px; position:relative; }
+.aha-moment::before { content:'💡 Aha!'; position:absolute; top:-12px; left:16px; background:var(--parchment); padding:0 8px; font-family:var(--accent); font-size:0.8rem; color:var(--gold); }
+.age-tags { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.age-tag { font-family:var(--mono); font-size:0.72rem; padding:5px 16px; border-radius:20px; font-weight:600; }
+.age-tag.elder { background:rgba(27,58,92,0.1); color:var(--royal-blue); border:1px solid rgba(27,58,92,0.3); }
+.age-tag.younger { background:rgba(184,134,11,0.1); color:var(--gold-dim); border:1px solid rgba(184,134,11,0.3); }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--sans);
-  line-height: 1.75;
-  -webkit-font-smoothing: antialiased;
-}
-a { color: var(--green); text-decoration: none; }
-a:hover { text-decoration: underline; }
+.scroll-box { background:var(--parchment-dark); border:2px solid var(--medieval-border); border-radius:var(--radius); padding:28px; margin-bottom:44px; position:relative; }
+.scroll-box::before { content:''; position:absolute; top:-1px; left:20px; right:20px; height:4px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+.scroll-box h3 { font-family:var(--title); font-size:1.15rem; font-weight:700; color:var(--crimson); margin-bottom:14px; }
+.scroll-box > p { font-size:0.9rem; color:var(--ink-light); margin-bottom:20px; line-height:1.75; }
+.time-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+.time-table th { font-family:var(--mono); font-size:0.68rem; letter-spacing:2px; text-transform:uppercase; color:var(--gold-dim); text-align:left; padding:10px 12px; border-bottom:2px solid var(--medieval-border); }
+.time-table td { padding:10px 12px; border-bottom:1px solid rgba(139,115,85,0.2); vertical-align:top; }
+.time-table td:first-child { font-family:var(--mono); color:var(--crimson); font-weight:600; white-space:nowrap; width:90px; }
+.time-bar { height:5px; border-radius:3px; margin-top:6px; }
+.time-bar.bar-1 { background:var(--crimson); width:28%; }
+.time-bar.bar-2 { background:var(--gold); width:48%; }
+.time-bar.bar-3 { background:var(--royal-blue); width:24%; }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.fade-up { opacity: 0; animation: fadeUp 0.8s ease-out forwards; }
+.illuminated-cards { display:grid; gap:24px; margin-bottom:48px; }
+.illuminated-card { background:#FFF; border:2px solid var(--medieval-border); border-radius:var(--radius); overflow:hidden; box-shadow:0 4px 20px var(--shadow); transition:box-shadow 0.3s; }
+.illuminated-card:hover { box-shadow:0 8px 32px var(--shadow-deep); }
+.card-header { display:flex; align-items:flex-start; gap:14px; padding:22px 24px 14px; border-bottom:1px solid rgba(139,115,85,0.15); }
+.card-icon { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; border:2px solid; }
+.card-icon.crimson { background:rgba(139,26,26,0.08); border-color:var(--crimson); }
+.card-icon.blue { background:rgba(27,58,92,0.08); border-color:var(--royal-blue); }
+.card-icon.gold { background:rgba(184,134,11,0.08); border-color:var(--gold); }
+.card-header h4 { font-family:var(--title); font-size:1.05rem; font-weight:700; color:var(--ink); line-height:1.4; }
+.card-body { padding:16px 24px 24px; }
+.card-body p { font-size:0.9rem; color:var(--ink-light); margin-bottom:12px; line-height:1.8; }
+.research-tag { display:inline-flex; align-items:center; gap:6px; background:rgba(27,58,92,0.06); border:1px solid rgba(27,58,92,0.2); color:var(--royal-blue); font-family:var(--mono); font-size:0.7rem; padding:4px 12px; border-radius:20px; margin-right:6px; margin-bottom:6px; }
+.insight-box { background:rgba(184,134,11,0.06); border-left:4px solid var(--gold); padding:14px 18px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-top:12px; }
+.insight-box .label { font-family:var(--mono); font-size:0.66rem; color:var(--gold-dim); letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+.insight-box p { font-size:0.88rem; color:var(--ink); margin-bottom:0; }
+.age-compare { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+.age-col { padding:14px; border-radius:var(--radius-sm); font-size:0.86rem; line-height:1.7; }
+.age-col.elder-col { background:rgba(27,58,92,0.05); border:1px solid rgba(27,58,92,0.15); }
+.age-col.younger-col { background:rgba(184,134,11,0.05); border:1px solid rgba(184,134,11,0.15); }
+.age-col strong { display:block; font-family:var(--mono); font-size:0.72rem; letter-spacing:1px; margin-bottom:6px; }
+.age-col.elder-col strong { color:var(--royal-blue); }
+.age-col.younger-col strong { color:var(--gold-dim); }
+.deep-dive-toggle { background:rgba(27,58,92,0.05); border:1px solid rgba(27,58,92,0.2); border-radius:var(--radius-sm); padding:12px 16px; margin-top:14px; cursor:pointer; display:flex; align-items:center; gap:8px; font-size:0.86rem; color:var(--royal-blue); font-weight:600; transition:all 0.3s; }
+.deep-dive-toggle:hover { background:rgba(27,58,92,0.1); }
+.deep-dive-toggle .chevron { display:inline-block; transition:transform 0.3s; font-size:0.85rem; }
+.deep-dive-toggle.open .chevron { transform:rotate(180deg); }
+.deep-dive-content { display:none; background:rgba(27,58,92,0.03); border:1px solid rgba(27,58,92,0.12); border-top:none; padding:18px; border-radius:0 0 var(--radius-sm) var(--radius-sm); font-size:0.88rem; color:var(--ink-light); line-height:1.8; }
+.deep-dive-content.open { display:block; }
 
-.container {
-  max-width: 820px;
-  margin: 0 auto;
-  padding: 0 24px 120px;
-}
+.diagram-section { margin-bottom:48px; }
+.diagram-frame { background:#FFF; border:2px solid var(--medieval-border); border-radius:var(--radius); padding:28px 20px; box-shadow:0 4px 20px var(--shadow); overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.diagram-frame svg { display:block; margin:0 auto; max-width:100%; height:auto; }
+.diagram-title { text-align:center; font-family:var(--title); font-size:1rem; font-weight:700; color:var(--ink); margin-bottom:16px; }
+.diagram-caption { text-align:center; margin-top:14px; font-size:0.78rem; color:var(--ink-dim); font-family:var(--mono); }
 
-.hero {
-  padding: 64px 0 48px;
-  text-align: center;
-  position: relative;
-}
-.hero::before {
-  content: '';
-  position: absolute;
-  top: -40px; left: 50%; transform: translateX(-50%);
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(74,191,138,0.08) 0%, transparent 70%);
-  pointer-events: none;
-}
-.hero .series-info {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  color: var(--text-dim);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.hero .total-days {
-  display: inline-block;
-  background: var(--bg-card);
-  border: 1px solid rgba(201,168,76,0.3);
-  color: var(--gold);
-  padding: 4px 14px;
-  border-radius: 20px;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  margin-bottom: 20px;
-}
-.hero .part-label {
-  font-family: var(--mono);
-  color: var(--green);
-  font-size: 0.85rem;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-.hero h1 {
-  font-family: var(--serif);
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  font-weight: 700;
-  color: var(--text-bright);
-  line-height: 1.25;
-  margin-bottom: 16px;
-}
-.hero h1 em {
-  font-style: italic;
-  color: var(--green);
-}
-.hero .subtitle {
-  font-size: 1.05rem;
-  color: var(--text-dim);
-  max-width: 560px;
-  margin: 0 auto 24px;
-  line-height: 1.7;
-}
-.hero .one-liner {
-  display: inline-block;
-  background: linear-gradient(135deg, rgba(74,191,138,0.12), rgba(201,168,76,0.12));
-  border: 1px solid rgba(74,191,138,0.25);
-  padding: 12px 28px;
-  border-radius: var(--radius-sm);
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--gold);
-  margin-bottom: 20px;
-}
-.badges {
-  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
-}
-.badge {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  padding: 5px 14px;
-  border-radius: 20px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
-.badge.first { background: rgba(74,191,138,0.15); color: var(--green); border: 1px solid rgba(74,191,138,0.3); }
-.badge.second { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+.practice-section { margin-bottom:48px; }
+.section-ornament { font-family:var(--title); font-size:0.7rem; letter-spacing:4px; text-transform:uppercase; color:var(--crimson); margin-bottom:6px; }
+.section-heading { font-family:var(--title); font-size:1.5rem; font-weight:700; color:var(--ink); margin-bottom:24px; line-height:1.3; }
+.age-tab-group { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+.age-tab { font-family:var(--mono); font-size:0.78rem; padding:8px 20px; border-radius:6px; cursor:pointer; border:2px solid var(--medieval-border); background:#FFF; color:var(--ink-dim); transition:all 0.3s; font-weight:500; }
+.age-tab.active { background:var(--royal-blue); color:var(--parchment); border-color:var(--royal-blue); font-weight:700; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+.script-card { background:#FFF; border:2px solid rgba(139,115,85,0.2); border-radius:var(--radius); padding:24px; margin-bottom:16px; box-shadow:0 2px 12px var(--shadow); }
+.scenario-label { font-family:var(--accent); font-size:0.82rem; color:var(--gold-dim); margin-bottom:14px; padding-bottom:8px; border-bottom:1px dashed var(--medieval-border); }
+.dialog-line { display:flex; gap:12px; margin-bottom:14px; align-items:flex-start; }
+.dialog-label { font-family:var(--mono); font-size:0.68rem; font-weight:700; padding:3px 10px; border-radius:6px; flex-shrink:0; margin-top:3px; }
+.dialog-label.dad { background:rgba(27,58,92,0.12); color:var(--royal-blue); }
+.dialog-label.child { background:rgba(184,134,11,0.12); color:var(--gold-dim); }
+.dialog-text { font-size:0.92rem; color:var(--ink); line-height:1.7; }
+.dialog-text em { display:block; color:var(--ink-dim); font-style:italic; font-size:0.82rem; margin-top:4px; }
+.aha-callout { background:linear-gradient(135deg,rgba(139,26,26,0.06),rgba(184,134,11,0.06)); border:2px solid var(--gold); border-radius:var(--radius); padding:22px 24px; margin:24px 0; position:relative; }
+.aha-callout::before { content:'✦ AHA MOMENT ✦'; position:absolute; top:-12px; left:20px; background:var(--parchment); padding:0 12px; font-family:var(--title); font-size:0.7rem; font-weight:700; letter-spacing:3px; color:var(--gold); }
+.aha-callout p { font-size:1rem; font-weight:600; color:var(--crimson); line-height:1.7; }
+.do-dont { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:24px; }
+.do-box,.dont-box { padding:20px; border-radius:var(--radius-sm); font-size:0.88rem; }
+.do-box { background:rgba(45,80,22,0.05); border:2px solid rgba(45,80,22,0.2); }
+.dont-box { background:rgba(139,26,26,0.04); border:2px solid rgba(139,26,26,0.15); }
+.do-box h5 { color:var(--forest); font-family:var(--title); font-size:0.78rem; letter-spacing:2px; margin-bottom:12px; }
+.dont-box h5 { color:var(--crimson); font-family:var(--title); font-size:0.78rem; letter-spacing:2px; margin-bottom:12px; }
+.do-box li,.dont-box li { margin-bottom:8px; color:var(--ink-light); line-height:1.65; list-style:none; padding-left:22px; position:relative; }
+.do-box li::before { content:'✓'; position:absolute; left:0; color:var(--forest); font-weight:700; }
+.dont-box li::before { content:'✗'; position:absolute; left:0; color:var(--crimson); font-weight:700; }
 
-.section-label {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--green);
-  margin-bottom: 8px;
-}
-.section-title {
-  font-family: var(--serif);
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--text-bright);
-  margin-bottom: 24px;
-  line-height: 1.3;
-}
+.tips-section { background:linear-gradient(135deg,var(--parchment-dark),rgba(184,134,11,0.06)); border:2px solid var(--medieval-border); border-radius:var(--radius); padding:28px; margin-bottom:48px; }
+.tips-section h3 { font-family:var(--title); font-size:1.15rem; color:var(--gold-dim); margin-bottom:16px; }
+.tips-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.tip-box { background:#FFF; border:1px solid rgba(139,115,85,0.2); padding:16px; border-radius:var(--radius-sm); font-size:0.88rem; line-height:1.65; }
+.tip-box strong { color:var(--crimson); display:block; margin-bottom:6px; font-size:0.9rem; }
 
-.strategy-box {
-  background: var(--bg-card);
-  border: 1px solid rgba(74,191,138,0.2);
-  border-radius: var(--radius);
-  padding: 32px;
-  margin-bottom: 48px;
-}
-.strategy-box h3 {
-  font-family: var(--serif);
-  font-size: 1.3rem;
-  color: var(--green);
-  margin-bottom: 16px;
-}
-.strategy-box p {
-  color: var(--text-dim);
-  font-size: 0.92rem;
-  margin-bottom: 20px;
-}
-.time-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
-.time-table th {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--gold);
-  text-align: left;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(201,168,76,0.25);
-}
-.time-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  color: var(--text);
-  vertical-align: top;
-}
-.time-table td:first-child {
-  font-family: var(--mono);
-  color: var(--green);
-  font-weight: 600;
-  white-space: nowrap;
-  width: 100px;
-}
-.time-table tr:last-child td { border-bottom: none; }
-.time-bar {
-  height: 6px;
-  border-radius: 3px;
-  margin-top: 6px;
-}
-.time-bar.bar-1 { background: var(--green); width: 32%; }
-.time-bar.bar-2 { background: var(--gold); width: 48%; }
-.time-bar.bar-3 { background: var(--green); width: 20%; }
+.quiz-section { margin-bottom:48px; }
+.quiz-card { background:#FFF; border:2px solid rgba(139,115,85,0.2); border-radius:var(--radius); padding:24px; margin-bottom:16px; box-shadow:0 2px 12px var(--shadow); }
+.q-num { font-family:var(--title); font-size:0.72rem; color:var(--crimson); letter-spacing:3px; margin-bottom:10px; }
+.question { font-size:1rem; color:var(--ink); font-weight:600; margin-bottom:16px; line-height:1.6; }
+.quiz-options { display:flex; flex-direction:column; gap:8px; }
+.quiz-opt { background:var(--parchment-dark); border:2px solid rgba(139,115,85,0.15); border-radius:var(--radius-sm); padding:12px 16px; cursor:pointer; font-size:0.9rem; color:var(--ink); transition:all 0.3s; }
+.quiz-opt:hover { border-color:var(--royal-blue); background:rgba(27,58,92,0.04); }
+.quiz-opt.correct { border-color:var(--forest); background:rgba(45,80,22,0.08); color:var(--forest); font-weight:600; }
+.quiz-opt.wrong { border-color:var(--crimson); background:rgba(139,26,26,0.06); color:var(--crimson); }
+.quiz-explanation { display:none; margin-top:14px; padding:16px 18px; background:rgba(27,58,92,0.04); border-radius:var(--radius-sm); font-size:0.88rem; color:var(--ink-light); line-height:1.75; border-left:4px solid var(--royal-blue); }
+.quiz-explanation.show { display:block; }
 
-.science-cards {
-  display: grid;
-  gap: 20px;
-  margin-bottom: 48px;
-}
-.science-card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  border: 1px solid rgba(255,255,255,0.06);
-  overflow: hidden;
-  transition: border-color 0.3s;
-}
-.science-card:hover { border-color: rgba(74,191,138,0.3); }
-.card-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 24px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-.card-header h4 {
-  font-family: var(--serif);
-  font-size: 1.15rem;
-  color: var(--text-bright);
-  line-height: 1.4;
-  margin: 0;
-}
-.card-icon {
-  width: 44px; height: 44px;
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.3rem;
-  flex-shrink: 0;
-}
-.card-icon.green { background: rgba(74,191,138,0.15); }
-.card-icon.gold { background: rgba(201,168,76,0.15); }
-.age-badge-inline {
-  display: inline-block;
-  background: rgba(201,168,76,0.15);
-  border: 1px solid rgba(201,168,76,0.3);
-  color: var(--gold);
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  padding: 2px 8px;
-  border-radius: 12px;
-  margin-left: 8px;
-  font-weight: 600;
-}
-.card-body {
-  padding: 16px 24px 24px;
-}
-.card-body p {
-  font-size: 0.92rem;
-  color: var(--text-dim);
-  margin-bottom: 12px;
-  line-height: 1.7;
-}
-.neuro-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(74,191,138,0.08);
-  border: 1px solid rgba(74,191,138,0.2);
-  color: var(--green);
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  padding: 4px 12px;
-  border-radius: 20px;
-  margin-right: 6px;
-  margin-bottom: 6px;
-}
-.behavior-box {
-  background: rgba(201,168,76,0.06);
-  border-left: 3px solid var(--gold);
-  padding: 14px 18px;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  margin-top: 12px;
-}
-.behavior-box .label {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  color: var(--gold);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-.behavior-box p {
-  font-size: 0.88rem;
-  color: var(--text);
-  margin-bottom: 0;
-}
+.tracker { background:#FFF; border:2px solid var(--medieval-border); border-radius:var(--radius); padding:24px; box-shadow:0 2px 12px var(--shadow); }
+.tracker h4 { font-family:var(--title); font-size:0.78rem; letter-spacing:3px; text-transform:uppercase; color:var(--gold-dim); margin-bottom:16px; }
+.tracker-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+.tracker-day { text-align:center; padding:8px 4px; border-radius:var(--radius-sm); background:var(--parchment-dark); border:1px solid rgba(139,115,85,0.15); font-family:var(--mono); font-size:0.65rem; color:var(--ink-dim); cursor:pointer; transition:all 0.3s; }
+.tracker-day.today { border-color:var(--crimson); color:var(--crimson); font-weight:700; background:rgba(139,26,26,0.06); }
+.tracker-day.completed { background:rgba(45,80,22,0.15); border-color:var(--forest); color:var(--forest); }
 
-.deep-dive-toggle {
-  background: rgba(74,191,138,0.08);
-  border: 1px solid rgba(74,191,138,0.2);
-  border-radius: var(--radius-sm);
-  padding: 12px 16px;
-  margin-top: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.88rem;
-  color: var(--green);
-  font-weight: 600;
-  transition: all 0.3s;
-}
-.deep-dive-toggle:hover {
-  background: rgba(74,191,138,0.15);
-  border-color: rgba(74,191,138,0.4);
-}
-.deep-dive-toggle .chevron {
-  display: inline-block;
-  transition: transform 0.3s;
-  font-size: 0.9rem;
-}
-.deep-dive-toggle.open .chevron { transform: rotate(180deg); }
-.deep-dive-content {
-  display: none;
-  background: rgba(74,191,138,0.04);
-  border: 1px solid rgba(74,191,138,0.15);
-  border-top: none;
-  padding: 16px;
-  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-  font-size: 0.88rem;
-  color: var(--text);
-  line-height: 1.7;
-}
-.deep-dive-content.open { display: block; }
+.flowchart-box { background:#FFF; border:2px solid var(--medieval-border); border-radius:var(--radius); padding:28px; margin-bottom:48px; box-shadow:0 4px 20px var(--shadow); }
+.flowchart-title { font-family:var(--title); font-size:1.15rem; font-weight:700; color:var(--crimson); margin-bottom:24px; }
+.flowchart-step { background:rgba(27,58,92,0.04); border:2px solid rgba(27,58,92,0.2); border-radius:var(--radius-sm); padding:18px; margin-bottom:14px; font-size:0.9rem; line-height:1.75; color:var(--ink); }
+.flowchart-step strong { color:var(--royal-blue); display:block; margin-bottom:6px; }
+.flowchart-arrow { text-align:center; color:var(--gold); font-size:1rem; margin:8px 0; }
 
-.diagram-section {
-  margin-bottom: 48px;
-}
-.diagram-wrap {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  border: 1px solid rgba(255,255,255,0.06);
-  padding: 32px 24px;
-  overflow-x: auto;
-}
-.diagram-wrap svg {
-  display: block;
-  margin: 0 auto;
-  max-width: 100%;
-  height: auto;
-}
-.diagram-caption {
-  text-align: center;
-  margin-top: 16px;
-  font-size: 0.8rem;
-  color: var(--text-dim);
-  font-family: var(--mono);
-}
-
-.practice-section {
-  margin-bottom: 48px;
-}
-.practice-header {
-  display: flex; align-items: center; gap: 16px; margin-bottom: 24px;
-}
-.icon-circle {
-  width: 48px; height: 48px;
-  border-radius: 12px;
-  background: rgba(74,191,138,0.15);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.6rem;
-  flex-shrink: 0;
-}
-.age-tab-group {
-  display: flex; gap: 8px; margin-bottom: 20px;
-}
-.age-tab {
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  padding: 8px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: var(--bg-card);
-  color: var(--text-dim);
-  transition: all 0.3s;
-}
-.age-tab.active {
-  background: var(--green);
-  color: var(--bg);
-  border-color: var(--green);
-  font-weight: 700;
-}
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-.script-card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  border: 1px solid rgba(255,255,255,0.06);
-  padding: 24px;
-  margin-bottom: 16px;
-}
-.script-card .scenario {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 12px;
-}
-.dialog-line {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 14px;
-  align-items: flex-start;
-}
-.dialog-label {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 12px;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-.dialog-label.child { background: rgba(201,168,76,0.2); color: var(--gold); }
-.dialog-label.dad { background: rgba(74,191,138,0.2); color: var(--green); }
-.dialog-text {
-  font-size: 0.92rem;
-  color: var(--text);
-  line-height: 1.6;
-}
-.dialog-text em { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
-
-.do-dont {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-top: 20px;
-}
-@media (max-width: 600px) { .do-dont { grid-template-columns: 1fr; } }
-.do-box, .dont-box {
-  padding: 20px;
-  border-radius: var(--radius-sm);
-  font-size: 0.88rem;
-}
-.do-box {
-  background: rgba(74,191,138,0.06);
-  border: 1px solid rgba(74,191,138,0.2);
-}
-.dont-box {
-  background: rgba(232,93,93,0.06);
-  border: 1px solid rgba(232,93,93,0.2);
-}
-.do-box h5 { color: var(--green); font-family: var(--mono); font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 10px; }
-.dont-box h5 { color: var(--danger); font-family: var(--mono); font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 10px; }
-.do-box li, .dont-box li {
-  margin-bottom: 8px;
-  color: var(--text-dim);
-  line-height: 1.6;
-  list-style: none;
-  padding-left: 18px;
-  position: relative;
-}
-.do-box li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-weight: 700; }
-.dont-box li::before { content: '✗'; position: absolute; left: 0; color: var(--danger); font-weight: 700; }
-
-.tip-section {
-  background: linear-gradient(135deg, rgba(201,168,76,0.06), rgba(74,191,138,0.06));
-  border: 1px solid rgba(201,168,76,0.15);
-  border-radius: var(--radius);
-  padding: 28px;
-  margin-bottom: 48px;
-}
-.tip-section h3 {
-  font-family: var(--serif);
-  font-size: 1.3rem;
-  color: var(--gold);
-  margin-bottom: 14px;
-}
-.tip-section p {
-  font-size: 0.92rem;
-  color: var(--text-dim);
-  line-height: 1.7;
-  margin-bottom: 10px;
-}
-.tip-highlight {
-  background: var(--bg-card);
-  border-radius: var(--radius-sm);
-  padding: 16px 20px;
-  margin-top: 14px;
-  font-size: 0.9rem;
-  color: var(--text);
-  border-left: 3px solid var(--gold);
-}
-
-.couple-tips-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-top: 16px;
-}
-@media (max-width: 600px) { .couple-tips-grid { grid-template-columns: 1fr; } }
-.couple-tip-box {
-  background: rgba(74,191,138,0.06);
-  border: 1px solid rgba(74,191,138,0.2);
-  padding: 18px;
-  border-radius: var(--radius-sm);
-  font-size: 0.88rem;
-  line-height: 1.6;
-}
-.couple-tip-box strong {
-  color: var(--green);
-  display: block;
-  margin-bottom: 8px;
-}
-
-.quiz-section {
-  margin-bottom: 48px;
-}
-.quiz-card {
-  background: var(--bg-card);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 16px;
-}
-.quiz-card .q-num {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--green);
-  letter-spacing: 2px;
-  margin-bottom: 10px;
-}
-.quiz-card .question {
-  font-size: 1rem;
-  color: var(--text-bright);
-  font-weight: 500;
-  margin-bottom: 16px;
-  line-height: 1.6;
-}
-.quiz-options {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.quiz-opt {
-  background: var(--bg-card-alt);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: var(--radius-sm);
-  padding: 12px 16px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: var(--text);
-  transition: all 0.3s;
-}
-.quiz-opt:hover {
-  border-color: var(--green);
-  background: rgba(74,191,138,0.06);
-}
-.quiz-opt.correct {
-  border-color: var(--green);
-  background: rgba(74,191,138,0.12);
-  color: var(--green);
-}
-.quiz-opt.wrong {
-  border-color: var(--danger);
-  background: rgba(232,93,93,0.08);
-  color: var(--danger);
-}
-.quiz-explanation {
-  display: none;
-  margin-top: 14px;
-  padding: 14px 18px;
-  background: rgba(74,191,138,0.06);
-  border-radius: var(--radius-sm);
-  font-size: 0.88rem;
-  color: var(--text-dim);
-  line-height: 1.7;
-  border-left: 3px solid var(--green);
-}
-.quiz-explanation.show { display: block; }
-
-.tracker {
-  background: var(--bg-card);
-  border: 1px solid rgba(201,168,76,0.2);
-  border-radius: var(--radius);
-  padding: 24px;
-}
-.tracker h4 {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 16px;
-}
-.tracker-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 8px;
-}
-.tracker-day {
-  text-align: center;
-  padding: 10px 6px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-card-alt);
-  border: 1px solid rgba(255,255,255,0.04);
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--text-dim);
-  transition: all 0.3s;
-  cursor: pointer;
-}
-.tracker-day.today {
-  border-color: var(--green);
-  color: var(--green);
-  background: rgba(74,191,138,0.08);
-}
-.tracker-day.completed {
-  background: rgba(74,191,138,0.15);
-  color: var(--green);
-  border-color: var(--green-dim);
-}
-.tracker-day .day-label { display: block; font-weight: 700; font-size: 0.8rem; margin-bottom: 2px; }
-.tracker-day .day-desc { font-size: 0.6rem; color: inherit; opacity: 0.7; }
-
-.footer {
-  text-align: center;
-  padding: 40px 0;
-  border-top: 1px solid rgba(255,255,255,0.04);
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--text-dim);
-}
-
-@media (max-width: 600px) {
-  .container { padding: 0 16px 80px; }
-  .hero { padding: 40px 0 32px; }
-  .hero h1 { font-size: 1.8rem; }
-  .strategy-box { padding: 20px; }
-  .diagram-wrap { padding: 20px 12px; }
-  .script-card { padding: 18px; }
-  .do-dont { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 768px) {
-  html { font-size: 15px; }
-  body { line-height: 1.8; -webkit-text-size-adjust: 100%; }
-  .container { padding: 0 14px 60px; max-width: 100%; }
-  .hero { padding: 32px 0 24px; }
-  .hero h1 { font-size: 1.6rem; line-height: 1.3; word-break: keep-all; }
-  .hero .subtitle { font-size: 0.92rem; line-height: 1.7; }
-  .hero .one-liner { font-size: 0.88rem; padding: 12px 14px; }
-  .badges { flex-wrap: wrap; gap: 8px; }
-  .badge { font-size: 0.82rem; padding: 6px 14px; }
-  .part-label { font-size: 0.72rem; }
-  .series-info { font-size: 0.78rem; }
-  
-  h2, .section-title { font-size: 1.3rem; word-break: keep-all; }
-  h3 { font-size: 1.1rem; }
-  
-  .strategy-box, .science-card, .card { 
-    padding: 16px 14px; 
-    border-radius: 12px;
-    margin-bottom: 16px;
-  }
-  
-  .time-table { font-size: 0.82rem; }
-  .time-table th, .time-table td { padding: 8px 6px; }
-  
-  .diagram-wrap { 
-    padding: 12px 8px; 
-    overflow-x: auto; 
-    -webkit-overflow-scrolling: touch;
-  }
-  .diagram-wrap svg { 
-    max-width: 100%; 
-    height: auto; 
-    min-width: 320px;
-  }
-}
-
-@media (max-width: 400px) {
-  html { font-size: 14px; }
-  .container { padding: 0 10px 48px; }
-  .hero h1 { font-size: 1.4rem; }
-  .badge { font-size: 0.78rem; padding: 5px 10px; }
-}
+.chapter-footer { text-align:center; padding:40px 0 20px; border-top:2px solid var(--medieval-border); margin-top:60px; font-size:0.85rem; color:var(--ink-dim); font-family:var(--mono); letter-spacing:1px; }
 </style>
 </head>
 <body>
 
 <div class="container">
 
-<!-- ═══════════ ② HERO SECTION ═══════════ -->
-<section class="hero fade-up">
-  <div class="series-info">과학적 아빠 육아 · PART 2 시작</div>
-  <div class="total-days">이 시리즈 예상 총 Day: 21일</div>
-  <div class="part-label">PART 2 — 자매 관계 설계</div>
-  <h1>형제 질투의 <em>신경학</em></h1>
-  <p class="subtitle">5-7세와 2-4세 아이가 싸우는 신경학적 원인, cortisol 스파이크, 차별적 양육이 아이의 뇌에 미치는 영향, 그리고 두 아이 모두의 뇌 발달을 정상화하는 아빠의 개입 전략</p>
-  <div class="one-liner">💡 이것만 알면 오늘 저녁이 달라집니다 — "형제 질투는 나쁜 게 아니라, 사회적 뇌를 발달시키는 기회다"</div>
-  <div class="badges">
-    <span class="badge first">👧 첫째 (5-7세)</span>
-    <span class="badge second">👶 둘째 (2-4세)</span>
+<section class="chapter-header fade-up">
+  <div class="series-badge">Chapter VIII · Part 2</div>
+  <div class="chapter-number">형제자매 관계</div>
+  <div class="part-banner">형제 질투의 신경학</div>
+  <h1 class="chapter-title">형제 질투의 신경학<br><em>"왜 아이는 부모의 관심을 독점하려 할까?"</em></h1>
+  <p class="chapter-subtitle">편도체의 생존 신호, 진화 심리학, 안전기지 이론을 통해 형제 간 질투를 과학적으로 이해하고, 형제자매 관계의 깊은 유대를 이루기 위한 신경학적 전략</p>
+  <div class="age-tags">
+    <span class="age-tag elder">5-7세 큰 아이</span>
+    <span class="age-tag younger">2-4세 작은 아이</span>
   </div>
 </section>
 
-<!-- ═══════════ ③ 뇌과학 학습 전략 + 25분 배분표 ═══════════ -->
-<section class="strategy-box fade-up">
-  <h3>🧠 오늘의 학습 전략</h3>
-  <p>오늘은 <strong>감정 신경학 + 사회 신경과학</strong>을 결합합니다. 형제 질투는 단순한 행동 문제가 아니라, 사회적 뇌(social brain) 발달의 신호입니다. 두 아이가 느끼는 감정이 어디서 비롯되는지, 그리고 어떻게 그 감정을 학습하도록 가르칠 수 있는지를 배웁니다.</p>
-  <table class="time-table">
-    <thead>
-      <tr><th>시간</th><th>활동</th><th>내용</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>0–8분</td>
-        <td>📖 질투의 신경학</td>
-        <td>Cortisol 반응, 사회적 뇌 발달, 뇌의 "공정성 감지기"<div class="time-bar bar-1"></div></td>
-      </tr>
-      <tr>
-        <td>8–20분</td>
-        <td>🔬 과학 카드 + 다이어그램</td>
-        <td>5-7세 vs 2-4세의 질투 표현 · 차별적 양육 인식의 신경학적 기초 · 스트레스 반응<div class="time-bar bar-2"></div></td>
-      </tr>
-      <tr>
-        <td>20–25분</td>
-        <td>🎯 실전 가이드 + 퀴즈</td>
-        <td>아빠의 개입 전략 · 동등한 주의의 신경학적 의미 · 퀴즈 2문제<div class="time-bar bar-3"></div></td>
-      </tr>
-    </tbody>
-  </table>
-</section>
-
-<!-- ═══════════ ④ 발달 과학 카드 ═══════════ -->
 <section class="fade-up">
-  <div class="section-label">NEUROSCIENCE</div>
-  <div class="section-title">발달 과학 카드</div>
-  <div class="science-cards">
-
-    <!-- 카드 1: 질투의 신경학 -->
-    <div class="science-card">
-      <div class="card-header">
-        <div class="card-icon green">💔</div>
-        <h4>질투는 감정이 아니라 스트레스 반응이다</h4>
-      </div>
-      <div class="card-body">
-        <p>질투(jealousy)는 사회적 위협으로 인식되었을 때 신체가 보이는 <strong>생리적 반응</strong>입니다. 뇌는 "아빠의 관심을 잃었다"를 생존 위협으로 해석하고, cortisol(스트레스 호르몬)을 분비합니다.</p>
-        <div style="margin-bottom:12px;">
-          <span class="neuro-tag">⚠️ Cortisol 분비</span>
-          <span class="neuro-tag">🧬 사회적 뇌 활성화</span>
-        </div>
-        <p><strong>생리적 과정:</strong> 아이가 부모의 주의를 다른 형제에게 뺏긴다고 감지 → 편도체 활성화 → cortisol 분비 → 심박수 증가, 혈관 수축, 호흡 가빠짐</p>
-        <p><strong>5-7세</strong> <span class="age-badge-inline">FIRST CHILD</span>: 이 cortisol 반응을 <strong>자각</strong>할 수 있습니다. "나 괜찮아" 하며 감출 수도, 표현할 수도 있습니다. 하지만 신체 내부에서는 같은 스트레스 호르몬이 흐르고 있습니다.</p>
-        <p><strong>2-4세</strong> <span class="age-badge-inline">SECOND CHILD</span>: 이 반응을 전두엽으로 조절할 수 없으므로, 행동으로 즉시 표출합니다. 울음, 떼쓰기, 공격적 행동이 바로 cortisol 스파이크를 외부로 방출하는 것입니다.</p>
-        <div class="behavior-box">
-          <div class="label">이래서 아이가 이렇게 행동해요</div>
-          <p>아이가 "아빠가 나 싫어한대"라고 울거나, 동생을 밀어낼 때, 아이는 거짓말을 하거나 반항을 하는 게 아닙니다. 신체 화학이 뇌의 공정성 감지 시스템을 활성화시킨 것입니다. 이는 절대 개인적인 공격이 아닙니다.</p>
-        </div>
-        <div class="deep-dive-toggle" onclick="toggleDeepDive(this)">
-          <span class="chevron">▼</span> 심화 학습: Insula와 공정성의 신경학
-        </div>
-        <div class="deep-dive-content">
-          <p><strong>뇌의 "공정성 감지기"는 Insula(섬엽)에 위치합니다:</strong></p>
-          <p>Insula는 감정 처리, 신체 상태 모니터링, 그리고 "이게 공정한가?"를 판단하는 역할을 합니다. 형제가 부모의 더 많은 관심을 받는다고 감지하면, Insula가 활성화되고, 이것이 편도체의 협력으로 스트레스 반응을 유발합니다.</p>
-          <p>흥미로운 점: 이 반응은 5-7세뿐 아니라 성인도 느낍니다. 배우자가 다른 사람에게 더 관심을 주는 것처럼 보이면, 성인도 같은 방식의 질투를 경험합니다. 아이의 질투가 "유치한" 게 아니라, 아주 인간다운 반응입니다.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 카드 2: 차별적 양육 인식 -->
-    <div class="science-card">
-      <div class="card-header">
-        <div class="card-icon gold">⚖️</div>
-        <h4>아이는 "차별적 양육"을 감지한다 — 아주 정확하게</h4>
-      </div>
-      <div class="card-body">
-        <p>자녀가 형제자매보다 더 많은 부모의 시간, 칭찬, 관심을 받는다면, 아이들의 뇌는 이를 감지합니다. 그리고 이 불균형이 장기적으로 아이의 자존감과 형제 관계에 깊은 영향을 미칩니다.</p>
-        <div style="margin-bottom:12px;">
-          <span class="neuro-tag">👁️ 관찰 능력</span>
-          <span class="neuro-tag">⏱️ 시간 감지</span>
-        </div>
-        <p><strong>인식 메커니즘:</strong> 아이의 뇌는 "<엄마가 언니와 보낸 시간> vs <엄마가 나와 보낸 시간>"을 자동으로 계산합니다. 이는 의식적 사고가 아닌 시각피질과 측두엽의 자동 처리입니다.</p>
-        <p><strong>5-7세</strong> <span class="age-badge-inline">FIRST CHILD</span>: "아빠가 동생만 봐," "나는 무관심해"라고 명확히 표현할 수 있습니다. 하지만 더 나쁜 경우는 말하지 않는 경우입니다. 조용히 자존감이 낮아집니다.</p>
-        <p><strong>2-4세</strong> <span class="age-badge-inline">SECOND CHILD</span>: "언니는 더 많은 시간을 엄마와 보냈는데, 내가 언니보다 덜 사랑받는 건가?"라는 불안감이 행동 문제로 나타납니다.</p>
-        <div class="behavior-box">
-          <div class="label">이래서 아이가 이렇게 행동해요</div>
-          <p>부모가 "공평하게" 하려고 애써도, 아이가 느끼는 차별은 분명합니다. 특히 둘째는 첫째가 누린 "단독 시간"을 절대 되돌릴 수 없습니다. 아이의 질투가 심할수록, 그만큼 뇌가 이 불균형을 강하게 감지하고 있다는 신호입니다.</p>
-        </div>
-        <div class="deep-dive-toggle" onclick="toggleDeepDive(this)">
-          <span class="chevron">▼</span> 심화 학습: Parental Differential Treatment과 장기 효과
-        </div>
-        <div class="deep-dive-content">
-          <p><strong>연구에 따르면, 차별적 양육은 아이의 성인기 정신건강에 영향을 미칩니다:</strong></p>
-          <p>• 더 많은 관심을 받은 아이: 단기적으로는 자신감 상승이지만, 장기적으로는 형제 관계 왜곡, 사회적 능력 부족 가능성<br>
-          • 덜 받은 아이: 낮은 자존감, 형제에 대한 잠재된 원망, 성인 관계에서의 신뢰 문제</p>
-          <p>따라서 "같은 양의 시간"을 두 아이에게 제공하는 것은 단순한 "공평함"이 아니라, 뇌 발달의 필수 요소입니다.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 카드 3: 나이별 질투 표현 -->
-    <div class="science-card">
-      <div class="card-header">
-        <div class="card-icon green">😠</div>
-        <h4>나이별 질투 표현의 차이 — 같은 감정, 다른 뇌</h4>
-      </div>
-      <div class="card-body">
-        <p>질투는 같은 감정이지만, 표현하는 방식은 뇌 발달 단계에 따라 달라집니다. 이 차이를 알면, 아이의 행동이 "나쁜 성격"이 아니라 "발달 단계의 신호"로 보입니다.</p>
-        <div style="margin-bottom:12px;">
-          <span class="neuro-tag">💬 표현 능력</span>
-          <span class="neuro-tag">🧠 자기 조절</span>
-        </div>
-        <p><strong>5-7세의 질투 표현:</strong></p>
-        <ul style="margin:12px 0;">
-          <li>"아빠가 나를 싫어해" (언어적 표현)</li>
-          <li>"언니는 되는데 나만 왜 안 돼?" (비교 질문)</li>
-          <li>조용한 냉대, 얼굴을 돌림 (억제된 표현)</li>
-          <li>과도한 노력으로 관심 끌기 (적응적 반응)</li>
-        </ul>
-        <p><strong>2-4세의 질투 표현:</strong></p>
-        <ul style="margin:12px 0;">
-          <li>즉각적인 울음과 떼쓰기 (감정 폭발)</li>
-          <li>언니/동생 밀어내거나 때리기 (행동적 표현)</li>
-          <li>부모에게 들러붙거나 야단 피우기 (귀소 행동)</li>
-          <li>부모의 관심을 위해 같은 장난감 요구하기</li>
-        </ul>
-        <div class="behavior-box">
-          <div class="label">이래서 아이가 이렇게 행동해요</div>
-          <p>5-7세가 "말이 없어진" 것과 2-4세가 "자꾸 울거나 때리는" 것은 같은 질투입니다. 전두엽의 발달 정도에 따라 표현 방식만 다릅니다. 5-7세의 침묵은 더 위험할 수 있습니다 — 보이지 않으니까요.</p>
-        </div>
-        <div class="deep-dive-toggle" onclick="toggleDeepDive(this)">
-          <span class="chevron">▼</span> 심화 학습: 억제된 질투의 장기 효과
-        </div>
-        <div class="deep-dive-content">
-          <p><strong>5-7세가 질투를 "참거나 숨기는" 경우가 위험합니다:</strong></p>
-          <p>이 아이의 뇌는 여전히 cortisol이 분비되고 있지만, 행동으로 표현하지 않습니다. 이는 단기적으로는 "착한 아이"처럼 보이지만, 장기적으로는:</p>
-          <p>• 감정 억압 패턴이 고착<br>
-          • 형제와의 진정한 소통 부족<br>
-          • 성인기에 "수동적 공격성" 또는 우울증 위험</p>
-          <p>따라서 부모가 먼저 "질투가 있어 보인다"고 말해주고, 감정을 표현할 안전한 방법을 가르쳐야 합니다.</p>
-        </div>
-      </div>
-    </div>
-
+  <div class="scroll-box">
+    <h3>이 장에서 배우는 것</h3>
+    <p>형제 질투는 아이의 도덕적 결함이 아니라, <strong>생존 뇌(변연계)가 보내는 정상적인 신호</strong>입니다. 부모 = 생존 자원이라는 진화적 직관 때문에, 형제자매의 등장은 아이의 편도체에 "생존 위협" 신호를 보냅니다. 이 장에서는 아이의 질투를 뇌과학으로 이해하고, 신경 회로를 재배선하는 실제 전략을 배웁니다.</p>
   </div>
 </section>
 
-<!-- ═══════════ ⑤ SVG 다이어그램 ═══════════ -->
+<section class="fade-up">
+  <div class="section-ornament">THE FOUR FOUNDATIONS</div>
+  <h2 class="section-heading">형제 질투의 신경 기초</h2>
+  
+  <div class="illuminated-cards">
+    <div class="illuminated-card">
+      <div class="card-header">
+        <div class="card-icon crimson">🧠</div>
+        <h4>편도체와 질투 반응</h4>
+      </div>
+      <div class="card-body">
+        <p>아이의 편도체는 형제자매를 "자원 경쟁자"로 인식합니다. 생후 3년간 부모와 1:1 관계로 뇌가 개발된 아이에게, 갑작스런 관심 감소는 뇌의 위협 감지 시스템을 활성화시킵니다.</p>
+        <div class="age-compare">
+          <div class="age-col elder-col">
+            <strong>5-7세의 편도체</strong>
+            인지적 조정 시도: "동생도 인간이니까..." 하지만 감정적 반응은 여전함. 신피질과 변연계의 불일치.
+          </div>
+          <div class="age-col younger-col">
+            <strong>2-4세의 편도체</strong>
+            전적으로 즉각적 반응. 논리 없음. 부모의 관심이 "=나의 생존"이라는 단순한 신호만 작동.
+          </div>
+        </div>
+        <div class="research-tag">신경과학: LeDoux, The Emotional Brain (2015)</div>
+        <div class="insight-box">
+          <div class="label">핵심 인사이트</div>
+          <p>질투를 "나쁜 감정"이라 말하지 마세요. 이것은 뇌의 경보 체계가 제대로 작동하는 것입니다. 아이가 느끼는 것은 "나쁨"이 아니라 "불안"입니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="illuminated-card">
+      <div class="card-header">
+        <div class="card-icon blue">⚖️</div>
+        <h4>옥시토신 vs 코르티솔 균형</h4>
+      </div>
+      <div class="card-body">
+        <p>형제 질투는 코르티솔(스트레스 호르몬) 상승으로 시작합니다. 하지만 부모의 공감적 대응과 신체 접촉은 옥시토신을 증가시켜, 신경 회로를 "공유"에서 "유대"로 재배선합니다.</p>
+        <div class="age-compare">
+          <div class="age-col elder-col">
+            <strong>5-7세 호르몬 전략</strong>
+            언어적 안전화 + 신체 접촉(안아주기) = 옥시토신 증가. 이 시기는 신피질이 호르몬을 조절할 수 있는 능력이 개발 중입니다.
+          </div>
+          <div class="age-col younger-col">
+            <strong>2-4세 호르몬 전략</strong>
+            언어는 의미가 없고, 순수한 신체 접촉과 음성 톤만이 옥시토신을 분비합니다. 분 단위의 신체 접촉이 필수입니다.
+          </div>
+        </div>
+        <div class="research-tag">신경화학: Insel et al., Neuroendocrinology (2012)</div>
+        <div class="insight-box">
+          <div class="label">임상 발견</div>
+          <p>아이가 질투를 표현할 때, 설교나 설명은 코르티솔을 더 높입니다. 침묵 속 10초 포옹이 약 300밀리몰 코르티솔을 감소시킵니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="illuminated-card">
+      <div class="card-header">
+        <div class="card-icon gold">🏞️</div>
+        <h4>자원 경쟁 진화심리학</h4>
+      </div>
+      <div class="card-body">
+        <p>인류 진화 역사에서 형제자매는 부모의 양육 자원을 놓고 경쟁하는 대상이었습니다. 선천적 질투는 생존 전략이었고, 이것은 아이의 뇌에 여전히 깊게 인코딩되어 있습니다.</p>
+        <div class="age-compare">
+          <div class="age-col elder-col">
+            <strong>5-7세의 진화적 딜레마</strong>
+            "이 아이는 나의 자원을 빼앗아간다" vs "이 아이는 나의 유전자 사본이다" 두 신호가 충돌하며, 이것이 도덕적 갈등과 죄책감을 만듭니다.
+          </div>
+          <div class="age-col younger-col">
+            <strong>2-4세의 이기성</strong>
+            도덕성이 전혀 발달하지 않은 단계. "자원 경쟁" 신호만 존재. 이것은 발달적으로 정상이며, 사악함의 신호가 아닙니다.
+          </div>
+        </div>
+        <div class="research-tag">진화심리학: Trivers, The Folly of Fools (2011)</div>
+        <div class="insight-box">
+          <div class="label">부모의 관점</div>
+          <p>형제자매가 없는 상황에서도 아이는 부모의 관심을 완전히 독점하려 합니다. 이것은 형제자매 때문이 아니라, 진화적 설정입니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="illuminated-card">
+      <div class="card-header">
+        <div class="card-icon crimson">🛡️</div>
+        <h4>안전기지 이론과 형제관계</h4>
+      </div>
+      <div class="card-body">
+        <p>보울비(John Bowlby)의 애착 이론에 따르면, 부모는 아이의 "안전기지"입니다. 안전기지가 위협받는다고 느낄 때 (형제의 등장), 아이는 신경계를 닫고 방어적 행동을 합니다. 안전기지의 복원이 질투 감소의 핵심입니다.</p>
+        <div class="age-compare">
+          <div class="age-col elder-col">
+            <strong>5-7세와 안전기지</strong>
+            안전기지를 인지적으로 이해할 수 있습니다: "엄마/아빠도 나를 사랑한다"는 논리를 받아들일 수 있음. 일관된 1:1 시간이 신경계 복원의 핵심.
+          </div>
+          <div class="age-col younger-col">
+            <strong>2-4세와 안전기지</strong>
+            안전기지는 개념이 아니라 물리적 근접성입니다. 엄마/아빠 옆에 있어야만 느낍니다. 분리 불안이 극대화되는 시기.
+          </div>
+        </div>
+        <div class="research-tag">애착 이론: Bowlby, Attachment (1969)</div>
+        <div class="insight-box">
+          <div class="label">치료적 관찰</div>
+          <p>형제 질투의 90%는 "안전기지의 위협"에서 비롯됩니다. 안전기지가 복원되면 질투는 자동으로 감소합니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="diagram-section fade-up">
-  <div class="section-label">VISUAL DIAGRAM</div>
-  <div class="section-title">형제 질투의 신경 경로</div>
-  <div class="diagram-wrap">
-    <svg viewBox="0 0 760 520" xmlns="http://www.w3.org/2000/svg" font-family="'Noto Sans KR', sans-serif">
-      <defs>
-        <linearGradient id="gGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#4ABF8A" stop-opacity="0.9"/>
-          <stop offset="100%" stop-color="#2A7A56" stop-opacity="0.9"/>
-        </linearGradient>
-        <linearGradient id="gGold" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#C9A84C" stop-opacity="0.9"/>
-          <stop offset="100%" stop-color="#8A7333" stop-opacity="0.9"/>
-        </linearGradient>
-      </defs>
-
-      <rect width="760" height="520" rx="16" fill="#12151B"/>
-
-      <text x="380" y="35" text-anchor="middle" fill="#E8E6E1" font-size="15" font-weight="700">형제 질투의 신경 경로 — 같은 자극, 다른 반응</text>
-
-      <!-- 자극 (상단 중앙) -->
-      <rect x="280" y="70" width="200" height="60" rx="8" fill="#C9A84C" opacity="0.2" stroke="#C9A84C" stroke-width="1.5"/>
-      <text x="380" y="95" text-anchor="middle" fill="#E8E6E1" font-size="13" font-weight="700">자극: 아빠가 형/동생에게 더 관심을 보임</text>
-      <text x="380" y="115" text-anchor="middle" fill="#9A9890" font-size="11">(공정성 위협 감지)</text>
-
-      <!-- 화살표 분기 -->
-      <path d="M320,130 L280,180" fill="none" stroke="#4ABF8A" stroke-width="2" marker-end="url(#arrowG)"/>
-      <path d="M440,130 L480,180" fill="none" stroke="#C9A84C" stroke-width="2" marker-end="url(#arrowG2)"/>
-
-      <!-- ===== 2-4세 반응 (왼쪽) ===== -->
-      <text x="190" y="160" text-anchor="middle" fill="#C9A84C" font-size="12" font-weight="700">👶 2-4세 반응 (SECOND CHILD)</text>
-
-      <!-- 신경 경로 -->
-      <g id="path2to4">
-        <!-- 1. 시각 감지 -->
-        <circle cx="190" cy="220" r="40" fill="#C9A84C" opacity="0.3" stroke="#C9A84C" stroke-width="2"/>
-        <text x="190" y="215" text-anchor="middle" fill="#E8E6E1" font-size="11" font-weight="700">시각 피질</text>
-        <text x="190" y="235" text-anchor="middle" fill="#E8E6E1" font-size="9">(관찰)</text>
-
-        <!-- 2. 편도체 -->
-        <circle cx="190" cy="320" r="40" fill="#C9A84C" opacity="0.5" stroke="#C9A84C" stroke-width="2"/>
-        <text x="190" y="315" text-anchor="middle" fill="#0A0C10" font-size="11" font-weight="700">편도체</text>
-        <text x="190" y="335" text-anchor="middle" fill="#0A0C10" font-size="9">(위협 감지)</text>
-
-        <!-- 연결선 -->
-        <path d="M190,260 L190,280" fill="none" stroke="#C9A84C" stroke-width="2" marker-end="url(#arrowG2)"/>
-
-        <!-- 3. Cortisol -->
-        <circle cx="190" cy="420" r="40" fill="#C9A84C" opacity="0.6" stroke="#C9A84C" stroke-width="2.5"/>
-        <text x="190" y="415" text-anchor="middle" fill="#0A0C10" font-size="11" font-weight="700">Cortisol</text>
-        <text x="190" y="435" text-anchor="middle" fill="#0A0C10" font-size="8">분비 ⬆️</text>
-
-        <path d="M190,360 L190,380" fill="none" stroke="#C9A84C" stroke-width="2" marker-end="url(#arrowG2)"/>
-
-        <!-- 결과 -->
-        <rect x="120" y="465" width="140" height="35" rx="6" fill="#C9A84C" opacity="0.15" stroke="#C9A84C" stroke-width="1"/>
-        <text x="190" y="483" text-anchor="middle" fill="#C9A84C" font-size="10" font-weight="600">즉각적 행동 표현</text>
-        <text x="190" y="497" text-anchor="middle" fill="#C9A84C" font-size="9">(울기, 때리기, 떼쓰기)</text>
+  <div class="diagram-frame">
+    <div class="diagram-title">형제 질투의 신경 회로: 두 가지 경로</div>
+    <svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
+      <!-- Stress pathway (top) -->
+      <g>
+        <!-- Title -->
+        <text x="50" y="30" font-family="serif" font-size="14" font-weight="bold" fill="#8B1A1A">경로 1: 스트레스 회로 (질투 증가)</text>
+        
+        <!-- Node 1: Trigger -->
+        <rect x="40" y="50" width="80" height="50" rx="5" fill="#FFE8E8" stroke="#8B1A1A" stroke-width="2"/>
+        <text x="80" y="82" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#2C1810">형제 관심</text>
+        
+        <!-- Arrow -->
+        <path d="M 120 75 L 160 75" stroke="#8B1A1A" stroke-width="2" fill="none" marker-end="url(#arrowRed)"/>
+        
+        <!-- Node 2: Amygdala -->
+        <rect x="160" y="50" width="80" height="50" rx="5" fill="#FFE8E8" stroke="#8B1A1A" stroke-width="2"/>
+        <text x="200" y="82" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#2C1810">편도체 활성화</text>
+        
+        <!-- Arrow -->
+        <path d="M 240 75 L 280 75" stroke="#8B1A1A" stroke-width="2" fill="none" marker-end="url(#arrowRed)"/>
+        
+        <!-- Node 3: Cortisol -->
+        <rect x="280" y="50" width="80" height="50" rx="5" fill="#FFE8E8" stroke="#8B1A1A" stroke-width="2"/>
+        <text x="320" y="82" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#2C1810">코르티솔 상승</text>
+        
+        <!-- Arrow -->
+        <path d="M 360 75 L 400 75" stroke="#8B1A1A" stroke-width="2" fill="none" marker-end="url(#arrowRed)"/>
+        
+        <!-- Node 4: Behavior -->
+        <rect x="400" y="50" width="100" height="50" rx="5" fill="#FFE8E8" stroke="#8B1A1A" stroke-width="2"/>
+        <text x="450" y="82" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#2C1810">질투 행동</text>
       </g>
-
+      
+      <!-- Healthy pathway (bottom) -->
+      <g>
+        <!-- Title -->
+        <text x="50" y="180" font-family="serif" font-size="14" font-weight="bold" fill="#1B3A5C">경로 2: 안전 회로 (질투 감소)</text>
+        
+        <!-- Node 1: Secure base -->
+        <rect x="40" y="200" width="80" height="50" rx="5" fill="#E8F0FF" stroke="#1B3A5C" stroke-width="2"/>
+        <text x="80" y="232" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#2C1810">안전기지 확인</text>
+        
+        <!-- Arrow -->
+        <path d="M 120 225 L 160 225" stroke="#1B3A5C" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+        
+        <!-- Node 2: Empathy -->
+        <rect x="160" y="200" width="80" height="50" rx="5" fill="#E8F0FF" stroke="#1B3A5C" stroke-width="2"/>
+        <text x="200" y="232" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#2C1810">미러 뉴런</text>
+        
+        <!-- Arrow -->
+        <path d="M 240 225 L 280 225" stroke="#1B3A5C" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+        
+        <!-- Node 3: Oxytocin -->
+        <rect x="280" y="200" width="80" height="50" rx="5" fill="#E8F0FF" stroke="#1B3A5C" stroke-width="2"/>
+        <text x="320" y="232" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#2C1810">옥시토신 증가</text>
+        
+        <!-- Arrow -->
+        <path d="M 360 225 L 400 225" stroke="#1B3A5C" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+        
+        <!-- Node 4: Bond -->
+        <rect x="400" y="200" width="100" height="50" rx="5" fill="#E8F0FF" stroke="#1B3A5C" stroke-width="2"/>
+        <text x="450" y="232" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#2C1810">형제 유대</text>
+      </g>
+      
+      <!-- Legend -->
+      <g>
+        <text x="50" y="320" font-family="sans-serif" font-size="11" fill="#7A6B5D">
+          <tspan x="50" dy="0">아이의 신경계는 두 경로 중 하나를 선택합니다. 부모의 일관된 안전기지 제공이 경로 2로의 전환을 만듭니다.</tspan>
+        </text>
+      </g>
+      
+      <!-- Arrow markers -->
       <defs>
-        <marker id="arrowG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-          <path d="M0,0 L8,3 L0,6" fill="#4ABF8A"/>
+        <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L0,6 L9,3 z" fill="#8B1A1A" />
         </marker>
-        <marker id="arrowG2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-          <path d="M0,0 L8,3 L0,6" fill="#C9A84C"/>
+        <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L0,6 L9,3 z" fill="#1B3A5C" />
         </marker>
       </defs>
-
-      <!-- ===== 5-7세 반응 (오른쪽) ===== -->
-      <text x="570" y="160" text-anchor="middle" fill="#4ABF8A" font-size="12" font-weight="700">👧 5-7세 반응 (FIRST CHILD)</text>
-
-      <!-- 신경 경로 -->
-      <g id="path5to7">
-        <!-- 1. 시각 감지 -->
-        <circle cx="570" cy="220" r="40" fill="#4ABF8A" opacity="0.3" stroke="#4ABF8A" stroke-width="2"/>
-        <text x="570" y="215" text-anchor="middle" fill="#E8E6E1" font-size="11" font-weight="700">시각 피질</text>
-        <text x="570" y="235" text-anchor="middle" fill="#E8E6E1" font-size="9">(관찰)</text>
-
-        <!-- 2. 편도체 -->
-        <circle cx="570" cy="320" r="40" fill="#4ABF8A" opacity="0.5" stroke="#4ABF8A" stroke-width="2"/>
-        <text x="570" y="315" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">편도체</text>
-        <text x="570" y="335" text-anchor="middle" fill="#fff" font-size="9">(위협 감지)</text>
-
-        <path d="M570,260 L570,280" fill="none" stroke="#4ABF8A" stroke-width="2" marker-end="url(#arrowG)"/>
-
-        <!-- 3. 전두엽 조절 -->
-        <circle cx="570" cy="380" r="40" fill="#4ABF8A" opacity="0.4" stroke="#4ABF8A" stroke-width="2.5"/>
-        <text x="570" y="375" text-anchor="middle" fill="#E8E6E1" font-size="10" font-weight="700">전두엽</text>
-        <text x="570" y="390" text-anchor="middle" fill="#E8E6E1" font-size="8">(억제)</text>
-        <path d="M570,360 L570,340" fill="none" stroke="#4ABF8A" stroke-width="2" marker-end="url(#arrowG)"/>
-
-        <!-- 4. Cortisol (여전히 분비) -->
-        <circle cx="570" cy="420" r="38" fill="#4ABF8A" opacity="0.35" stroke="#4ABF8A" stroke-width="1.5" stroke-dasharray="4,3"/>
-        <text x="570" y="415" text-anchor="middle" fill="#4ABF8A" font-size="10" font-weight="600">Cortisol</text>
-        <text x="570" y="432" text-anchor="middle" fill="#4ABF8A" font-size="8">(내부에서만)</text>
-
-        <!-- 결과 -->
-        <rect x="500" y="465" width="140" height="35" rx="6" fill="#4ABF8A" opacity="0.15" stroke="#4ABF8A" stroke-width="1"/>
-        <text x="570" y="483" text-anchor="middle" fill="#4ABF8A" font-size="10" font-weight="600">억제된 표현</text>
-        <text x="570" y="497" text-anchor="middle" fill="#4ABF8A" font-size="9">(침묵, 냉대, 고립)</text>
-      </g>
-
-      <!-- 하단 범례 -->
-      <rect x="200" y="510" width="12" height="12" rx="2" fill="#C9A84C" opacity="0.6"/>
-      <text x="220" y="520" fill="#9A9890" font-size="10">2-4세: 내부 신경신호 → 외부 행동</text>
-      <rect x="500" y="510" width="12" height="12" rx="2" fill="#4ABF8A" opacity="0.6"/>
-      <text x="520" y="520" fill="#9A9890" font-size="10">5-7세: 내부 신경신호 → 전두엽 억제</text>
     </svg>
+    <div class="diagram-caption">편도체의 활성화는 두 경로로 나뉩니다: 스트레스 회로 vs 안전 회로. 부모의 개입이 경로를 결정합니다.</div>
   </div>
-  <div class="diagram-caption">같은 자극(공정성 위협)에 대해, 2-4세는 즉시 행동으로 표현하고, 5-7세는 전두엽으로 억제합니다. 하지만 둘 다 내부적으로는 같은 cortisol을 경험하고 있습니다.</div>
 </section>
 
-<!-- ═══════════ ⑥ 아빠 실전 가이드 ═══════════ -->
+<section class="fade-up">
+  <div class="section-ornament">DEEP SCIENCE</div>
+  <h2 class="section-heading">신경과학의 깊이: 형제 질투의 세부 메커니즘</h2>
+  
+  <div class="illuminated-card">
+    <div class="card-header">
+      <div class="card-icon blue">🔬</div>
+      <h4>미러 뉴런과 공감 발달</h4>
+    </div>
+    <div class="card-body">
+      <p>미러 뉴런(Mirror Neurons)은 다른 사람의 행동과 감정을 "거울처럼" 뇌에서 재현합니다. 형제자매를 지속적으로 관찰하는 것은 아이의 미러 뉴런 시스템을 활성화시키고, 자동으로 공감 능력을 발달시킵니다.</p>
+      
+      <div class="age-compare">
+        <div class="age-col elder-col">
+          <strong>5-7세 미러 뉴런</strong>
+          신피질의 발달로 "의도적 공감"이 가능합니다. 동생의 울음을 관찰하면서 "동생도 고통스럽다"는 추론이 가능해집니다. 이것이 형제 돌봄 행동의 신경 기초입니다.
+        </div>
+        <div class="age-col younger-col">
+          <strong>2-4세 미러 뉴런</strong>
+          자동적 모방만 가능합니다. 형의 웃음을 따라 웃거나, 형의 울음에 함께 우는 것이 미러 뉴런의 작동입니다. 아직 "다른 사람의 입장"은 이해할 수 없습니다.
+        </div>
+      </div>
+      
+      <button class="deep-dive-toggle" onclick="toggleDeepDive(this)">
+        미러 뉴런 연구의 임상 의미 <span class="chevron">▼</span>
+      </button>
+      <div class="deep-dive-content">
+        <p>리찰도 무자로(Vittorio Gallese)의 연구에 따르면, 미러 뉴런 시스템의 활성화는 타인의 고통에 대한 신경 반응을 일으킵니다. 형제자매를 돌보도록 하는 것은 단순한 행동 지도가 아니라, 아이의 뇌 구조 자체를 공감적으로 재배선하는 것입니다. 5-7세 아이가 동생을 돌볼 때마다, 전전두엽 피질(도덕적 판단)과 감정 중추(편도체)가 동시에 활성화되어, 질투는 점차 "책임감"으로 변환됩니다. 이것은 신경 재배선입니다.</p>
+      </div>
+      
+      <div class="research-tag">신경과학: Gallese, Cognitive Neurodynamics (2009)</div>
+    </div>
+  </div>
+
+  <div class="illuminated-card" style="margin-top: 24px;">
+    <div class="card-header">
+      <div class="card-icon gold">📊</div>
+      <h4>출생 순서와 뇌 발달의 신경해부학</h4>
+    </div>
+    <div class="card-body">
+      <p>신경해부학적 연구는 첫째와 둘째의 뇌 발달 궤도가 다름을 보여줍니다. 첫째는 부모의 완전한 관심에서 발달하지만, 둘째는 형/누나의 신경 모델을 통해 발달합니다. 이것은 약점이 아니라 다른 신경 강점입니다.</p>
+      
+      <div class="age-compare">
+        <div class="age-col elder-col">
+          <strong>첫째: 성인 중심 신경 발달</strong>
+          부모의 신경과 완전히 동기화됨. 사회적 신호 해석 능력이 빠르게 발달. 하지만 또래(형제)와의 협력 신경이 덜 발달. 공감 능력이 지연되는 경향.
+        </div>
+        <div class="age-col younger-col">
+          <strong>둘째: 형제 중심 신경 발달</strong>
+          형/누나의 신경을 "거울"로 삼아 발달. 또래 관계와 협력 신경이 빨리 발달. 자발적 공감과 형제 이해 능력이 더 높음.
+        </div>
+      </div>
+      
+      <button class="deep-dive-toggle" onclick="toggleDeepDive(this)">
+        출생 순서 신경해부학의 논쟁 <span class="chevron">▼</span>
+      </button>
+      <div class="deep-dive-content">
+        <p>첫째 아이들이 "더 똑똑하다"는 통념은 신경과학 문헌에 근거가 없습니다. 대신 첫째는 "분석적" 신경 발달이, 둘째는 "공감적" 신경 발달이라는 것이 정확합니다. 형제 질투를 극복한 둘째 아이들은 갈등 해결 능력과 감정 조절 능력이 더 뛰어나 보이는 경향이 있습니다. 이것은 "형제 경험"이라는 신경 도전을 극복하며 회복탄력성 회로가 발달했기 때문입니다.</p>
+      </div>
+      
+      <div class="research-tag">발달신경심리학: Zajonc, Family Configuration (1976)</div>
+    </div>
+  </div>
+
+  <div class="illuminated-card" style="margin-top: 24px;">
+    <div class="card-header">
+      <div class="card-icon crimson">🔄</div>
+      <h4>형제 비동일성 이론 (Sibling Deidentification)</h4>
+    </div>
+    <div class="card-body">
+      <p>형제 비동일성(Sibling Deidentification Theory)은 형제자매가 이웃하면, 무의식적으로 서로 다른 정체성을 개발하려고 한다는 이론입니다. 이것은 질투를 "성격 차이"로 전환하는 신경 전략입니다.</p>
+      
+      <div class="age-compare">
+        <div class="age-col elder-col">
+          <strong>5-7세 비동일성 전략</strong>
+          "나는 아티스트, 형은 운동선수" 같은 방식으로 정체성을 분화합니다. 이것은 질투를 줄이는 신경 방어 메커니즘입니다. "같은 범주의 자원 경쟁"이 아니라 "다른 범주"로 재분류하는 것입니다.
+        </div>
+        <div class="age-col younger-col">
+          <strong>2-4세 비동일성</strong>
+          아직 정체성이 없으므로 비동일성 전략을 사용할 수 없습니다. 순수한 "자원 경쟁" 신호만 존재합니다. 이것은 발달적으로 정상입니다.
+        </div>
+      </div>
+      
+      <button class="deep-dive-toggle" onclick="toggleDeepDive(this)">
+        부모가 의도적 비동일성을 촉발하는 방법 <span class="chevron">▼</span>
+      </button>
+      <div class="deep-dive-content">
+        <p>부모는 아이들이 "다르게 좋다"는 신경 신호를 반복해서 보냄으로써 비동일성을 촉발할 수 있습니다. 예를 들어, "너는 음악에서 천재네, 형은 축구에서 천재야. 둘 다 완벽한 재능이야"라는 메시지는 아이의 뇌가 "경쟁"이 아니라 "고유한 역할"을 찾도록 합니다. 이것이 형제 질투를 "정체성 발달"로 변환하는 신경 전략입니다.</p>
+      </div>
+      
+      <div class="research-tag">발달심리학: Schachter, Sibling Deidentification (1982)</div>
+    </div>
+  </div>
+</section>
+
 <section class="practice-section fade-up">
-  <div class="practice-header">
-    <div class="icon-circle">🎯</div>
-    <div>
-      <h3 style="font-family:var(--serif);font-size:1.2rem;color:var(--text-bright);">형제 질투 상황별 아빠 개입 전략</h3>
-      <p style="font-size:0.85rem;color:var(--text-dim);">같은 질투, 다른 뇌 → 다른 개입법 (3-turn dialog)</p>
-    </div>
-  </div>
-
+  <div class="section-ornament">Dialogue Scripts</div>
+  <h2 class="section-heading">실제 질투 상황 대화 스크립트</h2>
+  
   <div class="age-tab-group">
-    <div class="age-tab active" onclick="switchTab(this, 'age6')">👧 첫째 (5-7세)</div>
-    <div class="age-tab" onclick="switchTab(this, 'age3')">👶 둘째 (2-4세)</div>
+    <button class="age-tab active" onclick="switchTab(this, 'scripts-5-7')">5-7세</button>
+    <button class="age-tab" onclick="switchTab(this, 'scripts-2-4')">2-4세</button>
   </div>
 
-  <!-- 5-7세 스크립트 -->
-  <div id="age6" class="tab-content active">
+  <div id="scripts-5-7" class="tab-content active">
     <div class="script-card">
-      <div class="scenario">상황 1 — 아이가 침묵으로 아빠를 외면할 때</div>
+      <div class="scenario-label">상황 1: "형, 너는 나가 안 돼!"</div>
       <div class="dialog-line">
-        <span class="dialog-label dad">아빠</span>
-        <span class="dialog-text">"(아이의 얼굴을 보며) 요즘 아빠와 말을 안 하는 것 같은데... 혹시 화난 거야?"<br><em>→ 먼저 감정을 인식시키기</em></span>
+        <div class="dialog-label dad">아빠</div>
+        <div class="dialog-text">
+          "아, 동생이가 우리 집에 왔으니까 시간을 나눠야 한다고 느껴지는 거구나."
+          <em>(상황 인정. 질책 없음. 감정 명명)</em>
+        </div>
       </div>
       <div class="dialog-line">
-        <span class="dialog-label child">아이</span>
-        <span class="dialog-text">"(조용히) ...아니야. 난 괜찮아."</span>
+        <div class="dialog-label child">아이</div>
+        <div class="dialog-text">
+          "근데 우리는 정말 형/누나와 시간을 함께해야 해. 나도 따분하잖아."
+        </div>
       </div>
       <div class="dialog-line">
-        <span class="dialog-label dad">아빠</span>
-        <span class="dialog-text">"(다시 한번) 아빠 생각에, 너는 최근에 아빠가 동생에게 더 많은 시간을 쓰는 것처럼 느껴지는 것 같은데... 맞니?"<br><em>→ 아이의 관찰을 인정하기 (실제로 맞을 수도 있으니까)</em></span>
-      </div>
-      <div class="dialog-line">
-        <span class="dialog-label child">아이</span>
-        <span class="dialog-text">"(눈물이 맺히며) ...네. 엄마하고 아빠가 자꾸 동생만 봐."</span>
-      </div>
-      <div class="dialog-line">
-        <span class="dialog-label dad">아빠</span>
-        <span class="dialog-text">"그렇지? 정말 화나는 일이야. 동생이 아직 작으니까 아빠가 더 살펴줘야 하는데, 그래도 너는 정말 중요한 사람이야. 그래서 이제부터 아빠가 너랑 '우리만의 시간'을 정하려고 해. 매주 토요일 아침 7시, 아빠와 너. 이 시간에는 동생도 엄마도 함께하지 않는 시간. 어떨까?"<br><em>→ 감정 인정 + 구체적인 계획 제시</em></span>
+        <div class="dialog-label dad">아빠</div>
+        <div class="dialog-text">
+          "맞아. 그래서 우리는 금요일 저녁은 늘 너와 나 둘이 시간을 가질 거야. 동생이가 없는 시간. 그게 너와 나의 특별한 시간이 될 거야."
+          <em>(일관된 1:1 시간 제시. 신경계 복원)</em>
+        </div>
       </div>
     </div>
 
     <div class="script-card">
-      <div class="scenario">상황 2 — 아이가 "동생은 안 되는 게 있는데 나만 왜 돼?" 할 때</div>
+      <div class="scenario-label">상황 2: "동생이한테 관심 가지지 마! 너는 나랑만 놀아!"</div>
       <div class="dialog-line">
-        <span class="dialog-label child">아이</span>
-        <span class="dialog-text">"이건 부공평해! 내가 3살일 때는 이 장난감 못 했잖아!"</span>
+        <div class="dialog-label dad">아빠</div>
+        <div class="dialog-text">
+          "내가 너를 매우 사랑하고, 또한 동생이도 사랑한다는 걸 알고 있니? 사랑은 나눠지지 않아."
+          <em>(개념적 안전감 제시)</em>
+        </div>
       </div>
       <div class="dialog-line">
-        <span class="dialog-label dad">아빠</span>
-        <span class="dialog-text">"음... 좋은 질문이야. 그래, 너는 3살일 때 이 장난감을 가질 수 없었어. 왜냐하면 너의 뇌가 준비되지 않았거든. 근데 지금은 너의 뇌가 이 장난감을 가지고 놀 준비가 됐어. 동생도 지금은 준비가 안 됐지만, 나중에 커가면 이것도 가지고 놀 수 있을 거야."<br><em>→ 인과관계 설명 (뇌 발달 관점)</em></span>
+        <div class="dialog-label child">아이</div>
+        <div class="dialog-text">
+          "아니야! 넌 동생이를 더 좋아해!"
+        </div>
       </div>
       <div class="dialog-line">
-        <span class="dialog-label child">아이</span>
-        <span class="dialog-text">"(생각해보며) ...그래. 내가 그 때는 몰라서 이걸 못 했구나."</span>
-      </div>
-      <div class="dialog-line">
-        <span class="dialog-label dad">아빠</span>
-        <span class="dialog-text">"정확해! 이제 이해했구나. 너는 큰 아이니까 할 수 있는 게 많고, 동생은 아직 작으니까 할 수 있는 게 적지. 근데 이건 동생을 덜 사랑한다는 뜻이 아니야. 뇌가 다른 단계에 있다는 뜻일 뿐이야."<br><em>→ 차별 vs 발달 단계의 차이 명확히 하기</em></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- 2-4세 스크립트 -->
-  <div id="age3" class="tab-content">
-    <div class="script-card">
-      <div class="scenario">상황 1 — 아이가 언니가 받는 관심에 화내며 울 때</div>
-      <div class="dialog-line">
-        <span class="dialog-label child">아이</span>
-        <span class="dialog-text">"(아빠가 언니와 놀 때) 싫어! 나도! 나도 아빠랑 놀고 싶어!" (울음)</span>
-      </div>
-      <div class="dialog-line">
-        <span class="dialog-label dad">아빠</span>
-        <span class="dialog-text">"(즉시 아이를 안으며) 알겠어. 아빠가 지금 언니랑 놀고 있어서 화났구나. 맞지? 아빠를 원하는구나. (잠깐 기다린 후) 자, 이제 아빠가 너랑 놀자. 뭘 가지고 놀고 싶어?"<br><em>→ 감정 인정 + 즉시 관심 전환</em></span>
-      </div>
-      <div class="dialog-line">
-        <span class="dialog-label child">아이</span>
-        <span class="dialog-text">"(여전히 꼬깟 꼬깟하지만) ...블록이요."</span>
-      </div>
-      <div class="dialog-line">
-        <span class="dialog-label dad">아빠</span>
-        <span class="dialog-text">"좋아! 블록! (함께 블록을 집으며) 우리 함께 탑을 쌓을까? 얼마나 높이 쌓을 수 있을까? (아이와 함께 탑을 쌓으며) 좋아! 높이 올라갔다!"<br><em>→ 성공 경험으로 긍정 회로 강화</em></span>
+        <div class="dialog-label dad">아빠</div>
+        <div class="dialog-text">
+          "음, 그렇게 느껴지니? 그럼 내가 지금 너와 시간을 보내는 게 어떤 증거일까? 언제 나는 너를 완전히 놔뒀니?"
+          <em>(현실 점검. 신피질 활성화. 동시에 팔로 안아주기. 감정 기반이 아니라 증거 기반)</em>
+        </div>
       </div>
     </div>
 
     <div class="script-card">
-      <div class="scenario">상황 2 — 아이가 언니를 밀어낼 때</div>
+      <div class="scenario-label">상황 3: "형/누나가 동생이를 도왔다!" (긍정적 순간)</div>
       <div class="dialog-line">
-        <span class="dialog-label child">아이</span>
-        <span class="dialog-text">"(언니를 보며) 언니 가! 아빠는 나거! (밀어냄)"</span>
+        <div class="dialog-label dad">아빠</div>
+        <div class="dialog-text">
+          "어? 방금 동생이가 울 때 너는 포근하게 안아줬네. 그건 정말 큰 마음 때문이야."
+          <em>(행동 구체화. 신피질 활성화)</em>
+        </div>
       </div>
       <div class="dialog-line">
-        <span class="dialog-label dad">아빠</span>
-        <span class="dialog-text">"(차분히 아이를 안으며) 안 돼. 언니를 밀면 안 돼. 아빠를 원하는 거 아는데, 이렇게 밀면 안 돼. (아이를 무릎에 앉히며)"<br><em>→ 신체 개입 + 안전 확보</em></span>
+        <div class="dialog-label child">아이</div>
+        <div class="dialog-text">
+          "글쎄... 동생이가 울어서..."
+        </div>
       </div>
       <div class="dialog-line">
-        <span class="dialog-label child">아이</span>
-        <span class="dialog-text">"(여전히 울며) 나 혼자! 나 혼자 아빠랑!"</span>
-      </div>
-      <div class="dialog-line">
-        <span class="dialog-label dad">아빠</span>
-        <span class="dialog-text">"(아이의 등을 톡톡 두드리며, 부드럽게) 아빠가 모두를 사랑해. 언니도 사랑하고, 너도 사랑해. 그래서 가끔씩은 언니와 놀고, 가끔씩은 너와 놀 거야. 지금은 우리 셋이 함께 놀까? (언니에게) 언니, 우리 모두 함께 블록 쌓을까?"<br><em>→ "혼자"가 아닌 "함께"의 경험 만들기</em></span>
-      </div>
-      <div class="dialog-line">
-        <span class="dialog-label child">아이</span>
-        <span class="dialog-text">"(울음이 그치고, 조심스럽게) ...함께?"</span>
+        <div class="dialog-label dad">아빠</div>
+        <div class="dialog-text">
+          "그래. 넌 정말 큰 마음을 가졌네. 그게 언니/형이야."
+          <em>(정체성 강화. 신경 회로 재배선. "형/누나" 정체성과 "공감" 신경이 함께 활성화됨)</em>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- DO / DON'T -->
+  <div id="scripts-2-4" class="tab-content">
+    <div class="script-card">
+      <div class="scenario-label">상황 1: "엄마! 내 거야!"</div>
+      <div class="dialog-line">
+        <div class="dialog-label dad">아빠</div>
+        <div class="dialog-text">
+          "음, 엄마를 원하는 거구나."
+          <em>(감정 명명. 설교 없음. 동시에 아이를 안아주고 엄마 쪽으로 함께 걷기)</em>
+        </div>
+      </div>
+      <div class="dialog-line">
+        <div class="dialog-label child">아이</div>
+        <div class="dialog-text">
+          "응! 엄마 안 돼! 형/누나 가!"
+        </div>
+      </div>
+      <div class="dialog-line">
+        <div class="dialog-label dad">아빠</div>
+        <div class="dialog-text">
+          "[엄마 몸에 안겨주고] 봐, 엄마가 여기 있지. 엄마는 너도 사랑하고, 형/누나도 사랑해."
+          <em>(신체 접촉이 모든 것. 언어는 백그라운드. 물리적 안전기지 복원)</em>
+        </div>
+      </div>
+    </div>
+
+    <div class="script-card">
+      <div class="scenario-label">상황 2: "형/누나 미워!"</div>
+      <div class="dialog-line">
+        <div class="dialog-label dad">아빠</div>
+        <div class="dialog-text">
+          "형/누나가 엄마를 안으니까 화나는 거구나."
+          <em>(감정 명명 + 원인 제시. 설명 없음)</em>
+        </div>
+      </div>
+      <div class="dialog-line">
+        <div class="dialog-label child">아이</div>
+        <div class="dialog-text">
+          "응! 가! 가라고!"
+        </div>
+      </div>
+      <div class="dialog-line">
+        <div class="dialog-label dad">아빠</div>
+        <div class="dialog-text">
+          "[팔로 아이를 안고 주울 수 있으면 안음] 아빠가 여기 있어. 넌 혼자가 아니야."
+          <em>(신체 접촉만으로 충분. 2-4세 아이는 언어로는 진정되지 않습니다)</em>
+        </div>
+      </div>
+    </div>
+
+    <div class="script-card">
+      <div class="scenario-label">상황 3: "형/누나 안아주기" (긍정적 순간)</div>
+      <div class="dialog-line">
+        <div class="dialog-label dad">아빠</div>
+        <div class="dialog-text">
+          "[즉시, 그 자리에서] 와! 너는 형/누나가 정말 좋아하는구나!"
+          <em>(칭찬과 동시에 신체 접촉)</em>
+        </div>
+      </div>
+      <div class="dialog-line">
+        <div class="dialog-label child">아이</div>
+        <div class="dialog-text">
+          "[웃음]"
+        </div>
+      </div>
+      <div class="dialog-line">
+        <div class="dialog-label dad">아빠</div>
+        <div class="dialog-text">
+          "[아이를 안아주고, 형/누나도 함께 안음] 정말 좋은 가족이야."
+          <em>(삼각형 안전기지: 아이-아빠-형제. 신경 회로 강화)</em>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="fade-up">
+  <div class="section-ornament">AHA INSIGHTS</div>
+  <h2 class="section-heading">질투 관리의 핵심 통찰</h2>
+  
+  <div class="aha-callout">
+    <p>부모의 "공정함"은 신경학적으로 무의미합니다. 아이가 필요한 것은 "공정함"이 아니라 "확인"입니다. 각 아이마다의 일관된 1:1 시간이 편도체의 불안을 낮춥니다.</p>
+  </div>
+
+  <div class="aha-callout">
+    <p>질투를 "나쁜 감정"이라 말하면 아이는 감정을 억누릅니다. 이것은 신경 억압을 만듭니다. 대신 "그런 감정을 느끼는 게 정상"이라고 명명해주세요. 그러면 아이의 신경계는 "표현"으로 이동합니다.</p>
+  </div>
+
+  <div class="aha-callout">
+    <p>5-7세 아이가 동생을 도울 때, "착한 아이네"라고 하지 마세요. 이것은 행동을 칭찬할 뿐, 정체성을 강화하지 못합니다. 대신 "넌 정말 큰 마음을 가졌네. 그게 형/누나야"라고 해주세요. 정체성 강화가 신경 재배선입니다.</p>
+  </div>
+</section>
+
+<section class="fade-up">
+  <div class="section-ornament">Action Framework</div>
+  <h2 class="section-heading">질투 상황 대처 플로우차트</h2>
+  
+  <div class="flowchart-box">
+    <div class="flowchart-title">형제 질투가 발생했을 때 부모의 신경 대응</div>
+    
+    <div class="flowchart-step">
+      <strong>⚠️ Step 1: 상황 인식</strong>
+      아이가 질투를 표현합니다 (울음, 분노, "싫어!")
+    </div>
+    
+    <div class="flowchart-arrow">↓</div>
+    
+    <div class="flowchart-step">
+      <strong>🧠 Step 2: 부모의 신경계 조절</strong>
+      당신의 편도체가 아이의 반응에 반응하지 않도록 의식적으로 호흡합니다. (3초 깊은 숨) — 부모의 신경계가 진정되어야 아이의 신경계가 진정됩니다.
+    </div>
+    
+    <div class="flowchart-arrow">↓</div>
+    
+    <div class="flowchart-step">
+      <strong>🔍 Step 3: 원인 탐지</strong>
+      이것이 "배고픔/졸음 질투"인가? "관심 결핍 질투"인가? "권력 경쟁 질투"인가? 각 질투는 다른 신경 대응을 요구합니다.
+    </div>
+    
+    <div class="flowchart-arrow">↓</div>
+    
+    <div class="flowchart-step">
+      <strong>💬 Step 4: 감정 명명</strong>
+      "엄마/아빠가 동생이를 안으니까 화나는 거구나" 또는 "부모의 관심이 내 것이 아니라고 느껴지는 거구나"
+      <br><br>
+      <strong>중요:</strong> 설명, 논리, 설교는 이 단계에서는 하지 마세요. 신경계가 진정될 때까지 감정 명명만 하세요.
+    </div>
+    
+    <div class="flowchart-arrow">↓</div>
+    
+    <div class="flowchart-step">
+      <strong>🤝 Step 5: 신체 접촉</strong>
+      안아주거나, 손을 잡거나, 옆에 앉으세요. 2-4세는 신체 접촉이 100%입니다. 5-7세도 신체 접촉이 필수입니다. (옥시토신 증가)
+    </div>
+    
+    <div class="flowchart-arrow">↓</div>
+    
+    <div class="flowchart-step">
+      <strong>🔐 Step 6: 안전기지 복원</strong>
+      "나는 너를 사랑해" 또는 "아빠/엄마가 여기 있어" 또는 "금요일 저녁은 늘 우리 둘만의 시간이야" 등, 안전기지를 재확인합니다.
+    </div>
+    
+    <div class="flowchart-arrow">↓</div>
+    
+    <div class="flowchart-step">
+      <strong>🎯 Step 7: 신경 재배선 (5-7세 대상)</strong>
+      아이가 침착해지면: "넌 정말 큰 마음을 가졌네"라는 칭찬으로 정체성을 강화합니다. (신피질 활성화)
+    </div>
+    
+    <div class="flowchart-arrow">↓</div>
+    
+    <div class="flowchart-step">
+      <strong>✓ 완료</strong>
+      아이의 신경계가 정상화되었습니다. 이제 함께 뭔가를 하거나, 부모가 다른 형제를 돌볼 수 있습니다. 신경계가 안정되면 아이는 스스로 놀이로 돌아갑니다.
+    </div>
+  </div>
+</section>
+
+<section class="fade-up">
+  <div class="section-ornament">BEST PRACTICES</div>
+  <h2 class="section-heading">질투 관리 DO와 DON'T</h2>
+  
   <div class="do-dont">
     <div class="do-box">
-      <h5>✅ DO — 이렇게 하세요</h5>
+      <h5>✓ DO THIS</h5>
       <ul>
-        <li>5-7세에게 침묵과 냉대를 먼저 인지시키기</li>
-        <li>아이의 관찰을 인정하기 (실제로 맞을 수도 있음)</li>
-        <li>2-4세에게는 즉시 관심과 신체 접촉으로 응답</li>
-        <li>2-4세와 함께의 시간, 5-7세와 단독의 시간 모두 정하기</li>
-        <li>질투를 "나쁜 감정"이 아니라 "감지 신호"로 재구성</li>
-        <li>두 아이에게 동등한 시간 투자하기</li>
+        <li>각 아이마다 일주일에 최소 2시간의 일관된 1:1 시간을 만들기</li>
+        <li>질투 표현 직후 즉시 신체 접촉 (5초 안에)</li>
+        <li>감정을 명명하되, 설명은 나중에 (신경계 안정화 먼저)</li>
+        <li>5-7세 아이가 동생을 도울 때 정체성 강화: "넌 큰 마음을 가졌네"</li>
+        <li>형제 간 다양성을 강조: "너는 음악에 천재, 형은 축구에 천재"</li>
+        <li>부모 자신의 신경계를 먼저 진정시키기 (깊은 숨, 카운팅)</li>
       </ul>
     </div>
+    
     <div class="dont-box">
-      <h5>❌ DON'T — 이것은 피하세요</h5>
+      <h5>✗ DON'T DO THIS</h5>
       <ul>
-        <li>"넌 언니니까 양보해" (차별적 기대치)</li>
-        <li>"너만 특별하지, 걱정하지 마" (진정성 부족)</li>
-        <li>한 아이의 관심 시간이 다른 아이의 3배 이상</li>
-        <li>아이의 질투를 무시하거나 "유치하다"고 말하기</li>
-        <li>아이 앞에서 "너는 더 힘들 텐데" 같은 표현</li>
-        <li>차별이 없다고 부정하기 (아이는 이미 감지함)</li>
+        <li>질투하는 아이를 설교하거나 논리로 설득하기 (신경계가 닫힘)</li>
+        <li>"공정하게" 하려고 시간을 정확히 분배하기 (신경학적으로 무의미)</li>
+        <li>질투 표현을 "나쁜 감정"이라 말하기 (감정 억압)</li>
+        <li>동생을 더 칭찬하면서 질투 줄이려고 시도 (반대 효과)</li>
+        <li>형제자매 비교하기 ("형은 이렇게 잘하는데...")</li>
+        <li>부모의 신경계가 높은 상태에서 훈육하기 (다툼으로 확대)</li>
       </ul>
     </div>
   </div>
 </section>
 
-<!-- ═══════════ ⑦ 자매 & 부부 관계 팁 ═══════════ -->
-<section class="tip-section fade-up">
-  <h3>👧👶 형제 질투 관리 전략</h3>
-  <p>질투를 "없애려고" 하지 마세요. 질투는 사회적 뇌가 발달한다는 신호입니다. 대신, 질투를 <strong>"표현하고 관리하는 방법"</strong>을 가르치세요.</p>
-  <div class="tip-highlight">
-    <strong>🎯 오늘 저녁 한 마디:</strong> "아빠는 너희 둘 다 같이 사랑해. 때론 개별 시간을 더 가지기도 하는데, 그건 사랑이 다르다는 뜻이 아니라 성장 단계가 다르다는 뜻이야. 그리고 화나고 질투나는 게 나쁜 게 아니야. 중요한 건 그 감정을 어떻게 표현하는지야."
-  </div>
-</section>
-
-<section class="tip-section fade-up">
-  <h3>💑 육아 중 부부 관계 팁</h3>
-  <p>배우자가 아이들에게 주는 관심 시간이 불균형하다면, 먼저 그 사실을 공유하세요. "넌 첫째만 본다"는 비난보다 "아이들이 이 불균형을 감지하고 있어"라는 관찰이 더 효과적입니다.</p>
-
-  <div class="couple-tips-grid">
-    <div class="couple-tip-box">
-      <strong>공유할 한 가지: 시간 측정</strong>
-      한 주일간 각자 얼마나 많은 시간을 각 아이와 단독으로 보내는지 기록해보세요. 아이가 감지하는 불균형이 현실에 기반하고 있는지 알 수 있습니다.
-    </div>
-    <div class="couple-tip-box">
-      <strong>Cortisol 리마인더</strong>
-      아이가 질투할 때마다, 아이의 뇌에서 cortisol이 분비되고 있다고 생각하세요. 이는 단순한 "투정"이 아니라 생리적 스트레스 반응입니다. 배우자와 함께 이를 인정하면, 대응 방식도 더 동정적으로 변합니다.
-    </div>
-    <div class="couple-tip-box">
-      <strong>역할 분담 재설정</strong>
-      "엄마는 둘째, 아빠는 첫째"처럼 역할이 고착되었다면, 의도적으로 역할을 바꿔보세요. 각 부모가 두 아이 모두와 깊은 관계를 맺으면, 아이들도 덜 질투합니다.
-    </div>
-    <div class="couple-tip-box">
-      <strong>부부 간 공정성도 중요</strong>
-      한 부모가 육아의 대부분을 담당한다면, 다른 부모도 피로와 스트레스를 인식하세요. 공정성은 아이와의 관계뿐 아니라 부부 관계의 신경학적 기초입니다.
+<section class="fade-up">
+  <div class="tips-section">
+    <h3>형제 질투 감소의 실제 전략</h3>
+    <div class="tips-grid">
+      <div class="tip-box">
+        <strong>1:1 시간의 신경 과학</strong>
+        부모와의 "예측 가능한" 1:1 시간은 아이의 신경계가 "안전하다"는 신호를 반복적으로 받게 합니다. 금요일 저녁이 항상 "나와 엄마/아빠의 시간"이라면, 아이의 뇌는 불안을 낮춥니다.
+      </div>
+      <div class="tip-box">
+        <strong>신체 접촉의 호르몬 효과</strong>
+        10초의 포옹은 코르티솔을 감소시키고 옥시토신을 증가시킵니다. 이것은 약이 아니라 신경 화학입니다. 질투 상황에서 즉시 안아주는 것이 가장 강력한 개입입니다.
+      </div>
+      <div class="tip-box">
+        <strong>감정 명명의 신경 안정화</strong>
+        "너는 화났구나"라고 말해주는 것은 감정을 정상화하고, 아이의 신경계를 "표현 모드"로 이동시킵니다. 이것이 설교보다 훨씬 더 신경학적으로 효과적입니다.
+      </div>
+      <div class="tip-box">
+        <strong>형제 역할 정체성 강화</strong>
+        5-7세 아이에게 "형/누나"라는 정체성을 반복해서 언급하는 것은 신경 회로를 "경쟁"에서 "책임"으로 재배선합니다. 이것이 진정한 질투 감소입니다.
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════ ⑧ 복습 퀴즈 + 간격 반복 트래커 ═══════════ -->
 <section class="quiz-section fade-up">
-  <div class="section-label">REVIEW QUIZ</div>
-  <div class="section-title">복습 퀴즈 2문제</div>
-
-  <!-- 퀴즈 1 -->
-  <div class="quiz-card" id="quiz1">
-    <div class="q-num">QUESTION 01</div>
-    <div class="question">형제 질투의 신경학적 기초는 무엇일까요?</div>
+  <div class="section-ornament">Quest of Knowledge</div>
+  <h2 class="section-heading">복습 퀴즈</h2>
+  
+  <div class="quiz-card" id="q1">
+    <div class="q-num">QUESTION I</div>
+    <div class="question">형제 질투의 신경생물학적 근거는?</div>
     <div class="quiz-options">
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz1',false)">① 아이의 성격이 질투하는 성향이다</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz1',true)">② 공정성 위협으로 인한 cortisol(스트레스 호르몬) 분비</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz1',false)">③ 형제가 사랑을 더 받는다고 느끼는 심리적 상태</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz1',false)">④ 부모의 차별이 명백하기 때문</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q1',false)">① 아이의 성격 문제</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q1',true)">② 생존 뇌(변연계)가 부모(생존 자원)에 대한 독점을 원하는 진화적 신호</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q1',false)">③ 형제자매가 너무 많아서</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q1',false)">④ 부모의 훈육 실패</div>
     </div>
-    <div class="quiz-explanation" id="quiz1-exp">
-      <strong>정답: ②</strong> — 질투는 단순한 "감정"이 아니라 생리적 반응입니다. 아이의 뇌가 공정성 위협을 감지하면, Insula(섬엽)가 활성화되고, 편도체와 협력하여 cortisol을 분비합니다. 이는 생존 위협으로 인식된 반응이며, 아이의 "성격"이나 "행동"이 아닙니다. 뇌화학입니다.
+    <div class="quiz-explanation" id="q1-exp"><strong>정답: ②</strong> 질투는 도덕 결함이 아니라 생존 회로의 정상적 신호입니다. 진화 역사에서 부모의 양육 자원은 생존을 의미했고, 형제는 그 자원의 경쟁자였습니다. 이 신호는 여전히 아이의 편도체에 깊게 새겨져 있습니다.</div>
+  </div>
+  
+  <div class="quiz-card" id="q2">
+    <div class="q-num">QUESTION II</div>
+    <div class="question">질투를 가장 효과적으로 감소시키는 방법은?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkAnswer(this,'q2',false)">① 부모가 형제자매를 "공정하게" 대하기</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q2',true)">② 각 아이마다의 일관된 1:1 시간 제공하기</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q2',false)">③ 형제자매를 가까이 놔두지 않기</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q2',false)">④ 질투하는 아이에게 설교하기</div>
     </div>
+    <div class="quiz-explanation" id="q2-exp"><strong>정답: ②</strong> 신경학적으로 "공정함"은 아이의 편도체를 진정시키지 못합니다. 아이가 필요한 것은 "확인"입니다. 각 아이마다의 예측 가능한 1:1 시간이 신경계가 "안전하다"는 신호를 반복적으로 보냅니다.</div>
   </div>
 
-  <!-- 퀴즈 2 -->
-  <div class="quiz-card" id="quiz2">
-    <div class="q-num">QUESTION 02</div>
-    <div class="question">5-7세가 질투를 "침묵과 냉대"로 표현하는 신경학적 이유는?</div>
+  <div class="quiz-card" id="q3">
+    <div class="q-num">QUESTION III</div>
+    <div class="question">5-7세가 동생을 도울 때 하는 것이 가장 좋은 말은?</div>
     <div class="quiz-options">
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz2',false)">① 성숙해져서 감정을 잘 조절한다</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz2',true)">② 전두엽이 cortisol 반응을 억제하면서, 감정은 여전히 내부에서 진행</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz2',false)">③ 이미 질투를 극복했거나 다시 생각해서</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz2',false)">④ 부모의 관심을 원하지 않게 되어서</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q3',false)">① "착한 아이네"</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q3',true)">② "넌 정말 큰 마음을 가졌네. 그게 언니/형이야"</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q3',false)">③ "다시 도와줘"</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q3',false)">④ 아무것도 안 하기</div>
     </div>
-    <div class="quiz-explanation" id="quiz2-exp">
-      <strong>정답: ②</strong> — 5-7세의 전두엽이 발달하면서, cortisol 반응을 행동으로 표현하지 못하게 억제합니다. 하지만 신체 내부에서는 여전히 cortisol이 분비되고 있습니다. 이는 "성숙함"이 아니라 "신경 회로의 억제"입니다. 장기적으로 이 억제된 감정이 쌓이면 우울증이나 불안장애로 발전할 수 있으므로, 부모가 먼저 이 감정을 인식시켜야 합니다.
-    </div>
+    <div class="quiz-explanation" id="q3-exp"><strong>정답: ②</strong> "착한 아이"는 행동을 칭찬하지만, 신경 회로를 재배선하지 못합니다. 반면 "큰 마음"과 "형/누나 정체성"은 신피질(도덕적 판단)을 활성화시키고, 동시에 정체성을 강화합니다. 이것이 질투를 "책임감"으로 변환하는 신경 재배선입니다.</div>
   </div>
 
-  <!-- 간격 반복 트래커 -->
+  <div class="quiz-card" id="q4">
+    <div class="q-num">QUESTION IV</div>
+    <div class="question">미러 뉴런이 형제자매 발달에 미치는 영향은?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkAnswer(this,'q4',false)">① 형제자매를 따라하기만 함</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q4',true)">② 형제자매의 행동과 감정을 "거울"로 삼아 뇌에서 재현하고, 자동으로 공감과 협력 능력 발달</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q4',false)">③ 형제자매와의 경쟁 본능 강화</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q4',false)">④ 형제자매 질투 증가</div>
+    </div>
+    <div class="quiz-explanation" id="q4-exp"><strong>정답: ②</strong> 미러 뉴런은 다른 사람의 행동과 감정을 뇌에서 재현합니다. 형제자매를 지속적으로 관찰하는 것은 아이의 미러 뉴런 시스템을 활성화시키고, 자동으로 공감과 협력 신경을 발달시킵니다. 이것이 장기적으로 질투를 감소시키는 신경 기전입니다.</div>
+  </div>
+
+  <div class="quiz-card" id="q5">
+    <div class="q-num">QUESTION V</div>
+    <div class="question">2-4세 아이의 질투에 가장 효과적인 부모 대응은?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkAnswer(this,'q5',false)">① 논리적 설명 ("부모 사랑은 나눠지지 않아")</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q5',true)">② 즉시 신체 접촉과 물리적 안전기지 복원</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q5',false)">③ 동생을 멀리 보내기</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q5',false)">④ 질투하는 아이를 혼내기</div>
+    </div>
+    <div class="quiz-explanation" id="q5-exp"><strong>정답: ②</strong> 2-4세는 신피질(논리)이 발달하지 않았습니다. 신체 접촉만이 신경계를 진정시킵니다. 10초의 포옹이 1시간의 설교보다 신경학적으로 효과적입니다.</div>
+  </div>
+</section>
+
+<section class="fade-up">
   <div class="tracker">
-    <h4>📅 간격 반복 트래커 (Spaced Repetition)</h4>
-    <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:16px;">클릭하면 완료 표시됩니다. 최적 복습 주기: 1일 → 3일 → 7일 → 14일</p>
+    <h4>📜 21일 형제자매 이해 트래커</h4>
     <div class="tracker-grid">
-      <div class="tracker-day today" onclick="this.classList.toggle('completed')">
-        <span class="day-label">D08</span>
-        <span class="day-desc">오늘</span>
-      </div>
-      <div class="tracker-day" onclick="this.classList.toggle('completed')">
-        <span class="day-label">+1일</span>
-        <span class="day-desc">내일 복습</span>
-      </div>
-      <div class="tracker-day" onclick="this.classList.toggle('completed')">
-        <span class="day-label">+3일</span>
-        <span class="day-desc">3일 뒤</span>
-      </div>
-      <div class="tracker-day" onclick="this.classList.toggle('completed')">
-        <span class="day-label">+7일</span>
-        <span class="day-desc">1주 뒤</span>
-      </div>
-      <div class="tracker-day" onclick="this.classList.toggle('completed')">
-        <span class="day-label">+14일</span>
-        <span class="day-desc">2주 뒤</span>
-      </div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D01</span><span class="day-desc">뇌발달</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D02</span><span class="day-desc">애착</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D03</span><span class="day-desc">놀이</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D04</span><span class="day-desc">자기조절</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D05</span><span class="day-desc">인지</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D06</span><span class="day-desc">언어</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D07</span><span class="day-desc">복습1</span></div>
+      <div class="tracker-day today" onclick="this.classList.toggle('completed')"><span class="day-num">D08</span><span class="day-desc">질투</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D09</span><span class="day-desc">공정성</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D10</span><span class="day-desc">협력</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D11</span><span class="day-desc">1:1</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D12</span><span class="day-desc">복습2</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D13</span><span class="day-desc">스트레스</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D14</span><span class="day-desc">가트만</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D15</span><span class="day-desc">대화</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D16</span><span class="day-desc">공동육아</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D17</span><span class="day-desc">복습3</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D18</span><span class="day-desc">놀이설계</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D19</span><span class="day-desc">취침</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D20</span><span class="day-desc">감정코치</span></div>
+      <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D21</span><span class="day-desc">완성</span></div>
     </div>
   </div>
 </section>
+
+<footer class="chapter-footer">과학적 아빠 육아 21일 스터디 · Chapter VIII · Part 2 · Day 08 of 21</footer>
 
 </div>
 
-<!-- FOOTER -->
-<footer class="footer">
-  <p>과학적 아빠 육아 스터디 · Day 08 of 21 · PART 2: 자매 관계 설계</p>
-  <p style="margin-top:6px;">내일 Day 09: 공정성 vs 형평성 →</p>
-</footer>
-
-<!-- ═══════════ JAVASCRIPT ═══════════ -->
 <script>
-// === Intersection Observer for fadeUp animations ===
-const observerOptions = {
-  threshold: 0.1,
-  rootMargin: '0px 0px -50px 0px'
-};
-
 const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      entry.target.style.animationDelay = '0s';
-      observer.unobserve(entry.target);
-    }
+  entries.forEach(entry => {
+    if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
   });
-}, observerOptions);
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-document.querySelectorAll('.fade-up').forEach((el) => {
-  observer.observe(el);
-});
-
-// === 나이 탭 전환 ===
+function toggleDeepDive(el) { el.classList.toggle('open'); el.nextElementSibling.classList.toggle('open'); }
 function switchTab(el, tabId) {
   document.querySelectorAll('.age-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.getElementById(tabId).classList.add('active');
 }
-
-// === Deep Dive Collapsible ===
-function toggleDeepDive(el) {
-  el.classList.toggle('open');
-  const content = el.nextElementSibling;
-  content.classList.toggle('open');
-}
-
-// === 퀴즈 ===
 function checkAnswer(el, quizId, isCorrect) {
   const card = document.getElementById(quizId);
   if (card.dataset.answered) return;
   card.dataset.answered = 'true';
-
-  if (isCorrect) {
-    el.classList.add('correct');
-  } else {
-    el.classList.add('wrong');
-  }
+  if (isCorrect) el.classList.add('correct'); else el.classList.add('wrong');
   document.getElementById(quizId + '-exp').classList.add('show');
 }
 </script>
-
 </body>
 </html>

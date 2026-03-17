@@ -3,154 +3,969 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Day 31 — FRF 시뮬레이션 vs 실측 상관성 | YS 진동학 마스터</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600;700&family=Noto+Sans+KR:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Day 31 — FRF 시뮬레이션 vs 실측 상관성 | YS CYBER DYNAMICS</title>
+
 <style>
-:root{--bg:#0A0C10;--surface:#12151C;--surface2:#1A1E28;--border:#252A38;--gold:#C9A84C;--gold-light:#E8C96A;--blue:#4A9EBF;--green:#4ABF8A;--purple:#8A6ABF;--orange:#BF6A4A;--text:#D8D3C8;--text-dim:#7A7A8A;--text-bright:#F0EBE0}
+/* ╔══════════════════════════════════════════╗
+   ║  CYBER FORMULA — ASURADA COCKPIT THEME  ║
+   ╚══════════════════════════════════════════╝ */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+:root{
+  --bg:#030712;
+  --surface:rgba(6,22,48,0.85);
+  --surface2:rgba(0,229,255,0.06);
+  --border:rgba(0,229,255,0.15);
+  --border-glow:rgba(0,229,255,0.4);
+  --cyan:#00e5ff;
+  --cyan-light:#67f0ff;
+  --cyan-dim:rgba(0,229,255,0.08);
+  --magenta:#ff2d78;
+  --magenta-dim:rgba(255,45,120,0.1);
+  --blue:#2979ff;
+  --green:#00e676;
+  --purple:#b388ff;
+  --orange:#ff9100;
+  --text:#c0d8ef;
+  --text-dim:#4a6a8a;
+  --text-bright:#e8f4ff;
+  --gold:#00e5ff;
+  --gold-light:#67f0ff;
+  --scanline:rgba(0,229,255,0.03)
+}
+
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-weight:300;line-height:1.8;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
-.sticky-header{position:sticky;top:0;z-index:100;background:rgba(10,12,16,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 0}
-.header-inner{max-width:960px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
-.header-brand{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:16px;color:var(--gold)}
-.header-progress-wrap{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-dim)}
-.header-progress-bar{width:120px;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
-.header-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px}
-.container{max-width:960px;margin:0 auto;padding:0 16px 60px}
-.series-info{text-align:center;padding:16px 0 0;font-size:13px;color:var(--text-dim);letter-spacing:.5px}
-.hero{text-align:center;padding:60px 0 48px;animation:fadeUp .8s ease both}
-.hero-day{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px}
-.hero-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:42px;color:var(--text-bright);line-height:1.2;margin-bottom:6px}
-.hero-title-en{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:20px;color:var(--text-dim);margin-bottom:32px}
 
-.gauge-wrap{display:flex;justify-content:center;margin-bottom:28px}
-.gauge-svg{width:100px;height:100px}
-.gauge-bg{fill:none;stroke:var(--surface2);stroke-width:6}
-.gauge-fill{fill:none;stroke:var(--gold);stroke-width:6;stroke-linecap:round;stroke-dasharray:251;transition:stroke-dashoffset 1s ease}
-.gauge-text{font-family:'JetBrains Mono',monospace;font-size:16px;fill:var(--gold-light);text-anchor:middle}
-.gauge-label{font-size:9px;fill:var(--text-dim);text-anchor:middle}
-.meta-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
-.meta-badge{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:13px;color:var(--text-dim)}
-.meta-badge span{color:var(--text-bright);font-weight:400}
-.section{margin-top:56px;padding:28px 0 16px;break-inside:avoid;animation:fadeUp .6s ease both}
-.section-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-.section-title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:28px;color:var(--text-bright);margin-bottom:20px}
-.brain-box{background:linear-gradient(135deg,rgba(138,106,191,.1),rgba(138,106,191,.04));border:1px solid rgba(138,106,191,.3);border-radius:16px;padding:28px 32px}
-.brain-box h3{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--purple);margin-bottom:16px}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Rajdhani','Noto Sans KR',sans-serif;
+  font-weight:400;
+  line-height:1.8;
+  -webkit-font-smoothing:antialiased;
+  position:relative;
+  overflow-x:hidden
+}
+
+/* ── Scanline Overlay ── */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:9999;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    var(--scanline) 2px,
+    var(--scanline) 4px
+  );
+  opacity:0.4
+}
+
+/* ── Grid Background ── */
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(0,229,255,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(255,45,120,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(41,121,255,0.03) 0%, transparent 50%);
+}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--cyan);border-radius:2px;box-shadow:0 0 8px var(--cyan)}
+
+/* ══════ STICKY HEADER — HUD Cockpit ══════ */
+.sticky-header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:linear-gradient(180deg,rgba(3,7,18,0.97),rgba(3,7,18,0.92));
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border-glow);
+  padding:10px 0;
+  box-shadow:0 0 20px rgba(0,229,255,0.1),inset 0 -1px 0 rgba(0,229,255,0.2)
+}
+.header-inner{max-width:960px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
+.header-brand{
+  font-family:'Orbitron',sans-serif;
+  font-weight:700;
+  font-size:14px;
+  color:var(--cyan);
+  text-shadow:0 0 12px rgba(0,229,255,0.6);
+  letter-spacing:2px;
+  text-transform:uppercase
+}
+.header-brand a{color:inherit;text-decoration:none}
+.header-progress-wrap{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-dim);font-family:'Share Tech Mono',monospace}
+.header-progress-bar{
+  width:140px;
+  height:6px;
+  background:rgba(0,229,255,0.08);
+  border-radius:3px;
+  overflow:hidden;
+  border:1px solid rgba(0,229,255,0.2);
+  position:relative
+}
+.header-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--cyan),var(--magenta));
+  border-radius:3px;
+  box-shadow:0 0 12px rgba(0,229,255,0.6);
+  position:relative;
+  animation:boostPulse 2s ease-in-out infinite
+}
+@keyframes boostPulse{0%,100%{opacity:1}50%{opacity:0.7}}
+
+.container{max-width:960px;margin:0 auto;padding:0 16px 60px}
+
+/* ══════ SERIES INFO ══════ */
+.series-info{
+  text-align:center;
+  padding:16px 0 0;
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;
+  color:var(--text-dim);
+  letter-spacing:3px;
+  text-transform:uppercase
+}
+
+/* ══════ HERO — Race Start ══════ */
+.hero{text-align:center;padding:60px 0 48px;animation:fadeUp .8s ease both;position:relative}
+.hero::before{
+  content:'';
+  position:absolute;
+  top:0;left:50%;
+  transform:translateX(-50%);
+  width:200px;height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  box-shadow:0 0 20px var(--cyan)
+}
+.hero-day{
+  font-family:'Orbitron',sans-serif;
+  font-size:13px;
+  color:var(--magenta);
+  letter-spacing:6px;
+  text-transform:uppercase;
+  margin-bottom:14px;
+  text-shadow:0 0 10px rgba(255,45,120,0.5)
+}
+.hero-title{
+  font-family:'Orbitron',sans-serif;
+  font-weight:800;
+  font-size:36px;
+  color:var(--text-bright);
+  line-height:1.3;
+  margin-bottom:8px;
+  text-shadow:0 0 30px rgba(0,229,255,0.2);
+  background:linear-gradient(135deg,var(--text-bright),var(--cyan-light));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text
+}
+.hero-title-en{
+  font-family:'Orbitron',sans-serif;
+  font-weight:400;
+  font-size:16px;
+  color:var(--text-dim);
+  margin-bottom:32px;
+  letter-spacing:3px
+}
+
+/* ── Gauge — Boost Meter ── */
+.gauge-wrap{display:flex;justify-content:center;align-items:center;margin-bottom:28px}
+.gauge-svg{width:100px;height:100px;filter:drop-shadow(0 0 8px rgba(0,229,255,0.4))}
+.gauge-bg{fill:none;stroke:rgba(0,229,255,0.1);stroke-width:6}
+.gauge-fill{fill:none;stroke:url(#cyberGrad);stroke-width:6;stroke-linecap:round;stroke-dasharray:251;transition:stroke-dashoffset 1s ease}
+.gauge-text{font-family:'Orbitron',sans-serif;font-size:16px;fill:var(--cyan);text-anchor:middle}
+.gauge-label{font-family:'Share Tech Mono',monospace;font-size:9px;fill:var(--text-dim);text-anchor:middle;letter-spacing:2px}
+
+/* ── Meta Badges — Telemetry ── */
+.meta-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.meta-badge{
+  background:var(--cyan-dim);
+  border:1px solid var(--border-glow);
+  border-radius:4px;
+  padding:6px 14px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;
+  color:var(--text-dim);
+  position:relative;
+  clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)
+}
+.meta-badge span{color:var(--cyan-light);font-weight:500}
+
+/* ══════ SECTION — Data Panel ══════ */
+.section{
+  margin-top:48px;
+  padding:28px 0 16px;
+  break-inside:avoid;
+  animation:fadeUp .6s ease both;
+  position:relative
+}
+.section-label{
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;
+  color:var(--magenta);
+  letter-spacing:4px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+  text-shadow:0 0 8px rgba(255,45,120,0.4)
+}
+.section-title{
+  font-family:'Orbitron',sans-serif;
+  font-weight:700;
+  font-size:24px;
+  color:var(--text-bright);
+  margin-bottom:20px;
+  position:relative;
+  padding-left:16px
+}
+.section-title::before{
+  content:'';
+  position:absolute;
+  left:0;top:4px;bottom:4px;
+  width:3px;
+  background:linear-gradient(180deg,var(--cyan),var(--magenta));
+  border-radius:2px;
+  box-shadow:0 0 10px var(--cyan)
+}
+
+/* ══════ BRAIN BOX — AI System ══════ */
+.brain-box{
+  background:linear-gradient(135deg,rgba(179,136,255,0.08),rgba(179,136,255,0.02));
+  border:1px solid rgba(179,136,255,0.25);
+  border-radius:4px;
+  padding:24px 28px;
+  position:relative;
+  overflow:hidden
+}
+.brain-box::before{
+  content:'SYSTEM';
+  position:absolute;
+  top:8px;right:12px;
+  font-family:'Orbitron',sans-serif;
+  font-size:8px;
+  color:rgba(179,136,255,0.4);
+  letter-spacing:4px
+}
+.brain-box h3{font-family:'Orbitron',sans-serif;font-weight:600;font-size:16px;color:var(--purple);margin-bottom:14px}
 .brain-box p,.brain-box li{font-size:14px;color:var(--text);margin-bottom:8px}
 .brain-box ul{padding-left:20px}
 .brain-box li::marker{color:var(--purple)}
-.time-split{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
-.time-block{background:rgba(138,106,191,.08);border:1px solid rgba(138,106,191,.2);border-radius:8px;padding:10px;text-align:center;font-size:12px}
-.time-block .t-range{color:var(--purple);font-weight:700;font-size:13px;display:block;margin-bottom:2px}
-.time-block .t-desc{color:var(--text-dim)}
-.intuition-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 32px}
-.intuition-card p{font-size:15px;margin-bottom:12px}
-.highlight{color:var(--gold-light);font-weight:400}
-.deriv-card{background:var(--surface);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;padding:24px 28px;margin-bottom:20px}
-.deriv-step-num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
 
+/* ── Time Split ── */
+.time-split{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.time-block{
+  background:rgba(179,136,255,0.06);
+  border:1px solid rgba(179,136,255,0.15);
+  border-radius:4px;
+  padding:10px;
+  text-align:center;
+  font-size:12px
+}
+.time-block .t-range{color:var(--purple);font-family:'Share Tech Mono',monospace;font-weight:700;font-size:13px;display:block;margin-bottom:2px}
+.time-block .t-desc{color:var(--text-dim)}
+
+/* ══════ INTUITION CARD — Cockpit Display ══════ */
+.intuition-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:24px 28px;
+  position:relative;
+  overflow:hidden
+}
+.intuition-card::after{
+  content:'';
+  position:absolute;
+  top:0;right:0;
+  width:60px;height:60px;
+  background:linear-gradient(225deg,rgba(0,229,255,0.1),transparent);
+  pointer-events:none
+}
+.intuition-card p{font-size:15px;margin-bottom:12px}
+.highlight{color:var(--cyan-light);font-weight:500;text-shadow:0 0 6px rgba(0,229,255,0.3)}
+
+/* ══════ DERIVATION CARD — Telemetry Log ══════ */
+.deriv-card{
+  background:var(--surface);
+  border-left:3px solid;
+  border-image:linear-gradient(180deg,var(--cyan),var(--magenta)) 1;
+  border-radius:0 4px 4px 0;
+  padding:20px 24px;
+  margin-bottom:16px;
+  position:relative
+}
+.deriv-step-num{
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;
+  color:var(--cyan);
+  letter-spacing:4px;
+  text-transform:uppercase;
+  margin-bottom:10px;
+  text-shadow:0 0 6px rgba(0,229,255,0.4)
+}
 .deriv-explain{font-size:14px;color:var(--text)}
-.deriv-explain .label{color:var(--blue);font-weight:400}
+.deriv-explain .label{color:var(--cyan-light);font-weight:500}
 .deriv-explain p{margin-bottom:8px}
-.arrow-connector{text-align:center;color:var(--gold);font-size:24px;margin:-8px 0 12px;opacity:.5}
-.checkpoint{background:rgba(74,191,138,.08);border:1px solid rgba(74,191,138,.25);border-radius:10px;padding:14px 20px;margin:24px 0;font-size:14px;color:var(--green)}
-.param-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+
+.arrow-connector{text-align:center;color:var(--cyan);font-size:24px;margin:-8px 0 12px;opacity:.5;text-shadow:0 0 8px var(--cyan)}
+
+/* ══════ CHECKPOINT — Pit Stop ══════ */
+.checkpoint{
+  background:rgba(0,230,118,0.06);
+  border:1px solid rgba(0,230,118,0.2);
+  border-radius:4px;
+  padding:14px 20px;
+  margin:24px 0;
+  font-size:14px;
+  color:var(--green);
+  font-family:'Rajdhani','Noto Sans KR',sans-serif;
+  position:relative
+}
+
+/* ══════ PARAM TABLE — Data Grid ══════ */
+.param-table-wrap{
+  overflow-x:auto;
+  border-radius:4px;
+  border:1px solid var(--border-glow);
+  box-shadow:0 0 12px rgba(0,229,255,0.05)
+}
 table.param-table{width:100%;border-collapse:collapse;font-size:13px}
-table.param-table th{background:var(--surface2);color:var(--gold);font-family:'JetBrains Mono',monospace;font-weight:500;padding:12px 14px;text-align:left;border-bottom:1px solid var(--border);font-size:11px;letter-spacing:1px;text-transform:uppercase}
+table.param-table th{
+  background:rgba(0,229,255,0.08);
+  color:var(--cyan);
+  font-family:'Orbitron',sans-serif;
+  font-weight:500;
+  padding:12px 14px;
+  text-align:left;
+  border-bottom:1px solid var(--border-glow);
+  font-size:10px;
+  letter-spacing:2px;
+  text-transform:uppercase
+}
 table.param-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top}
 table.param-table tr:last-child td{border-bottom:none}
-.sym{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:15px}
-.simpack-module{background:var(--surface);border:1px solid rgba(74,158,191,.3);border-radius:16px;overflow:hidden}
-.simpack-header{background:linear-gradient(135deg,rgba(74,158,191,.15),rgba(74,158,191,.05));padding:16px 28px;border-bottom:1px solid rgba(74,158,191,.2);display:flex;align-items:center;gap:10px}
-.simpack-badge{background:var(--blue);color:#fff;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;padding:3px 10px;border-radius:4px;letter-spacing:1px}
-.simpack-header span{color:var(--blue);font-weight:400;font-size:15px}
-.simpack-body{padding:24px 28px}
-.simpack-row{background:var(--surface2);border-radius:10px;padding:16px 20px;margin-bottom:12px}
-.simpack-row .sp-sym{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:16px;font-weight:500}
-.simpack-row .sp-path{font-family:'JetBrains Mono',monospace;color:var(--blue);font-size:12px;margin:6px 0}
+table.param-table tr:hover td{background:rgba(0,229,255,0.03)}
+.sym{font-family:'Share Tech Mono',monospace;color:var(--cyan-light);font-size:15px}
+
+/* ══════ SIMPACK MODULE — External Link ══════ */
+.simpack-module{
+  background:var(--surface);
+  border:1px solid rgba(41,121,255,0.25);
+  border-radius:4px;
+  overflow:hidden
+}
+.simpack-header{
+  background:linear-gradient(135deg,rgba(41,121,255,0.12),rgba(41,121,255,0.04));
+  padding:14px 24px;
+  border-bottom:1px solid rgba(41,121,255,0.2);
+  display:flex;
+  align-items:center;
+  gap:10px
+}
+.simpack-badge{
+  background:var(--blue);
+  color:#fff;
+  font-family:'Orbitron',sans-serif;
+  font-size:9px;
+  font-weight:600;
+  padding:3px 10px;
+  border-radius:2px;
+  letter-spacing:2px
+}
+.simpack-header span{color:var(--blue);font-weight:500;font-size:14px}
+.simpack-body{padding:20px 24px}
+.simpack-row{
+  background:rgba(41,121,255,0.05);
+  border:1px solid rgba(41,121,255,0.12);
+  border-radius:4px;
+  padding:14px 18px;
+  margin-bottom:10px
+}
+.simpack-row .sp-sym{font-family:'Share Tech Mono',monospace;color:var(--cyan-light);font-size:15px;font-weight:500}
+.simpack-row .sp-path{font-family:'Share Tech Mono',monospace;color:var(--blue);font-size:12px;margin:6px 0}
 .simpack-row .sp-detail{font-size:13px;color:var(--text-dim)}
-.sp-warn{background:rgba(191,106,74,.1);border:1px solid rgba(191,106,74,.3);border-radius:8px;padding:10px 14px;margin-top:8px;font-size:12px;color:var(--orange)}
-.accordion{border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.accordion-toggle{width:100%;background:var(--surface);border:none;padding:18px 24px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;color:var(--text-bright);font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:400}
-.accordion-toggle:hover{background:var(--surface2)}
-.accordion-arrow{color:var(--gold);font-size:18px;transition:transform .3s}
-.accordion-content{display:none;background:var(--surface);padding:0}
+.sp-warn{
+  background:rgba(255,145,0,0.08);
+  border:1px solid rgba(255,145,0,0.25);
+  border-radius:4px;
+  padding:10px 14px;
+  margin-top:8px;
+  font-size:12px;
+  color:var(--orange)
+}
+
+/* ══════ ACCORDION — DEEP DIVE Panels ══════ */
+.accordion{
+  border:1px solid var(--border);
+  border-radius:4px;
+  overflow:hidden;
+  transition:border-color 0.3s
+}
+.accordion:hover{border-color:var(--border-glow)}
+.accordion-toggle{
+  width:100%;
+  background:var(--surface);
+  border:none;
+  padding:16px 20px;
+  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:var(--text-bright);
+  font-family:'Rajdhani','Noto Sans KR',sans-serif;
+  font-size:15px;
+  font-weight:500;
+  transition:all 0.2s
+}
+.accordion-toggle:hover{
+  background:rgba(0,229,255,0.04);
+  color:var(--cyan-light)
+}
+.accordion-arrow{color:var(--cyan);font-size:18px;transition:transform .3s;text-shadow:0 0 6px rgba(0,229,255,0.4)}
+.accordion-content{display:none;background:rgba(3,7,18,0.6);padding:0}
 .accordion-content.open{display:block;padding:0}
-.accordion-inner{padding:0 24px 24px}
+.accordion-inner{padding:0 20px 20px}
 .accordion-inner p{font-size:14px;margin-bottom:10px}
 .accordion-inner .deriv-equation{margin-top:12px}
-.quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:16px}
-.quiz-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:10px}
-.quiz-q{font-size:15px;color:var(--text-bright);margin-bottom:16px;font-weight:400}
+
+/* ══════ QUIZ — Race Challenge ══════ */
+.quiz-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:24px 28px;
+  margin-bottom:16px;
+  position:relative
+}
+.quiz-num{
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;
+  color:var(--magenta);
+  letter-spacing:3px;
+  margin-bottom:10px;
+  text-shadow:0 0 6px rgba(255,45,120,0.4)
+}
+.quiz-q{font-size:15px;color:var(--text-bright);margin-bottom:16px;font-weight:500}
 .quiz-options{display:grid;gap:8px}
-.quiz-opt{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;cursor:pointer;font-size:14px;color:var(--text);transition:all .2s}
-.quiz-opt:hover{border-color:var(--gold);color:var(--text-bright)}
-.quiz-opt.correct{background:rgba(74,191,138,.12);border-color:var(--green);color:var(--green)}
-.quiz-opt.wrong{background:rgba(191,74,74,.12);border-color:#bf4a4a;color:#bf4a4a}
-.quiz-opt.disabled{pointer-events:none;opacity:.7}
-.quiz-feedback{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;display:none}
+.quiz-opt{
+  background:rgba(0,229,255,0.03);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:12px 16px;
+  cursor:pointer;
+  font-size:14px;
+  color:var(--text);
+  transition:all .2s;
+  font-family:'Rajdhani','Noto Sans KR',sans-serif
+}
+.quiz-opt:hover{border-color:var(--cyan);color:var(--cyan-light);box-shadow:0 0 10px rgba(0,229,255,0.15)}
+.quiz-opt.correct{background:rgba(0,230,118,0.1);border-color:var(--green);color:var(--green);box-shadow:0 0 12px rgba(0,230,118,0.2)}
+.quiz-opt.wrong{background:rgba(255,45,120,0.1);border-color:var(--magenta);color:var(--magenta)}
+.quiz-opt.disabled{pointer-events:none;opacity:.6}
+
+.quiz-feedback{margin-top:10px;padding:10px 14px;border-radius:4px;font-size:13px;display:none}
 .quiz-feedback.show{display:block}
-.quiz-feedback.correct-fb{background:rgba(74,191,138,.08);color:var(--green)}
-.quiz-feedback.wrong-fb{background:rgba(191,74,74,.08);color:#bf4a4a}
-.solution-panel{display:none;margin-top:16px;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.2);border-radius:12px;overflow:hidden;animation:solReveal .4s ease}
+.quiz-feedback.correct-fb{background:rgba(0,230,118,0.06);color:var(--green)}
+.quiz-feedback.wrong-fb{background:rgba(255,45,120,0.06);color:var(--magenta)}
+
+/* ══════ SOLUTION PANEL ══════ */
+.solution-panel{
+  display:none;margin-top:16px;
+  background:linear-gradient(135deg,rgba(0,229,255,0.04),rgba(0,229,255,0.01));
+  border:1px solid rgba(0,229,255,0.15);
+  border-radius:4px;
+  overflow:hidden;
+  animation:solReveal .4s ease
+}
 .solution-panel.show{display:block}
 @keyframes solReveal{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.sol-header{background:rgba(201,168,76,.1);padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);font-weight:500;letter-spacing:1px;border-bottom:1px solid rgba(201,168,76,.15)}
-.sol-step{padding:10px 20px;font-size:13px;color:var(--text);border-bottom:1px solid rgba(201,168,76,.08);display:flex;align-items:baseline;gap:12px}
+.sol-header{
+  background:rgba(0,229,255,0.08);
+  padding:10px 20px;
+  font-family:'Orbitron',sans-serif;
+  font-size:11px;
+  color:var(--cyan);
+  font-weight:600;
+  letter-spacing:3px;
+  border-bottom:1px solid rgba(0,229,255,0.12)
+}
+.sol-step{padding:10px 20px;font-size:13px;color:var(--text);border-bottom:1px solid rgba(0,229,255,0.06);display:flex;align-items:baseline;gap:12px}
 .sol-step:last-of-type{border-bottom:none}
-.sol-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);font-weight:500;min-width:50px;letter-spacing:1px;flex-shrink:0}
-.sol-step.highlight-step{background:rgba(201,168,76,.08)}
-.sol-insight{padding:16px 20px;background:rgba(74,191,138,.06);border-top:1px solid rgba(74,191,138,.15);font-size:13px;color:var(--text);line-height:1.9}
+.sol-num{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan);font-weight:500;min-width:50px;letter-spacing:2px;flex-shrink:0}
+.sol-step.highlight-step{background:rgba(0,229,255,0.05)}
+.sol-insight{padding:14px 20px;background:rgba(0,230,118,0.04);border-top:1px solid rgba(0,230,118,0.12);font-size:13px;color:var(--text);line-height:1.9}
 .sol-insight strong{color:var(--green)}
-.footer{text-align:center;padding:40px 0 20px;font-size:12px;color:var(--text-dim);border-top:1px solid var(--border);margin-top:60px}
-.placeholder-box{background:var(--surface);border:2px dashed var(--border);border-radius:16px;padding:40px;text-align:center;color:var(--text-dim);font-size:14px;margin:20px 0}
+
+/* ══════ HERO EQUATION — Display HUD ══════ */
+.hero-equation{
+  background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(255,45,120,0.03));
+  border:1px solid rgba(0,229,255,0.2);
+  border-radius:4px;
+  padding:24px 32px;
+  margin:20px 0;
+  font-family:'Share Tech Mono',monospace;
+  font-size:18px;
+  color:var(--text-bright);
+  text-align:center;
+  position:relative;
+  overflow:hidden
+}
+.hero-equation::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  box-shadow:0 0 10px var(--cyan)
+}
+.hero-equation .katex-display{overflow:hidden!important}
+
+/* ══════ DERIV EQUATION ══════ */
+.deriv-equation{
+  background:rgba(0,229,255,0.03);
+  border-left:2px solid var(--cyan);
+  border-radius:0 4px 4px 0;
+  padding:16px 20px;
+  margin:12px 0;
+  font-family:'Share Tech Mono',monospace;
+  font-size:16px;
+  color:var(--text-bright);
+  overflow-x:auto;
+  position:relative
+}
+.deriv-equation::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;bottom:0;
+  width:2px;
+  box-shadow:0 0 8px var(--cyan)
+}
+
+/* ══════ KBOX — Formula Display ══════ */
+.kbox{
+  background:linear-gradient(135deg,rgba(0,229,255,0.05),rgba(0,229,255,0.01));
+  border:1px solid rgba(0,229,255,0.15);
+  border-radius:4px;
+  padding:16px 20px;
+  margin:12px 0;
+  text-align:center
+}
+
+/* ══════ TIP BOX — Renault Korea Pit Crew ══════ */
+.tip-box,.tip{
+  background:linear-gradient(135deg,rgba(255,45,120,0.06),rgba(255,45,120,0.02));
+  border:1px solid rgba(255,45,120,0.2);
+  border-radius:4px;
+  padding:16px 20px;
+  margin:12px 0;
+  font-size:14px;
+  color:var(--text);
+  position:relative
+}
+.tip-box::before,.tip::before{
+  content:'PIT CREW TIP';
+  font-family:'Orbitron',sans-serif;
+  font-size:8px;
+  letter-spacing:3px;
+  color:var(--magenta);
+  display:block;
+  margin-bottom:8px;
+  text-shadow:0 0 6px rgba(255,45,120,0.4)
+}
+
+/* ══════ FOOTER — Finish Line ══════ */
+.footer{
+  text-align:center;
+  padding:40px 0 20px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;
+  color:var(--text-dim);
+  border-top:1px solid var(--border);
+  margin-top:60px;
+  letter-spacing:2px;
+  position:relative
+}
+.footer::before{
+  content:'';
+  position:absolute;
+  top:-1px;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),var(--magenta),transparent);
+  box-shadow:0 0 12px rgba(0,229,255,0.3)
+}
+
+/* ══════ PLACEHOLDER ══════ */
+.placeholder-box{
+  background:var(--surface);
+  border:1px dashed var(--border-glow);
+  border-radius:4px;
+  padding:40px;
+  text-align:center;
+  color:var(--text-dim);
+  font-size:14px;
+  margin:20px 0
+}
 .placeholder-box .ph-icon{font-size:36px;margin-bottom:12px;display:block}
-.diagram-wrap{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin:20px 0;text-align:center;overflow-x:auto}
+
+/* ══════ DIAGRAM ══════ */
+.diagram-wrap{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:24px;
+  margin:20px 0;
+  text-align:center;
+  overflow-x:auto
+}
 .diagram-wrap svg{max-width:100%;height:auto}
-.diagram-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;text-align:center}
-@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-.hero-equation code{font-size:18px}.container{padding:0 16px 60px}.time-split{grid-template-columns:repeat(2,1fr)}.deriv-equation code{font-size:16px}}
+.diagram-label{
+  font-family:'Orbitron',sans-serif;
+  font-size:9px;
+  color:var(--cyan);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+  text-align:center
+}
 
-@media print{body{background:#fff;color:#222}.sticky-header{display:none}.hero{padding:20px 0}.diagram-wrap{border:1px solid #ccc}.quiz-opt{border:1px solid #999}code{color:#333}}
-.memory-hook{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:14px}
-.memory-hook strong{color:var(--gold-light)}
-.vehicle-example{background:linear-gradient(135deg,rgba(74,158,191,.08),rgba(74,158,191,.02));border:1px solid rgba(74,158,191,.25);border-radius:12px;padding:20px 24px;margin-top:20px}
-.vehicle-example h4{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:17px;color:var(--blue);margin-bottom:12px}
+/* ══════ MEMORY HOOK ══════ */
+.memory-hook{
+  background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(0,229,255,0.02));
+  border:1px solid rgba(0,229,255,0.15);
+  border-radius:4px;
+  padding:14px 18px;
+  margin:16px 0;
+  font-size:14px
+}
+.memory-hook strong{color:var(--cyan-light);text-shadow:0 0 6px rgba(0,229,255,0.3)}
+
+/* ══════ VEHICLE EXAMPLE ══════ */
+.vehicle-example{
+  background:linear-gradient(135deg,rgba(41,121,255,0.06),rgba(41,121,255,0.01));
+  border:1px solid rgba(41,121,255,0.2);
+  border-radius:4px;
+  padding:18px 22px;
+  margin-top:16px
+}
+.vehicle-example h4{font-family:'Orbitron',sans-serif;font-weight:600;font-size:14px;color:var(--blue);margin-bottom:10px}
 .vehicle-example p{font-size:13px;margin-bottom:6px}
-.vehicle-example .calc{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:13px;background:#0D1017;padding:6px 12px;border-radius:6px;display:inline-block;margin:4px 0}
+.vehicle-example .calc{font-family:'Share Tech Mono',monospace;color:var(--cyan-light);font-size:13px;background:rgba(0,229,255,0.05);padding:4px 10px;border-radius:2px;display:inline-block;margin:4px 0;border:1px solid rgba(0,229,255,0.1)}
 
-/* 인라인 수식도 부드럽게 */
-
-/* ══════ Mobile KaTeX Fix ══════ */
-.deriv-equation{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.deriv-equation code{white-space:normal;word-wrap:break-word}
+/* ══════ KaTeX SCROLLBAR FIX ══════ */
+.katex-display::-webkit-scrollbar{display:none}
+.katex-display{scrollbar-width:none}
 .katex{font-size:1.1em}
-@media(max-width:640px){
-  .hero-equation{padding:16px 20px !important;max-width:100%;overflow-x:auto !important;display:block !important;text-align:center}
-    .hero-equation code{font-size:15px !important;white-space:normal !important;word-break:break-all}
-  .deriv-equation{padding:12px 14px !important;margin-bottom:12px}
-    .deriv-equation code{font-size:14px !important}
-  .deriv-equation::before{width:2px}
-    .eq-tooltip{max-width:280px !important;font-size:12px !important}
-}
-@media(max-width:380px){
-      .hero-equation{padding:12px 14px !important}
-}
 
-/* ══════ Interactive Formula Explorer ══════ */
+/* ══════ EQUATION TOOLTIP ══════ */
 .eq-explorer{position:relative;cursor:pointer}
-.eq-tooltip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1A1E28,#12151C);border:1px solid var(--gold);border-radius:10px;padding:12px 16px;min-width:220px;max-width:340px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 12px rgba(201,168,76,.15);animation:tooltipIn .2s ease;pointer-events:none}
-.eq-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--gold)}
+.eq-tooltip{
+  display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,rgba(6,22,48,0.98),rgba(3,7,18,0.98));
+  border:1px solid var(--cyan);
+  border-radius:4px;
+  padding:12px 16px;
+  min-width:220px;max-width:340px;
+  z-index:200;
+  box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 20px rgba(0,229,255,0.2);
+  animation:tooltipIn .2s ease;
+  pointer-events:none
+}
+.eq-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--cyan)}
 .eq-explorer:hover .eq-tooltip,.eq-explorer:focus .eq-tooltip,.eq-explorer.active .eq-tooltip{display:block}
 @keyframes tooltipIn{from{opacity:0;transform:translateX(-50%) translateY(4px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-.eq-tooltip .tt-symbol{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--gold-light);font-weight:700;margin-bottom:6px}
+.eq-tooltip .tt-symbol{font-family:'Share Tech Mono',monospace;font-size:18px;color:var(--cyan-light);font-weight:700;margin-bottom:6px}
 .eq-tooltip .tt-name{font-size:13px;color:var(--text-bright);font-weight:400;margin-bottom:4px}
-.eq-tooltip .tt-unit{font-size:11px;color:var(--blue);font-family:'JetBrains Mono',monospace;margin-bottom:4px}
-.eq-tooltip .tt-xm3{font-size:12px;color:var(--green);padding:6px 8px;background:rgba(74,191,138,.08);border-radius:6px;margin-top:6px}
-.eq-tooltip .tt-xm3::before{content:'🚗 Ref: ';font-weight:700}
+.eq-tooltip .tt-unit{font-size:11px;color:var(--blue);font-family:'Share Tech Mono',monospace;margin-bottom:4px}
+.eq-tooltip .tt-xm3{font-size:12px;color:var(--green);padding:6px 8px;background:rgba(0,230,118,0.06);border-radius:4px;margin-top:6px}
+.eq-tooltip .tt-xm3::before{content:'DATA: ';font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px}
 .eq-tooltip .tt-meaning{font-size:12px;color:var(--text-dim);margin-top:4px;line-height:1.6}
+
+/* ══════ ANIMATIONS ══════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══════ RESPONSIVE ══════ */
+@media(max-width:640px){
+  .hero-title{font-size:24px}
+  .section-title{font-size:20px}
+  .hero-equation{padding:16px 18px!important;max-width:100%;overflow-x:auto!important;display:block!important;text-align:center}
+  .hero-equation code{font-size:15px!important;white-space:normal!important;word-break:break-all}
+  .deriv-equation{padding:12px 14px!important;margin-bottom:12px}
+  .deriv-equation code{font-size:14px!important}
+  .time-split{grid-template-columns:repeat(2,1fr)}
+  .eq-tooltip{max-width:280px!important;font-size:12px!important}
+  .meta-badge{clip-path:none;border-radius:4px}
+}
+
+@media print{
+  body{background:#fff;color:#222}
+  body::before,body::after{display:none}
+  .sticky-header{display:none}
+  .hero{padding:20px 0}
+  .diagram-wrap{border:1px solid #ccc}
+  .quiz-opt{border:1px solid #999}
+}
+
+
+
+/* ╔══════════════════════════════════════════════╗
+   ║  CYBER INTERACTIVE ENHANCEMENTS v2.0        ║
+   ╚══════════════════════════════════════════════╝ */
+
+/* ── 1. SYSTEM BOOT Overlay ── */
+.cyber-boot{
+  position:fixed;inset:0;z-index:99999;
+  background:#030712;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .6s ease,visibility .6s ease
+}
+.cyber-boot.done{opacity:0;visibility:hidden;pointer-events:none}
+.boot-logo{
+  font-family:'Orbitron',sans-serif;font-size:28px;font-weight:800;
+  background:linear-gradient(135deg,#00e5ff,#ff2d78);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;margin-bottom:24px;
+  animation:bootPulse 1s ease infinite alternate
+}
+.boot-status{
+  font-family:'Share Tech Mono',monospace;font-size:12px;
+  color:#4a6a8a;letter-spacing:3px;
+  overflow:hidden;white-space:nowrap;
+  border-right:2px solid #00e5ff;
+  animation:bootType 1.2s steps(24) forwards, bootBlink .5s step-end infinite alternate
+}
+.boot-bar-wrap{width:200px;height:3px;background:rgba(0,229,255,0.1);border-radius:2px;margin-top:16px;overflow:hidden}
+.boot-bar-fill{height:100%;width:0;background:linear-gradient(90deg,#00e5ff,#ff2d78);border-radius:2px;animation:bootFill 1.4s ease forwards}
+@keyframes bootPulse{from{opacity:.6;filter:brightness(.8)}to{opacity:1;filter:brightness(1.2)}}
+@keyframes bootType{from{width:0}to{width:24ch}}
+@keyframes bootBlink{50%{border-color:transparent}}
+@keyframes bootFill{0%{width:0}100%{width:100%}}
+
+/* ── 2. Gauge Boost Animation ── */
+@keyframes gaugeCharge{
+  0%{stroke-dashoffset:251}
+  100%{stroke-dashoffset:var(--gauge-target,100)}
+}
+@keyframes gaugeSpark{
+  0%,100%{filter:drop-shadow(0 0 4px rgba(0,229,255,0.3))}
+  50%{filter:drop-shadow(0 0 16px rgba(0,229,255,0.8)) drop-shadow(0 0 30px rgba(255,45,120,0.4))}
+}
+.gauge-svg.charged{animation:gaugeSpark 2s ease-in-out infinite}
+.gauge-svg.charged .gauge-fill{animation:gaugeCharge 1.5s cubic-bezier(.4,0,.2,1) forwards}
+
+/* Gauge particle ring */
+@keyframes orbitParticle{0%{transform:rotate(0deg) translateX(52px)}100%{transform:rotate(360deg) translateX(52px)}}
+.gauge-particle{
+  position:absolute;width:4px;height:4px;border-radius:50%;
+  background:#00e5ff;box-shadow:0 0 6px #00e5ff;
+  top:50%;left:50%;margin:-2px 0 0 -2px;
+  animation:orbitParticle 3s linear infinite;opacity:0;
+  transition:opacity .5s
+}
+.gauge-wrap{position:relative;display:flex;justify-content:center}
+.gauge-wrap.active .gauge-particle{opacity:1}
+
+/* ── 3. Card Hologram Hover ── */
+@keyframes holoShift{
+  0%{background-position:0% 0%}
+  100%{background-position:200% 200%}
+}
+@keyframes glitchFlicker{
+  0%,92%,100%{opacity:1;transform:translate(0)}
+  93%{opacity:.8;transform:translate(-2px,1px)}
+  95%{opacity:.9;transform:translate(1px,-1px)}
+  97%{opacity:.7;transform:translate(2px,0)}
+}
+.intuition-card,.brain-box,.deriv-card,.vehicle-example,.simpack-module,.checkpoint,.tip-box,.tip,.memory-hook{
+  transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease
+}
+.intuition-card:hover,.brain-box:hover,.deriv-card:hover,.vehicle-example:hover,.simpack-module:hover{
+  transform:translateY(-3px) scale(1.005);
+  box-shadow:0 8px 32px rgba(0,229,255,0.15),0 0 60px rgba(0,229,255,0.05);
+  border-color:rgba(0,229,255,0.4)
+}
+.intuition-card:hover::after,.brain-box:hover::before{
+  animation:glitchFlicker 2s linear infinite
+}
+
+/* Data stream on hover — top edge scanner */
+.intuition-card::before,.deriv-card::after,.vehicle-example::before{
+  content:'';position:absolute;top:0;left:0;width:0;height:1px;
+  background:linear-gradient(90deg,transparent,#00e5ff,#ff2d78,transparent);
+  box-shadow:0 0 10px #00e5ff;
+  transition:width .6s ease;pointer-events:none
+}
+.intuition-card:hover::before,.deriv-card:hover::after,.vehicle-example:hover::before{width:100%}
+
+/* ── 4. Accordion Cyber-Open ── */
+@keyframes accordionScan{
+  0%{height:0;opacity:0}
+  30%{height:100%;opacity:0.3}
+  100%{height:100%;opacity:1}
+}
+@keyframes dataStream{
+  0%{background-position:0 0}
+  100%{background-position:0 200px}
+}
+.accordion-content.cyber-open{
+  display:block!important;
+  animation:accordionScan .4s ease-out forwards;
+  overflow:hidden;
+  background:
+    linear-gradient(180deg,rgba(0,229,255,0.03) 0%,rgba(3,7,18,0.6) 10%),
+    rgba(3,7,18,0.6)
+}
+.accordion-toggle.active{
+  background:linear-gradient(90deg,rgba(0,229,255,0.08),rgba(255,45,120,0.04));
+  border-bottom:1px solid rgba(0,229,255,0.2)
+}
+.accordion-toggle.active .accordion-arrow{
+  color:#ff2d78;
+  text-shadow:0 0 8px rgba(255,45,120,0.6);
+  transform:rotate(180deg)
+}
+
+/* ── 5. Quiz BOOST / RETIRE Effects ── */
+@keyframes quizBoost{
+  0%{box-shadow:0 0 0 0 rgba(0,230,118,0.4)}
+  50%{box-shadow:0 0 20px 8px rgba(0,230,118,0.2),0 0 40px 16px rgba(0,230,118,0.1)}
+  100%{box-shadow:0 0 0 0 rgba(0,230,118,0)}
+}
+@keyframes quizRetire{
+  0%{box-shadow:0 0 0 0 rgba(255,45,120,0.4)}
+  50%{box-shadow:0 0 15px 6px rgba(255,45,120,0.2)}
+  100%{box-shadow:0 0 0 0 rgba(255,45,120,0)}
+}
+@keyframes correctPulse{
+  0%,100%{text-shadow:0 0 4px rgba(0,230,118,0.4)}
+  50%{text-shadow:0 0 16px rgba(0,230,118,0.8),0 0 30px rgba(0,230,118,0.3)}
+}
+.quiz-opt.correct{animation:quizBoost .8s ease-out}
+.quiz-opt.wrong{animation:quizRetire .6s ease-out}
+.quiz-feedback.correct-fb.show{animation:correctPulse 2s ease-in-out infinite}
+.quiz-card{transition:border-color .3s ease}
+.quiz-card.answered-correct{border-color:rgba(0,230,118,0.3)}
+.quiz-card.answered-wrong{border-color:rgba(255,45,120,0.2)}
+
+/* ── 6. Section HUD Entrance ── */
+@keyframes hudEntrance{
+  0%{opacity:0;transform:translateY(40px);filter:blur(4px)}
+  60%{opacity:0.7;filter:blur(0)}
+  100%{opacity:1;transform:translateY(0);filter:blur(0)}
+}
+.section{opacity:0;transform:translateY(40px)}
+.section.hud-visible{animation:hudEntrance .7s cubic-bezier(.22,.61,.36,1) forwards}
+
+/* Section label scanner line */
+.section-label{position:relative;overflow:hidden}
+.section.hud-visible .section-label::after{
+  content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,45,120,0.3),transparent);
+  animation:labelScan .8s ease .2s forwards
+}
+@keyframes labelScan{0%{left:-100%}100%{left:200%}}
+
+/* ── 7. Circuit Particle Background ── */
+#cyberParticles{
+  position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:0.4
+}
+
+/* ── 8. Progress Bar Nitro Flame ── */
+@keyframes nitroFlame{
+  0%{box-shadow:0 0 8px rgba(0,229,255,0.6),4px 0 12px rgba(255,45,120,0.3)}
+  50%{box-shadow:0 0 16px rgba(0,229,255,0.9),6px 0 20px rgba(255,45,120,0.5)}
+  100%{box-shadow:0 0 8px rgba(0,229,255,0.6),4px 0 12px rgba(255,45,120,0.3)}
+}
+.header-progress-fill{animation:nitroFlame 1.5s ease-in-out infinite,boostPulse 2s ease-in-out infinite}
+.header-progress-fill::after{
+  content:'';position:absolute;right:-3px;top:-3px;bottom:-3px;width:8px;
+  background:radial-gradient(circle,rgba(255,45,120,0.8),transparent);
+  border-radius:50%;filter:blur(2px)
+}
+
+/* ── 9. Hero Equation Glow Pulse ── */
+@keyframes eqGlow{
+  0%,100%{box-shadow:0 0 12px rgba(0,229,255,0.1),inset 0 0 12px rgba(0,229,255,0.02)}
+  50%{box-shadow:0 0 24px rgba(0,229,255,0.2),inset 0 0 20px rgba(0,229,255,0.04),0 0 60px rgba(0,229,255,0.05)}
+}
+.hero-equation{animation:eqGlow 4s ease-in-out infinite}
+
+/* ── 10. Quiz Num Counter Effect ── */
+.quiz-num{position:relative;display:inline-block}
+.quiz-num::after{
+  content:'';position:absolute;bottom:-2px;left:0;width:100%;height:1px;
+  background:linear-gradient(90deg,#ff2d78,transparent);
+  box-shadow:0 0 6px rgba(255,45,120,0.4)
+}
+
+/* ── 11. Table Row Hover Scanner ── */
+table.param-table tr{transition:background .3s ease}
+table.param-table tbody tr:hover td{
+  background:rgba(0,229,255,0.06);
+  text-shadow:0 0 4px rgba(0,229,255,0.2)
+}
+
+/* ── 12. Floating Tooltip Enhancement ── */
+.eq-explorer:hover .eq-tooltip{
+  animation:tooltipIn .2s ease, tooltipGlow 2s ease-in-out infinite .3s;
+}
+@keyframes tooltipGlow{
+  0%,100%{box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 20px rgba(0,229,255,0.2)}
+  50%{box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 30px rgba(0,229,255,0.35),0 0 60px rgba(0,229,255,0.1)}
+}
+
+/* ── 13. Checkpoint Pit Stop Indicator ── */
+.checkpoint{position:relative;overflow:hidden}
+.checkpoint::after{
+  content:'PIT STOP';position:absolute;top:8px;right:12px;
+  font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:3px;
+  color:rgba(0,230,118,0.3)
+}
+
+/* ── 14. Scroll Progress Indicator (top bar) ── */
+#scrollProgress{
+  position:fixed;top:0;left:0;height:2px;z-index:9998;
+  background:linear-gradient(90deg,#00e5ff,#ff2d78);
+  box-shadow:0 0 10px #00e5ff;
+  width:0;transition:width 50ms linear
+}
+
+/* ── 15. KBox formula shimmer ── */
+@keyframes kboxShimmer{
+  0%{background-position:-200% 0}
+  100%{background-position:200% 0}
+}
+.kbox{
+  background:linear-gradient(90deg,rgba(0,229,255,0.03),rgba(0,229,255,0.08),rgba(0,229,255,0.03));
+  background-size:200% 100%;
+  animation:kboxShimmer 6s ease-in-out infinite
+}
+
+/* ── Korean Font Fix: Orbitron → Noto Sans KR for Korean text ── */
+.hero-title{font-family:'Noto Sans KR','Rajdhani',sans-serif!important;font-weight:700;-webkit-text-fill-color:transparent}
+.hero-title-en{font-family:'Orbitron',sans-serif!important;font-weight:400}
+.section-title{font-family:'Noto Sans KR','Rajdhani',sans-serif!important;font-weight:700}
+.brain-box h3{font-family:'Noto Sans KR','Rajdhani',sans-serif!important;font-weight:600}
+.vehicle-example h4{font-family:'Noto Sans KR','Rajdhani',sans-serif!important;font-weight:600}
+.intuition-card p,.deriv-explain p,.accordion-inner p,.brain-box p{font-family:'Noto Sans KR','Rajdhani',sans-serif}
+.quiz-q{font-family:'Noto Sans KR','Rajdhani',sans-serif!important}
+.quiz-opt{font-family:'Noto Sans KR','Rajdhani',sans-serif!important}
+.part-title{font-family:'Noto Sans KR','Rajdhani',sans-serif!important;font-weight:700}
+
+/* ── Readability Improvements ── */
+.accordion-toggle{font-family:'Noto Sans KR','Rajdhani',sans-serif;font-weight:500}
+.deriv-card{margin-bottom:20px}
+.section{margin-top:52px}
+.checkpoint{font-family:'Noto Sans KR','Rajdhani',sans-serif}
 
 </style>
 
@@ -161,50 +976,50 @@ table.param-table tr:last-child td{border-bottom:none}
 /* Hero equation - 메인 수식 */
 .hero-equation .katex-display{margin:0!important;padding:0!important;overflow:hidden!important}
 .katex-display::-webkit-scrollbar{display:none}.katex-display{scrollbar-width:none}
-.hero-equation .katex{font-size:1.5em!important;color:#E8C96A!important}
-.hero-equation .katex .mord{color:#E8C96A!important}
-.hero-equation .katex .mbin{color:#4A9EBF!important}
-.hero-equation .katex .mrel{color:#4ABF8A!important}
-.hero-equation .katex .mop{color:#E8C96A!important}
+.hero-equation .katex{font-size:1.5em!important;color:#67f0ff!important}
+.hero-equation .katex .mord{color:#67f0ff!important}
+.hero-equation .katex .mbin{color:#2979ff!important}
+.hero-equation .katex .mrel{color:#00e676!important}
+.hero-equation .katex .mop{color:#67f0ff!important}
 .hero-equation .katex .mopen,.hero-equation .katex .mclose{color:#BF8A4A!important}
-.hero-equation .katex .sqrt .sqrt-sign{color:#C9A84C!important}
-.hero-equation .katex .frac-line{border-bottom-color:#C9A84C!important}
-.hero-equation .katex .accent-body{color:#E8C96A!important}
+.hero-equation .katex .sqrt .sqrt-sign{color:#00e5ff!important}
+.hero-equation .katex .frac-line{border-bottom-color:#00e5ff!important}
+.hero-equation .katex .accent-body{color:#67f0ff!important}
 
 /* Derivation equation - 유도 단계 수식 */
 .deriv-equation .katex-display{margin:0!important;padding:0!important}
-.deriv-equation .katex{font-size:1.15em!important;color:#E8C96A!important}
-.deriv-equation .katex .mord{color:#E8C96A!important}
-.deriv-equation .katex .mord.mathnormal{color:#E8C96A!important}
-.deriv-equation .katex .mbin{color:#4A9EBF!important}
-.deriv-equation .katex .mrel{color:#4ABF8A!important}
-.deriv-equation .katex .mop{color:#E8C96A!important}
-.deriv-equation .katex .sqrt .sqrt-sign{color:#C9A84C!important}
-.deriv-equation .katex .sqrt .vlist{color:#E8C96A!important}
-.deriv-equation .katex .frac-line{border-bottom-color:#C9A84C!important}
+.deriv-equation .katex{font-size:1.15em!important;color:#67f0ff!important}
+.deriv-equation .katex .mord{color:#67f0ff!important}
+.deriv-equation .katex .mord.mathnormal{color:#67f0ff!important}
+.deriv-equation .katex .mbin{color:#2979ff!important}
+.deriv-equation .katex .mrel{color:#00e676!important}
+.deriv-equation .katex .mop{color:#67f0ff!important}
+.deriv-equation .katex .sqrt .sqrt-sign{color:#00e5ff!important}
+.deriv-equation .katex .sqrt .vlist{color:#67f0ff!important}
+.deriv-equation .katex .frac-line{border-bottom-color:#00e5ff!important}
 .deriv-equation .katex .mopen,.deriv-equation .katex .mclose{color:#BF8A4A!important}
-.deriv-equation .katex .accent-body{color:#E8C96A!important}
+.deriv-equation .katex .accent-body{color:#67f0ff!important}
 
 /* 일반 영역 수식 */
-.katex{color:#E8C96A!important}
-.katex .mord{color:#E8C96A!important}
-.katex .mbin{color:#4A9EBF!important}
-.katex .mrel{color:#4ABF8A!important}
-.katex .mop{color:#E8C96A!important}
-.katex .frac-line{border-bottom-color:rgba(201,168,76,0.6)!important}
-.katex .sqrt .sqrt-sign{color:#C9A84C!important}
+.katex{color:#67f0ff!important}
+.katex .mord{color:#67f0ff!important}
+.katex .mbin{color:#2979ff!important}
+.katex .mrel{color:#00e676!important}
+.katex .mop{color:#67f0ff!important}
+.katex .frac-line{border-bottom-color:rgba(0,229,255,0.6)!important}
+.katex .sqrt .sqrt-sign{color:#00e5ff!important}
 
 /* katex-display 블록 스타일 */
 .katex-display{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:4px 0}
 .katex-display>.katex{text-align:center!important}
 
 /* Hero equation 박스 강화 */
-.hero-equation{display:inline-block;background:linear-gradient(135deg,#0D1017 0%,#151A25 100%);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:24px 48px;margin-bottom:32px;box-shadow:0 4px 20px rgba(201,168,76,0.1),0 0 40px rgba(201,168,76,0.03);position:relative;overflow:visible;max-width:100%}
-.hero-equation::before{content:'';position:absolute;inset:-1px;border-radius:16px;background:linear-gradient(135deg,rgba(201,168,76,0.2),transparent,rgba(201,168,76,0.1));z-index:0;pointer-events:none}
+.hero-equation{display:inline-block;background:linear-gradient(135deg,rgba(3,7,18,0.9) 0%,#151A25 100%);border:1px solid rgba(0,229,255,0.3);border-radius:16px;padding:24px 48px;margin-bottom:32px;box-shadow:0 4px 20px rgba(0,229,255,0.1),0 0 40px rgba(0,229,255,0.03);position:relative;overflow:visible;max-width:100%}
+.hero-equation::before{content:'';position:absolute;inset:-1px;border-radius:16px;background:linear-gradient(135deg,rgba(0,229,255,0.2),transparent,rgba(0,229,255,0.1));z-index:0;pointer-events:none}
 
 /* Deriv equation 박스 강화 */
-.deriv-equation{background:linear-gradient(135deg,rgba(13,16,23,0.8),rgba(21,26,37,0.6));border-left:3px solid #C9A84C;border-radius:0 12px 12px 0;padding:16px 20px;margin:12px 0;box-shadow:0 2px 12px rgba(0,0,0,0.3);transition:border-color 0.3s,box-shadow 0.3s}
-.deriv-equation:hover{border-left-color:#E8C96A;box-shadow:0 4px 16px rgba(201,168,76,0.15)}
+.deriv-equation{background:linear-gradient(135deg,rgba(13,16,23,0.8),rgba(21,26,37,0.6));border-left:3px solid #00e5ff;border-radius:0 12px 12px 0;padding:16px 20px;margin:12px 0;box-shadow:0 2px 12px rgba(0,0,0,0.3);transition:border-color 0.3s,box-shadow 0.3s}
+.deriv-equation:hover{border-left-color:#67f0ff;box-shadow:0 4px 16px rgba(0,229,255,0.15)}
 
 /* 모바일 반응형 */
 @media(max-width:640px){
@@ -224,7 +1039,7 @@ table.param-table tr:last-child td{border-bottom:none}
 td .katex,th .katex{font-size:0.9em!important}
 
 /* 수식 에러 폴백 */
-.katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
+.katex-error{color:#67f0ff;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
 
 <!-- KaTeX Auto-Render -->
@@ -259,7 +1074,7 @@ td .katex,th .katex{font-size:0.9em!important}
 <!-- ① STICKY HEADER -->
 <header class="sticky-header">
   <div class="header-inner">
-    <div class="header-brand"><a href="index.html" style="color:inherit;text-decoration:none;">YS · 진동학 마스터</a> / Day 31</div>
+    <div class="header-brand"><a href="index.html" style="color:inherit;text-decoration:none;">CYBER DYNAMICS</a> / Day 31</div>
     <div class="header-progress-wrap">
       <span>31 / 60</span>
       <div class="header-progress-bar"><div class="header-progress-fill" style="width:60%"></div></div>
@@ -270,7 +1085,7 @@ td .katex,th .katex{font-size:0.9em!important}
 
 <div class="container">
 
-<div class="series-info">이 시리즈 예상 총 Day: 52일 &nbsp;|&nbsp; PART 5 — Simpack 완전 통합</div>
+<div class="series-info">FUTURE GPX VEHICLE DYNAMICS — 60 DAY MASTER COURSE</div>
 
 <section class="hero">
   <div class="hero-day">— DAY 31 —</div>
@@ -279,8 +1094,9 @@ td .katex,th .katex{font-size:0.9em!important}
   <div class="hero-equation"><span class="katex-eq"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>C</mi><mi>o</mi><mi>r</mi><mi>r</mi><mi>e</mi><mi>l</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mi>A</mi><mi>n</mi><mi>a</mi><mi>l</mi><mi>y</mi><mi>s</mi><mi>i</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">Correlation Analysis</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mord mathnormal" style="margin-right:0.02778em;">or</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord mathnormal">n</span><span class="mord mathnormal">A</span><span class="mord mathnormal">na</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord mathnormal">s</span><span class="mord mathnormal">i</span><span class="mord mathnormal">s</span></span></span></span></span></span></div>
   <div class="gauge-wrap">
     <svg class="gauge-svg" viewBox="0 0 100 100">
+      <defs><linearGradient id="gGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#ff2d78"/></linearGradient></defs>
       <circle class="gauge-bg" cx="50" cy="50" r="40"/>
-      <circle class="gauge-fill" cx="50" cy="50" r="40" transform="rotate(-90 50 50)" style="stroke-dashoffset:101.5"/>
+      <circle class="gauge-fill" cx="50" cy="50" r="40" transform="rotate(-90 50 50)" style="stroke-dashoffset:101.5;stroke:url(#gGrad)"  />
       <text class="gauge-text" x="50" y="48">60%</text>
       <text class="gauge-label" x="50" y="62">DAY 31 / 60</text>
     </svg>
@@ -293,17 +1109,12 @@ td .katex,th .katex{font-size:0.9em!important}
   </div>
 </section>
 
-<div style="max-width:960px;margin:0 auto;padding:0 24px">
-  
-</div>
-
-
 <!-- ③ 뇌과학 학습 전략 -->
 <div class="section">
   <div class="section-label">INTUITION</div>
   <h2 class="section-title">왜 이 수식이 필요한가?</h2>
-    <div style="background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:14px 20px;margin:20px 0;font-size:13px;">
-      <strong style="color:var(--gold);">💡 수식 유도 읽는 법</strong> — 각 STEP의 <span style="color:var(--blue);">파란색 라벨</span>은 "왜 이 변환을 하는가"를 설명합니다. 수식만 보지 말고 <span style="color:var(--gold-light);">동기 $\rightarrow$ 변환 $\rightarrow$ 의미</span> 순서로 읽으세요. 눈으로 3번 읽는 것보다 <strong>손으로 1번 쓰는 것</strong>이 기억에 4배 효과적입니다.
+    <div style="background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(0,229,255,.03));border:1px solid rgba(0,229,255,.2);border-radius:10px;padding:14px 20px;margin:20px 0;font-size:13px;">
+      <strong style="color:var(--cyan);">💡 수식 유도 읽는 법</strong> — 각 STEP의 <span style="color:var(--blue);">파란색 라벨</span>은 "왜 이 변환을 하는가"를 설명합니다. 수식만 보지 말고 <span style="color:var(--cyan-light);">동기 $\rightarrow$ 변환 $\rightarrow$ 의미</span> 순서로 읽으세요. 눈으로 3번 읽는 것보다 <strong>손으로 1번 쓰는 것</strong>이 기억에 4배 효과적입니다.
     </div>
 
   <div class="intuition-card">
@@ -333,7 +1144,7 @@ td .katex,th .katex{font-size:0.9em!important}
       <div class="deriv-explain">
         <p><span class="label">이 항의 의미:</span> FRAC(Frequency Response Assurance Criterion)은 각 주파수에서 시뮬레이션과 실측 FRF의 유사도를 0~1로 평가합니다. 1에 가까울수록 일치.</p>
         <p><span class="label">부호/변환 이유:</span> FRAC은 크기만 비교하고 위상은 고려하지 않습니다. 위상까지 포함하면 Complex FRAC 사용.</p>
-        <p><span class="label">이전 단계와의 연결:</span> Day 25 Coherence $\gamma$²의 개념과 유사하지만, FRAC은 &#x27;두 FRF 간&#x27; 상관도입니다.</p>
+        <p><span class="label">이전 단계와의 연결:</span> Day 25 Coherence $\gamma^2$의 개념과 유사하지만, FRAC은 &#x27;두 FRF 간&#x27; 상관도입니다.</p>
       </div>
     </div>
     <div class="arrow-connector">↓</div>
@@ -363,14 +1174,14 @@ td .katex,th .katex{font-size:0.9em!important}
     </div>
 
 <!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
-<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
-  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
-  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue);">
+  <div class="deriv-step-num" style="color:var(--blue);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Orbitron',sans-serif;font-weight:600;font-size:20px;color:var(--text-bright);margin-bottom:16px;">중간 과정 완전 전개</h3>
   <div class="sub-step">
     <p class="sub-label">① FRF 측정 원리</p>
     <div class="sub-eq">$$H(f) = \frac{S_{xy}(f)}{S_{xx}(f)} = \frac{\text{Cross-PSD}}{\text{Input Auto-PSD}}$$</div>
     <div class="sub-eq">$$\text{Coherence: } \gamma^2(f) = \frac{|S_{xy}|^2}{S_{xx} \cdot S_{yy}} \leq 1$$</div>
-    <p class="sub-note">코히어런스 $\gamma$² $\approx$ 1이면 선형 입출력 관계 성립. $\gamma$² < 0.8이면 비선형/노이즈 의심</p>
+    <p class="sub-note">코히어런스 $\gamma^2$ $\approx$ 1이면 선형 입출력 관계 성립. $\gamma^2$ < 0.8이면 비선형/노이즈 의심</p>
   </div>
   <div class="sub-step">
     <p class="sub-label">② 시뮬레이션-시험 상관성 지표</p>
@@ -402,7 +1213,7 @@ td .katex,th .katex{font-size:0.9em!important}
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
             <thead>
                 <tr style="border-bottom:2px solid var(--gold);">
-                    <th style="padding:8px;text-align:left;color:var(--gold);">기호</th>
+                    <th style="padding:8px;text-align:left;color:var(--cyan);">기호</th>
                     <th style="padding:8px;text-align:left;">파라미터명</th>
                     <th style="padding:8px;text-align:left;">설명</th>
                     <th style="padding:8px;text-align:center;">단위</th>
@@ -410,25 +1221,25 @@ td .katex,th .katex{font-size:0.9em!important}
                 </tr>
             </thead>
             <tbody><tr>
-            <td style="color:var(--gold);font-family:'JetBrains Mono',monospace;font-weight:600;">H(f)</td>
+            <td style="color:var(--cyan);font-family:'JetBrains Mono',monospace;font-weight:600;">H(f)</td>
             <td>주파수응답함수</td>
             <td style="color:var(--text-dim)">입력-출력 관계</td>
             <td style="text-align:center">-</td>
             <td style="text-align:center;color:var(--blue)">복소수 함수</td>
         </tr><tr>
-            <td style="color:var(--gold);font-family:'JetBrains Mono',monospace;font-weight:600;">|H(f)|</td>
+            <td style="color:var(--cyan);font-family:'JetBrains Mono',monospace;font-weight:600;">|H(f)|</td>
             <td>FRF 크기</td>
             <td style="color:var(--text-dim)">진폭 비</td>
             <td style="text-align:center">-</td>
             <td style="text-align:center;color:var(--blue)">공진시 피크</td>
         </tr><tr>
-            <td style="color:var(--gold);font-family:'JetBrains Mono',monospace;font-weight:600;">$\phi$(f)</td>
+            <td style="color:var(--cyan);font-family:'JetBrains Mono',monospace;font-weight:600;">$\phi$(f)</td>
             <td>위상각</td>
             <td style="color:var(--text-dim)">입출력 위상차</td>
             <td style="text-align:center">rad</td>
             <td style="text-align:center;color:var(--blue)">0 ~ -$\pi$</td>
         </tr><tr>
-            <td style="color:var(--gold);font-family:'JetBrains Mono',monospace;font-weight:600;">$\gamma$²</td>
+            <td style="color:var(--cyan);font-family:'JetBrains Mono',monospace;font-weight:600;">$\gamma^2$</td>
             <td>코히런스</td>
             <td style="color:var(--text-dim)">상관 신뢰도</td>
             <td style="text-align:center">-</td>
@@ -444,53 +1255,55 @@ td .katex,th .katex{font-size:0.9em!important}
   <div class="diagram-wrap">
     <div class="diagram-label">FRF 크기 비교 (시뮬-실험)</div>
     <svg style="max-width:100%;height:auto;" viewBox="0 0 440 260" xmlns="http://www.w3.org/2000/svg">
-  <text x="220" y="20" text-anchor="middle" fill="#7A7A8A" font-size="12" font-family="JetBrains Mono">FRF Magnitude |H($\omega$)|</text>
-  <line x1="60" y1="30" x2="60" y2="230" stroke="#252A38" stroke-width="1.5"/>
-  <line x1="60" y1="230" x2="410" y2="230" stroke="#252A38" stroke-width="1.5"/>
-  <text x="420" y="235" fill="#7A7A8A" font-size="10">r</text>
-  <text x="30" y="35" fill="#7A7A8A" font-size="10">|H|</text>
-  <text x="50" y="228" text-anchor="end" fill="#7A7A8A" font-size="9">0</text>
-  <text x="220" y="248" text-anchor="middle" fill="#7A7A8A" font-size="9">1.0</text>
+  <defs><linearGradient id="cyberGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#ff2d78"/></linearGradient></defs>
+  <text x="220" y="20" text-anchor="middle" fill="#4a6a8a" font-size="12" font-family="JetBrains Mono">FRF Magnitude |H(ω)|</text>
+  <line x1="60" y1="30" x2="60" y2="230" stroke="rgba(0,229,255,0.15)" stroke-width="1.5"/>
+  <line x1="60" y1="230" x2="410" y2="230" stroke="rgba(0,229,255,0.15)" stroke-width="1.5"/>
+  <text x="420" y="235" fill="#4a6a8a" font-size="10">r</text>
+  <text x="30" y="35" fill="#4a6a8a" font-size="10">|H|</text>
+  <text x="50" y="228" text-anchor="end" fill="#4a6a8a" font-size="9">0</text>
+  <text x="220" y="248" text-anchor="middle" fill="#4a6a8a" font-size="9">1.0</text>
   <!-- ζ=0.1 (sharp peak) -->
-  <path d="M60,200 Q140,195 190,180 Q210,130 218,50 Q222,50 230,130 Q250,195 300,210 L400,215" fill="none" stroke="#BF6A4A" stroke-width="2"/>
-  <text x="405" y="218" fill="#BF6A4A" font-size="10">$\zeta$=0.1</text>
+  <path d="M60,200 Q140,195 190,180 Q210,130 218,50 Q222,50 230,130 Q250,195 300,210 L400,215" fill="none" stroke="#ff9100" stroke-width="2"/>
+  <text x="405" y="218" fill="#ff9100" font-size="10">ζ=0.1</text>
   <!-- ζ=0.3 -->
-  <path d="M60,200 Q140,190 190,170 Q210,140 220,100 Q230,140 250,175 Q300,200 400,210" fill="none" stroke="#4ABF8A" stroke-width="2"/>
-  <text x="405" y="212" fill="#4ABF8A" font-size="10">$\zeta$=0.3</text>
+  <path d="M60,200 Q140,190 190,170 Q210,140 220,100 Q230,140 250,175 Q300,200 400,210" fill="none" stroke="#00e676" stroke-width="2"/>
+  <text x="405" y="212" fill="#00e676" font-size="10">ζ=0.3</text>
   <!-- ζ=0.7 -->
-  <path d="M60,200 Q140,195 200,185 Q220,180 240,185 Q300,200 400,208" fill="none" stroke="#4A9EBF" stroke-width="2"/>
-  <text x="405" y="206" fill="#4A9EBF" font-size="10">$\zeta$=0.7</text>
+  <path d="M60,200 Q140,195 200,185 Q220,180 240,185 Q300,200 400,208" fill="none" stroke="#2979ff" stroke-width="2"/>
+  <text x="405" y="206" fill="#2979ff" font-size="10">ζ=0.7</text>
   <!-- Resonance line -->
-  <line x1="220" y1="30" x2="220" y2="230" stroke="#C9A84C" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="220" y1="30" x2="220" y2="230" stroke="url(#cyberGrad)" stroke-width="1" stroke-dasharray="4,4"/>
 </svg>
   </div>
   <div class="diagram-wrap">
     <div class="diagram-label">Simpack 워크플로우</div>
     <svg style="max-width:100%;height:auto;" viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg">
-  <text x="240" y="20" text-anchor="middle" fill="#7A7A8A" font-size="12" font-family="JetBrains Mono">Simpack Workflow</text>
-  <rect x="20" y="50" width="90" height="45" rx="6" fill="none" stroke="#4A9EBF" stroke-width="2"/>
-  <text x="65" y="72" text-anchor="middle" fill="#4A9EBF" font-size="10">Math Model</text>
-  <text x="65" y="87" text-anchor="middle" fill="#4A9EBF" font-size="9">EOM</text>
-  <rect x="140" y="50" width="90" height="45" rx="6" fill="none" stroke="#4ABF8A" stroke-width="2"/>
-  <text x="185" y="72" text-anchor="middle" fill="#4ABF8A" font-size="10">Simpack</text>
-  <text x="185" y="87" text-anchor="middle" fill="#4ABF8A" font-size="9">MBS Model</text>
-  <rect x="260" y="50" width="90" height="45" rx="6" fill="none" stroke="#8A6ABF" stroke-width="2"/>
-  <text x="305" y="72" text-anchor="middle" fill="#8A6ABF" font-size="10">Simulate</text>
-  <text x="305" y="87" text-anchor="middle" fill="#8A6ABF" font-size="9">FRF/Time</text>
-  <rect x="380" y="50" width="90" height="45" rx="6" fill="none" stroke="#C9A84C" stroke-width="2"/>
-  <text x="425" y="72" text-anchor="middle" fill="#C9A84C" font-size="10">Correlate</text>
-  <text x="425" y="87" text-anchor="middle" fill="#C9A84C" font-size="9">vs Test</text>
+  <defs><linearGradient id="cyberGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#ff2d78"/></linearGradient></defs>
+  <text x="240" y="20" text-anchor="middle" fill="#4a6a8a" font-size="12" font-family="JetBrains Mono">Simpack Workflow</text>
+  <rect x="20" y="50" width="90" height="45" rx="6" fill="none" stroke="#2979ff" stroke-width="2"/>
+  <text x="65" y="72" text-anchor="middle" fill="#2979ff" font-size="10">Math Model</text>
+  <text x="65" y="87" text-anchor="middle" fill="#2979ff" font-size="9">EOM</text>
+  <rect x="140" y="50" width="90" height="45" rx="6" fill="none" stroke="#00e676" stroke-width="2"/>
+  <text x="185" y="72" text-anchor="middle" fill="#00e676" font-size="10">Simpack</text>
+  <text x="185" y="87" text-anchor="middle" fill="#00e676" font-size="9">MBS Model</text>
+  <rect x="260" y="50" width="90" height="45" rx="6" fill="none" stroke="#b388ff" stroke-width="2"/>
+  <text x="305" y="72" text-anchor="middle" fill="#b388ff" font-size="10">Simulate</text>
+  <text x="305" y="87" text-anchor="middle" fill="#b388ff" font-size="9">FRF/Time</text>
+  <rect x="380" y="50" width="90" height="45" rx="6" fill="none" stroke="url(#cyberGrad)" stroke-width="2"/>
+  <text x="425" y="72" text-anchor="middle" fill="#00e5ff" font-size="10">Correlate</text>
+  <text x="425" y="87" text-anchor="middle" fill="#00e5ff" font-size="9">vs Test</text>
   <!-- Arrows -->
-  <line x1="110" y1="72" x2="135" y2="72" stroke="#D8D3C8" stroke-width="1.5"/>
-  <polygon points="133,68 140,72 133,76" fill="#D8D3C8"/>
-  <line x1="230" y1="72" x2="255" y2="72" stroke="#D8D3C8" stroke-width="1.5"/>
-  <polygon points="253,68 260,72 253,76" fill="#D8D3C8"/>
-  <line x1="350" y1="72" x2="375" y2="72" stroke="#D8D3C8" stroke-width="1.5"/>
-  <polygon points="373,68 380,72 373,76" fill="#D8D3C8"/>
+  <line x1="110" y1="72" x2="135" y2="72" stroke="#c0d8ef" stroke-width="1.5"/>
+  <polygon points="133,68 140,72 133,76" fill="#c0d8ef"/>
+  <line x1="230" y1="72" x2="255" y2="72" stroke="#c0d8ef" stroke-width="1.5"/>
+  <polygon points="253,68 260,72 253,76" fill="#c0d8ef"/>
+  <line x1="350" y1="72" x2="375" y2="72" stroke="#c0d8ef" stroke-width="1.5"/>
+  <polygon points="373,68 380,72 373,76" fill="#c0d8ef"/>
   <!-- Feedback -->
-  <path d="M425,95 L425,130 L65,130 L65,95" fill="none" stroke="#BF6A4A" stroke-width="1.5" stroke-dasharray="5,3"/>
-  <polygon points="61,97 65,90 69,97" fill="#BF6A4A"/>
-  <text x="240" y="148" text-anchor="middle" fill="#BF6A4A" font-size="10">Parameter Update Loop</text>
+  <path d="M425,95 L425,130 L65,130 L65,95" fill="none" stroke="#ff9100" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <polygon points="61,97 65,90 69,97" fill="#ff9100"/>
+  <text x="240" y="148" text-anchor="middle" fill="#ff9100" font-size="10">Parameter Update Loop</text>
 </svg>
   </div>
 </div>
@@ -500,10 +1313,10 @@ td .katex,th .katex{font-size:0.9em!important}
   <div class="simpack-mapping">
         <h3 style="color:var(--blue);font-size:14px;margin-bottom:12px;">Simpack 파라미터 매핑</h3>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;">
-            <span style="color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:13px;">FRF Analysis $\rightarrow$ Post Processing</span>
+            <span style="color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:13px;">FRF Analysis $\rightarrow$ Post Processing</span>
             <span style="color:var(--text-dim);font-size:12px;">시뮬레이션 결과 FRF 추출</span>
         </div><div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;">
-            <span style="color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:13px;">Correlation $\rightarrow$ Comparison</span>
+            <span style="color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:13px;">Correlation $\rightarrow$ Comparison</span>
             <span style="color:var(--text-dim);font-size:12px;">시험 데이터 vs 시뮬레이션</span>
         </div>
     </div>
@@ -521,8 +1334,8 @@ td .katex,th .katex{font-size:0.9em!important}
       <div class="accordion-content">
         <div class="accordion-inner">
         <p>상세 콘텐츠가 여기에 추가됩니다.</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">상관성 지표: FRAC$(f) = \frac{|H_{sim}(f) \cdot H_{test}^*(f)|^2}{|H_{sim}|^2 \cdot |H_{test}|^2} \rightarrow FRAC > 0.8$이면 양호</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">주파수 오차: $\varepsilon_f = \frac{|f_{sim} - f_{test}|}{f_{test}} \times 100\% \rightarrow$ 목표 $< 5\%$</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">상관성 지표: FRAC$(f) = \frac{|H_{sim}(f) \cdot H_{test}^*(f)|^2}{|H_{sim}|^2 \cdot |H_{test}|^2} \rightarrow FRAC > 0.8$이면 양호</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">주파수 오차: $\varepsilon_f = \frac{|f_{sim} - f_{test}|}{f_{test}} \times 100\% \rightarrow$ 목표 $< 5\%$</p>
         </div>
       </div>
     
@@ -534,8 +1347,8 @@ td .katex,th .katex{font-size:0.9em!important}
       <div class="accordion-content" id="deepdive2">
         <div class="accordion-inner">
         <p><strong>■ 개념</strong></p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">민감도: $S_{ij} = \frac{\partial \omega_i}{\partial p_j} \rightarrow$ 파라미터 $p_j$ 변화에 대한 고유진동수 민감도</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">최적화: $\min_p \sum_i w_i (f_{sim,i}(p) - f_{test,i})^2 \rightarrow$ 가중 최소자승법</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">민감도: $S_{ij} = \frac{\partial \omega_i}{\partial p_j} \rightarrow$ 파라미터 $p_j$ 변화에 대한 고유진동수 민감도</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">최적화: $\min_p \sum_i w_i (f_{sim,i}(p) - f_{test,i})^2 \rightarrow$ 가중 최소자승법</p>
 <p>시뮬레이션과 실측의 차이를 최소화하도록 파라미터 조정</p>
 <p>목적 함수: J = Σ wᵢ(f_sim,i − f_exp,i)² $\rightarrow$ 최소화</p>
 <p><strong>■ 민감도 분석</strong></p>
@@ -609,14 +1422,14 @@ td .katex,th .katex{font-size:0.9em!important}
     
     const sl_err = addSlider('모델 오차 (%)', 0, 20, 5, 1, 'sim31-err');
     function draw() {
-      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#020510'; ctx.fillRect(0,0,W,H);
       const err=+sl_err.value/100, z=0.1, fn=8;
-      ctx.strokeStyle='#C9A84C';ctx.lineWidth=2;ctx.beginPath();
+      ctx.strokeStyle='#00e5ff';ctx.lineWidth=2;ctx.beginPath();
       for(let i=1;i<=300;i++){const f=i*30/300;const r=f/fn;const mag=20*Math.log10(1/Math.sqrt((1-r*r)**2+(2*z*r)**2));const px=i*W/300,py=H/2-mag*2;ctx.lineTo(px,Math.max(10,Math.min(H-10,py)));} ctx.stroke();
-      ctx.strokeStyle='#4A9EBF';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();
+      ctx.strokeStyle='#2979ff';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();
       for(let i=1;i<=300;i++){const f=i*30/300;const r=f/(fn*(1+err));const mag=20*Math.log10(1/Math.sqrt((1-r*r)**2+(2*(z+err*0.5)*r)**2));const px=i*W/300,py=H/2-mag*2;ctx.lineTo(px,Math.max(10,Math.min(H-10,py)));} ctx.stroke();ctx.setLineDash([]);
-      ctx.fillStyle='#C9A84C';ctx.font='12px monospace';ctx.fillText('— 실험 FRF',10,20);
-      ctx.fillStyle='#4A9EBF';ctx.fillText('--- 시뮬레이션 FRF',10,36);
+      ctx.fillStyle='#00e5ff';ctx.font='12px Share Tech Mono,monospace';ctx.fillText('— 실험 FRF',10,20);
+      ctx.fillStyle='#2979ff';ctx.fillText('--- 시뮬레이션 FRF',10,36);
       const corr=Math.max(0,(100-err*300)).toFixed(1);
       setMetrics([['FRAC',corr+'%'],['모델오차',Math.round(err*100)+'%'],['목표','FRAC > 90%']]);
     }
@@ -694,73 +1507,309 @@ td .katex,th .katex{font-size:0.9em!important}
 }
 
 /* === Enhanced: Simulation & Sub-step Styles === */
-.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
-.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
-.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
-.sim-canvas-wrap canvas{display:block;margin:0 auto}
+
+/* ╔══════════════════════════════════════════════════╗
+   ║  CYBER COCKPIT — SIMULATION MODULE v2.0         ║
+   ╚══════════════════════════════════════════════════╝ */
+
+/* ── Container: HUD Frame ── */
+.sim-container{
+  background:linear-gradient(135deg,rgba(6,22,48,0.92),rgba(3,7,18,0.95));
+  border:1px solid rgba(0,229,255,0.25);
+  border-radius:4px;
+  padding:0;margin:28px 0;
+  overflow:hidden;position:relative;
+  box-shadow:0 0 30px rgba(0,229,255,0.08),inset 0 0 60px rgba(0,229,255,0.02)
+}
+.sim-container::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,#00e5ff 30%,#ff2d78 70%,transparent);
+  box-shadow:0 0 12px rgba(0,229,255,0.5);z-index:2
+}
+.sim-container::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,229,255,0.3),transparent)
+}
+
+/* ── HUD Corner Brackets ── */
+.sim-container .sim-hud-corners{
+  position:absolute;inset:0;pointer-events:none;z-index:3
+}
+.sim-container .sim-hud-corners span{
+  position:absolute;width:16px;height:16px;
+  border-color:#00e5ff;border-style:solid;border-width:0;
+  opacity:0.6
+}
+.sim-container .sim-hud-corners span:nth-child(1){top:4px;left:4px;border-top-width:2px;border-left-width:2px}
+.sim-container .sim-hud-corners span:nth-child(2){top:4px;right:4px;border-top-width:2px;border-right-width:2px}
+.sim-container .sim-hud-corners span:nth-child(3){bottom:4px;left:4px;border-bottom-width:2px;border-left-width:2px}
+.sim-container .sim-hud-corners span:nth-child(4){bottom:4px;right:4px;border-bottom-width:2px;border-right-width:2px}
+
+/* ── Title Bar: System Header ── */
+.sim-title,.sim-container>h3{
+  font-family:'Orbitron',sans-serif!important;
+  font-weight:700;font-size:14px;
+  color:#00e5ff;
+  letter-spacing:3px;text-transform:uppercase;
+  background:linear-gradient(90deg,rgba(0,229,255,0.1),rgba(0,229,255,0.03));
+  padding:14px 24px;margin:0;
+  border-bottom:1px solid rgba(0,229,255,0.15);
+  display:flex;align-items:center;gap:12px;
+  position:relative
+}
+.sim-title::before,.sim-container>h3::before{
+  content:'◆';color:#ff2d78;font-size:10px;
+  animation:simTitleBlink 2s ease-in-out infinite;
+  text-shadow:0 0 8px rgba(255,45,120,0.6)
+}
+.sim-title::after,.sim-container>h3::after{
+  content:'SIMULATION MODULE';
+  position:absolute;right:24px;
+  font-size:9px;letter-spacing:4px;
+  color:rgba(0,229,255,0.3);font-weight:400
+}
+@keyframes simTitleBlink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* ── Canvas Viewport: Cockpit Window ── */
+.sim-canvas-wrap{
+  background:linear-gradient(180deg,#020510,#050d20);
+  border:none;border-radius:0;
+  padding:2px;margin:0;
+  position:relative;overflow:hidden;
+  border-top:1px solid rgba(0,229,255,0.1);
+  border-bottom:1px solid rgba(0,229,255,0.1)
+}
+.sim-canvas-wrap::before{
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,229,255,0.015) 3px,rgba(0,229,255,0.015) 4px),
+    linear-gradient(180deg,rgba(0,229,255,0.04),transparent 15%,transparent 85%,rgba(0,229,255,0.04));
+  border-radius:0
+}
+.sim-canvas-wrap::after{
+  content:'REC ●';position:absolute;top:12px;right:16px;z-index:2;
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  color:#ff2d78;letter-spacing:2px;
+  animation:recBlink 1.5s step-end infinite;
+  text-shadow:0 0 6px rgba(255,45,120,0.5)
+}
+@keyframes recBlink{0%,50%{opacity:1}51%,100%{opacity:0}}
+.sim-canvas-wrap canvas{
+  max-width:100%;border-radius:0;display:block;
+  position:relative;z-index:0
+}
+
+/* ── Controls Panel: Cockpit Instruments ── */
+.sim-controls{
+  display:flex;flex-wrap:wrap;gap:2px;
+  background:rgba(0,229,255,0.03);
+  padding:16px 20px;margin:0;
+  border-bottom:1px solid rgba(0,229,255,0.08)
+}
+
+/* ── Slider Group: Boost Lever ── */
+.sim-slider-group{
+  flex:1;min-width:180px;
+  background:linear-gradient(135deg,rgba(6,22,48,0.8),rgba(3,7,18,0.9));
+  border:1px solid rgba(0,229,255,0.12);
+  border-radius:4px;padding:14px 16px;
+  position:relative;overflow:hidden;
+  transition:border-color .3s
+}
+.sim-slider-group:hover{border-color:rgba(0,229,255,0.35)}
+.sim-slider-group::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,229,255,0.3),transparent)
+}
+.sim-slider-group label{
+  display:block;font-size:10px;color:#5a7a9a;
+  margin-bottom:8px;font-family:'Orbitron',sans-serif;
+  letter-spacing:2px;text-transform:uppercase
+}
+.sim-slider-group .sim-value,.sim-slider-group .sim-readout{
+  font-family:'Share Tech Mono',monospace;
+  font-size:18px;color:#00e5ff;text-align:right;
+  text-shadow:0 0 8px rgba(0,229,255,0.5);
+  margin-top:4px;
+  transition:color .2s,text-shadow .2s
+}
+
+/* ── Custom Range Slider ── */
+.sim-slider-group input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:6px;margin:8px 0;
+  background:linear-gradient(90deg,rgba(0,229,255,0.15),rgba(0,229,255,0.08));
+  border-radius:3px;outline:none;
+  border:1px solid rgba(0,229,255,0.1)
+}
+.sim-slider-group input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:18px;height:18px;border-radius:2px;
+  background:linear-gradient(135deg,#00e5ff,#2979ff);
+  cursor:pointer;
+  box-shadow:0 0 12px rgba(0,229,255,0.6),0 0 24px rgba(0,229,255,0.2);
+  border:2px solid rgba(255,255,255,0.3);
+  transition:box-shadow .2s,transform .1s
+}
+.sim-slider-group input[type=range]::-webkit-slider-thumb:hover{
+  box-shadow:0 0 18px rgba(0,229,255,0.8),0 0 36px rgba(0,229,255,0.3);
+  transform:scale(1.15)
+}
+.sim-slider-group input[type=range]::-webkit-slider-thumb:active{
+  background:linear-gradient(135deg,#ff2d78,#00e5ff);
+  box-shadow:0 0 20px rgba(255,45,120,0.6),0 0 40px rgba(0,229,255,0.3)
+}
+.sim-slider-group input[type=range]::-moz-range-thumb{
+  width:18px;height:18px;border-radius:2px;
+  background:linear-gradient(135deg,#00e5ff,#2979ff);
+  cursor:pointer;border:2px solid rgba(255,255,255,0.3);
+  box-shadow:0 0 12px rgba(0,229,255,0.6)
+}
+
+/* ── Buttons: Ignition Keys ── */
+.sim-btn{
+  background:linear-gradient(135deg,#00e5ff,#0097a7)!important;
+  color:#030712!important;
+  border:none!important;border-radius:4px!important;
+  padding:12px 28px!important;
+  font-family:'Orbitron',sans-serif!important;
+  font-size:12px!important;font-weight:700!important;
+  letter-spacing:2px!important;text-transform:uppercase!important;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:all .3s!important;
+  box-shadow:0 0 16px rgba(0,229,255,0.3),inset 0 1px 0 rgba(0,229,255,0.07)!important
+}
+.sim-btn:hover{
+  background:linear-gradient(135deg,#67f0ff,#00e5ff)!important;
+  transform:translateY(-2px)!important;
+  box-shadow:0 4px 20px rgba(0,229,255,0.5),0 0 30px rgba(0,229,255,0.2)!important
+}
+.sim-btn:active{
+  transform:translateY(0) scale(0.98)!important;
+  box-shadow:0 0 24px rgba(0,229,255,0.6),inset 0 0 12px rgba(0,229,255,0.3)!important
+}
+.sim-btn::after{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(circle,rgba(0,229,255,0.06),transparent 60%);
+  opacity:0;transition:opacity .3s;pointer-events:none
+}
+.sim-btn:hover::after{opacity:1}
+
+/* ── Secondary Button: System Command ── */
+.sim-btn-secondary{
+  background:rgba(6,22,48,0.8)!important;
+  color:#5a7a9a!important;
+  border:1px solid rgba(0,229,255,0.2)!important;
+  box-shadow:none!important;
+  letter-spacing:2px!important
+}
+.sim-btn-secondary:hover{
+  background:rgba(0,229,255,0.08)!important;
+  color:#00e5ff!important;
+  border-color:rgba(0,229,255,0.4)!important;
+  box-shadow:0 0 12px rgba(0,229,255,0.15)!important
+}
+
+/* ── Button Container ── */
+.sim-btn-group{
+  display:flex;gap:10px;padding:16px 20px;
+  background:rgba(0,229,255,0.02);
+  border-bottom:1px solid rgba(0,229,255,0.06)
+}
+
+/* ── Readout: Telemetry Display ── */
+.sim-readout{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:2px;margin:0;
+  background:rgba(0,229,255,0.03);padding:12px 20px
+}
+.sim-metric,.sim-metrics>div{
+  background:linear-gradient(135deg,rgba(6,22,48,0.9),rgba(3,7,18,0.95));
+  border:1px solid rgba(0,229,255,0.1);
+  border-radius:4px;padding:12px 14px;text-align:center;
+  position:relative;overflow:hidden;
+  transition:border-color .3s
+}
+.sim-metric:hover{border-color:rgba(0,229,255,0.3)}
+.sim-metric::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(0,229,255,0.2),transparent)
+}
+.sim-metric .sm-label,.sim-metric strong{
+  font-size:9px!important;color:#4a6a8a;
+  font-family:'Orbitron',sans-serif;
+  letter-spacing:2px;text-transform:uppercase;
+  font-weight:400!important;display:block;margin-bottom:4px
+}
+.sim-metric .sm-value{
+  font-family:'Share Tech Mono',monospace;
+  font-size:20px;color:#00e5ff;
+  font-weight:500;display:block;
+  text-shadow:0 0 10px rgba(0,229,255,0.5);
+  letter-spacing:1px;
+  transition:color .3s,text-shadow .3s
+}
+
+/* ── Metrics Container (Pattern B) ── */
+.sim-metrics{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:4px;padding:12px 20px;
+  background:rgba(0,229,255,0.02)
+}
+
+/* ── Running State Animation ── */
+@keyframes simRunning{
+  0%{border-color:rgba(0,229,255,0.25)}
+  50%{border-color:rgba(255,45,120,0.4)}
+  100%{border-color:rgba(0,229,255,0.25)}
+}
+@keyframes simRunningGlow{
+  0%{box-shadow:0 0 30px rgba(0,229,255,0.08)}
+  50%{box-shadow:0 0 40px rgba(0,229,255,0.15),0 0 60px rgba(255,45,120,0.05)}
+  100%{box-shadow:0 0 30px rgba(0,229,255,0.08)}
+}
+@keyframes telemetryFlash{
+  0%{color:#00e5ff;text-shadow:0 0 10px rgba(0,229,255,0.5)}
+  50%{color:#67f0ff;text-shadow:0 0 16px rgba(0,229,255,0.8)}
+  100%{color:#00e5ff;text-shadow:0 0 10px rgba(0,229,255,0.5)}
+}
+.sim-container.sim-running{
+  animation:simRunning 2s ease-in-out infinite,simRunningGlow 2s ease-in-out infinite
+}
+.sim-container.sim-running .sim-metric .sm-value{
+  animation:telemetryFlash 1.5s ease-in-out infinite
+}
+.sim-container.sim-running .sim-canvas-wrap::after{
+  color:#00e676;content:'LIVE ●'
+}
+
+/* ── Responsive ── */
+@media(max-width:640px){
+  .sim-controls{padding:12px}
+  .sim-slider-group{min-width:140px;padding:10px 12px}
+  .sim-slider-group .sim-value,.sim-slider-group .sim-readout{font-size:14px}
+  .sim-metric .sm-value{font-size:16px}
+  .sim-title::after,.sim-container>h3::after{display:none}
+}
+
 .sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
 .sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
 .sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
-.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
-.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--cyan)}
+.sim-readout{color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
 .sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
-.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
-.sim-metric strong{color:var(--gold,#C9A84C)}
-.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-metric{background:rgba(41,121,255,0.1);border:1px solid rgba(41,121,255,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue)}
+.sim-metric strong{color:var(--cyan)}
+.sim-btn{background:var(--cyan);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
 .sim-btn:hover{filter:brightness(1.15)}
-.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
-.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
-.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
-.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
+.sub-step{background:rgba(41,121,255,0.05);border-left:3px solid var(--blue);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--cyan);margin:0 0 8px}
 </style>
 
 
 <script>
-/* Accordion */
-document.addEventListener('click', function(e) {
-    var hdr = e.target.closest('.accordion-header, .accordion-toggle');
-    if (hdr) {
-        var content = hdr.nextElementSibling;
-        if (content) {
-            content.classList.toggle('open');
-            var nowOpen = content.classList.contains('open');
-            var arrow = hdr.querySelector('.accordion-arrow, span:last-child');
-            if (arrow) {
-                if (arrow.textContent === '+' || arrow.textContent === '−') {
-                    arrow.textContent = nowOpen ? '−' : '+';
-                } else {
-                    arrow.style.transform = nowOpen ? 'rotate(180deg)' : 'rotate(0deg)';
-                }
-            }
-        }
-    }
-    /* Quiz Pattern C: data-correct click delegation */
-    var opt = e.target.closest('.quiz-opt');
-    if (opt) {
-        var card = opt.closest('.quiz-card');
-        if (card && card.dataset.correct) {
-            var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct) - 1;
-            var clickedIdx = Array.from(options).indexOf(opt);
-            var isCorrect = clickedIdx === correctIdx;
-            options.forEach(function(o, i) {
-                o.style.pointerEvents = 'none';
-                o.style.opacity = '0.6';
-                if (i === correctIdx) {
-                    o.style.border = '2px solid var(--green, #4ABF8A)';
-                    o.style.opacity = '1';
-                    o.style.color = 'var(--green, #4ABF8A)';
-                }
-                if (o === opt && !isCorrect) {
-                    o.style.border = '2px solid #e74c3c';
-                    o.style.color = '#e74c3c';
-                }
-            });
-            var fb = card.querySelector('.quiz-feedback');
-            if (fb) { fb.style.display = 'block'; }
-        }
-    }
-});
 /* Quiz Pattern A: checkAnswer */
 function checkAnswer(qId, el, isCorrect) {
     var container = el.closest('.quiz-options') || document.getElementById(qId);
@@ -771,8 +1820,8 @@ function checkAnswer(qId, el, isCorrect) {
         o.style.opacity = '0.6';
     });
     el.style.opacity = '1';
-    el.style.border = isCorrect ? '2px solid var(--green, #4ABF8A)' : '2px solid #e74c3c';
-    el.style.color = isCorrect ? 'var(--green, #4ABF8A)' : '#e74c3c';
+    el.style.border = isCorrect ? '2px solid var(--green, #00e676)' : '2px solid #e74c3c';
+    el.style.color = isCorrect ? 'var(--green, #00e676)' : '#e74c3c';
     /* Show feedback if exists */
     var fb = document.getElementById(qId + '-fb');
     if (fb) fb.style.display = 'block';
@@ -797,16 +1846,440 @@ function toggleAnswer(arg) {
     }
 }
 
-/* Intersection Observer for fade-in */
-var obs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, {threshold: 0.1});
-document.querySelectorAll('.section').forEach(function(s) { obs.observe(s); });
+/* Old IntersectionObserver removed — replaced by CYBER HUD entrance */
 </script>
+
+
+
+<!-- CYBER CANVAS HUD OVERLAY ENGINE -->
+<script>
+(function(){
+  'use strict';
+
+  /* ══════ CYBER CANVAS THEME ══════ */
+  var CYBER = {
+    bg: '#020510',
+    grid: 'rgba(0,229,255,0.05)',
+    gridMajor: 'rgba(0,229,255,0.1)',
+    cyan: '#00e5ff',
+    magenta: '#ff2d78',
+    blue: '#2979ff',
+    green: '#00e676',
+    dimText: '#3d6080',
+    brightText: '#67f0ff',
+    cornerColor: 'rgba(0,229,255,0.4)',
+    scanlineAlpha: 0.015
+  };
+
+  /* ── Enhance each simulation canvas ── */
+  function enhanceCanvas(canvas) {
+    if (!canvas || canvas.dataset.cyberEnhanced) return;
+    canvas.dataset.cyberEnhanced = 'true';
+
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    /* ── Monkey-patch fillRect to add HUD overlay after bg clear ── */
+    var origFillRect = ctx.fillRect.bind(ctx);
+    var W = canvas.width, H = canvas.height;
+
+    ctx.fillRect = function(x, y, w, h) {
+      origFillRect(x, y, w, h);
+
+      /* Detect full-canvas clear (background fill) */
+      if (x === 0 && y === 0 && w >= W - 1 && h >= H - 1) {
+        /* Draw subtle radial glow */
+        var grad = ctx.createRadialGradient(W*0.3, H*0.5, 0, W*0.3, H*0.5, W*0.6);
+        grad.addColorStop(0, 'rgba(0,229,255,0.02)');
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        origFillRect(0, 0, W, H);
+
+        var grad2 = ctx.createRadialGradient(W*0.8, H*0.3, 0, W*0.8, H*0.3, W*0.4);
+        grad2.addColorStop(0, 'rgba(255,45,120,0.015)');
+        grad2.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad2;
+        origFillRect(0, 0, W, H);
+      }
+    };
+
+    /* ── Add line glow via shadow ── */
+    var origStroke = ctx.stroke.bind(ctx);
+    ctx.stroke = function() {
+      var lw = ctx.lineWidth;
+      var sc = ctx.strokeStyle;
+      /* Add glow for main data lines (thick lines) */
+      if (lw >= 2 && typeof sc === 'string') {
+        ctx.save();
+        if (sc.indexOf('00e5ff') > -1 || sc === CYBER.cyan) {
+          ctx.shadowColor = 'rgba(0,229,255,0.5)';
+          ctx.shadowBlur = 8;
+        } else if (sc.indexOf('2979ff') > -1 || sc === CYBER.blue) {
+          ctx.shadowColor = 'rgba(41,121,255,0.4)';
+          ctx.shadowBlur = 6;
+        } else if (sc.indexOf('ff2d78') > -1 || sc === CYBER.magenta) {
+          ctx.shadowColor = 'rgba(255,45,120,0.4)';
+          ctx.shadowBlur = 6;
+        } else if (sc.indexOf('00e676') > -1 || sc === CYBER.green) {
+          ctx.shadowColor = 'rgba(0,230,118,0.4)';
+          ctx.shadowBlur = 6;
+        }
+        origStroke();
+        ctx.restore();
+        return;
+      }
+      origStroke();
+    };
+
+    /* ── Add text glow via shadow ── */
+    var origFillText = ctx.fillText.bind(ctx);
+    ctx.fillText = function(text, x, y, maxW) {
+      var fc = ctx.fillStyle;
+      if (typeof fc === 'string' && (fc.indexOf('00e5ff') > -1 || fc.indexOf('67f0ff') > -1)) {
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,229,255,0.5)';
+        ctx.shadowBlur = 4;
+        if (maxW !== undefined) origFillText(text, x, y, maxW);
+        else origFillText(text, x, y);
+        ctx.restore();
+        return;
+      }
+      if (maxW !== undefined) origFillText(text, x, y, maxW);
+      else origFillText(text, x, y);
+    };
+  }
+
+  /* ── Post-draw HUD overlay (drawn once at end) ── */
+  function drawHUDOverlay(canvas) {
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+
+    ctx.save();
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+
+    /* Corner brackets */
+    var size = 14, pad = 4, lw = 1.5;
+    ctx.strokeStyle = CYBER.cornerColor;
+    ctx.lineWidth = lw;
+
+    /* Top-left */
+    ctx.beginPath();
+    ctx.moveTo(pad, pad + size); ctx.lineTo(pad, pad); ctx.lineTo(pad + size, pad);
+    ctx.stroke();
+    /* Top-right */
+    ctx.beginPath();
+    ctx.moveTo(W - pad - size, pad); ctx.lineTo(W - pad, pad); ctx.lineTo(W - pad, pad + size);
+    ctx.stroke();
+    /* Bottom-left */
+    ctx.beginPath();
+    ctx.moveTo(pad, H - pad - size); ctx.lineTo(pad, H - pad); ctx.lineTo(pad + size, H - pad);
+    ctx.stroke();
+    /* Bottom-right */
+    ctx.beginPath();
+    ctx.moveTo(W - pad - size, H - pad); ctx.lineTo(W - pad, H - pad); ctx.lineTo(W - pad, H - pad - size);
+    ctx.stroke();
+
+    /* Top edge glow line */
+    var edgeGrad = ctx.createLinearGradient(0, 0, W, 0);
+    edgeGrad.addColorStop(0, 'transparent');
+    edgeGrad.addColorStop(0.3, 'rgba(0,229,255,0.15)');
+    edgeGrad.addColorStop(0.7, 'rgba(255,45,120,0.1)');
+    edgeGrad.addColorStop(1, 'transparent');
+    ctx.strokeStyle = edgeGrad;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, 0.5); ctx.lineTo(W, 0.5); ctx.stroke();
+
+    /* Bottom edge glow line */
+    ctx.beginPath(); ctx.moveTo(0, H - 0.5); ctx.lineTo(W, H - 0.5); ctx.stroke();
+
+    ctx.restore();
+  }
+
+  /* ── Apply to all sim canvases ── */
+  document.querySelectorAll('.sim-canvas-wrap canvas').forEach(function(c) {
+    enhanceCanvas(c);
+  });
+
+  /* ── Also apply to any canvas inside sim-container ── */
+  document.querySelectorAll('.sim-container canvas').forEach(function(c) {
+    enhanceCanvas(c);
+  });
+
+  /* ── Override requestAnimationFrame to add HUD after each draw cycle ── */
+  /* Instead, use MutationObserver to detect canvas updates */
+  /* Actually, simpler: just run HUD overlay periodically on visible canvases */
+  var hudInterval = setInterval(function() {
+    document.querySelectorAll('.sim-container canvas[data-cyber-enhanced]').forEach(function(c) {
+      /* Check if canvas has content (not blank) */
+      var ctx = c.getContext('2d');
+      var pixel = ctx.getImageData(c.width/2, c.height/2, 1, 1).data;
+      if (pixel[0] > 0 || pixel[1] > 0 || pixel[2] > 0) {
+        drawHUDOverlay(c);
+      }
+    });
+  }, 200);
+
+  /* Stop after 30 seconds to save CPU */
+  setTimeout(function() { clearInterval(hudInterval); }, 30000);
+
+})();
+</script>
+
+<!-- CYBER COCKPIT SIM ENGINE -->
+<script>
+(function(){
+  'use strict';
+
+  /* ── Add HUD corner brackets to all sim-containers ── */
+  document.querySelectorAll('.sim-container').forEach(function(container){
+    if(container.querySelector('.sim-hud-corners')) return;
+    var corners = document.createElement('div');
+    corners.className = 'sim-hud-corners';
+    corners.innerHTML = '<span></span><span></span><span></span><span></span>';
+    container.appendChild(corners);
+  });
+
+  /* ── Intercept start/reset buttons for running state ── */
+  document.querySelectorAll('.sim-btn').forEach(function(btn){
+    var orig = btn.onclick;
+    btn.addEventListener('click', function(){
+      var container = btn.closest('.sim-container');
+      if(!container) return;
+      var text = (btn.textContent||'').toLowerCase();
+      if(text.indexOf('리셋') > -1 || text.indexOf('reset') > -1 || text.indexOf('↻') > -1){
+        container.classList.remove('sim-running');
+      } else {
+        container.classList.add('sim-running');
+        // Auto-remove after animation likely done
+        setTimeout(function(){ container.classList.remove('sim-running'); }, 8000);
+      }
+    });
+  });
+
+  /* ── Slider value glow on change ── */
+  document.querySelectorAll('.sim-slider-group input[type=range]').forEach(function(slider){
+    slider.addEventListener('input', function(){
+      var valEl = slider.parentElement.querySelector('.sim-value, .sim-readout');
+      if(valEl){
+        valEl.style.color = '#ff2d78';
+        valEl.style.textShadow = '0 0 12px rgba(255,45,120,0.6)';
+        setTimeout(function(){
+          valEl.style.color = '';
+          valEl.style.textShadow = '';
+        }, 400);
+      }
+    });
+  });
+
+})();
+</script>
+
+<!-- CYBER INTERACTIVE ENGINE -->
+<div id="scrollProgress"></div>
+<canvas id="cyberParticles"></canvas>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ══════ SYSTEM BOOT ══════ */
+  var boot = document.createElement('div');
+  boot.className = 'cyber-boot';
+  boot.innerHTML = '<div class="boot-logo">CYBER DYNAMICS</div>'
+    + '<div class="boot-status">INITIALIZING SYSTEM...</div>'
+    + '<div class="boot-bar-wrap"><div class="boot-bar-fill"></div></div>';
+  document.body.prepend(boot);
+  setTimeout(function(){ boot.classList.add('done'); }, 1800);
+  setTimeout(function(){ boot.remove(); }, 2500);
+
+  /* ══════ SCROLL PROGRESS ══════ */
+  var sp = document.getElementById('scrollProgress');
+  if(sp){
+    window.addEventListener('scroll', function(){
+      var h = document.documentElement.scrollHeight - window.innerHeight;
+      sp.style.width = (h > 0 ? (window.scrollY / h * 100) : 0) + '%';
+    }, {passive:true});
+  }
+
+  /* ══════ SECTION HUD ENTRANCE ══════ */
+  var sections = document.querySelectorAll('.section');
+  if(sections.length){
+    var sObs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.classList.add('hud-visible');
+          sObs.unobserve(e.target);
+        }
+      });
+    }, {threshold:0.1, rootMargin:'0px 0px -60px 0px'});
+    sections.forEach(function(s){ sObs.observe(s); });
+  }
+
+  /* ══════ GAUGE SCROLL CHARGE ══════ */
+  var gauges = document.querySelectorAll('.gauge-svg');
+  if(gauges.length){
+    var gObs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.classList.add('charged');
+          var wrap = e.target.closest('.gauge-wrap');
+          if(wrap) wrap.classList.add('active');
+          gObs.unobserve(e.target);
+        }
+      });
+    }, {threshold:0.5});
+    gauges.forEach(function(g){ gObs.observe(g); });
+  }
+
+  /* ══════ ACCORDION CYBER-OPEN + QUIZ PATTERN C ══════ */
+  document.addEventListener('click', function(e){
+    /* --- Accordion --- */
+    var toggle = e.target.closest('.accordion-header, .accordion-toggle');
+    if(toggle){
+      var content = toggle.nextElementSibling;
+      if(!content) return;
+      var isOpen = content.classList.contains('cyber-open') || content.classList.contains('open');
+      if(isOpen){
+        content.classList.remove('cyber-open','open');
+        content.style.display = 'none';
+        toggle.classList.remove('active');
+      } else {
+        content.style.display = 'block';
+        content.classList.add('cyber-open','open');
+        toggle.classList.add('active');
+      }
+      var arrow = toggle.querySelector('.accordion-arrow, span:last-child');
+      if(arrow){
+        if(arrow.textContent === '+' || arrow.textContent === '−'){
+          arrow.textContent = isOpen ? '+' : '−';
+        } else {
+          arrow.textContent = isOpen ? '▸' : '▾';
+          arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+      }
+      return;
+    }
+
+    /* --- Quiz Pattern C: data-correct click delegation --- */
+    var opt = e.target.closest('.quiz-opt');
+    if(opt){
+      var card = opt.closest('.quiz-card');
+      if(card && card.dataset.correct){
+        var options = card.querySelectorAll('.quiz-opt');
+        var correctIdx = parseInt(card.dataset.correct) - 1;
+        var clickedIdx = Array.from(options).indexOf(opt);
+        var isCorrect = clickedIdx === correctIdx;
+        card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+        options.forEach(function(o, i){
+          o.style.pointerEvents = 'none';
+          o.style.opacity = '0.6';
+          if(i === correctIdx){
+            o.classList.add('correct');
+            o.style.opacity = '1';
+          }
+          if(o === opt && !isCorrect){
+            o.classList.add('wrong');
+          }
+        });
+        var fb = card.querySelector('.quiz-feedback');
+        if(fb){
+          fb.style.display = 'block';
+          fb.classList.add('show');
+          fb.classList.add(isCorrect ? 'correct-fb' : 'wrong-fb');
+        }
+      }
+    }
+  });
+
+  /* ══════ QUIZ BOOST/RETIRE ══════ */
+  window._cyberCheckAnswer = window.checkAnswer;
+  window.checkAnswer = function(qId, el, isCorrect) {
+    var card = el.closest('.quiz-card');
+    if(card){
+      card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+    }
+    if(window._cyberCheckAnswer){
+      window._cyberCheckAnswer(qId, el, isCorrect);
+    }
+  };
+
+  /* ══════ CIRCUIT PARTICLE CANVAS ══════ */
+  var canvas = document.getElementById('cyberParticles');
+  if(canvas){
+    var ctx = canvas.getContext('2d');
+    var particles = [];
+    var maxP = 30;
+
+    function resizeCanvas(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function Particle(){
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.vx = (Math.random() - 0.5) * 0.3;
+      this.vy = (Math.random() - 0.5) * 0.3;
+      this.r = Math.random() * 1.5 + 0.5;
+      this.alpha = Math.random() * 0.4 + 0.1;
+    }
+
+    for(var i = 0; i < maxP; i++) particles.push(new Particle());
+
+    function drawParticles(){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for(var i = 0; i < particles.length; i++){
+        var p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        if(p.x < 0) p.x = canvas.width;
+        if(p.x > canvas.width) p.x = 0;
+        if(p.y < 0) p.y = canvas.height;
+        if(p.y > canvas.height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,229,255,' + p.alpha + ')';
+        ctx.fill();
+
+        // Connect nearby particles
+        for(var j = i + 1; j < particles.length; j++){
+          var p2 = particles[j];
+          var dx = p.x - p2.x, dy = p.y - p2.y;
+          var dist = Math.sqrt(dx*dx + dy*dy);
+          if(dist < 150){
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = 'rgba(0,229,255,' + (0.08 * (1 - dist/150)) + ')';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+  }
+
+  /* ══════ GAUGE PARTICLE ORBIT ══════ */
+  document.querySelectorAll('.gauge-wrap').forEach(function(wrap){
+    for(var i = 0; i < 3; i++){
+      var dot = document.createElement('div');
+      dot.className = 'gauge-particle';
+      dot.style.animationDelay = (i * 1) + 's';
+      dot.style.animationDuration = (2.5 + i * 0.5) + 's';
+      wrap.appendChild(dot);
+    }
+  });
+
+})();
+</script>
+
 </body>
 </html>

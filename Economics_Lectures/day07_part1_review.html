@@ -2,198 +2,308 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Day 07 | Part 1 복습 & 통합 점검 — 부자 마인드셋 스터디</title>
+<script>
+/* Prevent FOUC: apply saved theme before render */
+(function(){
+  var t = localStorage.getItem('eldorado-theme');
+  if(!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  if(t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+})();
+</script>
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Day 07 | 첫 번째 관문 통과 — El Dorado 투자 원정대</title>
+<meta name="theme-color" content="#0D0B08">
+<meta name="description" content="El Dorado 투자 원정대 Day 07 — Part 1을 복습하고 핵심 개념을 점검합니다.">
+<meta name="robots" content="noindex">
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-/* ═══ DESIGN SYSTEM v2 ═══ */
+<style>/* LIGHTHOUSE_OPTIMIZED */
 :root {
-  --bg-primary: #0A0C10;
-  --bg-card: #12151C;
-  --bg-card-hover: #181C26;
-  --bg-accent: #1A1E2A;
-  --gold: #C9A84C;
-  --gold-dim: rgba(201,168,76,0.15);
-  --gold-glow: rgba(201,168,76,0.3);
-  --blue: #4A9EBF;
-  --blue-dim: rgba(74,158,191,0.15);
-  --blue-glow: rgba(74,158,191,0.3);
-  --text-primary: #E8E6E1;
-  --text-secondary: #9A9890;
-  --text-dim: #5A584F;
-  --border: #2A2D36;
-  --red: #BF4A4A;
-  --green: #4ABF7A;
+  --bg-primary: #0D0B08;
+  --bg-card: #16130E;
+  --bg-card-hover: #1E1A13;
+  --bg-accent: #1A1610;
+  --bg-temple: #110E09;
+  --gold: #D4A843;
+  --gold-bright: #E8C65A;
+  --gold-dim: rgba(212,168,67,0.12);
+  --gold-glow: rgba(212,168,67,0.25);
+  --gold-radiant: rgba(232,198,90,0.4);
+  --emerald: #3D9E6E;
+  --emerald-dim: rgba(61,158,110,0.12);
+  --emerald-glow: rgba(61,158,110,0.25);
+  --amber: #C4793D;
+  --amber-dim: rgba(196,121,61,0.12);
+  --copper: #A0634A;
+  --text-primary: #EDE8D8;
+  --text-secondary: #B8B0A0;
+  --text-dim: #8A8272;
+  --border: #2C261E;
+  --border-gold: rgba(212,168,67,0.2);
+  --red: #C45A4A;
+  --green: #4AAF6A;
   --font-display: 'Cormorant Garamond', serif;
   --font-body: 'Noto Sans KR', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; font-size: 16px; }
 body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: white !important;
+  background-image: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(212,168,67,0.05) 0%, transparent 60%),
+  radial-gradient(ellipse 40% 30% at 90% 90%, rgba(196,121,61,0.04) 0%, transparent 50%);
+  color: #1a1a1a !important;
   font-family: var(--font-body);
   font-weight: 300;
   line-height: 1.8;
   -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
+  min-height: 100vh;
 }
-
-/* ═══ CUSTOM SCROLLBAR ═══ */
-::-webkit-scrollbar { width: 6px; }
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+  repeating-linear-gradient(90deg, rgba(212,168,67,0.015) 0px, rgba(212,168,67,0.015) 1px, transparent 1px, transparent 80px),
+  repeating-linear-gradient(0deg, rgba(212,168,67,0.015) 0px, rgba(212,168,67,0.015) 1px, transparent 1px, transparent 80px);
+  pointer-events: none;
+  z-index: 0;
+}
+::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
-
-/* ═══ FADE-UP ANIMATION ═══ */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--gold-dim), var(--gold-glow));
+  border-radius: 4px; border: 1px solid var(--border-gold);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 .fade-up {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition: opacity 0.7s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .fade-up.visible {
   opacity: 1;
   transform: translateY(0);
 }
-
-/* ═══ STICKY HEADER ═══ */
+@keyframes goldShimmer {
+  0%,100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+@keyframes templeGlow {
+  0%,100% { box-shadow: 0 0 20px rgba(212,168,67,0.05); }
+  50% { box-shadow: 0 0 40px rgba(212,168,67,0.12); }
+}
 .sticky-header {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: rgba(10,12,16,0.92);
+  background: rgba(13,11,8,0.94);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-gold);
   padding: 0.6rem 2rem;
   display: flex; justify-content: space-between; align-items: center;
   flex-wrap: wrap; gap: 0.5rem;
 }
+.sticky-header::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-glow), transparent);
+}
 .header-left { display: flex; align-items: center; gap: 1rem; }
 .header-day {
-  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold-bright);
   background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
   letter-spacing: 0.1em;
+  border: 1px solid var(--border-gold);
 }
 .header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
 .header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
-.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
-.badge-asset { color: var(--blue); background: var(--blue-dim); }
-.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.header-badge {
+  font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem;
+  border-radius: 4px; letter-spacing: 0.05em;
+}
+.badge-asset { color: var(--gold-bright); background: var(--gold-dim); border: 1px solid var(--border-gold); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.03); }
 .timer-btn {
-  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold-bright);
   font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
   border-radius: 4px; cursor: pointer; transition: all 0.3s;
 }
-.timer-btn:hover { background: var(--gold-glow); }
-
-/* ═══ LAYOUT ═══ */
-.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.timer-btn:hover { background: var(--gold-glow); box-shadow: 0 0 12px rgba(212,168,67,0.2); }
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; position: relative; z-index: 1; }
 .hero {
   text-align: center; padding: 3rem 0 2.5rem;
-  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+  border-bottom: 1px solid var(--border-gold); margin-bottom: 3rem;
+  position: relative;
 }
-.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
-.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
-.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
-.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero::before {
+  content: '';
+  position: absolute; top: -2rem; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.hero::after {
+  content: '◆';
+  position: absolute; top: -2.6rem; left: 50%; transform: translateX(-50%);
+  color: var(--gold); font-size: 0.7rem;
+  animation: goldShimmer 3s ease-in-out infinite;
+}
+.hero-part {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold);
+  letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem;
+}
+.hero-day {
+  font-family: var(--font-display); font-size: 4rem; font-weight: 700;
+  color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem;
+  text-shadow: 0 0 40px rgba(212,168,67,0.15);
+}
+.hero-subtitle {
+  font-family: var(--font-display); font-size: 1.8rem; font-weight: 400;
+  color: var(--gold); margin-bottom: 0.3rem;
+}
+.hero-eldorado-sub {
+  font-family: var(--font-display); font-size: 1.1rem; font-weight: 400;
+  color: var(--amber); font-style: italic; margin-bottom: 1.5rem;
+  letter-spacing: 0.05em;
+}
+.hero-quote {
+  font-family: var(--font-display); font-size: 1.1rem; font-style: italic;
+  color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6;
+}
 .hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
-.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge {
+  font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem;
+  border-radius: 4px; display: flex; align-items: center; gap: 0.4rem;
+}
 .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
-.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
-.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
-.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
-.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.hb-net { color: var(--gold-bright); background: var(--gold-dim); border: 1px solid var(--border-gold); }
+.hb-net .dot { background: var(--gold-bright); }
+.hb-house { color: var(--emerald); background: var(--emerald-dim); }
+.hb-house .dot { background: var(--emerald); }
+.hb-debt { color: var(--red); background: rgba(196,90,74,0.12); }
+.hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,175,106,0.12); }
+.hb-stock .dot { background: var(--green); }
 .series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
 .progress-wrap { margin: 1.5rem 0; }
-.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
-.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
-.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
-
-/* ═══ SECTIONS ═══ */
-.section { margin-bottom: 3rem; }
-.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
-.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
-
-/* ═══ BRAIN BOX ═══ */
-.brain-box {
-  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
-  border: 1px solid var(--border); border-left: 3px solid var(--blue);
-  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; border: 1px solid var(--border); }
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--gold-bright));
+  border-radius: 2px; transition: width 0.5s;
 }
-.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+.section { margin-bottom: 3rem; }
+.section-label {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.section-label::before { content: '◈'; font-size: 0.5rem; }
+.section-title {
+  font-family: var(--font-display); font-size: 1.6rem; font-weight: 600;
+  color: var(--text-primary); margin-bottom: 1rem;
+}
+.brain-box {
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--emerald);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+  position: relative; overflow: hidden;
+}
+.brain-box::before {
+  content: '';
+  position: absolute; top: 0; right: 0; width: 60px; height: 60px;
+  background: radial-gradient(circle at 100% 0%, rgba(61,158,110,0.08), transparent 70%);
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--emerald); margin-bottom: 0.8rem; }
 .brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
 .time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
-.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
-.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table th {
+  text-align: left; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border);
+}
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(44,38,30,0.5); }
 .time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
-
-/* ═══ CONCEPT CARDS ═══ */
 .cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
 .concept-card {
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
-  padding: 1.5rem; transition: all 0.3s;
+  background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.4s;
+  position: relative; overflow: hidden;
 }
-.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.concept-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold-glow), var(--gold-dim));
+  opacity: 0; transition: opacity 0.4s;
+}
+.concept-card:hover {
+  background: var(--bg-card-hover); border-color: var(--border-gold);
+  box-shadow: 0 4px 24px rgba(212,168,67,0.06);
+}
+.concept-card:hover::before { opacity: 1; }
 .card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
 .card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
 .card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
 .card-body p { margin-bottom: 0.6rem; }
-
-/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
 .formula-block {
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--gold);
-  border-radius: 6px;
-  padding: 1rem 1.2rem;
-  margin: 1rem 0;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  line-height: 2;
-  overflow-x: auto;
+  background: var(--bg-temple);
+  border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 6px; padding: 1rem 1.2rem; margin: 1rem 0;
+  font-family: var(--font-mono); font-size: 0.82rem; line-height: 2; overflow-x: auto;
 }
 .formula-line { color: var(--text-primary); }
 .formula-comment { color: var(--text-dim); font-size: 0.72rem; }
-.formula-highlight { color: var(--gold); }
-.formula-blue { color: var(--blue); }
-
-/* ═══ DATA TABLE ═══ */
+.formula-highlight { color: var(--gold-bright); }
+.formula-blue { color: var(--emerald); }
 .data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
 .data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
 .data-table th {
   font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
   letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
-  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+  border-bottom: 2px solid var(--border-gold); white-space: nowrap;
 }
 .data-table th:first-child { text-align: left; }
 .data-table td {
   padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
-  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+  border-bottom: 1px solid rgba(44,38,30,0.5); font-family: var(--font-mono); font-size: 0.78rem;
 }
 .data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
-.data-table tr:hover td { background: rgba(201,168,76,0.04); }
-.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
-
-/* ═══ CHART ═══ */
+.data-table tr:hover td { background: rgba(212,168,67,0.04); }
+.highlight-row td { color: var(--gold-bright) !important; font-weight: 500; background: var(--gold-dim) !important; }
 .chart-container {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
   padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.chart-container::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
 }
 .chart-title {
   font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
   letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
 }
-
-/* ═══ SIMULATION BOX ═══ */
 .sim-box {
-  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
-  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+  background: linear-gradient(135deg, rgba(212,168,67,0.04), rgba(61,158,110,0.04));
+  border: 1px solid var(--border-gold); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.sim-box::before {
+  content: '⬥';
+  position: absolute; top: -8px; left: 1.5rem; color: var(--gold);
+  font-size: 0.6rem; background: var(--bg-primary); padding: 0 0.3rem;
 }
 .sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
 .checklist { list-style: none; margin-top: 1rem; }
 .checklist li {
   font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
-  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+  position: relative; border-bottom: 1px solid rgba(44,38,30,0.3); cursor: pointer;
 }
 .checklist li::before {
   content: ''; position: absolute; left: 0; top: 0.65rem;
@@ -201,21 +311,19 @@ body {
 }
 .checklist li.checked::before { background: var(--gold); }
 .checklist li.checked::after {
-  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  content: '\u2713'; position: absolute; left: 2px; top: 0.42rem;
   color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
 }
-
-/* ═══ PSYCHOLOGY BOX ═══ */
 .psych-box {
-  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--amber);
   border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
 }
-.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--amber); margin-bottom: 0.8rem; }
 .psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
 .psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
 .neuro-tag {
   display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
-  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  color: var(--emerald); background: var(--emerald-dim); padding: 0.15rem 0.5rem;
   border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
 }
 .engineer-tag {
@@ -223,8 +331,6 @@ body {
   color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
   border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
 }
-
-/* ═══ DEEP DIVE ═══ */
 .deep-dive {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
   margin: 1rem 0; overflow: hidden;
@@ -237,7 +343,7 @@ body {
 }
 .deep-dive summary::-webkit-details-marker { display: none; }
 .deep-dive summary::before {
-  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  content: '\u25B8'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
   transition: transform 0.2s;
 }
 .deep-dive[open] summary::before { transform: rotate(90deg); }
@@ -246,9 +352,16 @@ body {
   padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
 }
 .deep-dive-content p { margin-bottom: 0.6rem; }
-
-/* ═══ QUIZ ═══ */
-.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-section {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.quiz-section::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--amber));
+}
 .quiz-q { margin-bottom: 1.5rem; }
 .quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
 .quiz-options { list-style: none; }
@@ -258,14 +371,12 @@ body {
   border: 1px solid transparent;
 }
 .quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
-.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
-.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-options li.correct { background: rgba(74,175,106,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(196,90,74,0.12); border-color: var(--red); color: var(--red); }
 .quiz-answer {
   display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
   border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
 }
-
-/* ═══ SR TRACKER ═══ */
 .sr-tracker {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
   padding: 1.5rem; margin: 1.5rem 0;
@@ -274,90 +385,779 @@ body {
   font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
   letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
 }
-.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 0.5rem; }
 .sr-slot {
   background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
   padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
 }
 .sr-slot:hover { border-color: var(--gold); }
-.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,175,106,0.08); }
 .sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
 .sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
-
-/* ═══ DISCLAIMER ═══ */
 .disclaimer {
-  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border-gold);
   font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
 }
-
-/* ═══ NAV FOOTER ═══ */
 .nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
 .nav-btn {
   font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
   text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
   border-radius: 4px; transition: all 0.3s;
 }
-.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px rgba(212,168,67,0.1); }
 .nav-btn.disabled { opacity: 0.3; pointer-events: none; }
-
-/* ═══ RESPONSIVE ═══ */
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+  radial-gradient(circle at 15% 20%, rgba(212,168,67,0.025) 0%, transparent 25%),
+  radial-gradient(circle at 85% 80%, rgba(212,168,67,0.02) 0%, transparent 20%);
+  pointer-events: none; z-index: 0;
+}
+.aztec-divider {
+  text-align: center;
+  margin: 2.5rem 0;
+  position: relative;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aztec-divider::before,
+.aztec-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
+}
+.aztec-divider .aztec-glyph {
+  padding: 0 1rem;
+  color: var(--gold);
+  font-size: 0.65rem;
+  opacity: 0.5;
+  letter-spacing: 0.3em;
+}
+.concept-card {
+  position: relative;
+  overflow: hidden;
+}
+.concept-card .card-glow {
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,168,67,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+.concept-card:hover .card-glow { opacity: 1; }
+.concept-card > * { position: relative; z-index: 1; }
+.quiz-section { position: relative; overflow: hidden; }
+.quiz-burst-canvas {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 10;
+}
+.scroll-compass {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  z-index: 99;
+  opacity: 0;
+  transition: opacity 0.5s;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+}
+.scroll-compass.visible { opacity: 1; }
+.scroll-compass svg { width: 100%; height: 100%; }
+.section-flash {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-bright), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.section.flash-active .section-flash { opacity: 1; }
+@keyframes checkPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+.checklist li.just-checked::before {
+  animation: checkPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+@keyframes checkGlow {
+  0% { box-shadow: 0 0 0 0 rgba(212,168,67,0.4); }
+  100% { box-shadow: 0 0 0 12px rgba(212,168,67,0); }
+}
+.checklist li.just-checked {
+  animation: checkGlow 0.6s ease-out;
+}
+.deep-dive[open] {
+  border-color: var(--border-gold);
+  box-shadow: 0 0 20px rgba(212,168,67,0.04);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+@keyframes timerPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(212,168,67,0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(212,168,67,0); }
+}
+.timer-btn.active {
+  animation: timerPulse 2s infinite;
+  background: var(--gold-glow);
+}
+@keyframes heroFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.hero-icon svg {
+  animation: heroFloat 4s ease-in-out infinite;
+}
+@keyframes barShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.progress-bar-fill {
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--gold-bright), var(--gold), var(--amber));
+  background-size: 200% 100%;
+  animation: barShimmer 4s linear infinite;
+}
+.sr-slot.done {
+  position: relative;
+  overflow: hidden;
+}
+.sr-slot.done::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+}
+.data-table tr {
+  transition: background 0.2s;
+}
+.data-table tr:hover td {
+  background: rgba(212,168,67,0.06);
+}
+.highlight-row td {
+  position: relative;
+}
+.hero-illustration {
+  margin: 0 -1.5rem 1.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(212,168,67,0.06);
+  position: relative;
+}
+.hero-illustration::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40px;
+  background: linear-gradient(to top, var(--bg-primary), transparent);
+  pointer-events: none;
+}
+@supports(padding: max(0px)) {
+  .sticky-header {
+  padding-left: max(0.8rem, env(safe-area-inset-left));
+  padding-right: max(0.8rem, env(safe-area-inset-right));
+  }
+  .container {
+  padding-left: max(0.8rem, env(safe-area-inset-left));
+  padding-right: max(0.8rem, env(safe-area-inset-right));
+  }
+  .scroll-compass {
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+@media print {
+  .sticky-header, .scroll-compass, #goldParticles, .timer-btn { display: none !important; }
+  body::before, body::after { display: none !important; }
+  .concept-card, .brain-box, .sim-box, .psych-box, .quiz-section, .sr-tracker {
+  border: 1px solid #ccc !important;
+  background: white !important;
+  break-inside: avoid;
+  }
+  .hero { border-bottom: 2px solid #333 !important; }
+  .nav-footer { display: none !important; }
+}
 @media (max-width: 640px) {
-  .sticky-header { padding: 0.5rem 1rem; }
+.sticky-header { padding: 0.5rem 1rem; }
   .hero-day { font-size: 2.5rem; }
   .hero-subtitle { font-size: 1.3rem; }
   .container { padding: 4.5rem 1rem 2rem; }
   .section-title { font-size: 1.3rem; }
   .sr-slots { grid-template-columns: repeat(2, 1fr); }
   .header-right { gap: 0.6rem; }
+.hero-illustration { margin: 0 -1rem 1rem; }
 }
+@media (prefers-reduced-motion: reduce) {
+.fade-up { opacity: 1; transform: none; transition: none; }
+  .hero-icon svg { animation: none; }
+  .progress-bar-fill { animation: none; }
+  .timer-btn.active { animation: none; }
+  #goldParticles { display: none !important; }
+  body::before { display: none; }
+  body::after { display: none; }
+}
+@media (max-width: 768px) {
+.hero-day { font-size: 3rem; }
+  .hero-subtitle { font-size: 1.5rem; }
+  .hero-eldorado-sub { font-size: 0.95rem; }
+  .hero-quote { font-size: 0.95rem; max-width: 90%; }
+  .hero-icon svg { width: 40px; height: 40px; }
+  .section-title { font-size: 1.4rem; }
+  .concept-card { padding: 1.2rem; }
+  .card-title { font-size: 1.15rem; }
+  .data-table { font-size: 0.75rem; }
+  .data-table th { font-size: 0.6rem; padding: 0.5rem; }
+  .data-table td { padding: 0.5rem; font-size: 0.72rem; }
+  .formula-block { font-size: 0.76rem; padding: 0.8rem 1rem; }
+  .scroll-compass { width: 48px; height: 48px; bottom: 1.5rem; right: 1.5rem; }
+}
+@media (max-width: 480px) {
+html { font-size: 15px; }
+  .sticky-header {
+  padding: 0.4rem 0.8rem;
+  gap: 0.3rem;
+  }
+  .header-day { font-size: 0.65rem; padding: 0.15rem 0.5rem; }
+  .header-title { font-size: 0.75rem; }
+  .header-badge { font-size: 0.6rem; padding: 0.15rem 0.4rem; }
+  .badge-series { display: none; }
+  .timer-btn { font-size: 0.65rem; padding: 0.25rem 0.6rem; }
+  .container { padding: 3.8rem 0.8rem 2rem; }
+  .hero { padding: 2rem 0 1.8rem; margin-bottom: 2rem; }
+  .hero-part { font-size: 0.6rem; letter-spacing: 0.2em; }
+  .hero-icon svg { width: 36px; height: 36px; }
+  .hero-day { font-size: 2.2rem; }
+  .hero-subtitle { font-size: 1.2rem; }
+  .hero-eldorado-sub { font-size: 0.85rem; }
+  .hero-quote { font-size: 0.85rem; line-height: 1.5; }
+  .hero-badges { gap: 0.4rem; }
+  .hero-badge { font-size: 0.6rem; padding: 0.25rem 0.5rem; }
+  .series-info { font-size: 0.6rem; }
+  .hero-illustration { margin: 0 -0.8rem 1rem; }
+  .section { margin-bottom: 2rem; }
+  .section-label { font-size: 0.58rem; }
+  .section-title { font-size: 1.2rem; }
+  .brain-box { padding: 1rem; }
+  .brain-box h3 { font-size: 0.82rem; }
+  .brain-box p { font-size: 0.8rem; }
+  .time-table { font-size: 0.72rem; }
+  .time-table th { font-size: 0.58rem; padding: 0.4rem 0.5rem; }
+  .time-table td { padding: 0.4rem 0.5rem; }
+  .concept-card { padding: 1rem; }
+  .card-num { font-size: 0.55rem; }
+  .card-title { font-size: 1.05rem; }
+  .card-body { font-size: 0.8rem; line-height: 1.7; }
+  .formula-block { font-size: 0.7rem; padding: 0.7rem 0.8rem; line-height: 1.8; }
+  .data-table-wrap { margin: 0.8rem -0.3rem; }
+  .data-table { font-size: 0.68rem; }
+  .data-table th { font-size: 0.55rem; padding: 0.4rem; }
+  .data-table td { padding: 0.4rem; font-size: 0.65rem; }
+  .chart-container { padding: 1rem; margin: 1rem 0; }
+  .chart-title { font-size: 0.6rem; }
+  .sim-box { padding: 1rem; }
+  .sim-box h3 { font-size: 0.85rem; }
+  .checklist li { font-size: 0.8rem; padding: 0.4rem 0 0.4rem 1.6rem; }
+  .psych-box { padding: 1rem; }
+  .psych-box h3 { font-size: 0.85rem; }
+  .psych-box .bias-name { font-size: 1rem; }
+  .deep-dive summary { padding: 0.8rem 1rem; font-size: 0.82rem; }
+  .deep-dive-content { padding: 0 1rem 1rem; font-size: 0.78rem; }
+  .quiz-section { padding: 1rem; }
+  .quiz-q h4 { font-size: 0.82rem; }
+  .quiz-options li { font-size: 0.76rem; padding: 0.45rem 0.6rem; }
+  .quiz-answer { font-size: 0.74rem; }
+  .sr-tracker { padding: 1rem; }
+  .sr-tracker h3 { font-size: 0.65rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
+  .sr-slot { padding: 0.5rem; }
+  .sr-slot .sr-label { font-size: 0.55rem; }
+  .sr-slot .sr-date { font-size: 0.65rem; }
+  .disclaimer { font-size: 0.65rem; padding: 1rem; }
+  .nav-footer { flex-direction: column; gap: 0.8rem; align-items: stretch; }
+  .nav-btn { text-align: center; font-size: 0.7rem; }
+  .scroll-compass { width: 42px; height: 42px; bottom: 1rem; right: 1rem; }
+  .aztec-divider { margin: 1.5rem 0; }
+  .aztec-divider .aztec-glyph { font-size: 0.55rem; }
+  .sim-box input[type="number"] {
+  width: 120px !important;
+  font-size: 0.85rem !important;
+  padding: 0.4rem 0.6rem !important;
+}
+@media (max-width: 360px) {
+html { font-size: 14px; }
+  .hero-day { font-size: 1.8rem; }
+  .hero-subtitle { font-size: 1rem; }
+  .container { padding: 3.5rem 0.6rem 1.5rem; }
+  .badge-asset { display: none; }
+  .hero-badges { flex-direction: column; align-items: center; }
+  .sr-slots { grid-template-columns: 1fr; }
+}
+@media ((hover: none) and (pointer: coarse)) {
+.quiz-options li {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  }
+  .checklist li {
+  .nav-btn {
+  justify-content: center;
+  .sr-slot {
+  flex-direction: column;
+  .timer-btn {
+  min-height: 40px;
+  .deep-dive summary {
+  min-height: 48px;
+  .concept-card .card-glow { display: none; }
+}
+@media ((max-height: 500px) and (orientation: landscape)) {
+.sticky-header { padding: 0.3rem 1rem; }
+  .hero { padding: 1.5rem 0 1rem; margin-bottom: 1.5rem; }
+  .hero-day { font-size: 2rem; }
+  .hero-illustration svg { max-height: 120px; }
+  .scroll-compass { width: 36px; height: 36px; bottom: 0.5rem; right: 0.5rem; }
+}
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.quiz-options li:focus-visible { border-color: var(--gold); }
+.nav-btn:focus-visible { border-color: var(--gold); color: var(--gold); }
+
+
+/* Content-visibility for off-screen rendering optimization */
+.section { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+.deep-dive { content-visibility: auto; contain-intrinsic-size: auto 200px; }
+.quiz-section { content-visibility: auto; contain-intrinsic-size: auto 400px; }
+.sr-tracker { content-visibility: auto; contain-intrinsic-size: auto 200px; }
+
+
+/* ═══ THEME TOGGLE ═══ */
+/* ── Toggle Button ── */
+.theme-toggle {
+  position: relative;
+  width: 52px; height: 28px;
+  background: var(--gold-dim);
+  border: 1px solid var(--border-gold);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex; align-items: center;
+  padding: 0 3px;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(212,168,67,0.2);
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.theme-toggle-knob {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--gold);
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  position: relative;
+}
+.theme-toggle-knob svg {
+  width: 14px; height: 14px;
+  transition: all 0.3s;
+}
+/* Dark mode icon (moon visible) */
+.theme-toggle .icon-moon { display: none; }
+.theme-toggle .icon-sun { display: block; }
+[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+[data-theme="light"] .theme-toggle-knob {
+  transform: translateX(24px);
+  background: #8B6914;
+}
+[data-theme="light"] .theme-toggle {
+  background: rgba(139,105,20,0.15);
+  border-color: rgba(139,105,20,0.3);
+}
+
+/* ── Light Theme Variables ── */
+[data-theme="light"] {
+  --bg-primary: #FAF6EE;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FFF9F0;
+  --bg-accent: #F5F0E5;
+  --bg-temple: #FBF7EF;
+  --gold: #8B6914;
+  --gold-bright: #A67C1A;
+  --gold-dim: rgba(139,105,20,0.08);
+  --gold-glow: rgba(139,105,20,0.15);
+  --gold-radiant: rgba(166,124,26,0.2);
+  --emerald: #2D7A52;
+  --emerald-dim: rgba(45,122,82,0.08);
+  --emerald-glow: rgba(45,122,82,0.15);
+  --amber: #9E5E28;
+  --amber-dim: rgba(158,94,40,0.08);
+  --copper: #7A4A30;
+  --text-primary: #2C2416;
+  --text-secondary: #5A5040;
+  --text-dim: #8A8070;
+  --border: #E0D8C8;
+  --border-gold: rgba(139,105,20,0.2);
+  --red: #B84A3A;
+  --green: #2D8A4A;
+}
+
+/* ── Light Theme Overrides ── */
+[data-theme="light"] body {
+  background: #FAF6EE !important;
+  color: #2C2416 !important;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139,105,20,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(158,94,40,0.03) 0%, transparent 50%) !important;
+}
+[data-theme="light"] body::before {
+  background-image:
+    repeating-linear-gradient(90deg, rgba(139,105,20,0.025) 0px, rgba(139,105,20,0.025) 1px, transparent 1px, transparent 80px),
+    repeating-linear-gradient(0deg, rgba(139,105,20,0.025) 0px, rgba(139,105,20,0.025) 1px, transparent 1px, transparent 80px) !important;
+}
+[data-theme="light"] body::after {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(139,105,20,0.03) 0%, transparent 25%),
+    radial-gradient(circle at 85% 80%, rgba(139,105,20,0.02) 0%, transparent 20%) !important;
+}
+[data-theme="light"] .sticky-header {
+  background: rgba(250,246,238,0.95) !important;
+  border-bottom-color: rgba(139,105,20,0.15) !important;
+}
+[data-theme="light"] .sticky-header::after {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.2), transparent) !important;
+}
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #F0EBE0;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(139,105,20,0.2), rgba(139,105,20,0.35));
+  border: 1px solid rgba(139,105,20,0.15);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(139,105,20,0.5);
+}
+[data-theme="light"] .header-day {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .header-title {
+  color: #5A5040;
+}
+[data-theme="light"] .badge-asset {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .badge-series {
+  color: #8A8070;
+  background: rgba(0,0,0,0.04);
+}
+[data-theme="light"] .timer-btn {
+  background: rgba(139,105,20,0.08);
+  border-color: #8B6914;
+  color: #8B6914;
+}
+[data-theme="light"] .timer-btn:hover {
+  background: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .hero {
+  border-bottom-color: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .hero::before {
+  background: linear-gradient(90deg, transparent, #8B6914, transparent);
+}
+[data-theme="light"] .hero-day {
+  color: #2C2416;
+  text-shadow: none;
+}
+[data-theme="light"] .hero-subtitle {
+  color: #8B6914;
+}
+[data-theme="light"] .hero-eldorado-sub {
+  color: #9E5E28;
+}
+[data-theme="light"] .hero-quote {
+  color: #5A5040;
+}
+[data-theme="light"] .concept-card {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+[data-theme="light"] .concept-card:hover {
+  background: #FFF9F0;
+  border-color: rgba(139,105,20,0.3);
+  box-shadow: 0 4px 16px rgba(139,105,20,0.08);
+}
+[data-theme="light"] .concept-card::before {
+  background: linear-gradient(90deg, rgba(139,105,20,0.1), rgba(139,105,20,0.3), rgba(139,105,20,0.1));
+}
+[data-theme="light"] .brain-box {
+  background: linear-gradient(135deg, #FFFFFF, #F8F4EC);
+  border-color: #E0D8C8;
+  border-left-color: #2D7A52;
+}
+[data-theme="light"] .brain-box::before {
+  background: radial-gradient(circle at 100% 0%, rgba(45,122,82,0.06), transparent 70%);
+}
+[data-theme="light"] .formula-block {
+  background: #FBF7EF;
+  border-color: #E0D8C8;
+  border-left-color: #8B6914;
+}
+[data-theme="light"] .sim-box {
+  background: linear-gradient(135deg, rgba(139,105,20,0.04), rgba(45,122,82,0.04));
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .sim-box::before {
+  background: #FAF6EE;
+}
+[data-theme="light"] .psych-box {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+  border-left-color: #9E5E28;
+}
+[data-theme="light"] .deep-dive {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .deep-dive summary:hover {
+  background: #F8F4EC;
+}
+[data-theme="light"] .deep-dive[open] {
+  border-color: rgba(139,105,20,0.3);
+  box-shadow: 0 0 15px rgba(139,105,20,0.05);
+}
+[data-theme="light"] .quiz-section {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .quiz-section::before {
+  background: linear-gradient(90deg, #9E5E28, #8B6914, #9E5E28);
+}
+[data-theme="light"] .quiz-options li:hover {
+  background: #F5F0E5;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .quiz-answer {
+  background: #F5F0E5;
+}
+[data-theme="light"] .sr-tracker {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .sr-slot {
+  background: #F5F0E5;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .sr-slot:hover {
+  border-color: #8B6914;
+}
+[data-theme="light"] .chart-container {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .data-table th {
+  border-bottom-color: rgba(139,105,20,0.3);
+}
+[data-theme="light"] .data-table td {
+  border-bottom-color: rgba(224,216,200,0.7);
+}
+[data-theme="light"] .data-table tr:hover td {
+  background: rgba(139,105,20,0.04);
+}
+[data-theme="light"] .highlight-row td {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+}
+[data-theme="light"] .nav-btn {
+  color: #5A5040;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .nav-btn:hover {
+  border-color: #8B6914;
+  color: #8B6914;
+}
+[data-theme="light"] .disclaimer {
+  border-top-color: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .progress-bar-bg {
+  background: #EDE8D8;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .progress-bar-fill {
+  background: linear-gradient(90deg, #9E5E28, #8B6914, #A67C1A);
+  background-size: 200% 100%;
+}
+[data-theme="light"] .aztec-divider::before,
+[data-theme="light"] .aztec-divider::after {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.15), transparent);
+}
+[data-theme="light"] .hero-illustration {
+  border-color: rgba(139,105,20,0.1);
+}
+[data-theme="light"] .hero-illustration::after {
+  background: linear-gradient(to top, #FAF6EE, transparent);
+}
+/* Light theme: SVG illustrations get warmer tones */
+[data-theme="light"] .hero-illustration svg {
+  filter: saturate(0.8) brightness(1.1);
+}
+/* Light theme: particles become subtle */
+[data-theme="light"] #goldParticles {
+  opacity: 0.3;
+}
+/* Scroll compass light adaptation */
+[data-theme="light"] .scroll-compass {
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+}
+/* Card glow adapts to light theme */
+[data-theme="light"] .concept-card .card-glow {
+  background: radial-gradient(circle, rgba(139,105,20,0.08) 0%, transparent 70%);
+}
+/* Section flash for light */
+[data-theme="light"] .section-flash {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.4), transparent);
+}
+/* Checklist in light */
+[data-theme="light"] .checklist li::before {
+  border-color: #8B6914;
+}
+[data-theme="light"] .checklist li.checked::before {
+  background: #8B6914;
+}
+[data-theme="light"] .checklist li.checked::after {
+  color: #FFFFFF;
+}
+/* Neuro & Engineer tags */
+[data-theme="light"] .neuro-tag {
+  color: #2D7A52;
+  background: rgba(45,122,82,0.08);
+}
+[data-theme="light"] .engineer-tag {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+}
+/* Time table */
+[data-theme="light"] .time-table td {
+  border-bottom-color: rgba(224,216,200,0.5);
+}
+/* Part texture backgrounds in light */
+[data-theme="light"] .bg-part-texture {
+  opacity: 0.3;
+}
+/* Smooth transition on theme change */
+html {
+  transition: none;
+}
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 0.4s, color 0.3s, border-color 0.3s, box-shadow 0.3s !important;
+}
+/* ═══ END THEME TOGGLE ═══ */
+
 </style>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 </head>
 <body>
+<a href="#main-content" class="skip-link" style="position:absolute;top:-100px;left:0;background:var(--gold);color:var(--bg-primary);padding:0.5rem 1rem;z-index:200;font-size:0.8rem;transition:top 0.2s;" onfocus="this.style.top='0'" onblur="this.style.top='-100px'">본문으로 건너뛰기</a>
 
-<header class="sticky-header">
+<header class="sticky-header" role="banner" aria-label="상단 네비게이션">
   <div class="header-left">
     <span class="header-day">DAY 07 / 23</span>
     <span class="header-title">Part 1 복습 & 통합 점검</span>
   </div>
   <div class="header-right">
+<button class="theme-toggle" id="themeToggle" aria-label="테마 전환" title="다크/라이트 모드 전환">
+  <div class="theme-toggle-knob">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </div>
+</button>
+
     <span class="header-badge badge-asset">순자산 3억 2,800만</span>
-    <span class="header-badge badge-series">PART 1 · 부자 마인드셋 & 자산 기초</span>
-    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+    <span class="header-badge badge-series">제1장 · 황금 지도의 발견</span>
+    <button class="timer-btn" aria-label="포모도로 타이머 시작/정지" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
   </div>
 </header>
 
-<div class="container">
+<div class="container" id="main-content" role="main">
 
 <section class="hero">
-  <div class="hero-part">PART 1 — 부자 마인드셋 & 자산 기초</div>
+  <div class="hero-part">제1장 · 황금 지도의 발견</div>
+  <div class="hero-icon" style="margin-bottom:1rem;opacity:0.7;display:flex;justify-content:center;"><svg viewBox="0 0 48 48" width="48" height="48"><path d="M12 24 L20 32 L36 16" fill="none" stroke="#3D9E6E" stroke-width="2.5" opacity="0.5"/><circle cx="24" cy="24" r="18" fill="none" stroke="#D4A843" stroke-width="1.5" opacity="0.3"/></svg></div>
   <h1 class="hero-day">Day 07</h1>
   <h2 class="hero-subtitle">Part 1 복습 & 통합 점검</h2>
-  <p class="hero-quote">"아는 것은 내가 모르는 것의 경계를 알 때 비로소 완성된다." — 소크라테스</p>
+  <p class="hero-quote">"훌륭한 계획을 오늘 실행하는 것이, 내일의 완벽한 계획보다 낫다." — Sheryl Sandberg</p>
   <div class="hero-badges">
     <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
     <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
     <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
     <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
   </div>
-  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 1: 01~07</div>
+  <div class="series-info">El Dorado 원정 — 포모도로 1세션(25분) × 23일 | PART 1: 01~07</div>
   <div class="progress-wrap">
     <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:30.4%"></div></div>
     <div class="progress-label"><span>Day 07</span><span>7 / 23 완료 (30.4%)</span></div>
   </div>
 </section>
 
+<div class="hero-illustration fade-up"><svg viewBox="0 0 860 200" width="860" height="200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;margin:-1rem 0 1rem;opacity:0.85;" preserveAspectRatio="xMidYMid slice">
+  <rect width="860" height="200" fill="#0D0B08"/>
+  <!-- stone gate -->
+  <rect x="360" y="30" width="20" height="170" fill="#D4A843" opacity="0.06"/>
+  <rect x="480" y="30" width="20" height="170" fill="#D4A843" opacity="0.06"/>
+  <path d="M355,30 Q430,5 505,30" fill="none" stroke="#D4A843" stroke-width="1.5" opacity="0.12"/>
+  <!-- arch keystone -->
+  <polygon points="430,8 420,25 440,25" fill="#D4A843" opacity="0.1"/>
+  <!-- path through gate -->
+  <path d="M0,180 L360,170 M500,170 L860,160" stroke="#D4A843" stroke-width="0.8" opacity="0.1" stroke-dasharray="6 3"/>
+  <!-- flag -->
+  <line x1="430" y1="5" x2="430" y2="-10" stroke="#D4A843" stroke-width="1" opacity="0.15"/>
+  <!-- torches -->
+  <circle cx="370" cy="60" r="6" fill="#E8C65A" opacity="0.08"/>
+  <circle cx="490" cy="60" r="6" fill="#E8C65A" opacity="0.08"/>
+  <line x1="370" y1="66" x2="370" y2="90" stroke="#C4793D" stroke-width="1" opacity="0.1"/>
+  <line x1="490" y1="66" x2="490" y2="90" stroke="#C4793D" stroke-width="1" opacity="0.1"/>
+  <text x="430" y="110" text-anchor="middle" fill="#D4A843" font-size="10" opacity="0.12" font-family="Cormorant Garamond,serif" font-style="italic">Gate I</text>
+</svg>
+</div>
+
+
 <!-- 뇌과학 학습 전략 -->
 <section class="section fade-up">
   <div class="brain-box">
-    <h3>🧠 뇌과학 학습 전략: 분산적 학습 & 장기 기억 전환</h3>
-    <p>Part 1(일 1~6)의 핵심을 통합하고, 자신의 자산 상황에 적용합니다. 에빙하우스 망각곡선을 극복하는 '능동적 회상'이 핵심입니다.</p>
+    <h3>🧠 뇌과학 학습 전략: 통합 이해 + 실행 의지</h3>
+    <p>Part 1의 6개 개념이 하나의 시스템을 이루는 이유를 이해하는 것이 중요합니다. 이해는 학습이고, 실행은 변화입니다. 당신은 이미 이해했습니다. 이제는 첫 발걸음입니다.</p>
     <table class="time-table">
       <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
-      <tbody><tr><td class="time-col">0–5분</td><td>Part 1 핵심 요약 (Day 01~06)</td><td>개념 복습</td></tr>
-<tr><td class="time-col">5–12분</td><td>개인 자산 통합 시뮬레이션</td><td>계산 검증</td></tr>
-<tr><td class="time-col">12–18분</td><td>위험 vs 기회 매트릭스</td><td>의사결정 준비</td></tr>
-<tr><td class="time-col">18–23분</td><td>종합 퀴즈 & 자가 평가</td><td>약점 파악</td></tr>
-<tr><td class="time-col">23–25분</td><td>Part 2 미리보기</td><td>동기 부여</td></tr>
+      <tbody><tr><td class="time-col">09:00-09:05</td><td>전체 6일 회고</td><td>Day 1-6 핵심 개념 1분 요약</td></tr>
+<tr><td class="time-col">09:05-09:12</td><td>통합 이해</td><td>6가지 개념이 하나의 시스템을 이루는 방식</td></tr>
+<tr><td class="time-col">09:12-09:20</td><td>차트 분석</td><td>여정맵, 망각곡선, 개념 네트워크</td></tr>
+<tr><td class="time-col">09:20-09:25</td><td>실행 계획</td><td>다음 3년의 액션 아이템 정의</td></tr>
 </tbody>
     </table>
   </div>
@@ -370,61 +1170,93 @@ body {
   <div class="cards-grid">
     <div class="concept-card fade-up">
       <div class="card-num">CONCEPT 01</div>
-      <div class="card-title">Part 1 핵심 요약: 5개 키 콘셉트</div>
-      <div class="card-body"><div class="formula-block">
-<div class="formula-highlight">Day 01: 재정 목표 설정</div>
-<div class="formula-line">  → "어디로 가는지 모르면 어느 길로든 도착한다"</div>
-<div class="formula-line">  → 학습자 목표: 10년 내 순자산 10억 달성 (현재 3.28억)</div>
-<br>
-<div class="formula-highlight">Day 02: 복리의 수식</div>
-<div class="formula-line">  FV = PV × (1 + r)^n</div>
-<div class="formula-line">  → 3.28억 × (1.08)^10 ≈ 7.07억 (연 8% 수익 기준)</div>
-<div class="formula-line">  → 10억 도달은 연 9.5% 수익 필요</div>
-<br>
-<div class="formula-highlight">Day 03: 한국 직장인 자산 형성 경로</div>
-<div class="formula-line">  소득 → 저축 + 부채 활용 → 자산 구축</div>
-<div class="formula-line">  → 학습자: 월 맞벌이 1,000~1,200만 + 부채 4억 활용</div>
-<br>
-<div class="formula-highlight">Day 04: 담보대출 최적화</div>
-<div class="formula-line">  LTV (부채/담보자산 비율) = 400 / 700 = 57%</div>
-<div class="formula-line">  → 안정 범위(40~60%) 내, 금리 상승 시 위험 증가</div>
-<br>
-<div class="formula-highlight">Day 05: 위험 수용도 & 자산 배분</div>
-<div class="formula-line">  목표: 부동산 90.9% → 45~50%로 리밸런싱</div>
-<div class="formula-line">  추가: 주식 35%, 채권 12%, 현금 8%</div>
-<br>
-<div class="formula-highlight">Day 06: 행동재무학</div>
-<div class="formula-line">  극복 규칙: 월 1회 확인, 손절 -15%, 예측 오류 일지</div>
-</div></div>
+      <div class="card-title">Part 1의 철학: 시스템적 접근</div>
+      <div class="card-body">
+        <p><strong>왜 6개의 독립적인 주제가 아니라 "Part 1"인가?</strong></p>
+        <p>Part 1은 당신의 현재 자산(3.28억)을 중심으로 설계된 통합 시스템입니다. 각 Day는:</p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>Day 1: "무엇을 위해?" (목표)</li>
+          <li>Day 2-3: "어떻게 하면?" (경로)</li>
+          <li>Day 4-5: "어떤 구조로?" (배분과 최적화)</li>
+          <li>Day 6: "어떻게 지킬까?" (심리 관리)</li>
+          <li>Day 7: "맞는가?" (통합 검증)</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>선형적 학습과의 차이:</strong> 보통의 강의는 "주식 기초 → 기업 분석 → 매수 타이밍"처럼 순서대로 진행합니다. 하지만 실제 투자는 "목표 → 자산 배분 → 실행 → 심리 관리 → 재검토"라는 사이클입니다. Part 1은 이 사이클의 한 바퀴를 완성합니다.</p>
+        </div>
     </div>
     <div class="concept-card fade-up">
       <div class="card-num">CONCEPT 02</div>
-      <div class="card-title">자산 배분 통합 시뮬레이션 (3년 계획)</div>
-      <div class="card-body"><div class="data-table-wrap">
-<table class="data-table">
-<thead><tr><th>연도</th><th>연 저축(만)</th><th>투자 자산</th><th>부동산 가치</th><th>부채</th><th>순자산(억)</th></tr></thead>
-<tbody>
-<tr><td>2026 현재</td><td>-</td><td>2,800만</td><td>7억</td><td>-4억</td><td>3.28</td></tr>
-<tr><td>2027 목표</td><td>3,600</td><td>6,400</td><td>7.2</td><td>-3.8</td><td>3.84</td></tr>
-<tr><td>2028 목표</td><td>3,600</td><td>10,000</td><td>7.4</td><td>-3.6</td><td>4.44</td></tr>
-<tr><td>2029 목표</td><td>3,600</td><td>14,500</td><td>7.6</td><td>-3.4</td><td>5.14</td></tr>
-<tr class="highlight-row"><td style="font-weight:600;">가정</td><td>월 300만 × 12</td><td>연 8%</td><td>연 2%</td><td>연 50만 상환</td><td>복합 증가</td></tr>
-</tbody></table></div>
-<p style="color:var(--gold);font-size:0.85rem;margin-top:0.8rem;"><strong>통합 진단:</strong> 월부 1,500만 상환 + 월 300만 저축 = 월 1,800만 필요. 맞벌이(월 ~1,200만)는 충분하지만, "금리 상승 충격" 및 "경기 둔화" 시나리오에 대비 필요.</p></div>
+      <div class="card-title">6일의 누적 학습 효과</div>
+      <div class="card-body">
+        <p><strong>각 Day의 '혼자'는 약하지만, '함께'는 강합니다.</strong></p>
+        <p>Day 별 학습 효과 (독립적):</p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>Day 1 (목표): 동기 부여 +++, 실제 변화 +</li>
+          <li>Day 2-3 (자산 형성): 이해 +++, 실행 가능성 ++</li>
+          <li>Day 4 (부채 관리): 절약 +++, 위험 감소 +++</li>
+          <li>Day 5 (자산 배분): 구체적 계획 +++, 심리적 저항 +</li>
+          <li>Day 6 (심리 관리): 자각 +++, 실행 통제 +++</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>통합 효과 (Part 1 전체):</strong> Day 5만으로는 "60/40 배분이 맞다"는 지식. 하지만 Day 6을 더하면 "내가 실제로 이 배분을 지킬 수 있는가?"라는 실행력이 생깁니다. 이것이 "통합 학습"의 힘입니다.</p>
+        </div>
     </div>
     <div class="concept-card fade-up">
       <div class="card-num">CONCEPT 03</div>
-      <div class="card-title">위험 vs 기회 매트릭스 (의사결정 프레임)</div>
-      <div class="card-body"><div class="data-table-wrap">
-<table class="data-table">
-<thead><tr><th>시나리오</th><th>확률</th><th>주식 영향</th><th>부동산 영향</th><th>대응 전략</th></tr></thead>
-<tbody>
-<tr><td>경기 호황 (확률 30%)</td><td>+</td><td style="color:#4ABF7A">+12~15%</td><td style="color:#4A9EBF">+3~4%</td><td>주식 비중 유지</td></tr>
-<tr><td>경기 정상 (확률 50%)</td><td>중립</td><td style="color:#C9A84C">+6~8%</td><td style="color:#4A9EBF">+2~3%</td><td>계획대로 적립</td></tr>
-<tr><td>금리 급상승 (확률 15%)</td><td>위험</td><td style="color:#BF4A4A">-5~10%</td><td style="color:#BF4A4A">-5~8%</td><td>채권 비중 +5%</td></tr>
-<tr><td>재정위기 (확률 5%)</td><td>극단</td><td style="color:#BF4A4A">-20~30%</td><td style="color:#BF4A4A">-15~20%</td><td>현금 10% 유지, 기회 매수</td></tr>
-</tbody></table></div>
-<p style="color:var(--text-secondary);font-size:0.85rem;margin-top:0.8rem;">기대값 = 30%×13.5% + 50%×7% + 15%×(-7.5%) + 5%×(-25%) = <span style="color:var(--gold);">+4.8%</span> (평균적으로 안정적)</p></div>
+      <div class="card-title">Part 2 (주식 투자)로의 브릿지</div>
+      <div class="card-body">
+        <p><strong>Part 1이 없었다면, Part 2는 위험합니다.</strong></p>
+        <p>Part 2에서 배울 것들 (예상):</p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>PER, PBR 같은 기업 분석 지표</li>
+          <li>재무제표 읽는 방법</li>
+          <li>기술적 분석 (차트 패턴)</li>
+          <li>매수/매도 타이밍</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>하지만 Part 1 없이 Part 2를 배우면:</strong></p>
+        <ul style="margin-left:1.2rem;">
+          <li>"이 주식이 좋으니까 사야 한다" ← 과신의 함정</li>
+          <li>"이 기업의 PER이 낮으니까 기회다" ← 앵커링의 함정</li>
+          <li>"지금 사는 것이 최적이다" ← 타이밍 환상</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>Part 1의 안전장치:</strong> 당신은 이미 "60/40 자산 배분", "월 470만원 정기 매수", "심리 편향에 대한 자각"을 갖추고 있습니다. 이것이 Part 2에서 무리한 투자를 하지 않도록 보호합니다.</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">간격 반복의 실질적 효과</div>
+      <div class="card-body">
+        <p><strong>학습의 70%는 복습에서 나온다.</strong></p>
+        <p>뇌과학 데이터:</p>
+        <div class="data-table-wrap" style="margin-top:0.6rem;">
+          <table class="data-table" style="font-size:0.8rem;">
+            <thead>
+              <tr><th>복습 방식</th><th>1주 후</th><th>1개월 후</th><th>3개월 후</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>복습 없음</td><td>30%</td><td>10%</td><td>5%</td></tr>
+              <tr><td>1회 복습</td><td>60%</td><td>40%</td><td>20%</td></tr>
+              <tr><td>간격 반복(D+1,3,7)</td><td>90%</td><td>85%</td><td>80%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:0.6rem;"><strong>당신의 계획:</strong> "이번 주: 전체 재정독 (D+1) → 3일 뒤: 퀴즈 풀이 (D+3) → 7일 뒤: 자신의 자산에 적용 (D+7)". 이 세 번의 복습이 Part 1의 장기 기억 전환율을 30%에서 85%로 상승시킵니다.</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">다음 Part (2-4)와의 연속성</div>
+      <div class="card-body">
+        <p><strong>Part 1은 기초, Part 2-4는 세부입니다.</strong></p>
+        <p>Part 구성:</p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>Part 1 (Days 1-7): 목표 & 자산 구조 설계</li>
+          <li>Part 2 (Days 8-14): 주식 투자 실전 (Part 1의 "주식 부분" 심화)</li>
+          <li>Part 3 (Days 15-19): 부동산 & 자산 배분 (Part 1의 "부동산 부분" 심화)</li>
+          <li>Part 4 (Days 20-23): 세금 & 자동화 (Part 1의 "수익 극대화" 응용)</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>흐름:</strong> Part 1에서 "60/40 배분"을 정했다면, Part 2에서는 "주식 60%를 어떻게 선택하는가?"를 배웁니다. Part 3에서는 "부동산 70-80%를 어떻게 관리하는가?"를 배웁니다. Part 4에서는 "전체 수익에 세금을 어떻게 최소화하는가?"를 배웁니다.</p>
+        <p style="margin-top:0.4rem;"><strong>일관성:</strong> Part 1의 기초가 단단하면, 다음 3개 Part는 자연스럽게 연결됩니다. 하지만 Part 1을 건너뛰고 Part 2부터 시작하면, "왜 이것을 배워야 하는가?"라는 혼란이 생깁니다.</p>
+        </div>
     </div></div>
 </section>
 
@@ -432,98 +1264,487 @@ body {
 <section class="section fade-up">
   <div class="section-label">VISUALIZATION</div>
   <h2 class="section-title">시각화 자료</h2>
-  <div class="chart-container">
-    <div class="chart-title">Part 1 (Day 01~06) 통합 맵 — 5개 모듈의 인과관계</div>
-    <svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
-      <!-- 제목 -->
-      <text x="450" y="30" fill="#E8E6E1" font-family="Noto Sans KR" font-size="14" text-anchor="middle" font-weight="600">Part 1 핵심 5개 모듈 & 인과 흐름</text>
-
-      <!-- 모듈 박스 -->
-      <!-- Module 1: 목표 설정 -->
-      <rect x="50" y="100" width="120" height="80" fill="rgba(201,168,76,0.2)" stroke="#C9A84C" stroke-width="2" rx="8"/>
-      <text x="110" y="125" fill="#C9A84C" font-family="Noto Sans KR" font-size="12" text-anchor="middle" font-weight="600">Day 01</text>
-      <text x="110" y="145" fill="#E8E6E1" font-family="Noto Sans KR" font-size="11" text-anchor="middle">재정 목표</text>
-      <text x="110" y="165" fill="#9A9890" font-family="JetBrains Mono" font-size="9" text-anchor="middle">10억 목표</text>
-
-      <!-- Module 2: 복리 공식 -->
-      <rect x="210" y="100" width="120" height="80" fill="rgba(74,158,191,0.2)" stroke="#4A9EBF" stroke-width="2" rx="8"/>
-      <text x="270" y="125" fill="#4A9EBF" font-family="Noto Sans KR" font-size="12" text-anchor="middle" font-weight="600">Day 02</text>
-      <text x="270" y="145" fill="#E8E6E1" font-family="Noto Sans KR" font-size="11" text-anchor="middle">복리 수식</text>
-      <text x="270" y="165" fill="#9A9890" font-family="JetBrains Mono" font-size="9" text-anchor="middle">연 9.5% 필요</text>
-
-      <!-- Module 3: 자산 형성 -->
-      <rect x="370" y="100" width="120" height="80" fill="rgba(74,191,122,0.2)" stroke="#4ABF7A" stroke-width="2" rx="8"/>
-      <text x="430" y="125" fill="#4ABF7A" font-family="Noto Sans KR" font-size="12" text-anchor="middle" font-weight="600">Day 03~04</text>
-      <text x="430" y="145" fill="#E8E6E1" font-family="Noto Sans KR" font-size="11" text-anchor="middle">소득 & 부채</text>
-      <text x="430" y="165" fill="#9A9890" font-family="JetBrains Mono" font-size="9" text-anchor="middle">월 1.2M 저축</text>
-
-      <!-- Module 4: 자산 배분 -->
-      <rect x="530" y="100" width="120" height="80" fill="rgba(201,168,76,0.2)" stroke="#C9A84C" stroke-width="2" rx="8"/>
-      <text x="590" y="125" fill="#C9A84C" font-family="Noto Sans KR" font-size="12" text-anchor="middle" font-weight="600">Day 05</text>
-      <text x="590" y="145" fill="#E8E6E1" font-family="Noto Sans KR" font-size="11" text-anchor="middle">자산 배분</text>
-      <text x="590" y="165" fill="#9A9890" font-family="JetBrains Mono" font-size="9" text-anchor="middle">주식 35~60%</text>
-
-      <!-- Module 5: 심리 관리 -->
-      <rect x="690" y="100" width="120" height="80" fill="rgba(191,74,74,0.2)" stroke="#BF4A4A" stroke-width="2" rx="8"/>
-      <text x="750" y="125" fill="#BF4A4A" font-family="Noto Sans KR" font-size="12" text-anchor="middle" font-weight="600">Day 06</text>
-      <text x="750" y="145" fill="#E8E6E1" font-family="Noto Sans KR" font-size="11" text-anchor="middle">심리 관리</text>
-      <text x="750" y="165" fill="#9A9890" font-family="JetBrains Mono" font-size="9" text-anchor="middle">감정 제거</text>
-
-      <!-- 화살표: 인과 흐름 -->
-      <defs>
-        <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
-          <polygon points="0 0, 10 5, 0 10" fill="#C9A84C"/>
-        </marker>
-      </defs>
-
-      <path d="M170,140 L210,140" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
-      <path d="M330,140 L370,140" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
-      <path d="M490,140 L530,140" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
-      <path d="M650,140 L690,140" stroke="#C9A84C" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
-
-      <!-- 하단: 통합 적용 -->
-      <rect x="100" y="250" width="700" height="100" fill="rgba(73,73,73,0.2)" stroke="#5A584F" stroke-width="1" rx="8"/>
-      <text x="450" y="280" fill="#E8E6E1" font-family="Noto Sans KR" font-size="13" text-anchor="middle" font-weight="600">Part 1 통합 실행 계획</text>
-      <text x="450" y="305" fill="#9A9890" font-family="Noto Sans KR" font-size="11" text-anchor="middle">현자산 3.28억 → 자산배분 리밸런싱 → 월 300만 적립 + 월 부채 50만 상환</text>
-      <text x="450" y="330" fill="#9A9890" font-family="Noto Sans KR" font-size="11" text-anchor="middle">→ 3년 후 순자산 5.14억 → 10년 후 10억 달성 (연 8% 수익 + 적절한 심리 관리)</text>
-    </svg>
+  
+<div class="chart-container">
+  <div class="chart-title">CHART 1: PART 1 LEARNING JOURNEY — 6일간의 통합 체계</div>
+  <svg loading="lazy" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1000" height="500" fill="#0D0B08"/>
+    
+    <!-- Background grid -->
+    <g stroke="#2C261E" stroke-width="0.5" opacity="0.3">
+      <line x1="100" y1="50" x2="100" y2="400"/>
+      <line x1="100" y1="400" x2="950" y2="400"/>
+      <line x1="150" y1="50" x2="150" y2="400"/><line x1="200" y1="50" x2="200" y2="400"/><line x1="250" y1="50" x2="250" y2="400"/>
+      <line x1="300" y1="50" x2="300" y2="400"/><line x1="350" y1="50" x2="350" y2="400"/><line x1="400" y1="50" x2="400" y2="400"/>
+      <line x1="450" y1="50" x2="450" y2="400"/><line x1="500" y1="50" x2="500" y2="400"/><line x1="550" y1="50" x2="550" y2="400"/>
+      <line x1="600" y1="50" x2="600" y2="400"/><line x1="650" y1="50" x2="650" y2="400"/><line x1="700" y1="50" x2="700" y2="400"/>
+      <line x1="750" y1="50" x2="750" y2="400"/><line x1="800" y1="50" x2="800" y2="400"/><line x1="850" y1="50" x2="850" y2="400"/>
+      <line x1="900" y1="50" x2="900" y2="400"/><line x1="950" y1="50" x2="950" y2="400"/>
+    </g>
+    
+    <!-- Axis -->
+    <line x1="100" y1="400" x2="950" y2="400" stroke="#3D9E6E" stroke-width="2"/>
+    <line x1="100" y1="50" x2="100" y2="400" stroke="#3D9E6E" stroke-width="2"/>
+    
+    <!-- Day 1: Goal Setting -->
+    <circle cx="150" cy="280" r="20" fill="#3D9E6E" opacity="0.7"/>
+    <text x="150" y="288" font-family="JetBrains Mono" font-size="12" fill="#EDE8D8" text-anchor="middle" font-weight="bold">Day1</text>
+    <text x="150" y="330" font-family="Noto Sans KR" font-size="9" fill="#B8B0A0" text-anchor="middle">목표 설정</text>
+    <text x="150" y="345" font-family="Noto Sans KR" font-size="8" fill="#8A8272" text-anchor="middle">(3.28억)</text>
+    
+    <!-- Day 2: Compound Interest -->
+    <circle cx="250" cy="200" r="20" fill="#4AAF6A" opacity="0.7"/>
+    <text x="250" y="208" font-family="JetBrains Mono" font-size="12" fill="#EDE8D8" text-anchor="middle" font-weight="bold">Day2</text>
+    <text x="250" y="330" font-family="Noto Sans KR" font-size="9" fill="#B8B0A0" text-anchor="middle">복리의 수식</text>
+    <text x="250" y="345" font-family="Noto Sans KR" font-size="8" fill="#8A8272" text-anchor="middle">(시간의 힘)</text>
+    
+    <!-- Day 3: Asset Pipeline -->
+    <circle cx="350" cy="150" r="20" fill="#D4A843" opacity="0.7"/>
+    <text x="350" y="158" font-family="JetBrains Mono" font-size="12" fill="#EDE8D8" text-anchor="middle" font-weight="bold">Day3</text>
+    <text x="350" y="330" font-family="Noto Sans KR" font-size="9" fill="#B8B0A0" text-anchor="middle">자산 형성 경로</text>
+    <text x="350" y="345" font-family="Noto Sans KR" font-size="8" fill="#8A8272" text-anchor="middle">(한국 현실)</text>
+    
+    <!-- Day 4: Mortgage Optimization -->
+    <circle cx="450" cy="120" r="20" fill="#C45A4A" opacity="0.7"/>
+    <text x="450" y="128" font-family="JetBrains Mono" font-size="12" fill="#EDE8D8" text-anchor="middle" font-weight="bold">Day4</text>
+    <text x="450" y="330" font-family="Noto Sans KR" font-size="9" fill="#B8B0A0" text-anchor="middle">담보대출 최적화</text>
+    <text x="450" y="345" font-family="Noto Sans KR" font-size="8" fill="#8A8272" text-anchor="middle">(4억 관리)</text>
+    
+    <!-- Day 5: Risk Assessment & Allocation -->
+    <circle cx="550" cy="140" r="20" fill="#3D9E6E" opacity="0.7"/>
+    <text x="550" y="148" font-family="JetBrains Mono" font-size="12" fill="#EDE8D8" text-anchor="middle" font-weight="bold">Day5</text>
+    <text x="550" y="330" font-family="Noto Sans KR" font-size="9" fill="#B8B0A0" text-anchor="middle">위험 & 자산배분</text>
+    <text x="550" y="345" font-family="Noto Sans KR" font-size="8" fill="#8A8272" text-anchor="middle">(60/40 목표)</text>
+    
+    <!-- Day 6: Behavioral Finance -->
+    <circle cx="650" cy="180" r="20" fill="#4AAF6A" opacity="0.7"/>
+    <text x="650" y="188" font-family="JetBrains Mono" font-size="12" fill="#EDE8D8" text-anchor="middle" font-weight="bold">Day6</text>
+    <text x="650" y="330" font-family="Noto Sans KR" font-size="9" fill="#B8B0A0" text-anchor="middle">행동재무학</text>
+    <text x="650" y="345" font-family="Noto Sans KR" font-size="8" fill="#8A8272" text-anchor="middle">(심리 제어)</text>
+    
+    <!-- Connecting path -->
+    <polyline points="150,280 250,200 350,150 450,120 550,140 650,180" 
+              stroke="#D4A843" stroke-width="2" fill="none" opacity="0.6" stroke-dasharray="5,5"/>
+    
+    <!-- Integration node (Day 7) -->
+    <circle cx="750" cy="200" r="25" fill="#D4A843" opacity="0.8"/>
+    <text x="750" y="205" font-family="JetBrains Mono" font-size="13" fill="#EDE8D8" text-anchor="middle" font-weight="bold">Day7</text>
+    <text x="750" y="330" font-family="Noto Sans KR" font-size="10" fill="#EDE8D8" text-anchor="middle" font-weight="bold">통합점검</text>
+    <text x="750" y="347" font-family="Noto Sans KR" font-size="8" fill="#B8B0A0" text-anchor="middle">(전체 시스템)</text>
+    
+    <!-- X-axis labels -->
+    <text x="150" y="430" font-family="JetBrains Mono" font-size="10" fill="#B8B0A0" text-anchor="middle">Day 01</text>
+    <text x="250" y="430" font-family="JetBrains Mono" font-size="10" fill="#B8B0A0" text-anchor="middle">Day 02</text>
+    <text x="350" y="430" font-family="JetBrains Mono" font-size="10" fill="#B8B0A0" text-anchor="middle">Day 03</text>
+    <text x="450" y="430" font-family="JetBrains Mono" font-size="10" fill="#B8B0A0" text-anchor="middle">Day 04</text>
+    <text x="550" y="430" font-family="JetBrains Mono" font-size="10" fill="#B8B0A0" text-anchor="middle">Day 05</text>
+    <text x="650" y="430" font-family="JetBrains Mono" font-size="10" fill="#B8B0A0" text-anchor="middle">Day 06</text>
+    <text x="750" y="430" font-family="JetBrains Mono" font-size="10" fill="#D4A843" text-anchor="middle" font-weight="bold">TODAY</text>
+    
+    <!-- Y-axis label -->
+    <text x="30" y="220" font-family="JetBrains Mono" font-size="10" fill="#B8B0A0" text-anchor="middle" transform="rotate(-90 30 220)">개념적 복잡도</text>
+  </svg>
 </div>
+
+<div class="chart-container">
+  <div class="chart-title">CHART 2: 에빙하우스 망각곡선 — 최적 복습 일정</div>
+  <svg loading="lazy" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1000" height="500" fill="#0D0B08"/>
+    
+    <!-- Grid -->
+    <g stroke="#2C261E" stroke-width="0.5" opacity="0.5">
+      <line x1="100" y1="50" x2="100" y2="400"/><line x1="100" y1="400" x2="950" y2="400"/>
+      <line x1="150" y1="50" x2="150" y2="400"/><line x1="200" y1="50" x2="200" y2="400"/><line x1="250" y1="50" x2="250" y2="400"/>
+      <line x1="300" y1="50" x2="300" y2="400"/><line x1="350" y1="50" x2="350" y2="400"/><line x1="400" y1="50" x2="400" y2="400"/>
+      <line x1="450" y1="50" x2="450" y2="400"/><line x1="500" y1="50" x2="500" y2="400"/><line x1="550" y1="50" x2="550" y2="400"/>
+      <line x1="600" y1="50" x2="600" y2="400"/><line x1="650" y1="50" x2="650" y2="400"/><line x1="700" y1="50" x2="700" y2="400"/>
+      <line x1="750" y1="50" x2="750" y2="400"/><line x1="800" y1="50" x2="800" y2="400"/><line x1="850" y1="50" x2="850" y2="400"/>
+      <line x1="100" y1="100" x2="950" y2="100"/><line x1="100" y1="150" x2="950" y2="150"/><line x1="100" y1="200" x2="950" y2="200"/>
+      <line x1="100" y1="250" x2="950" y2="250"/><line x1="100" y1="300" x2="950" y2="300"/><line x1="100" y1="350" x2="950" y2="350"/>
+    </g>
+    
+    <!-- Axis -->
+    <line x1="100" y1="400" x2="950" y2="400" stroke="#3D9E6E" stroke-width="2"/>
+    <line x1="100" y1="50" x2="100" y2="400" stroke="#3D9E6E" stroke-width="2"/>
+    
+    <!-- Forgetting curve (without review) -->
+    <path d="M 100,80 Q 200,120 300,180 Q 400,240 500,280 Q 600,310 700,330 Q 800,345 900,355" 
+          stroke="#C45A4A" stroke-width="2" fill="none"/>
+    <text x="920" y="360" font-family="Noto Sans KR" font-size="9" fill="#C45A4A">복습 없음</text>
+    
+    <!-- With 1st review (D+1) -->
+    <path d="M 100,80 Q 150,85 200,100 L 200,120 Q 250,125 300,140 Q 400,180 500,240 Q 600,280 700,310 Q 800,330 900,345" 
+          stroke="#D4A843" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+    <circle cx="200" cy="120" r="6" fill="#D4A843"/>
+    <text x="200" y="145" font-family="JetBrains Mono" font-size="8" fill="#D4A843" text-anchor="middle">D+1 복습</text>
+    
+    <!-- With D+1, D+3 review -->
+    <path d="M 100,80 Q 150,85 200,100 L 200,120 Q 250,123 300,135 L 300,160 Q 350,165 400,180 Q 500,220 600,260 Q 700,290 800,310 Q 850,320 900,330" 
+          stroke="#4AAF6A" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+    <circle cx="200" cy="120" r="6" fill="#D4A843"/>
+    <circle cx="300" cy="160" r="6" fill="#4AAF6A"/>
+    <text x="300" y="185" font-family="JetBrains Mono" font-size="8" fill="#4AAF6A" text-anchor="middle">D+3 복습</text>
+    
+    <!-- With D+1, D+3, D+7 review (optimal) -->
+    <path d="M 100,80 Q 150,83 200,98 L 200,120 Q 250,122 300,133 L 300,160 Q 350,162 400,175 L 400,195 Q 450,197 500,210 Q 600,240 700,270 Q 800,290 900,310" 
+          stroke="#3D9E6E" stroke-width="2" fill="none"/>
+    <circle cx="200" cy="120" r="6" fill="#D4A843"/>
+    <circle cx="300" cy="160" r="6" fill="#4AAF6A"/>
+    <circle cx="400" cy="195" r="6" fill="#3D9E6E"/>
+    <text x="400" y="220" font-family="JetBrains Mono" font-size="8" fill="#3D9E6E" text-anchor="middle">D+7 복습</text>
+    
+    <!-- X-axis labels -->
+    <text x="100" y="430" font-family="JetBrains Mono" font-size="9" fill="#B8B0A0">Day 0</text>
+    <text x="200" y="430" font-family="JetBrains Mono" font-size="9" fill="#B8B0A0">D+1</text>
+    <text x="300" y="430" font-family="JetBrains Mono" font-size="9" fill="#B8B0A0">D+3</text>
+    <text x="400" y="430" font-family="JetBrains Mono" font-size="9" fill="#B8B0A0">D+7</text>
+    <text x="500" y="430" font-family="JetBrains Mono" font-size="9" fill="#B8B0A0">D+14</text>
+    <text x="650" y="430" font-family="JetBrains Mono" font-size="9" fill="#B8B0A0">D+30</text>
+    <text x="850" y="430" font-family="JetBrains Mono" font-size="9" fill="#B8B0A0">D+60</text>
+    
+    <!-- Y-axis labels -->
+    <text x="85" y="405" font-family="JetBrains Mono" font-size="9" fill="#B8B0A0">0%</text>
+    <text x="75" y="205" font-family="JetBrains Mono" font-size="9" fill="#B8B0A0">50%</text>
+    <text x="75" y="105" font-family="JetBrains Mono" font-size="9" fill="#B8B0A0">100%</text>
+    
+    <!-- Y-axis label -->
+    <text x="25" y="220" font-family="JetBrains Mono" font-size="9" fill="#B8B0A0" text-anchor="middle" transform="rotate(-90 25 220)">기억 지속율 (%)</text>
+    
+    <!-- Legend box -->
+    <rect x="600" y="60" width="320" height="130" fill="rgba(0,0,0,0.3)" stroke="#D4A843" stroke-width="1" rx="4"/>
+    <text x="615" y="80" font-family="Noto Sans KR" font-size="10" fill="#D4A843" font-weight="bold">최적 복습 일정:</text>
+    <text x="615" y="100" font-family="Noto Sans KR" font-size="9" fill="#B8B0A0">✓ D+1 (내일)</text>
+    <text x="615" y="118" font-family="Noto Sans KR" font-size="9" fill="#B8B0A0">✓ D+3 (3일 뒤)</text>
+    <text x="615" y="136" font-family="Noto Sans KR" font-size="9" fill="#B8B0A0">✓ D+7 (7일 뒤)</text>
+    <text x="615" y="154" font-family="Noto Sans KR" font-size="9" fill="#B8B0A0">✓ D+14 (14일 뒤)</text>
+    <text x="615" y="172" font-family="Noto Sans KR" font-size="9" fill="#B8B0A0">✓ D+30 (30일 뒤)</text>
+  </svg>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">CHART 3: PART 1 개념 통합 네트워크</div>
+  <svg loading="lazy" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1000" height="500" fill="#0D0B08"/>
+    
+    <!-- Central hub: Your Assets -->
+    <circle cx="500" cy="250" r="40" fill="#D4A843" opacity="0.8"/>
+    <text x="500" y="245" font-family="Noto Sans KR" font-size="11" fill="#EDE8D8" text-anchor="middle" font-weight="bold">당신의</text>
+    <text x="500" y="260" font-family="Noto Sans KR" font-size="11" fill="#EDE8D8" text-anchor="middle" font-weight="bold">자산</text>
+    <text x="500" y="275" font-family="JetBrains Mono" font-size="9" fill="#B8B0A0" text-anchor="middle">3.28억</text>
+    
+    <!-- Connection nodes -->
+    <!-- Day 1: Goal Setting -->
+    <circle cx="150" cy="100" r="28" fill="#3D9E6E" opacity="0.6"/>
+    <text x="150" y="103" font-family="Noto Sans KR" font-size="9" fill="#EDE8D8" text-anchor="middle" font-weight="bold">목표</text>
+    <text x="150" y="120" font-family="Noto Sans KR" font-size="8" fill="#B8B0A0" text-anchor="middle">(Day 1)</text>
+    <line x1="180" y1="120" x2="470" y2="230" stroke="#D4A843" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Day 2: Compound -->
+    <circle cx="150" cy="250" r="28" fill="#4AAF6A" opacity="0.6"/>
+    <text x="150" y="253" font-family="Noto Sans KR" font-size="9" fill="#EDE8D8" text-anchor="middle" font-weight="bold">복리</text>
+    <text x="150" y="270" font-family="Noto Sans KR" font-size="8" fill="#B8B0A0" text-anchor="middle">(Day 2)</text>
+    <line x1="180" y1="250" x2="470" y2="250" stroke="#4AAF6A" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Day 3: Pipeline -->
+    <circle cx="150" cy="400" r="28" fill="#C45A4A" opacity="0.6"/>
+    <text x="150" y="403" font-family="Noto Sans KR" font-size="9" fill="#EDE8D8" text-anchor="middle" font-weight="bold">자산</text>
+    <text x="150" y="418" font-family="Noto Sans KR" font-size="8" fill="#B8B0A0" text-anchor="middle">형성</text>
+    <text x="150" y="433" font-family="Noto Sans KR" font-size="8" fill="#B8B0A0" text-anchor="middle">(Day 3)</text>
+    <line x1="180" y1="380" x2="470" y2="270" stroke="#C45A4A" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Day 4: Mortgage -->
+    <circle cx="850" cy="100" r="28" fill="#3D9E6E" opacity="0.6"/>
+    <text x="850" y="103" font-family="Noto Sans KR" font-size="9" fill="#EDE8D8" text-anchor="middle" font-weight="bold">부채</text>
+    <text x="850" y="118" font-family="Noto Sans KR" font-size="8" fill="#B8B0A0" text-anchor="middle">관리</text>
+    <text x="850" y="133" font-family="Noto Sans KR" font-size="8" fill="#B8B0A0" text-anchor="middle">(Day 4)</text>
+    <line x1="820" y1="120" x2="540" y2="230" stroke="#3D9E6E" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Day 5: Risk -->
+    <circle cx="850" cy="250" r="28" fill="#4AAF6A" opacity="0.6"/>
+    <text x="850" y="253" font-family="Noto Sans KR" font-size="9" fill="#EDE8D8" text-anchor="middle" font-weight="bold">위험</text>
+    <text x="850" y="268" font-family="Noto Sans KR" font-size="8" fill="#B8B0A0" text-anchor="middle">배분</text>
+    <text x="850" y="283" font-family="Noto Sans KR" font-size="8" fill="#B8B0A0" text-anchor="middle">(Day 5)</text>
+    <line x1="820" y1="250" x2="540" y2="250" stroke="#4AAF6A" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Day 6: Behavior -->
+    <circle cx="850" cy="400" r="28" fill="#C45A4A" opacity="0.6"/>
+    <text x="850" y="403" font-family="Noto Sans KR" font-size="9" fill="#EDE8D8" text-anchor="middle" font-weight="bold">심리</text>
+    <text x="850" y="418" font-family="Noto Sans KR" font-size="8" fill="#B8B0A0" text-anchor="middle">관리</text>
+    <text x="850" y="433" font-family="Noto Sans KR" font-size="8" fill="#B8B0A0" text-anchor="middle">(Day 6)</text>
+    <line x1="820" y1="380" x2="540" y2="270" stroke="#C45A4A" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Insight box -->
+    <rect x="200" y="70" width="600" height="50" fill="rgba(201,168,76,0.1)" stroke="#D4A843" stroke-width="1" rx="4"/>
+    <text x="500" y="92" font-family="Noto Sans KR" font-size="10" fill="#D4A843" text-anchor="middle" font-weight="bold">Part 1은 "당신의 자산"을 중심으로 6가지 차원에서 접근하는 통합 시스템</text>
+    <text x="500" y="112" font-family="Noto Sans KR" font-size="9" fill="#B8B0A0" text-anchor="middle">각 차원은 독립적이지만, 실제로는 모두 연결되어 있습니다.</text>
+  </svg>
+</div>
+
 </section>
 
 
-<!-- Deep Dive -->
+
+
 <section class="section fade-up">
   <div class="section-label">DEEP DIVE</div>
   <h2 class="section-title">심화 학습</h2>
+  
   <details class="deep-dive">
-    <summary>Part 1에서 놓치기 쉬운 5가지 — 통합 체크포인트</summary>
+    <summary><strong>DD1. Part 1의 6일 과정이 하나의 통합 시스템인 이유</strong></summary>
     <div class="deep-dive-content">
-      <p><strong>1. 부채 구조 무시:</strong> 담보대출 4억(LTV 57%)은 "부채"가 아닌 "투자 지렛대"입니다. 금리 인상 시 월부 증가를 시뮬레이션하셨나요?</p>
-      <p><strong>2. 예금 비상금 부재:</strong> 부동산 90.9% 집중은 "유동성 위기" 시 재앙입니다. 6개월 생활비(4,500~9,000만)를 현금/채권으로 확보하세요.</p>
-      <p><strong>3. 세금 최적화 미래 계획 부재:</strong> 주식 2,800만 + 추가 5,000만 = 7,800만 → 배당·매매차익 세금 전략이 필요합니다.</p>
-      <p><strong>4. 심리 관리 체계 미보유:</strong> "감정적 매매 기록"을 하고 있나요? 손실 시 패닉 매도 패턴을 파악해야 합니다.</p>
-      <p><strong>5. 장기 목표와 단기 변동성의 괴리:</strong> 10년 목표가 있어도 월간 변동성에 흔들리면 실패합니다. "6개월마다만 리뷰" 규칙을 지키세요.</p>
+      <p><strong>선형적 학습 vs 시스템적 학습:</strong> 대부분의 투자 강의는 "주식은 이렇게, 부동산은 이렇게"라는 선형적 시리즈를 따릅니다. 하지만 Part 1은 다릅니다. 모든 날이 당신의 현재 자산(3.28억)을 중심으로 설계되었습니다. Day 1의 "목표"는 Day 2의 "복리"를 통해 구체화되고, Day 3의 "자산 형성 경로"는 Day 4의 "부채 관리"와 결합되고, Day 5의 "위험 배분"은 Day 6의 "심리 관리"가 없으면 실행 불가능합니다.</p>
+      
+      <p><strong>반복문(Loop)의 중요성:</strong> 대부분의 학습은 "선형 진행"입니다. A → B → C → 완료. 하지만 투자는 다릅니다. "목표 설정 → 자산 배분 → 투자 → 변화된 자산 → 새로운 목표 설정"이라는 반복 사이클입니다. Part 1의 6일은 이 사이클의 한 바퀴(iteration)를 완성합니다. Day 7(오늘)은 다음 바퀴를 시작하기 전의 "점검" 역할입니다.</p>
+      
+      <p><strong>순환적 구조의 신경과학적 이점:</strong> 뇌는 순환 구조를 더 잘 기억합니다. "네트워크"의 형태로 정보가 저장되면, 한 개념에서 다른 개념으로의 연결이 강해져 장기 기억으로의 전환율이 높아집니다. 따라서 Part 1의 각 날이 "독립적인 강의"가 아니라 "하나의 전체의 일부"로 느껴질 때, 기억 지속율이 훨씬 높습니다.</p>
+      
+      <p><strong>당신에게 적용:</strong> 이제부터는 "Day X를 완료했다"가 아니라 "당신의 자산 구조가 이렇게 변해야 한다"는 액션 아이템으로 Part 1을 회고하세요. 예: "Day 7 점검 후, 3년 계획에 따라 매월 470만원 주식 매수"라는 구체적 행동으로.</p>
+    </div>
+  </details>
+  
+  <details class="deep-dive">
+    <summary><strong>DD2. 망각곡선과 당신의 학습 계획</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>에빙하우스 망각 곡선의 신경과학적 근거:</strong> 1885년 헤르만 에빙하우스가 발견한 "망각 곡선"은 최신 뇌과학으로 설명됩니다. 뇌의 해마(hippocampus)에서 단기 기억이 만들어지지만, 반복 자극이 없으면 24시간 내에 50-70%가 사라집니다. 반면 반복 자극이 있으면, 장기 기억(대뇌피질)으로의 전환이 일어나 지속율이 급상승합니다.</p>
+      
+      <p><strong>당신의 Part 1 복습 일정:</strong> 지금이 "Day 7 (학습 완료)"이라면, 최적 복습은 (1) 내일(D+1): 전체 요약 정독, (2) 3일 뒤(D+3): 퀴즈 재풀이, (3) 7일 뒤(D+7): 실제 자산에 적용. 이렇게 하면 Part 1의 기억이 60% → 90%로 상승합니다.</p>
+      
+      <p><strong>간격 반복의 수학적 효과:</strong> 단순 암기(1회만): 50% 지속율. 간격 반복 (D+1, D+3, D+7): 90% 이상 지속율. 약 80%의 학습 효율 향상입니다. 이것이 왜 SR(Spaced Repetition) 트래커가 필수적인지의 이유입니다.</p>
+      
+      <p><strong>당신의 실행 계획:</strong> 이 파일의 하단 "간격 반복 트래커"에서 (1) D+1 칸을 클릭하면 "내일 D+1 복습" 기억이 생깁니다. 모바일 달력에도 알람을 설정하세요. "완벽한 학습"보다 "꾸준한 복습"이 중요합니다.</p>
+    </div>
+  </details>
+  
+  <details class="deep-dive">
+    <summary><strong>DD3. Part 1 개념 간의 인과관계와 피드백 루프</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>Day 1 → Day 2 → Day 3의 선형 진행:</strong> (1) Day 1의 목표(10년 후 10억)가 없으면, (2) Day 2의 복리 계산이 추상적입니다. (3) Day 2의 "복리의 힘(연 7% 수익)"을 알아야 (4) Day 3의 "자산 형성 경로(월 500만 자산 구축)"가 현실적입니다.</p>
+      
+      <p><strong>Day 4 → Day 5로의 흐름:</strong> (1) Day 4에서 담보대출 4억을 최적화했다면, (2) Day 5의 자산 배분이 더 유연해집니다. 예를 들어 부채 비용이 연 4.5%에서 4.0%로 내려가면, 이는 추가 수익으로 작용하여 주식 투자 여력이 증가합니다.</p>
+      
+      <p><strong>Day 5 ← → Day 6의 상호관계(피드백):</strong> (1) Day 5에서 "60/40 자산 배분"을 정했다면, (2) Day 6에서 배우는 "행동재무학 편향"이 그 결정을 얼마나 잘 지킬 수 있는지를 결정합니다. 역으로 (3) 당신의 "손실 회피 편향이 약하다면", 좀 더 공격적인 70/30도 고려할 수 있습니다.</p>
+      
+      <p><strong>피드백 루프 (Feedback Loop):</strong> "자산 배분 결정 → 실제 투자 → 시장 변동 → 심리적 반응 → 행동 선택 → 결과"의 사이클이 반복됩니다. Part 1에서 배운 모든 것이 이 사이클 내에서 영역을 담당합니다. 따라서 Part 1 전체를 "하나의 시스템"으로 이해하면, Part 2(주식 투자)와 Part 3(자산 배분)에서도 더 빠르게 적응할 수 있습니다.</p>
+    </div>
+  </details>
+  
+  <details class="deep-dive">
+    <summary><strong>DD4. Part 1 복습 시 점검해야 할 10가지 체크리스트</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>개념 이해 레벨:</strong></p>
+      <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+        <li>□ 복리 수식을 손으로 계산할 수 있는가? (Day 2)</li>
+        <li>□ 당신의 자산 형성 경로(직업, 부동산, 부채)를 설명할 수 있는가? (Day 3)</li>
+        <li>□ 담보대출 최적화의 3가지 변수(금리, 기간, 금액)를 이해하는가? (Day 4)</li>
+        <li>□ 위험 수용도 62점이 60/40 배분을 의미하는 이유를 설명할 수 있는가? (Day 5)</li>
+        <li>□ 손실 회피, 확증편향, 앵커링 3가지 편향이 당신에게 어떻게 나타나는가? (Day 6)</li>
+      </ul>
+      
+      <p style="margin-top:0.8rem;"><strong>실행 의지 레벨:</strong></p>
+      <ul style="margin-left:1.2rem;">
+        <li>□ 3년 매월 470만원 주식 매수 계획을 달력에 입력했는가?</li>
+        <li>□ ISA 계좌를 개설했거나, 개설 계획을 세웠는가?</li>
+        <li>□ 현재 포트폴리오의 정확한 자산 배분(부동산 %, 주식 %, 현금 %)을 계산했는가?</li>
+        <li>□ "손절 기준"(예: 연 기대수익률 -5% 이하)을 정했는가?</li>
+        <li>□ 매월 자산 상황을 기록할 "자산 트래킹 시스템"을 구축했는가?</li>
+      </ul>
+      
+      <p style="margin-top:0.8rem;"><strong>해석:</strong> 개념 레벨에서 4개 이상 체크: 중상. Part 2로 진행 가능. 실행 의지에서 3개 이상: 실제 변화 예상. 5개 모두 체크: 탁월한 준비.</p>
     </div>
   </details>
 </section>
 
+<!-- Data Table: Part 1 6일 개념 요약 -->
+<section class="section fade-up">
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>핵심 개념</th>
+          <th>당신의 상황</th>
+          <th>다음 액션</th>
+          <th>Part 2 연결</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Day 1</td>
+          <td>재정 목표</td>
+          <td>10년 후 10억</td>
+          <td>목표 문서화</td>
+          <td>월 투자액 결정</td>
+        </tr>
+        <tr>
+          <td>Day 2</td>
+          <td>복리의 수식</td>
+          <td>연 7% × 10년 = 2배</td>
+          <td>수익률 가정 검증</td>
+          <td>주식 기대수익 추정</td>
+        </tr>
+        <tr>
+          <td>Day 3</td>
+          <td>자산 형성 경로</td>
+          <td>부동산→추가 부채→주식</td>
+          <td>경로 최적화</td>
+          <td>주식 투자 비중 조정</td>
+        </tr>
+        <tr>
+          <td>Day 4</td>
+          <td>부채 최적화</td>
+          <td>4억 대출 재구성</td>
+          <td>금리 재협상</td>
+          <td>금리 변화 민감도</td>
+        </tr>
+        <tr>
+          <td>Day 5</td>
+          <td>위험 수용도 & 자산배분</td>
+          <td>62점 → 60/40</td>
+          <td>3년 리밸런싱 계획</td>
+          <td>주식 투자 시작</td>
+        </tr>
+        <tr class="highlight-row">
+          <td>Day 6</td>
+          <td>행동재무학</td>
+          <td>편향 자각 & 규칙화</td>
+          <td>의사결정 시스템 구축</td>
+          <td>감정적 매도 방지</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Integration Formula Block -->
+<section class="section fade-up">
+  <div class="formula-block">
+    <div class="formula-line"><span class="formula-highlight">Part 1 통합 공식 — 당신의 10년 자산 계획</span></div>
+    <div class="formula-line" style="margin-top:0.8rem;"><span class="formula-blue">최종 자산 = 현재 자산 × (1+수익률)^년수 + 월 저축액 × [(1+수익률)^년수 - 1] / 수익률</span></div>
+    <div class="formula-line" style="margin-top:0.8rem;"><span class="formula-comment">실제 계산 (당신의 상황):</span></div>
+    <div class="formula-line"><span class="formula-comment">  현재 자산 = 3.28억</span></div>
+    <div class="formula-line"><span class="formula-comment">  월 저축액 = 470만원 (주식) + α (보너스, 임대수익)</span></div>
+    <div class="formula-line"><span class="formula-comment">  기대 수익률 = 7% (혼합: 부동산 3% + 주식 10% 가중평균)</span></div>
+    <div class="formula-line"><span class="formula-comment">  기간 = 10년</span></div>
+    <div class="formula-line" style="margin-top:0.6rem;"><span class="formula-blue">최종 = 3.28억 × 1.96 + (470만 × 12) × [(1.07^10 - 1) / 0.07]</span></div>
+    <div class="formula-line"><span class="formula-blue">최종 = 6.43억 + 5.65억 = 12.08억 ≈ 12억</span></div>
+    <div class="formula-line" style="margin-top:0.6rem;"><span class="formula-highlight">결론:</span> Day 1의 "10년 후 10억" 목표는 현실적이며, 약간의 추가 노력(보너스 투자 등)으로 12억 달성 가능</div>
+    <div class="formula-line"><span class="formula-comment">※ 이 계산은 세금, 인플레이션을 미포함한 순 자산 기준입니다</span></div>
+  </div>
+</section>
+
+<!-- Simulation Box: Part 1 정리 -->
+<section class="section fade-up">
+  <div class="sim-box">
+    <h3>📋 Part 1 최종 액션 아이템</h3>
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1.2rem;">
+      Part 1을 완료한 당신이 즉시 실행해야 할 6가지입니다. 체크리스트로 관리하세요.
+    </p>
+    <ul class="checklist">
+      <li><strong>우선 1순위 (이번 주):</strong> ISA 계좌 개설 또는 기존 계좌 확인</li>
+      <li><strong>우선 2순위 (1-2주):</strong> 현재 자산 상황 정리 (부동산 평가액, 부채 이자율, 주식 현황)</li>
+      <li><strong>우선 3순위 (2-4주):</strong> 자동 주식 매매 설정 (월 1회, 고정액 470만원)</li>
+      <li><strong>우선 4순위 (1개월):</strong> 담보대출 금리 재협상 요청 (은행 컨설턴트 면담)</li>
+      <li><strong>우선 5순위 (3개월):</strong> 첫 번째 D+30 복습 (Part 1 전체 재정독)</li>
+      <li><strong>선택 사항:</strong> 가족과 함께 "10년 자산 계획" 공유 및 합의 (부부 맞벌이 가정의 경우)</li>
+    </ul>
+  </div>
+</section>
 
 
 <!-- 시뮬레이션 -->
 <section class="section fade-up">
   <div class="section-label">APPLY TO MY ASSETS</div>
   <h2 class="section-title">내 자산에 직접 적용</h2>
-  <div class="sim-box">
-    <h3>Part 1 마무리 체크리스트 (Part 2 입장 전 필수)</h3>
-    <ul class="checklist">
-      <li>☑ 10년 목표 재확인: 순자산 10억 (또는 개인 목표로 수정)</li>
-      <li>☑ 월 부채상환액 정확히 파악: 금리 상승 시나리오 계산</li>
-      <li>☑ 비상금 목표 설정: 현재 2M → 목표 5,000만 (6개월 계획)</li>
-      <li>☑ 자산배분 목표 수립: 부동산 → 45~50% (3년 계획)</li>
-      <li>☑ 주식 추가 계획: 2,800만 → 7,800만 (월 150만씩, 36개월)</li>
-      <li>☑ 감정 관리 규칙 작성: 월 1회 확인, 손절 -15%, 예측 오류 일지</li>
-      <li>☑ Part 2 미리보기: 반도체 산업 분석 준비</li>
-    </ul>
+  
+    <div class="sim-box">
+      <h3>🎯 Part 1 완수 체크리스트</h3>
+      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1.2rem;">
+        당신은 이미 학습했습니다. 이제는 실행만 남았습니다.
+      </p>
+      <ul class="checklist">
+        <li><strong>이번 주:</strong> 현재 자산 정확히 계산 (부동산 평가액, 주식 평가액, 현금, 부채)</li>
+        <li><strong>이번 주:</strong> ISA 계좌 개설 및 정기 매수 설정 (월 470만원, 자동)</li>
+        <li><strong>2주 내:</strong> 담보대출 금리 재협상 (은행 상담 1회)</li>
+        <li><strong>1개월 내:</strong> 투자 기록 시스템 구축 (매달 자산 추적)</li>
+        <li><strong>매달:</strong> 첫 번째 자동 주식 매수 확인</li>
+        <li><strong>3개월 뒤:</strong> Part 1 전체 재정독 (D+30 복습)</li>
+        <li><strong>지금 바로:</strong> Part 2 Day 08 시작 (주식 투자 기초)</li>
+      </ul>
+    </div>
+    
+</section>
+
+
+<!-- 아하 모먼트 -->
+<section class="section fade-up">
+  <div class="section-label">💡 AHA MOMENT</div>
+  <h2 class="section-title">지금까지 배운 것만 실행하면 vs 안 하면</h2>
+  <div style="background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(191,74,74,0.08));border:2px solid var(--gold);border-radius:12px;padding:2rem;margin:1.5rem 0;text-align:center;">
+    <p style="font-size:1.1rem;color:var(--gold);font-weight:600;margin-bottom:1.5rem;font-family:var(--font-display);">10년 뒤 순자산 5.6억 차이 = "배운 것을 실행하는 가치"</p>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;margin:1.5rem 0;">
+      <div style="background:rgba(191,74,74,0.15);border:1px solid var(--red);border-radius:8px;padding:1.2rem;">
+        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--red);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">NO ACTION</div>
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--red);">7.2억</div>
+      </div>
+      <div style="font-size:2rem;color:var(--gold);">→</div>
+      <div style="background:rgba(74,191,122,0.15);border:1px solid var(--green);border-radius:8px;padding:1.2rem;">
+        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--green);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">WITH DAY 1-6</div>
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--green);">12.8억</div>
+      </div>
+    </div>
+    <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8;margin-top:1rem;text-align:left;">현상 유지: 월 300만 예금, 연 2% 이자 → 10년 뒤 순자산 7.2억. Day 1-6 적용: 월 300만 분산투자, 연 7% 수익 → 10년 뒤 순자산 12.8억. 차이: 5.6억 = "배운 것을 실행하는 가치"이며, 이는 10년의 근로 소득과 같은 규모입니다.</p>
+  </div>
+</section>
+
+<!-- 위기 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">⚠️ CRISIS SIMULATION</div>
+  <h2 class="section-title">KOSPI 40% + 부동산 20% 동시 폭락</h2>
+  <div style="background:linear-gradient(135deg,rgba(191,74,74,0.08),rgba(10,12,16,0.9));border:1px solid var(--red);border-left:3px solid var(--red);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <p style="font-size:0.95rem;color:var(--red);font-weight:500;margin-bottom:1rem;">🚨 시나리오: 2008년 글로벌 금융위기 같은 최악의 시나리오</p>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th style="text-align:left;">자산</th><th>현재</th><th>위기 후</th><th>변동</th></tr></thead>
+        <tbody><tr>
+          <td style="font-weight:500;">주식 (KOSPI)</td>
+          <td style="text-align:right;">2,800만원</td>
+          <td style="text-align:right;color:var(--red);font-weight:600;">1,680만원</td>
+          <td style="text-align:right;color:var(--red);">-1,120만 (-40%)</td>
+        </tr><tr>
+          <td style="font-weight:500;">주택</td>
+          <td style="text-align:right;">7억원</td>
+          <td style="text-align:right;color:var(--red);font-weight:600;">5.6억원</td>
+          <td style="text-align:right;color:var(--red);">-1.4억 (-20%)</td>
+        </tr><tr>
+          <td style="font-weight:500;">순자산 합계</td>
+          <td style="text-align:right;">3.28억원</td>
+          <td style="text-align:right;color:var(--red);font-weight:600;">1.48억원</td>
+          <td style="text-align:right;color:var(--red);">-1.8억 (-55%)</td>
+        </tr><tr>
+          <td style="font-weight:500;">LTV (주택담보비율)</td>
+          <td style="text-align:right;">40%</td>
+          <td style="text-align:right;color:var(--red);font-weight:600;">71%</td>
+          <td style="text-align:right;color:var(--red);">+31%p</td>
+        </tr></tbody>
+      </table>
+    </div>
+    <div style="margin-top:1.5rem;padding:1rem;background:rgba(74,191,122,0.06);border:1px solid rgba(74,191,122,0.3);border-radius:6px;">
+      <p style="font-size:0.85rem;color:var(--green);font-weight:500;margin-bottom:0.8rem;">✅ 대응 전략</p>
+      <ul style="list-style:none;margin:0;padding:0;"><li style="padding:0.6rem 0;border-bottom:1px solid rgba(42,45,54,0.3);"><strong style="color:var(--gold);">Step 1.</strong> 패닉금지: 폭락은 역사적으로 5-7년 내 반등하는 현상입니다.</li><li style="padding:0.6rem 0;border-bottom:1px solid rgba(42,45,54,0.3);"><strong style="color:var(--gold);">Step 2.</strong> 현금 6개월분 확보: 월 생활비 200만 × 6개월 = 1,200만원 현금으로 보유</li><li style="padding:0.6rem 0;border-bottom:1px solid rgba(42,45,54,0.3);"><strong style="color:var(--gold);">Step 3.</strong> 적립식 투자 유지: 주가 저점에서 매매하는 심리적 해방감을 누립니다.</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- 액션 체크리스트 -->
+<section class="section fade-up">
+  <div class="section-label">🎯 THIS WEEK'S ACTION</div>
+  <h2 class="section-title">이번 주 실행 아이템</h2>
+  <div style="background:linear-gradient(135deg,rgba(74,191,122,0.06),rgba(201,168,76,0.06));border:1px solid var(--green);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <ul class="checklist"><li>Part 1 핵심 3가지 복습 (지금까지 배운 내용 정독) <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(5분)</span></li><li>순자산 대차대조표 업데이트 (자산/부채/순자산 정확히 입력) <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(10분)</span></li><li>다음 주 자동이체 설정 확인 (투자 적립금 설정 완료 여부 점검) <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(5분)</span></li></ul>
+    <div style="display:flex;justify-content:space-between;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);">
+      <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">⏱ 예상 소요: 20분</span>
+      <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--green);">📈 10년 예상 효과: +5.6억 (10년 누적 복리)</span>
+    </div>
   </div>
 </section>
 
@@ -533,11 +1754,27 @@ body {
   <h2 class="section-title">오늘의 투자 심리</h2>
   <div class="psych-box">
     <h3>행동재무학 편향</h3>
-    <div class="bias-name">인지 부하(Cognitive Overload) & 학습 피로</div>
-    <p>6일간의 학습으로 정보 과부하가 발생했을 수 있습니다. 뇌가 피로해지면 좋은 의사결정이 불가능해집니다.</p>
-    <span class="neuro-tag">전두엽 피로 (작업 기억 고갈)</span>
-    <span class="engineer-tag">엔지니어 주의: 분석 마비</span>
-    <p><strong>극복 규칙:</strong> 모든 학습을 즉시 적용하려 하지 마세요. "80%로 충분하다"는 것을 받아들이고, Part 2에서 "심화 학습"으로 나머지 20%를 채워나가세요. 지금은 "행동(자산배분 시작)"이 "완벽한 분석"보다 중요합니다.</p>
+    
+<div class="bias-name">완벽주의 편향 (Perfectionism Bias)</div>
+<p>
+  Part 1을 완료한 당신은 이제 "완벽한 계획을 세워야 한다"는 
+  <span class="neuro-tag">전전두피질의 과활성화</span>를 
+  느낄 수 있습니다. 엔지니어들의 특성상 "100% 완벽한 실행"을 추구합니다.
+</p>
+<p style="margin-top:0.6rem;">
+  하지만 투자의 현실은 다릅니다. 
+  "충분히 좋은 계획 (60/40 배분)"을 "계속 실행"하는 것이 
+  "완벽한 타이밍"을 기다리는 것보다 훨씬 더 큰 수익을 만듭니다.
+</p>
+<p style="margin-top:0.6rem;">
+  <strong>엔지니어 특화 해결책:</strong> 
+  <span class="engineer-tag">"완벽함 vs 꾸준함"의 트레이드오프를 인식하고</span>, 
+  "매월 470만원 자동 투자"처럼 
+  "구현 난이도 낮은" 규칙을 설정하세요. 
+  완벽한 선택 1개보다 
+  80점짜리 선택 10개가 더 좋습니다.
+</p>
+
   </div>
 </section>
 
@@ -547,40 +1784,91 @@ body {
   <h2 class="section-title">복습 퀴즈</h2>
   <div class="quiz-section">
     <div class="quiz-q" id="q1">
-      <h4>Q1. 학습자의 목표(10억) 달성을 위한 연 필요 수익률은?</h4>
-      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 5%</li>
-<li onclick="checkAnswer(this,'q1',false)">② 7.5%</li>
-<li onclick="checkAnswer(this,'q1',true)">③ 9.5%</li>
-<li onclick="checkAnswer(this,'q1',false)">④ 12%</li>
+      <h4>Q1. Part 1 (Day 1-7)이 '통합 시스템'인 이유는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 모두 같은 교사가 강의했기 때문에</li>
+<li onclick="checkAnswer(this,'q1',true)">② 모두 당신의 현재 자산(3.28억)을 중심으로 설계되었고, 각 Day가 다음 Day를 위한 기초 역할</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 순서대로 진행하면 자동으로 이해된다</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 투자의 모든 주제를 다루었다</li>
 </ul>
-      <div class="quiz-answer" id="q1-answer"><strong>정답: ③</strong><br>3.28억 × (1 + r)^10 = 10억 → r ≈ 9.5%. 현실적 기대수익(주식 8~10%)에 맞춘 목표입니다.</div>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          Part 1은 선형적 강의가 아니라 순환적 시스템입니다. 
+          Day 1의 목표가 Day 2의 복리 계산을 의미 있게 만들고, 
+          Day 5의 자산 배분이 Day 6의 심리 관리 없이는 실행 불가능합니다. 
+          따라서 Day 1-6은 독립적이 아니라 상호 연결되어 있으며, 
+          Day 7은 이 전체 시스템의 "점검"입니다.
+        </div>
     </div>
     <div class="quiz-q" id="q2">
-      <h4>Q2. 담보대출 LTV 57% (4억/7억)는 어느 범위에 속하는가?</h4>
-      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 위험 (70%+)</li>
-<li onclick="checkAnswer(this,'q2',true)">② 적절 (40~60%)</li>
-<li onclick="checkAnswer(this,'q2',false)">③ 보수적 (20% 이하)</li>
-<li onclick="checkAnswer(this,'q2',false)">④ 정보 부족</li>
+      <h4>Q2. 망각곡선에서 3회 복습(D+1, D+3, D+7)의 효과는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 기억 지속율 30% (복습 없음과 동일)</li>
+<li onclick="checkAnswer(this,'q2',false)">② 기억 지속율 60% (1회 복습과 동일)</li>
+<li onclick="checkAnswer(this,'q2',true)">③ 기억 지속율 90% 이상 (3배 향상)</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 기억 지속율은 복습 횟수와 무관하다</li>
 </ul>
-      <div class="quiz-answer" id="q2-answer"><strong>정답: ②</strong><br>LTV 40~60%는 일반적으로 안정 범위입니다. 금리 인상 시 월부 증가를 모니터링해야 합니다.</div>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ③</strong><br>
+          정답: ③ <br/>
+          에빙하우스 망각 곡선의 신경과학적 근거는 
+          반복 자극이 뇌의 해마 → 대뇌피질로의 
+          장기 기억 전환을 촉진한다는 것입니다. 
+          간격 반복(D+1, D+3, D+7)은 기억 지속율을 
+          30%에서 90% 이상으로 상승시킵니다. 
+          이것이 SR 트래커를 매우 중요하게 다루는 이유입니다.
+        </div>
     </div>
     <div class="quiz-q" id="q3">
-      <h4>Q3. 자산배분 리밸런싱의 가장 큰 어려움은?</h4>
-      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 계산 복잡성</li>
-<li onclick="checkAnswer(this,'q3',true)">② 손실 회피(부동산 매각 심리 거부)</li>
-<li onclick="checkAnswer(this,'q3',false)">③ 투자 시장 분석</li>
-<li onclick="checkAnswer(this,'q3',false)">④ 세금 계산</li>
+      <h4>Q3. Part 1 후 당신의 자산 상태에서 가장 중요한 '다음 액션'은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 주식 종목 연구를 시작한다 (Part 2 준비)</li>
+<li onclick="checkAnswer(this,'q3',true)">② ISA 계좌를 개설하고 매월 470만원 자동 매수를 설정한다</li>
+<li onclick="checkAnswer(this,'q3',false)">③ 담보대출 전액을 상환한다</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 부동산을 즉시 매각한다</li>
 </ul>
-      <div class="quiz-answer" id="q3-answer"><strong>정답: ②</strong><br>부동산 90.9%는 심리적 안정감을 제공하지만, 실제로는 분산 부족입니다. 손실 회피 편향이 리밸런싱을 방해합니다.</div>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          Part 1을 통해 당신이 결정한 것: 
+          (1) 10년 후 10억 목표, 
+          (2) 60/40 자산 배분, 
+          (3) 월 470만원 추가 투자. 
+          이를 실행하려면 ISA 계좌(비과세) 개설이 우선입니다. 
+          종목 연구(Part 2)는 그 다음입니다. 
+          "완벽한 선택"을 기다리지 말고 
+          "현실적 첫 발걸음"을 내딛으세요.
+        </div>
     </div>
     <div class="quiz-q" id="q4">
-      <h4>Q4. Part 2(반도체·주식 분석)에 입장할 때 가장 필요한 것은?</h4>
-      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① 더 많은 분석 기술</li>
-<li onclick="checkAnswer(this,'q4',false)">② 엔지니어적 완벽성</li>
-<li onclick="checkAnswer(this,'q4',true)">③ Part 1의 '감정 관리 규칙' 수립</li>
-<li onclick="checkAnswer(this,'q4',false)">④ 월별 수익 예측</li>
+      <h4>Q4. Part 2-4와 Part 1의 관계를 가장 잘 설명하는 것은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① Part 1은 완료했으니 다시 볼 필요 없다</li>
+<li onclick="checkAnswer(this,'q4',true)">② Part 1은 기초이고, Part 2-4는 세부 영역을 깊이 있게 다루면서 Part 1의 원칙을 계속 적용</li>
+<li onclick="checkAnswer(this,'q4',false)">③ Part 1-4는 모두 같은 난이도의 독립적 강의</li>
+<li onclick="checkAnswer(this,'q4',false)">④ Part 2-4가 더 중요하니 빠르게 진행한다</li>
 </ul>
-      <div class="quiz-answer" id="q4-answer"><strong>정답: ③</strong><br>완벽한 분석은 없습니다. Part 1에서 배운 위험 수용도 진단과 감정 관리 규칙이 Part 2 분석을 실패로부터 보호합니다.</div>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          Part 1에서 "60/40 배분"을 정했다면, 
+          Part 2에서는 "주식 60%를 어떻게 선택하는가?" 
+          (종목 분석, 타이밍), 
+          Part 3에서는 "부동산 배분을 어떻게 관리할까?" 
+          (리밸런싱, 매매)를 배웁니다. 
+          Part 1의 원칙("60/40") 없이 Part 2를 배우면 
+          "이 종목이 좋으니까 100% 투자"라는 과신에 빠질 수 있습니다.
+        </div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. '충분히 좋은 계획을 꾸준히 실행'이 '완벽한 타이밍을 기다리기'보다 나은 이유는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',false)">① 시간이 덜 걸리기 때문에</li>
+<li onclick="checkAnswer(this,'q5',true)">② 복리의 시간 가치 + 심리적 일관성 + 시장 타이밍 위험 제거</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 계획이 간단해서</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 투자 수익이 보장되기 때문에</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          투자에서 "타이밍 예측"은 불가능에 가깝습니다 (약 30%). 
+          대신 (1) 복리의 힘(10년 × 월 470만 × 7% 수익), 
+          (2) 정기 매수의 심리적 안정성(변동성에 덜 흔들림), 
+          (3) 시장 타이밍 위험 제거(평균 단가 낮춤)가 
+          장기 수익의 핵심입니다. 
+          엔지니어의 완벽주의는 도움이 되지 않습니다.
+        </div>
     </div></div>
 </section>
 
@@ -598,7 +1886,7 @@ body {
   </div>
 </section>
 
-<nav class="nav-footer">
+<nav class="nav-footer" role="navigation" aria-label="강의 탐색">
   <a class="nav-btn" href="day06_behavioral_finance.html">← Day 06</a>
   <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 07 / 23</span>
   <a class="nav-btn" href="day08_valuation_basics.html">Day 08 →</a>
@@ -609,12 +1897,15 @@ body {
   본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
   모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
   수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
-  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 El Dorado 투자 원정대 · 교육 목적 Only</span>
 </div>
 
 </div>
 
-<script>
+<!-- Gold Particle System -->
+<canvas id="goldParticles" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.6;"></canvas>
+<script defer>
+
 /* ═══ POMODORO TIMER ═══ */
 let timerRunning=false, timerSeconds=25*60, timerInterval=null;
 function toggleTimer() {
@@ -628,8 +1919,8 @@ function toggleTimer() {
       if (timerSeconds <= 0) {
         clearInterval(timerInterval);
         b.textContent = '✓ 완료!';
-        b.style.borderColor = '#4ABF7A';
-        b.style.color = '#4ABF7A';
+        b.style.borderColor = '#4AAF6A';
+        b.style.color = '#4AAF6A';
         timerRunning = false;
       }
     }, 1000);
@@ -662,6 +1953,507 @@ const fadeObserver = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+
+
+(function(){
+  const c=document.getElementById('goldParticles');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  let W,H;
+  const particles=[];
+  const N=window.innerWidth<480?12:window.innerWidth<768?20:35;
+
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+
+  class P{
+    constructor(){this.reset();}
+    reset(){
+      this.x=Math.random()*W;
+      this.y=Math.random()*H;
+      this.r=Math.random()*1.8+0.3;
+      this.vx=(Math.random()-0.5)*0.15;
+      this.vy=-Math.random()*0.3-0.05;
+      this.alpha=Math.random()*0.4+0.1;
+      this.fade=Math.random()*0.003+0.001;
+      this.phase=Math.random()*Math.PI*2;
+    }
+    update(){
+      this.x+=this.vx+Math.sin(this.phase)*0.1;
+      this.y+=this.vy;
+      this.phase+=0.01;
+      this.alpha-=this.fade;
+      if(this.alpha<=0||this.y<-10)this.reset();
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(212,168,67,${this.alpha})`;
+      ctx.fill();
+      if(this.r>1){
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.r*2,0,Math.PI*2);
+        ctx.fillStyle=`rgba(212,168,67,${this.alpha*0.15})`;
+        ctx.fill();
+      }
+    }
+  }
+
+  for(let i=0;i<N;i++)particles.push(new P());
+
+  let scrollY=0;
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY;},{passive:true});
+
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of particles){
+      p.y+=scrollY*0.0005;
+      p.update();
+      p.draw();
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+
+(function(){
+  /* ─── 1. Card Gold Light Trail ─── */
+  document.querySelectorAll('.concept-card').forEach(card => {
+    if(card.querySelector('.card-glow')) return;
+    const glow = document.createElement('div');
+    glow.className = 'card-glow';
+    card.appendChild(glow);
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      glow.style.left = (e.clientX - r.left) + 'px';
+      glow.style.top = (e.clientY - r.top) + 'px';
+    });
+  });
+
+  /* ─── 2. Quiz Correct Answer Particle Burst ─── */
+  function createBurst(container, x, y) {
+    let canvas = container.querySelector('.quiz-burst-canvas');
+    if (!canvas) {
+      canvas = document.createElement('canvas');
+      canvas.className = 'quiz-burst-canvas';
+      container.style.position = 'relative';
+      container.appendChild(canvas);
+    }
+    canvas.width = container.offsetWidth;
+    canvas.height = container.offsetHeight;
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const colors = ['#D4A843','#E8C65A','#C4793D','#3D9E6E','#EDE8D8'];
+    for (let i = 0; i < 40; i++) {
+      const angle = (Math.PI * 2 * i) / 40 + (Math.random() - 0.5) * 0.5;
+      const speed = 2 + Math.random() * 4;
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        r: Math.random() * 2.5 + 1,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 1,
+        decay: 0.015 + Math.random() * 0.01,
+        gravity: 0.06
+      });
+    }
+    let frame = 0;
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.vx *= 0.98;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) continue;
+        alive = true;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+        // glow
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha * 0.15;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      frame++;
+      if (alive && frame < 120) requestAnimationFrame(animate);
+      else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    }
+    animate();
+  }
+
+  // Enhance quiz click handler
+  document.querySelectorAll('.quiz-options li').forEach(li => {
+    const origClick = li.onclick;
+    li.addEventListener('click', function(e) {
+      setTimeout(() => {
+        if (li.classList.contains('correct')) {
+          const section = li.closest('.quiz-section');
+          if (section) {
+            const rect = li.getBoundingClientRect();
+            const sRect = section.getBoundingClientRect();
+            createBurst(section, rect.left - sRect.left + rect.width / 2, rect.top - sRect.top + rect.height / 2);
+          }
+        }
+      }, 50);
+    });
+  });
+
+  /* ─── 3. Scroll Compass Widget ─── */
+  if (!document.querySelector('.scroll-compass')) {
+    const compass = document.createElement('div');
+    compass.className = 'scroll-compass';
+    compass.innerHTML = `<svg viewBox="0 0 56 56">
+      <circle cx="28" cy="28" r="26" fill="rgba(13,11,8,0.9)" stroke="#D4A843" stroke-width="1.5"/>
+      <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(212,168,67,0.15)" stroke-width="1"/>
+      <!-- tick marks -->
+      <line x1="28" y1="4" x2="28" y2="8" stroke="#D4A843" stroke-width="1.5"/>
+      <line x1="28" y1="48" x2="28" y2="52" stroke="#8A8272" stroke-width="1"/>
+      <line x1="4" y1="28" x2="8" y2="28" stroke="#8A8272" stroke-width="1"/>
+      <line x1="48" y1="28" x2="52" y2="28" stroke="#8A8272" stroke-width="1"/>
+      <!-- needle (rotates via JS) -->
+      <g id="compassNeedle" style="transform-origin:28px 28px;">
+        <polygon points="28,8 25,28 28,26 31,28" fill="#D4A843"/>
+        <polygon points="28,48 25,28 28,30 31,28" fill="#C45A4A" opacity="0.6"/>
+      </g>
+      <!-- center -->
+      <circle cx="28" cy="28" r="3" fill="#D4A843"/>
+      <!-- progress arc -->
+      <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(212,168,67,0.1)" stroke-width="3"
+              stroke-dasharray="150.8" stroke-dashoffset="150.8"
+              id="compassProgress" transform="rotate(-90 28 28)"
+              stroke-linecap="round"/>
+      <!-- percentage text -->
+      <text x="28" y="43" text-anchor="middle" fill="#8A8272" font-family="JetBrains Mono,monospace" font-size="5.5" id="compassPct">0%</text>
+    </svg>`;
+    compass.title = 'Click to scroll to top';
+    compass.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+    document.body.appendChild(compass);
+
+    const needle = document.getElementById('compassNeedle');
+    const progressArc = document.getElementById('compassProgress');
+    const pctText = document.getElementById('compassPct');
+    const circumference = 150.8;
+
+    function updateCompass() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0;
+
+      // Show/hide
+      compass.classList.toggle('visible', scrollTop > 200);
+
+      // Rotate needle based on scroll (full rotation = full scroll)
+      const rotation = progress * 360;
+      if(needle) needle.style.transform = `rotate(${rotation}deg)`;
+
+      // Progress arc
+      if(progressArc) {
+        const offset = circumference - (progress * circumference);
+        progressArc.setAttribute('stroke-dashoffset', offset);
+        progressArc.setAttribute('stroke', progress > 0.8 ? '#4AAF6A' : '#D4A843');
+      }
+
+      // Percentage text
+      if(pctText) pctText.textContent = Math.round(progress * 100) + '%';
+    }
+
+    window.addEventListener('scroll', updateCompass, {passive: true});
+    updateCompass();
+  }
+
+  /* ─── 4. Section Reveal Gold Flash ─── */
+  document.querySelectorAll('.section').forEach(section => {
+    if(section.querySelector('.section-flash')) return;
+    section.style.position = 'relative';
+    const flash = document.createElement('div');
+    flash.className = 'section-flash';
+    section.prepend(flash);
+  });
+
+  const flashObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) {
+        entry.target.classList.add('flash-active');
+        setTimeout(() => entry.target.classList.remove('flash-active'), 800);
+        flashObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.2});
+
+  document.querySelectorAll('.section').forEach(s => flashObserver.observe(s));
+
+  /* ─── 5. Checklist Celebration ─── */
+  document.querySelectorAll('.checklist li').forEach(li => {
+    li.addEventListener('click', function() {
+      if(this.classList.contains('checked')) {
+        this.classList.add('just-checked');
+        setTimeout(() => this.classList.remove('just-checked'), 600);
+      }
+    });
+  });
+
+  /* ─── 6. Timer Button Active State ─── */
+  const timerBtn = document.getElementById('timerBtn');
+  if(timerBtn) {
+    const origToggle = window.toggleTimer;
+    if(origToggle) {
+      window.toggleTimer = function() {
+        origToggle();
+        timerBtn.classList.toggle('active');
+      };
+    }
+  }
+
+})();
+
+
+(function(){
+  /* ─── 1. Particle Performance Auto-Scaling ─── */
+  const canvas = document.getElementById('goldParticles');
+  if(canvas){
+    const isMobile = window.innerWidth < 768;
+    const isLowEnd = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if(prefersReduced){
+      canvas.style.display = 'none';
+    } else if(isMobile || isLowEnd){
+      // Reduce particle opacity and hide on very small screens
+      canvas.style.opacity = isMobile ? '0.3' : '0.4';
+      if(window.innerWidth < 400) canvas.style.display = 'none';
+    }
+
+    // Battery API: disable particles on low battery
+    if('getBattery' in navigator){
+      navigator.getBattery().then(batt => {
+        if(batt.level < 0.2 && !batt.charging){
+          canvas.style.display = 'none';
+        }
+        batt.addEventListener('levelchange', () => {
+          if(batt.level < 0.15 && !batt.charging) canvas.style.display = 'none';
+        });
+      }).catch(()=>{});
+    }
+
+    // Visibility: pause animation when tab is hidden
+    let rafId = null;
+    document.addEventListener('visibilitychange', () => {
+      if(document.hidden) {
+        canvas.style.display = 'none';
+      } else if(!prefersReduced && !(window.innerWidth < 400)){
+        canvas.style.display = '';
+      }
+    });
+  }
+
+  /* ─── 2. Illustration Lazy Load ─── */
+  const lazyObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const el = entry.target;
+        const svg = el.querySelector('svg');
+        if(svg) svg.style.opacity = '1';
+        el.classList.add('visible');
+        lazyObs.unobserve(el);
+      }
+    });
+  }, {rootMargin: '100px', threshold: 0.1});
+
+  document.querySelectorAll('.hero-illustration').forEach(ill => {
+    const svg = ill.querySelector('svg');
+    if(svg){
+      svg.style.opacity = '0';
+      svg.style.transition = 'opacity 0.8s ease-out';
+    }
+    lazyObs.observe(ill);
+  });
+
+  /* ─── 3. Touch Swipe Navigation ─── */
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+    touchStartTime = Date.now();
+  }, {passive: true});
+
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    const dy = e.changedTouches[0].screenY - touchStartY;
+    const dt = Date.now() - touchStartTime;
+
+    // Must be fast horizontal swipe (>80px, <300ms, mostly horizontal)
+    if(Math.abs(dx) > 80 && Math.abs(dx) > Math.abs(dy) * 2 && dt < 300){
+      const navBtns = document.querySelectorAll('.nav-btn:not(.disabled)');
+      if(dx > 0){
+        // Swipe right → prev
+        const prev = document.querySelector('.nav-btn[href*="day"]:first-of-type:not(.disabled)');
+        if(prev && prev.textContent.includes('Prev')) prev.click();
+      } else {
+        // Swipe left → next
+        const allBtns = Array.from(document.querySelectorAll('.nav-btn'));
+        const next = allBtns.find(b => b.textContent.includes('Next') && !b.classList.contains('disabled'));
+        if(next) next.click();
+      }
+    }
+  }, {passive: true});
+
+  /* ─── 4. Compass Touch Feedback ─── */
+  const compass = document.querySelector('.scroll-compass');
+  if(compass){
+    compass.addEventListener('touchstart', () => {
+      compass.style.transform = 'scale(0.9)';
+      compass.style.transition = 'transform 0.1s';
+    }, {passive: true});
+    compass.addEventListener('touchend', () => {
+      compass.style.transform = 'scale(1)';
+    }, {passive: true});
+  }
+
+  /* ─── 5. Viewport Height Fix for Mobile Browsers ─── */
+  function setVH(){
+    document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+  }
+  setVH();
+  window.addEventListener('resize', setVH);
+
+  /* ─── 6. Font Loading Optimization ─── */
+  if('fonts' in document){
+    document.fonts.ready.then(() => {
+      document.body.classList.add('fonts-loaded');
+    });
+  }
+
+  /* ─── 7. Smooth Scroll Polyfill for Older Safari ─── */
+  if(!('scrollBehavior' in document.documentElement.style)){
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if(target){
+          e.preventDefault();
+          target.scrollIntoView({behavior:'smooth',block:'start'});
+        }
+      });
+    });
+  }
+
+  /* ─── 8. Double-tap to top (mobile shortcut) ─── */
+  let lastTapTime = 0;
+  const header = document.querySelector('.sticky-header');
+  if(header){
+    header.addEventListener('touchend', () => {
+      const now = Date.now();
+      if(now - lastTapTime < 300){
+        window.scrollTo({top:0, behavior:'smooth'});
+      }
+      lastTapTime = now;
+    }, {passive: true});
+  }
+
+})();
+
+
+
+/* ═══ THEME TOGGLE LOGIC ═══ */
+(function(){
+  const toggle = document.getElementById('themeToggle');
+  if(!toggle) return;
+
+  // 1. Determine initial theme
+  function getPreferredTheme(){
+    const saved = localStorage.getItem('eldorado-theme');
+    if(saved) return saved;
+    // Respect system preference
+    if(window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
+    return 'dark';
+  }
+
+  function applyTheme(theme, animate){
+    const html = document.documentElement;
+    if(animate){
+      html.classList.add('theme-transitioning');
+      setTimeout(() => html.classList.remove('theme-transitioning'), 500);
+    }
+    if(theme === 'light'){
+      html.setAttribute('data-theme', 'light');
+      // Update meta theme-color
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.content = '#FAF6EE';
+    } else {
+      html.removeAttribute('data-theme');
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.content = '#0D0B08';
+    }
+    localStorage.setItem('eldorado-theme', theme);
+
+    // Update particle canvas colors if exists
+    updateParticleColors(theme);
+    // Update compass colors
+    updateCompassColors(theme);
+  }
+
+  function updateParticleColors(theme){
+    // Signal to particle system
+    window.__eldoradoTheme = theme;
+  }
+
+  function updateCompassColors(theme){
+    const compass = document.querySelector('.scroll-compass svg');
+    if(!compass) return;
+    const bgCircle = compass.querySelector('circle:first-of-type');
+    const texts = compass.querySelectorAll('text');
+    if(theme === 'light'){
+      if(bgCircle) bgCircle.setAttribute('fill', 'rgba(250,246,238,0.9)');
+      texts.forEach(t => {
+        if(t.getAttribute('fill') === '#8A8272' || t.getAttribute('fill') === 'var(--text-dim)')
+          t.setAttribute('fill', '#8A8070');
+      });
+    } else {
+      if(bgCircle) bgCircle.setAttribute('fill', 'rgba(13,11,8,0.85)');
+    }
+  }
+
+  // 2. Apply on load (no animation)
+  const initial = getPreferredTheme();
+  applyTheme(initial, false);
+
+  // 3. Toggle click
+  toggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    applyTheme(next, true);
+  });
+
+  // 4. Keyboard support
+  toggle.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      toggle.click();
+    }
+  });
+
+  // 5. Listen for system theme change
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+    if(!localStorage.getItem('eldorado-theme')){
+      applyTheme(e.matches ? 'light' : 'dark', true);
+    }
+  });
+})();
+/* ═══ END THEME TOGGLE ═══ */
+
 </script>
 </body>
 </html>

@@ -2,198 +2,308 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Day 12 | 매수·매도 타이밍 원칙 — 부자 마인드셋 스터디</title>
+<script>
+/* Prevent FOUC: apply saved theme before render */
+(function(){
+  var t = localStorage.getItem('eldorado-theme');
+  if(!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  if(t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+})();
+</script>
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Day 12 | 황금의 순간을 포착하다 — El Dorado 투자 원정대</title>
+<meta name="theme-color" content="#0D0B08">
+<meta name="description" content="El Dorado 투자 원정대 Day 12 — 매매 타이밍의 원칙과 진입/청산 전략을 배웁니다.">
+<meta name="robots" content="noindex">
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-/* ═══ DESIGN SYSTEM v2 ═══ */
+<style>/* LIGHTHOUSE_OPTIMIZED */
 :root {
-  --bg-primary: #0A0C10;
-  --bg-card: #12151C;
-  --bg-card-hover: #181C26;
-  --bg-accent: #1A1E2A;
-  --gold: #C9A84C;
-  --gold-dim: rgba(201,168,76,0.15);
-  --gold-glow: rgba(201,168,76,0.3);
-  --blue: #4A9EBF;
-  --blue-dim: rgba(74,158,191,0.15);
-  --blue-glow: rgba(74,158,191,0.3);
-  --text-primary: #E8E6E1;
-  --text-secondary: #9A9890;
-  --text-dim: #5A584F;
-  --border: #2A2D36;
-  --red: #BF4A4A;
-  --green: #4ABF7A;
+  --bg-primary: #0D0B08;
+  --bg-card: #16130E;
+  --bg-card-hover: #1E1A13;
+  --bg-accent: #1A1610;
+  --bg-temple: #110E09;
+  --gold: #D4A843;
+  --gold-bright: #E8C65A;
+  --gold-dim: rgba(212,168,67,0.12);
+  --gold-glow: rgba(212,168,67,0.25);
+  --gold-radiant: rgba(232,198,90,0.4);
+  --emerald: #3D9E6E;
+  --emerald-dim: rgba(61,158,110,0.12);
+  --emerald-glow: rgba(61,158,110,0.25);
+  --amber: #C4793D;
+  --amber-dim: rgba(196,121,61,0.12);
+  --copper: #A0634A;
+  --text-primary: #EDE8D8;
+  --text-secondary: #B8B0A0;
+  --text-dim: #8A8272;
+  --border: #2C261E;
+  --border-gold: rgba(212,168,67,0.2);
+  --red: #C45A4A;
+  --green: #4AAF6A;
   --font-display: 'Cormorant Garamond', serif;
   --font-body: 'Noto Sans KR', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; font-size: 16px; }
 body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: white !important;
+  background-image: radial-gradient(ellipse 70% 60% at 30% 0%, rgba(61,158,110,0.05) 0%, transparent 55%),
+  radial-gradient(ellipse 50% 40% at 80% 100%, rgba(212,168,67,0.03) 0%, transparent 50%);
+  color: #1a1a1a !important;
   font-family: var(--font-body);
   font-weight: 300;
   line-height: 1.8;
   -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
+  min-height: 100vh;
 }
-
-/* ═══ CUSTOM SCROLLBAR ═══ */
-::-webkit-scrollbar { width: 6px; }
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+  repeating-linear-gradient(90deg, rgba(212,168,67,0.015) 0px, rgba(212,168,67,0.015) 1px, transparent 1px, transparent 80px),
+  repeating-linear-gradient(0deg, rgba(212,168,67,0.015) 0px, rgba(212,168,67,0.015) 1px, transparent 1px, transparent 80px);
+  pointer-events: none;
+  z-index: 0;
+}
+::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
-
-/* ═══ FADE-UP ANIMATION ═══ */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--gold-dim), var(--gold-glow));
+  border-radius: 4px; border: 1px solid var(--border-gold);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 .fade-up {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition: opacity 0.7s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .fade-up.visible {
   opacity: 1;
   transform: translateY(0);
 }
-
-/* ═══ STICKY HEADER ═══ */
+@keyframes goldShimmer {
+  0%,100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+@keyframes templeGlow {
+  0%,100% { box-shadow: 0 0 20px rgba(212,168,67,0.05); }
+  50% { box-shadow: 0 0 40px rgba(212,168,67,0.12); }
+}
 .sticky-header {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: rgba(10,12,16,0.92);
+  background: rgba(13,11,8,0.94);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-gold);
   padding: 0.6rem 2rem;
   display: flex; justify-content: space-between; align-items: center;
   flex-wrap: wrap; gap: 0.5rem;
 }
+.sticky-header::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-glow), transparent);
+}
 .header-left { display: flex; align-items: center; gap: 1rem; }
 .header-day {
-  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold-bright);
   background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
   letter-spacing: 0.1em;
+  border: 1px solid var(--border-gold);
 }
 .header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
 .header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
-.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
-.badge-asset { color: var(--blue); background: var(--blue-dim); }
-.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.header-badge {
+  font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem;
+  border-radius: 4px; letter-spacing: 0.05em;
+}
+.badge-asset { color: var(--gold-bright); background: var(--gold-dim); border: 1px solid var(--border-gold); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.03); }
 .timer-btn {
-  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold-bright);
   font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
   border-radius: 4px; cursor: pointer; transition: all 0.3s;
 }
-.timer-btn:hover { background: var(--gold-glow); }
-
-/* ═══ LAYOUT ═══ */
-.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.timer-btn:hover { background: var(--gold-glow); box-shadow: 0 0 12px rgba(212,168,67,0.2); }
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; position: relative; z-index: 1; }
 .hero {
   text-align: center; padding: 3rem 0 2.5rem;
-  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+  border-bottom: 1px solid var(--border-gold); margin-bottom: 3rem;
+  position: relative;
 }
-.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
-.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
-.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
-.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero::before {
+  content: '';
+  position: absolute; top: -2rem; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.hero::after {
+  content: '◆';
+  position: absolute; top: -2.6rem; left: 50%; transform: translateX(-50%);
+  color: var(--gold); font-size: 0.7rem;
+  animation: goldShimmer 3s ease-in-out infinite;
+}
+.hero-part {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold);
+  letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem;
+}
+.hero-day {
+  font-family: var(--font-display); font-size: 4rem; font-weight: 700;
+  color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem;
+  text-shadow: 0 0 40px rgba(212,168,67,0.15);
+}
+.hero-subtitle {
+  font-family: var(--font-display); font-size: 1.8rem; font-weight: 400;
+  color: var(--gold); margin-bottom: 0.3rem;
+}
+.hero-eldorado-sub {
+  font-family: var(--font-display); font-size: 1.1rem; font-weight: 400;
+  color: var(--amber); font-style: italic; margin-bottom: 1.5rem;
+  letter-spacing: 0.05em;
+}
+.hero-quote {
+  font-family: var(--font-display); font-size: 1.1rem; font-style: italic;
+  color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6;
+}
 .hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
-.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge {
+  font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem;
+  border-radius: 4px; display: flex; align-items: center; gap: 0.4rem;
+}
 .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
-.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
-.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
-.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
-.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.hb-net { color: var(--gold-bright); background: var(--gold-dim); border: 1px solid var(--border-gold); }
+.hb-net .dot { background: var(--gold-bright); }
+.hb-house { color: var(--emerald); background: var(--emerald-dim); }
+.hb-house .dot { background: var(--emerald); }
+.hb-debt { color: var(--red); background: rgba(196,90,74,0.12); }
+.hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,175,106,0.12); }
+.hb-stock .dot { background: var(--green); }
 .series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
 .progress-wrap { margin: 1.5rem 0; }
-.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
-.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
-.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
-
-/* ═══ SECTIONS ═══ */
-.section { margin-bottom: 3rem; }
-.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
-.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
-
-/* ═══ BRAIN BOX ═══ */
-.brain-box {
-  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
-  border: 1px solid var(--border); border-left: 3px solid var(--blue);
-  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; border: 1px solid var(--border); }
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--gold-bright));
+  border-radius: 2px; transition: width 0.5s;
 }
-.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+.section { margin-bottom: 3rem; }
+.section-label {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.section-label::before { content: '◈'; font-size: 0.5rem; }
+.section-title {
+  font-family: var(--font-display); font-size: 1.6rem; font-weight: 600;
+  color: var(--text-primary); margin-bottom: 1rem;
+}
+.brain-box {
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--emerald);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+  position: relative; overflow: hidden;
+}
+.brain-box::before {
+  content: '';
+  position: absolute; top: 0; right: 0; width: 60px; height: 60px;
+  background: radial-gradient(circle at 100% 0%, rgba(61,158,110,0.08), transparent 70%);
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--emerald); margin-bottom: 0.8rem; }
 .brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
 .time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
-.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
-.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table th {
+  text-align: left; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border);
+}
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(44,38,30,0.5); }
 .time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
-
-/* ═══ CONCEPT CARDS ═══ */
 .cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
 .concept-card {
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
-  padding: 1.5rem; transition: all 0.3s;
+  background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.4s;
+  position: relative; overflow: hidden;
 }
-.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.concept-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold-glow), var(--gold-dim));
+  opacity: 0; transition: opacity 0.4s;
+}
+.concept-card:hover {
+  background: var(--bg-card-hover); border-color: var(--border-gold);
+  box-shadow: 0 4px 24px rgba(212,168,67,0.06);
+}
+.concept-card:hover::before { opacity: 1; }
 .card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
 .card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
 .card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
 .card-body p { margin-bottom: 0.6rem; }
-
-/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
 .formula-block {
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--gold);
-  border-radius: 6px;
-  padding: 1rem 1.2rem;
-  margin: 1rem 0;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  line-height: 2;
-  overflow-x: auto;
+  background: var(--bg-temple);
+  border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 6px; padding: 1rem 1.2rem; margin: 1rem 0;
+  font-family: var(--font-mono); font-size: 0.82rem; line-height: 2; overflow-x: auto;
 }
 .formula-line { color: var(--text-primary); }
 .formula-comment { color: var(--text-dim); font-size: 0.72rem; }
-.formula-highlight { color: var(--gold); }
-.formula-blue { color: var(--blue); }
-
-/* ═══ DATA TABLE ═══ */
+.formula-highlight { color: var(--gold-bright); }
+.formula-blue { color: var(--emerald); }
 .data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
 .data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
 .data-table th {
   font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
   letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
-  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+  border-bottom: 2px solid var(--border-gold); white-space: nowrap;
 }
 .data-table th:first-child { text-align: left; }
 .data-table td {
   padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
-  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+  border-bottom: 1px solid rgba(44,38,30,0.5); font-family: var(--font-mono); font-size: 0.78rem;
 }
 .data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
-.data-table tr:hover td { background: rgba(201,168,76,0.04); }
-.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
-
-/* ═══ CHART ═══ */
+.data-table tr:hover td { background: rgba(212,168,67,0.04); }
+.highlight-row td { color: var(--gold-bright) !important; font-weight: 500; background: var(--gold-dim) !important; }
 .chart-container {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
   padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.chart-container::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
 }
 .chart-title {
   font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
   letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
 }
-
-/* ═══ SIMULATION BOX ═══ */
 .sim-box {
-  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
-  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+  background: linear-gradient(135deg, rgba(212,168,67,0.04), rgba(61,158,110,0.04));
+  border: 1px solid var(--border-gold); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.sim-box::before {
+  content: '⬥';
+  position: absolute; top: -8px; left: 1.5rem; color: var(--gold);
+  font-size: 0.6rem; background: var(--bg-primary); padding: 0 0.3rem;
 }
 .sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
 .checklist { list-style: none; margin-top: 1rem; }
 .checklist li {
   font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
-  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+  position: relative; border-bottom: 1px solid rgba(44,38,30,0.3); cursor: pointer;
 }
 .checklist li::before {
   content: ''; position: absolute; left: 0; top: 0.65rem;
@@ -201,21 +311,19 @@ body {
 }
 .checklist li.checked::before { background: var(--gold); }
 .checklist li.checked::after {
-  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  content: '\u2713'; position: absolute; left: 2px; top: 0.42rem;
   color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
 }
-
-/* ═══ PSYCHOLOGY BOX ═══ */
 .psych-box {
-  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--amber);
   border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
 }
-.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--amber); margin-bottom: 0.8rem; }
 .psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
 .psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
 .neuro-tag {
   display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
-  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  color: var(--emerald); background: var(--emerald-dim); padding: 0.15rem 0.5rem;
   border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
 }
 .engineer-tag {
@@ -223,8 +331,6 @@ body {
   color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
   border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
 }
-
-/* ═══ DEEP DIVE ═══ */
 .deep-dive {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
   margin: 1rem 0; overflow: hidden;
@@ -237,7 +343,7 @@ body {
 }
 .deep-dive summary::-webkit-details-marker { display: none; }
 .deep-dive summary::before {
-  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  content: '\u25B8'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
   transition: transform 0.2s;
 }
 .deep-dive[open] summary::before { transform: rotate(90deg); }
@@ -246,9 +352,16 @@ body {
   padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
 }
 .deep-dive-content p { margin-bottom: 0.6rem; }
-
-/* ═══ QUIZ ═══ */
-.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-section {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.quiz-section::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--amber));
+}
 .quiz-q { margin-bottom: 1.5rem; }
 .quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
 .quiz-options { list-style: none; }
@@ -258,14 +371,12 @@ body {
   border: 1px solid transparent;
 }
 .quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
-.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
-.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-options li.correct { background: rgba(74,175,106,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(196,90,74,0.12); border-color: var(--red); color: var(--red); }
 .quiz-answer {
   display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
   border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
 }
-
-/* ═══ SR TRACKER ═══ */
 .sr-tracker {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
   padding: 1.5rem; margin: 1.5rem 0;
@@ -274,90 +385,792 @@ body {
   font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
   letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
 }
-.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 0.5rem; }
 .sr-slot {
   background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
   padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
 }
 .sr-slot:hover { border-color: var(--gold); }
-.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,175,106,0.08); }
 .sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
 .sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
-
-/* ═══ DISCLAIMER ═══ */
 .disclaimer {
-  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border-gold);
   font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
 }
-
-/* ═══ NAV FOOTER ═══ */
 .nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
 .nav-btn {
   font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
   text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
   border-radius: 4px; transition: all 0.3s;
 }
-.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px rgba(212,168,67,0.1); }
 .nav-btn.disabled { opacity: 0.3; pointer-events: none; }
-
-/* ═══ RESPONSIVE ═══ */
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+  radial-gradient(circle at 10% 70%, rgba(61,158,110,0.03) 0%, transparent 30%),
+  radial-gradient(circle at 90% 30%, rgba(61,158,110,0.02) 0%, transparent 25%);
+  pointer-events: none; z-index: 0;
+}
+.aztec-divider {
+  text-align: center;
+  margin: 2.5rem 0;
+  position: relative;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aztec-divider::before,
+.aztec-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
+}
+.aztec-divider .aztec-glyph {
+  padding: 0 1rem;
+  color: var(--gold);
+  font-size: 0.65rem;
+  opacity: 0.5;
+  letter-spacing: 0.3em;
+}
+.concept-card {
+  position: relative;
+  overflow: hidden;
+}
+.concept-card .card-glow {
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,168,67,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+.concept-card:hover .card-glow { opacity: 1; }
+.concept-card > * { position: relative; z-index: 1; }
+.quiz-section { position: relative; overflow: hidden; }
+.quiz-burst-canvas {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 10;
+}
+.scroll-compass {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  z-index: 99;
+  opacity: 0;
+  transition: opacity 0.5s;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+}
+.scroll-compass.visible { opacity: 1; }
+.scroll-compass svg { width: 100%; height: 100%; }
+.section-flash {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-bright), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.section.flash-active .section-flash { opacity: 1; }
+@keyframes checkPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+.checklist li.just-checked::before {
+  animation: checkPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+@keyframes checkGlow {
+  0% { box-shadow: 0 0 0 0 rgba(212,168,67,0.4); }
+  100% { box-shadow: 0 0 0 12px rgba(212,168,67,0); }
+}
+.checklist li.just-checked {
+  animation: checkGlow 0.6s ease-out;
+}
+.deep-dive[open] {
+  border-color: var(--border-gold);
+  box-shadow: 0 0 20px rgba(212,168,67,0.04);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+@keyframes timerPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(212,168,67,0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(212,168,67,0); }
+}
+.timer-btn.active {
+  animation: timerPulse 2s infinite;
+  background: var(--gold-glow);
+}
+@keyframes heroFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.hero-icon svg {
+  animation: heroFloat 4s ease-in-out infinite;
+}
+@keyframes barShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.progress-bar-fill {
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--gold-bright), var(--gold), var(--amber));
+  background-size: 200% 100%;
+  animation: barShimmer 4s linear infinite;
+}
+.sr-slot.done {
+  position: relative;
+  overflow: hidden;
+}
+.sr-slot.done::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+}
+.data-table tr {
+  transition: background 0.2s;
+}
+.data-table tr:hover td {
+  background: rgba(212,168,67,0.06);
+}
+.highlight-row td {
+  position: relative;
+}
+.hero-illustration {
+  margin: 0 -1.5rem 1.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(212,168,67,0.06);
+  position: relative;
+}
+.hero-illustration::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40px;
+  background: linear-gradient(to top, var(--bg-primary), transparent);
+  pointer-events: none;
+}
+@supports(padding: max(0px)) {
+  .sticky-header {
+  padding-left: max(0.8rem, env(safe-area-inset-left));
+  padding-right: max(0.8rem, env(safe-area-inset-right));
+  }
+  .container {
+  padding-left: max(0.8rem, env(safe-area-inset-left));
+  padding-right: max(0.8rem, env(safe-area-inset-right));
+  }
+  .scroll-compass {
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+@media print {
+  .sticky-header, .scroll-compass, #goldParticles, .timer-btn { display: none !important; }
+  body::before, body::after { display: none !important; }
+  .concept-card, .brain-box, .sim-box, .psych-box, .quiz-section, .sr-tracker {
+  border: 1px solid #ccc !important;
+  background: white !important;
+  break-inside: avoid;
+  }
+  .hero { border-bottom: 2px solid #333 !important; }
+  .nav-footer { display: none !important; }
+}
 @media (max-width: 640px) {
-  .sticky-header { padding: 0.5rem 1rem; }
+.sticky-header { padding: 0.5rem 1rem; }
   .hero-day { font-size: 2.5rem; }
   .hero-subtitle { font-size: 1.3rem; }
   .container { padding: 4.5rem 1rem 2rem; }
   .section-title { font-size: 1.3rem; }
   .sr-slots { grid-template-columns: repeat(2, 1fr); }
   .header-right { gap: 0.6rem; }
+.hero-illustration { margin: 0 -1rem 1rem; }
 }
+@media (prefers-reduced-motion: reduce) {
+.fade-up { opacity: 1; transform: none; transition: none; }
+  .hero-icon svg { animation: none; }
+  .progress-bar-fill { animation: none; }
+  .timer-btn.active { animation: none; }
+  #goldParticles { display: none !important; }
+  body::before { display: none; }
+  body::after { display: none; }
+}
+@media (max-width: 768px) {
+.hero-day { font-size: 3rem; }
+  .hero-subtitle { font-size: 1.5rem; }
+  .hero-eldorado-sub { font-size: 0.95rem; }
+  .hero-quote { font-size: 0.95rem; max-width: 90%; }
+  .hero-icon svg { width: 40px; height: 40px; }
+  .section-title { font-size: 1.4rem; }
+  .concept-card { padding: 1.2rem; }
+  .card-title { font-size: 1.15rem; }
+  .data-table { font-size: 0.75rem; }
+  .data-table th { font-size: 0.6rem; padding: 0.5rem; }
+  .data-table td { padding: 0.5rem; font-size: 0.72rem; }
+  .formula-block { font-size: 0.76rem; padding: 0.8rem 1rem; }
+  .scroll-compass { width: 48px; height: 48px; bottom: 1.5rem; right: 1.5rem; }
+}
+@media (max-width: 480px) {
+html { font-size: 15px; }
+  .sticky-header {
+  padding: 0.4rem 0.8rem;
+  gap: 0.3rem;
+  }
+  .header-day { font-size: 0.65rem; padding: 0.15rem 0.5rem; }
+  .header-title { font-size: 0.75rem; }
+  .header-badge { font-size: 0.6rem; padding: 0.15rem 0.4rem; }
+  .badge-series { display: none; }
+  .timer-btn { font-size: 0.65rem; padding: 0.25rem 0.6rem; }
+  .container { padding: 3.8rem 0.8rem 2rem; }
+  .hero { padding: 2rem 0 1.8rem; margin-bottom: 2rem; }
+  .hero-part { font-size: 0.6rem; letter-spacing: 0.2em; }
+  .hero-icon svg { width: 36px; height: 36px; }
+  .hero-day { font-size: 2.2rem; }
+  .hero-subtitle { font-size: 1.2rem; }
+  .hero-eldorado-sub { font-size: 0.85rem; }
+  .hero-quote { font-size: 0.85rem; line-height: 1.5; }
+  .hero-badges { gap: 0.4rem; }
+  .hero-badge { font-size: 0.6rem; padding: 0.25rem 0.5rem; }
+  .series-info { font-size: 0.6rem; }
+  .hero-illustration { margin: 0 -0.8rem 1rem; }
+  .section { margin-bottom: 2rem; }
+  .section-label { font-size: 0.58rem; }
+  .section-title { font-size: 1.2rem; }
+  .brain-box { padding: 1rem; }
+  .brain-box h3 { font-size: 0.82rem; }
+  .brain-box p { font-size: 0.8rem; }
+  .time-table { font-size: 0.72rem; }
+  .time-table th { font-size: 0.58rem; padding: 0.4rem 0.5rem; }
+  .time-table td { padding: 0.4rem 0.5rem; }
+  .concept-card { padding: 1rem; }
+  .card-num { font-size: 0.55rem; }
+  .card-title { font-size: 1.05rem; }
+  .card-body { font-size: 0.8rem; line-height: 1.7; }
+  .formula-block { font-size: 0.7rem; padding: 0.7rem 0.8rem; line-height: 1.8; }
+  .data-table-wrap { margin: 0.8rem -0.3rem; }
+  .data-table { font-size: 0.68rem; }
+  .data-table th { font-size: 0.55rem; padding: 0.4rem; }
+  .data-table td { padding: 0.4rem; font-size: 0.65rem; }
+  .chart-container { padding: 1rem; margin: 1rem 0; }
+  .chart-title { font-size: 0.6rem; }
+  .sim-box { padding: 1rem; }
+  .sim-box h3 { font-size: 0.85rem; }
+  .checklist li { font-size: 0.8rem; padding: 0.4rem 0 0.4rem 1.6rem; }
+  .psych-box { padding: 1rem; }
+  .psych-box h3 { font-size: 0.85rem; }
+  .psych-box .bias-name { font-size: 1rem; }
+  .deep-dive summary { padding: 0.8rem 1rem; font-size: 0.82rem; }
+  .deep-dive-content { padding: 0 1rem 1rem; font-size: 0.78rem; }
+  .quiz-section { padding: 1rem; }
+  .quiz-q h4 { font-size: 0.82rem; }
+  .quiz-options li { font-size: 0.76rem; padding: 0.45rem 0.6rem; }
+  .quiz-answer { font-size: 0.74rem; }
+  .sr-tracker { padding: 1rem; }
+  .sr-tracker h3 { font-size: 0.65rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
+  .sr-slot { padding: 0.5rem; }
+  .sr-slot .sr-label { font-size: 0.55rem; }
+  .sr-slot .sr-date { font-size: 0.65rem; }
+  .disclaimer { font-size: 0.65rem; padding: 1rem; }
+  .nav-footer { flex-direction: column; gap: 0.8rem; align-items: stretch; }
+  .nav-btn { text-align: center; font-size: 0.7rem; }
+  .scroll-compass { width: 42px; height: 42px; bottom: 1rem; right: 1rem; }
+  .aztec-divider { margin: 1.5rem 0; }
+  .aztec-divider .aztec-glyph { font-size: 0.55rem; }
+  .sim-box input[type="number"] {
+  width: 120px !important;
+  font-size: 0.85rem !important;
+  padding: 0.4rem 0.6rem !important;
+}
+@media (max-width: 360px) {
+html { font-size: 14px; }
+  .hero-day { font-size: 1.8rem; }
+  .hero-subtitle { font-size: 1rem; }
+  .container { padding: 3.5rem 0.6rem 1.5rem; }
+  .badge-asset { display: none; }
+  .hero-badges { flex-direction: column; align-items: center; }
+  .sr-slots { grid-template-columns: 1fr; }
+}
+@media ((hover: none) and (pointer: coarse)) {
+.quiz-options li {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  }
+  .checklist li {
+  .nav-btn {
+  justify-content: center;
+  .sr-slot {
+  flex-direction: column;
+  .timer-btn {
+  min-height: 40px;
+  .deep-dive summary {
+  min-height: 48px;
+  .concept-card .card-glow { display: none; }
+}
+@media ((max-height: 500px) and (orientation: landscape)) {
+.sticky-header { padding: 0.3rem 1rem; }
+  .hero { padding: 1.5rem 0 1rem; margin-bottom: 1.5rem; }
+  .hero-day { font-size: 2rem; }
+  .hero-illustration svg { max-height: 120px; }
+  .scroll-compass { width: 36px; height: 36px; bottom: 0.5rem; right: 0.5rem; }
+}
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.quiz-options li:focus-visible { border-color: var(--gold); }
+.nav-btn:focus-visible { border-color: var(--gold); color: var(--gold); }
+
+
+/* Content-visibility for off-screen rendering optimization */
+.section { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+.deep-dive { content-visibility: auto; contain-intrinsic-size: auto 200px; }
+.quiz-section { content-visibility: auto; contain-intrinsic-size: auto 400px; }
+.sr-tracker { content-visibility: auto; contain-intrinsic-size: auto 200px; }
+
+
+/* ═══ THEME TOGGLE ═══ */
+/* ── Toggle Button ── */
+.theme-toggle {
+  position: relative;
+  width: 52px; height: 28px;
+  background: var(--gold-dim);
+  border: 1px solid var(--border-gold);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex; align-items: center;
+  padding: 0 3px;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(212,168,67,0.2);
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.theme-toggle-knob {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--gold);
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  position: relative;
+}
+.theme-toggle-knob svg {
+  width: 14px; height: 14px;
+  transition: all 0.3s;
+}
+/* Dark mode icon (moon visible) */
+.theme-toggle .icon-moon { display: none; }
+.theme-toggle .icon-sun { display: block; }
+[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+[data-theme="light"] .theme-toggle-knob {
+  transform: translateX(24px);
+  background: #8B6914;
+}
+[data-theme="light"] .theme-toggle {
+  background: rgba(139,105,20,0.15);
+  border-color: rgba(139,105,20,0.3);
+}
+
+/* ── Light Theme Variables ── */
+[data-theme="light"] {
+  --bg-primary: #FAF6EE;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FFF9F0;
+  --bg-accent: #F5F0E5;
+  --bg-temple: #FBF7EF;
+  --gold: #8B6914;
+  --gold-bright: #A67C1A;
+  --gold-dim: rgba(139,105,20,0.08);
+  --gold-glow: rgba(139,105,20,0.15);
+  --gold-radiant: rgba(166,124,26,0.2);
+  --emerald: #2D7A52;
+  --emerald-dim: rgba(45,122,82,0.08);
+  --emerald-glow: rgba(45,122,82,0.15);
+  --amber: #9E5E28;
+  --amber-dim: rgba(158,94,40,0.08);
+  --copper: #7A4A30;
+  --text-primary: #2C2416;
+  --text-secondary: #5A5040;
+  --text-dim: #8A8070;
+  --border: #E0D8C8;
+  --border-gold: rgba(139,105,20,0.2);
+  --red: #B84A3A;
+  --green: #2D8A4A;
+}
+
+/* ── Light Theme Overrides ── */
+[data-theme="light"] body {
+  background: #FAF6EE !important;
+  color: #2C2416 !important;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139,105,20,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(158,94,40,0.03) 0%, transparent 50%) !important;
+}
+[data-theme="light"] body::before {
+  background-image:
+    repeating-linear-gradient(90deg, rgba(139,105,20,0.025) 0px, rgba(139,105,20,0.025) 1px, transparent 1px, transparent 80px),
+    repeating-linear-gradient(0deg, rgba(139,105,20,0.025) 0px, rgba(139,105,20,0.025) 1px, transparent 1px, transparent 80px) !important;
+}
+[data-theme="light"] body::after {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(139,105,20,0.03) 0%, transparent 25%),
+    radial-gradient(circle at 85% 80%, rgba(139,105,20,0.02) 0%, transparent 20%) !important;
+}
+[data-theme="light"] .sticky-header {
+  background: rgba(250,246,238,0.95) !important;
+  border-bottom-color: rgba(139,105,20,0.15) !important;
+}
+[data-theme="light"] .sticky-header::after {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.2), transparent) !important;
+}
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #F0EBE0;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(139,105,20,0.2), rgba(139,105,20,0.35));
+  border: 1px solid rgba(139,105,20,0.15);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(139,105,20,0.5);
+}
+[data-theme="light"] .header-day {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .header-title {
+  color: #5A5040;
+}
+[data-theme="light"] .badge-asset {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .badge-series {
+  color: #8A8070;
+  background: rgba(0,0,0,0.04);
+}
+[data-theme="light"] .timer-btn {
+  background: rgba(139,105,20,0.08);
+  border-color: #8B6914;
+  color: #8B6914;
+}
+[data-theme="light"] .timer-btn:hover {
+  background: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .hero {
+  border-bottom-color: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .hero::before {
+  background: linear-gradient(90deg, transparent, #8B6914, transparent);
+}
+[data-theme="light"] .hero-day {
+  color: #2C2416;
+  text-shadow: none;
+}
+[data-theme="light"] .hero-subtitle {
+  color: #8B6914;
+}
+[data-theme="light"] .hero-eldorado-sub {
+  color: #9E5E28;
+}
+[data-theme="light"] .hero-quote {
+  color: #5A5040;
+}
+[data-theme="light"] .concept-card {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+[data-theme="light"] .concept-card:hover {
+  background: #FFF9F0;
+  border-color: rgba(139,105,20,0.3);
+  box-shadow: 0 4px 16px rgba(139,105,20,0.08);
+}
+[data-theme="light"] .concept-card::before {
+  background: linear-gradient(90deg, rgba(139,105,20,0.1), rgba(139,105,20,0.3), rgba(139,105,20,0.1));
+}
+[data-theme="light"] .brain-box {
+  background: linear-gradient(135deg, #FFFFFF, #F8F4EC);
+  border-color: #E0D8C8;
+  border-left-color: #2D7A52;
+}
+[data-theme="light"] .brain-box::before {
+  background: radial-gradient(circle at 100% 0%, rgba(45,122,82,0.06), transparent 70%);
+}
+[data-theme="light"] .formula-block {
+  background: #FBF7EF;
+  border-color: #E0D8C8;
+  border-left-color: #8B6914;
+}
+[data-theme="light"] .sim-box {
+  background: linear-gradient(135deg, rgba(139,105,20,0.04), rgba(45,122,82,0.04));
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .sim-box::before {
+  background: #FAF6EE;
+}
+[data-theme="light"] .psych-box {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+  border-left-color: #9E5E28;
+}
+[data-theme="light"] .deep-dive {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .deep-dive summary:hover {
+  background: #F8F4EC;
+}
+[data-theme="light"] .deep-dive[open] {
+  border-color: rgba(139,105,20,0.3);
+  box-shadow: 0 0 15px rgba(139,105,20,0.05);
+}
+[data-theme="light"] .quiz-section {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .quiz-section::before {
+  background: linear-gradient(90deg, #9E5E28, #8B6914, #9E5E28);
+}
+[data-theme="light"] .quiz-options li:hover {
+  background: #F5F0E5;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .quiz-answer {
+  background: #F5F0E5;
+}
+[data-theme="light"] .sr-tracker {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .sr-slot {
+  background: #F5F0E5;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .sr-slot:hover {
+  border-color: #8B6914;
+}
+[data-theme="light"] .chart-container {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .data-table th {
+  border-bottom-color: rgba(139,105,20,0.3);
+}
+[data-theme="light"] .data-table td {
+  border-bottom-color: rgba(224,216,200,0.7);
+}
+[data-theme="light"] .data-table tr:hover td {
+  background: rgba(139,105,20,0.04);
+}
+[data-theme="light"] .highlight-row td {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+}
+[data-theme="light"] .nav-btn {
+  color: #5A5040;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .nav-btn:hover {
+  border-color: #8B6914;
+  color: #8B6914;
+}
+[data-theme="light"] .disclaimer {
+  border-top-color: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .progress-bar-bg {
+  background: #EDE8D8;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .progress-bar-fill {
+  background: linear-gradient(90deg, #9E5E28, #8B6914, #A67C1A);
+  background-size: 200% 100%;
+}
+[data-theme="light"] .aztec-divider::before,
+[data-theme="light"] .aztec-divider::after {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.15), transparent);
+}
+[data-theme="light"] .hero-illustration {
+  border-color: rgba(139,105,20,0.1);
+}
+[data-theme="light"] .hero-illustration::after {
+  background: linear-gradient(to top, #FAF6EE, transparent);
+}
+/* Light theme: SVG illustrations get warmer tones */
+[data-theme="light"] .hero-illustration svg {
+  filter: saturate(0.8) brightness(1.1);
+}
+/* Light theme: particles become subtle */
+[data-theme="light"] #goldParticles {
+  opacity: 0.3;
+}
+/* Scroll compass light adaptation */
+[data-theme="light"] .scroll-compass {
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+}
+/* Card glow adapts to light theme */
+[data-theme="light"] .concept-card .card-glow {
+  background: radial-gradient(circle, rgba(139,105,20,0.08) 0%, transparent 70%);
+}
+/* Section flash for light */
+[data-theme="light"] .section-flash {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.4), transparent);
+}
+/* Checklist in light */
+[data-theme="light"] .checklist li::before {
+  border-color: #8B6914;
+}
+[data-theme="light"] .checklist li.checked::before {
+  background: #8B6914;
+}
+[data-theme="light"] .checklist li.checked::after {
+  color: #FFFFFF;
+}
+/* Neuro & Engineer tags */
+[data-theme="light"] .neuro-tag {
+  color: #2D7A52;
+  background: rgba(45,122,82,0.08);
+}
+[data-theme="light"] .engineer-tag {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+}
+/* Time table */
+[data-theme="light"] .time-table td {
+  border-bottom-color: rgba(224,216,200,0.5);
+}
+/* Part texture backgrounds in light */
+[data-theme="light"] .bg-part-texture {
+  opacity: 0.3;
+}
+/* Smooth transition on theme change */
+html {
+  transition: none;
+}
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 0.4s, color 0.3s, border-color 0.3s, box-shadow 0.3s !important;
+}
+/* ═══ END THEME TOGGLE ═══ */
+
 </style>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 </head>
 <body>
+<a href="#main-content" class="skip-link" style="position:absolute;top:-100px;left:0;background:var(--gold);color:var(--bg-primary);padding:0.5rem 1rem;z-index:200;font-size:0.8rem;transition:top 0.2s;" onfocus="this.style.top='0'" onblur="this.style.top='-100px'">본문으로 건너뛰기</a>
 
-<header class="sticky-header">
+<header class="sticky-header" role="banner" aria-label="상단 네비게이션">
   <div class="header-left">
     <span class="header-day">DAY 12 / 23</span>
     <span class="header-title">매수·매도 타이밍 원칙</span>
   </div>
   <div class="header-right">
+<button class="theme-toggle" id="themeToggle" aria-label="테마 전환" title="다크/라이트 모드 전환">
+  <div class="theme-toggle-knob">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </div>
+</button>
+
     <span class="header-badge badge-asset">순자산 3억 2,800만</span>
-    <span class="header-badge badge-series">PART 2 · 주식 투자 심화</span>
-    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+    <span class="header-badge badge-series">제2장 · 밀림 속 보물 탐색</span>
+    <button class="timer-btn" aria-label="포모도로 타이머 시작/정지" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
   </div>
 </header>
 
-<div class="container">
+<div class="container" id="main-content" role="main">
 
 <section class="hero">
-  <div class="hero-part">PART 2 — 주식 투자 심화</div>
+  <div class="hero-part">제2장 · 밀림 속 보물 탐색</div>
+  <div class="hero-icon" style="margin-bottom:1rem;opacity:0.7;display:flex;justify-content:center;"><svg viewBox="0 0 48 48" width="48" height="48"><circle cx="24" cy="24" r="16" fill="none" stroke="#D4A843" stroke-width="1.5" opacity="0.3"/><line x1="24" y1="24" x2="24" y2="12" stroke="#D4A843" stroke-width="2" opacity="0.5"/><line x1="24" y1="24" x2="32" y2="28" stroke="#D4A843" stroke-width="1.5" opacity="0.4"/><circle cx="24" cy="24" r="2" fill="#D4A843" opacity="0.5"/></svg></div>
   <h1 class="hero-day">Day 12</h1>
   <h2 class="hero-subtitle">매수·매도 타이밍 원칙</h2>
-  <p class="hero-quote">"타이밍이 아니라 시간이 시장을 이긴다.<br>분할매수와 손절 규칙이 생존법이다."</p>
+  <p class="hero-quote">"투자의 핵심은 '뭘 사느냐'가 아니라 '얼마를 사느냐'이다. 포지션 사이징이 생존을 결정한다." — 랄프 빈스(Ralph Vince)</p>
   <div class="hero-badges">
     <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
     <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
     <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
     <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
   </div>
-  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 2: 08~14</div>
+  <div class="series-info">El Dorado 원정 — 포모도로 1세션(25분) × 23일 | PART 2: 08~14</div>
   <div class="progress-wrap">
     <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:52.2%"></div></div>
     <div class="progress-label"><span>Day 12</span><span>12 / 23 완료 (52.2%)</span></div>
   </div>
 </section>
 
+<div class="hero-illustration fade-up"><svg viewBox="0 0 860 200" width="860" height="200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;margin:-1rem 0 1rem;opacity:0.85;" preserveAspectRatio="xMidYMid slice">
+  <rect width="860" height="200" fill="#0D0B08"/>
+  <defs><radialGradient id="d12g" cx="50%" cy="50%" r="35%"><stop offset="0%" stop-color="rgba(212,168,67,0.06)"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>
+  <rect width="860" height="200" fill="url(#d12g)"/>
+  <!-- hourglass frame -->
+  <path d="M380,20 L480,20 L455,95 L480,170 L380,170 L405,95 Z" fill="none" stroke="#D4A843" stroke-width="1.2" opacity="0.15"/>
+  <!-- top sand -->
+  <path d="M395,30 L465,30 L445,80 L415,80 Z" fill="#D4A843" opacity="0.05"/>
+  <!-- falling sand stream -->
+  <line x1="430" y1="85" x2="430" y2="110" stroke="#E8C65A" stroke-width="1" opacity="0.12"/>
+  <!-- bottom sand pile -->
+  <path d="M405,170 Q430,140 455,170 Z" fill="#D4A843" opacity="0.06"/>
+  <!-- sand particles -->
+  <circle cx="428" cy="95" r="1" fill="#E8C65A" opacity="0.15"/>
+  <circle cx="432" cy="100" r="0.8" fill="#E8C65A" opacity="0.12"/>
+  <circle cx="430" cy="106" r="1" fill="#E8C65A" opacity="0.1"/>
+  <!-- clock face marks around -->
+  <circle cx="430" cy="95" r="60" fill="none" stroke="#D4A843" stroke-width="0.5" opacity="0.06"/>
+</svg>
+</div>
+
+
 <!-- 뇌과학 학습 전략 -->
 <section class="section fade-up">
   <div class="brain-box">
-    <h3>🧠 뇌과학 학습 전략: 손실회피와 장기 계획</h3>
-    <p>뇌의 편도체는 손실에 대해 이익보다 2배 강하게 반응합니다(손실회피 편향). 따라서 미리 손절선을 정하고, 분할매수로 평균단가를 낮추는 기계적 시스템이 감정적 판단을 이기는 유일한 방법입니다.</p>
+    <h3>🧠 뇌과학 학습 전략: 
+매수·매도 타이밍(Buy/Sell Timing)은 
+기술적·펀더멘털 분석과 자금 관리의 
+완벽한 결합입니다.
+</h3>
+    <p>
+<strong>Day 12 원칙: 4가지 타이밍 결정 요소</strong><br>
+1️⃣ <strong>매수 전략</strong>: 분할 매수 vs 일괄 매수<br>
+2️⃣ <strong>손절 관리</strong>: 손실 제한의 자동화<br>
+3️⃣ <strong>목표 설정</strong>: 리스크:보상 1:2 이상<br>
+4️⃣ <strong>포지션 사이징</strong>: 순자산의 2% 손실 한계<br>
+<br>
+<strong>핵심: 감정을 배제하고 규칙을 자동화할 것!</strong>
+</p>
     <table class="time-table">
       <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
-      <tbody><tr><td class="time-col">0–5분</td><td>분할매수 & 손절선 원칙</td><td>개념 카드</td></tr>
-<tr><td class="time-col">5–12분</td><td>2,800만원 포트폴리오 분할매수 계획</td><td>계산 예시</td></tr>
-<tr><td class="time-col">12–18분</td><td>포지션 사이징 (Kelly 공식)</td><td>수식 풀이</td></tr>
-<tr><td class="time-col">18–22분</td><td>내 자산으로 매매 시뮬레이션</td><td>자기 적용</td></tr>
-<tr><td class="time-col">22–25분</td><td>복습 퀴즈</td><td>능동적 회상</td></tr>
+      <tbody><tr><td class="time-col">13:00 ~ 13:20</td><td>매수 타이밍: 분할 매수 vs 일괄 매수</td><td>심리적 안정감 vs 수익 극대화 / 초보자 추천 전략</td></tr>
+<tr><td class="time-col">13:20 ~ 13:50</td><td>손절선(Stop Loss) 설정의 정확한 원칙</td><td>-10% 고정 손절 / 기술적 손절 / 변동성 손절</td></tr>
+<tr><td class="time-col">13:50 ~ 14:20</td><td>목표가(Target Price) & 수익 실현</td><td>리스크:보상 1:2 원칙 / 분할 수익실현 / Trailing Stop</td></tr>
+<tr><td class="time-col">14:20 ~ 14:50</td><td>포지션 사이징: 생존의 비결</td><td>2% 규칙 / 한 종목 5~10% 제한 / 현금 40% 유지</td></tr>
+<tr><td class="time-col">14:50 ~ 15:00</td><td>종합 체크리스트 & 당신의 투자 계획</td><td>펀더멘털 + 기술적 + 포지션 사이징 = 성공</td></tr>
 </tbody>
     </table>
   </div>
@@ -370,65 +1183,342 @@ body {
   <div class="cards-grid">
     <div class="concept-card fade-up">
       <div class="card-num">CONCEPT 01</div>
-      <div class="card-title">분할매수 (Scaling In) 원칙</div>
-      <div class="card-body"><p>한 번에 다 사지 말고 나누어 사세요. 이렇게 하면 평균단가를 낮추고 심리적 안정감을 얻습니다.</p>
-<div class="formula-block">
-<div class="formula-highlight">분할매수 예시 (2,800만원 포트폴리오):</div>
-<div class="formula-line">  대상: SK하이닉스 매수 결정</div>
-<div class="formula-line">  총 예산: 2,800만원 (하이닉스 + 삼성 분산)</div>
-<div class="formula-line">  하이닉스 할당: 1,200만원 (전체의 43%)</div>
-<br>
-<div class="formula-highlight">4단계 분할 매수:</div>
-<div class="formula-line">  Round 1 (D+0): 300만원 (1차 신호 발생 시)</div>
-<div class="formula-line">  Round 2 (D+5): 300만원 (추가 약세 또는 기술신호)</div>
-<div class="formula-line">  Round 3 (D+15): 300만원 (3주 후 재평가)</div>
-<div class="formula-line">  Round 4 (D+30): 300만원 (1개월 후 최종)</div>
-<br>
-<div class="formula-comment">// 장점: 평균단가 안정화 + 심리 안정 + 추가 정보 수집 기회</div>
-<div class="formula-comment">// 단점: 즉시 올라가면 아쉬움 (하지만 장기 수익률은 비슷)</div>
-</div></div>
+      <div class="card-title">분할 매수(Dollar-Cost Averaging, DCA) vs 일괄 매수</div>
+      <div class="card-body">
+        <div class="formula-block">
+            <div class="formula-line"><strong>분할 매수(DCA)란?</strong></div>
+            <div class="formula-comment">
+                한 번에 다 사지 말고, 일정 금액을 여러 번에 나누어 매수하는 전략<br>
+                예: 3,000만원을 월 500만원씩 6개월에 걸쳐 매수
+            </div>
+        </div>
+        
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <tr><th>기준</th><th>분할 매수 (DCA)</th><th>일괄 매수</th></tr>
+                <tr style="background: #2A2C30;">
+                    <td>심리적 부담</td>
+                    <td>✅ 낮음 (한 번에 적음)</td>
+                    <td>❌ 높음 (큰 손실 시 충격)</td>
+                </tr>
+                <tr>
+                    <td>평단가</td>
+                    <td>중간</td>
+                    <td>최저가에 매수 시 최고</td>
+                </tr>
+                <tr style="background: #2A2C30;">
+                    <td>수익률</td>
+                    <td>중간</td>
+                    <td>높을 수 있음 (타이밍 잘 맞으면)</td>
+                </tr>
+                <tr>
+                    <td>리스크</td>
+                    <td>낮음 (변동성 방어)</td>
+                    <td>높음 (고점 매수 가능성)</td>
+                </tr>
+                <tr style="background: #2A2C30;">
+                    <td>추천 대상</td>
+                    <td>초보자, 직장인</td>
+                    <td>경험자, 전문가</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="formula-block">
+            <div class="formula-line"><strong>DCA의 수학적 원리:</strong></div>
+            <div class="formula-line">평단가 = 총 투자금 ÷ 총 매수 주수</div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-top: 12px;">
+            <strong style="color: #4AAF6A;">📌 현실적 권장:</strong><br>
+            ✅ 초보 투자자: DCA 필수 (심리적 안정)<br>
+            ✅ 강한 하락장: 일괄 매수 고려 (저가 기회)<br>
+            ✅ 추세 상승: DCA로 리스크 최소화<br>
+            ✅ 장기 투자: 연금처럼 꾸준히 DCA
+        </div>
+        </div>
     </div>
     <div class="concept-card fade-up">
       <div class="card-num">CONCEPT 02</div>
-      <div class="card-title">손절선 설정 (-15% 규칙)</div>
-      <div class="card-body"><p>매수 후 15% 떨어지면 손절합니다. 감정적 판단을 허용하지 않는 기계적 규칙입니다.</p>
-<div class="formula-block">
-<div class="formula-highlight">손절선 계산:</div>
-<div class="formula-line">  평균 매수가: 50,000원</div>
-<div class="formula-line">  손절가 = 50,000 × (1 - 0.15)</div>
-<div class="formula-line">       = <span class="formula-highlight">42,500원</span></div>
-<br>
-<div class="formula-highlight">손실액:</div>
-<div class="formula-line">  300만원 매수 → 300만 ÷ 50,000 = 60주</div>
-<div class="formula-line">  42,500원에 매도 → 60주 × 42,500 = 2,550만원</div>
-<div class="formula-line">  손실 = 2,550만 - 300만 = -45만원 (약 -15%)</div>
-<br>
-<div class="formula-comment">// 원칙: 한 번의 매매에서 전체 자산의 2% 이상 잃지 않음</div>
-<div class="formula-comment">// 즉, 2,800만 × 2% = 56만원 이상 잃는 매매는 금지</div>
-</div></div>
+      <div class="card-title">손절선(Stop Loss) 설정의 정확한 원칙</div>
+      <div class="card-body">
+        <div class="formula-block">
+            <div class="formula-line"><strong>손절선이란?</strong></div>
+            <div class="formula-comment">
+                "여기까지 떨어지면 무조건 판다"는 사전 약속<br>
+                감정적 판단을 방지하고, 손실을 제한하는 가장 중요한 도구
+            </div>
+        </div>
+        
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <tr><th>손절 방식</th><th>설정 방법</th><th>특징</th><th>추천 대상</th></tr>
+                <tr style="background: #2A2C30;">
+                    <td><strong style="color: #D4A843;">고정 비율</strong></td>
+                    <td>매수가 -10%</td>
+                    <td>간단, 명확</td>
+                    <td>초보자</td>
+                </tr>
+                <tr>
+                    <td>기술적 손절</td>
+                    <td>주요 지지선 아래</td>
+                    <td>차트 기반, 정확함</td>
+                    <td>중급자</td>
+                </tr>
+                <tr style="background: #2A2C30;">
+                    <td>변동성 손절</td>
+                    <td>ATR(평균변동성) × 2</td>
+                    <td>변동성 적응형</td>
+                    <td>상급자</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="formula-block">
+            <div class="formula-line"><strong>손절선 계산 예:</strong></div>
+            <div class="formula-line">삼성전자 매수가: 67,500원</div>
+            <div class="formula-line">손절선 설정: 67,500 × (1 - 0.10) = <strong style="color: #C45A4A;">60,750원</strong></div>
+            <div class="formula-line">손실액: (67,500 - 60,750) × 매수주수</div>
+            <div class="formula-line">= 6,750원 × 매수주수</div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-top: 12px;">
+            <strong style="color: #C45A4A;">⚠️ 손절 실패의 심리적 함정</strong><br>
+            "혹시 반등하지 않을까?" → 손절 미루기 → 더 떨어짐 → 결국 패닉 손절<br>
+            <br>
+            <strong style="color: #D4A843;">해결책:</strong> 
+            손절은 "패배"가 아니라 "리스크 관리"<br>
+            손실을 제한함으로써 다음 기회에 자본을 보존하는 전략!
+        </div>
+        </div>
     </div>
     <div class="concept-card fade-up">
       <div class="card-num">CONCEPT 03</div>
-      <div class="card-title">목표가 설정 & 수익 실현</div>
-      <div class="card-body"><p>매수하면서 동시에 "언제 팔지?"를 정합니다. 욕심내지 말고 목표 도달 시 일부 매도합니다.</p>
-<div class="formula-block">
-<div class="formula-highlight">보수적 목표가 설정 (3단계):</div>
-<div class="formula-line">  매수가: 50,000원 기준</div>
-<br>
-<div class="formula-line">  첫 번째 목표 (+30%)</div>
-<div class="formula-line">    = 50,000 × 1.30 = 65,000원 (포지션 40% 매도)</div>
-<div class="formula-line">    수익: 300만 × 30% = 90만원</div>
-<br>
-<div class="formula-line">  두 번째 목표 (+50%)</div>
-<div class="formula-line">    = 50,000 × 1.50 = 75,000원 (포지션 40% 매도)</div>
-<div class="formula-line">    수익: 300만 × 50% = 150만원</div>
-<br>
-<div class="formula-line">  세 번째 목표 (+100%)</div>
-<div class="formula-line">    = 50,000 × 2.00 = 100,000원 (남은 포지션 20% 유지)</div>
-<div class="formula-line">    수익: 300만 × 100% = 300만원</div>
-<br>
-<div class="formula-comment">// 방식: "이익을 타면서" 계속 보유 = 장점 캡처</div>
-</div></div>
+      <div class="card-title">목표가(Target Price) 설정 & 수익 실현(Take Profit)</div>
+      <div class="card-body">
+        <div class="formula-block">
+            <div class="formula-line"><strong>목표가 설정의 원칙:</strong></div>
+            <div class="formula-line">리스크/보상 비율 ≥ 1:2</div>
+            <div class="formula-comment">
+                손실액 vs 수익액을 2:1 이상으로 설정<br>
+                예: 2% 손실 허용 → 4% 이상 수익 목표
+            </div>
+        </div>
+        
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <tr><th>시나리오</th><th>매수가</th><th>손절선</th><th>목표가</th><th>리스크:보상</th><th>평가</th></tr>
+                <tr style="background: #2A2C30;">
+                    <td><strong style="color: #C45A4A;">❌ 나쁜 예</strong></td>
+                    <td>100원</td>
+                    <td>95원 (-5%)</td>
+                    <td>102원 (+2%)</td>
+                    <td>5:2 = 1:0.4</td>
+                    <td>위험함</td>
+                </tr>
+                <tr>
+                    <td><strong style="color: #4AAF6A;">✅ 좋은 예</strong></td>
+                    <td>100원</td>
+                    <td>95원 (-5%)</td>
+                    <td>110원 (+10%)</td>
+                    <td>5:10 = 1:2</td>
+                    <td>합리적</td>
+                </tr>
+                <tr style="background: #2A2C30;">
+                    <td><strong style="color: #4AAF6A;">⭐ 최고 예</strong></td>
+                    <td>100원</td>
+                    <td>95원 (-5%)</td>
+                    <td>115원 (+15%)</td>
+                    <td>5:15 = 1:3</td>
+                    <td>최적</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="formula-block">
+            <div class="formula-line"><strong>수익 실현 시점의 판단:</strong></div>
+            <div class="formula-line">1️⃣ 기술적 신호 확인</div>
+            <div class="formula-comment">MACD 하향크로스 or RSI 70 이상</div>
+            
+            <div class="formula-line">2️⃣ 펀더멘털 변화</div>
+            <div class="formula-comment">호재가 완전히 반영된 후 / 악재 신호 포착</div>
+            
+            <div class="formula-line">3️⃣ 심리적 안정감</div>
+            <div class="formula-comment">목표가 도달 → 욕심 부리지 말고 팔기</div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-top: 12px;">
+            <strong style="color: #D4A843;">💡 탐욕의 함정</strong><br>
+            "10% 수익 났는데, 15%까지 기다리자" → 반등 시작 → 손실로 전환<br>
+            <strong style="color: #4AAF6A;">해결책:</strong> 
+            목표가에 도달하면 절반 정도 팔고, 나머지는 추세에 맡기기 (Trailing Stop)
+        </div>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">포지션 사이징(Position Sizing): 생존의 핵심</div>
+      <div class="card-body">
+        <div class="formula-block">
+            <div class="formula-line"><strong>포지션 사이징의 정의:</strong></div>
+            <div class="formula-comment">
+                "한 번의 거래에서 잃을 수 있는 최대 손실액을 사전에 정하는 것"<br>
+                = 자금 관리(Money Management)의 핵심
+            </div>
+        </div>
+        
+        <div class="formula-block">
+            <div class="formula-line"><strong>2% 규칙 (The 2% Rule):</strong></div>
+            <div class="formula-line">한 거래의 최대 손실 = 순자산 × 2%</div>
+            <div class="formula-line">예: 순자산 3.28억 × 2% = <strong style="color: #D4A843;">656만원</strong></div>
+            <div class="formula-comment">
+                656만원까지만 잃을 수 있다는 뜻<br>
+                이를 손절선 거리로 나누면 매수 가능 금액이 결정됨
+            </div>
+        </div>
+        
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <tr><th>손절 거리</th><th>매수 가능 금액</th><th>매수 주수 (67,500원 기준)</th></tr>
+                <tr style="background: #2A2C30;">
+                    <td>-5%</td>
+                    <td>656만 ÷ 0.05 = 13,120만</td>
+                    <td>약 1,945주</td>
+                </tr>
+                <tr>
+                    <td>-10%</td>
+                    <td>656만 ÷ 0.10 = 6,560만</td>
+                    <td>약 972주</td>
+                </tr>
+                <tr style="background: #2A2C30;">
+                    <td>-15%</td>
+                    <td>656만 ÷ 0.15 = 4,373만</td>
+                    <td>약 648주</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="formula-block">
+            <div class="formula-line"><strong>현금 비중 유지:</strong></div>
+            <div class="formula-line">항상 순자산의 30~40%를 현금으로 보유</div>
+            <div class="formula-comment">
+                목적: 급락장 기회 매수 (추가 매수 여력)<br>
+                예: 순자산 3.28억 × 40% = 1.31억원 현금 유지
+            </div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-top: 12px;">
+            <strong style="color: #D4A843;">⭐ 포지션 사이징이 생존 결정하는 이유</strong><br>
+            한 거래에서 20% 손실 = 원금 회복하려면 25% 수익 필요<br>
+            한 거래에서 50% 손실 = 원금 회복하려면 100% 수익 필요 (거의 불가능)<br>
+            <br>
+            <strong style="color: #4AAF6A;">결론:</strong> 
+            작은 손실로 생존 → 큰 기회에 집중 → 장기 생존 가능!
+        </div>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">매수·매도 타이밍 종합 체크리스트</div>
+      <div class="card-body">
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+            <strong style="color: #D4A843;">🎯 매수 결정 전 체크리스트</strong>
+        </div>
+        
+        <div style="margin: 12px 0;">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <input type="checkbox" style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;">
+                <label style="cursor: pointer; font-size: 13px;">
+                    <strong>펀더멘털 확인</strong> - 재무건전성 + 성장성 검증
+                </label>
+            </div>
+            <div style="margin-left: 30px; color: #B8B0A0; font-size: 12px;">
+                ∟ 부채비율 < 100% / 영업현금 > 순이익 / 매출 증가세
+            </div>
+        </div>
+        
+        <div style="margin: 12px 0;">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <input type="checkbox" style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;">
+                <label style="cursor: pointer; font-size: 13px;">
+                    <strong>기술적 신호 확인</strong> - 추세 + 모멘텀 + 전환
+                </label>
+            </div>
+            <div style="margin-left: 30px; color: #B8B0A0; font-size: 12px;">
+                ∟ 가격 > MA20 > MA50 / RSI 30~70 / MACD 상향크로스
+            </div>
+        </div>
+        
+        <div style="margin: 12px 0;">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <input type="checkbox" style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;">
+                <label style="cursor: pointer; font-size: 13px;">
+                    <strong>포지션 사이징 설정</strong> - 손절선 & 목표가 사전 결정
+                </label>
+            </div>
+            <div style="margin-left: 30px; color: #B8B0A0; font-size: 12px;">
+                ∟ 최대 손실액 (순자산 × 2%) / 매수액 계산 / 목표가 리스크:보상 1:2 이상
+            </div>
+        </div>
+        
+        <div style="margin: 12px 0;">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <input type="checkbox" style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;">
+                <label style="cursor: pointer; font-size: 13px;">
+                    <strong>현금 비중 확인</strong> - 최소 30% 현금 유지
+                </label>
+            </div>
+            <div style="margin-left: 30px; color: #B8B0A0; font-size: 12px;">
+                ∟ 급락장 추가 매수 여력 확보 / 심리적 안정감
+            </div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin: 12px 0;">
+            <strong style="color: #C45A4A;">🔴 매도 결정 기준</strong>
+        </div>
+        
+        <div style="margin: 12px 0;">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <input type="checkbox" style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;">
+                <label style="cursor: pointer; font-size: 13px;">
+                    <strong>수익 실현</strong> - 목표가 도달 시 절반 판매
+                </label>
+            </div>
+            <div style="margin-left: 30px; color: #B8B0A0; font-size: 12px;">
+                ∟ 나머지는 Trailing Stop (추세에 맡김)
+            </div>
+        </div>
+        
+        <div style="margin: 12px 0;">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <input type="checkbox" style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;">
+                <label style="cursor: pointer; font-size: 13px;">
+                    <strong>손절 실행</strong> - 손절선 도달 시 무조건 판매
+                </label>
+            </div>
+            <div style="margin-left: 30px; color: #B8B0A0; font-size: 12px;">
+                ∟ 감정 개입 금지 / 심리적 마찰 무시
+            </div>
+        </div>
+        
+        <div style="margin: 12px 0;">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <input type="checkbox" style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;">
+                <label style="cursor: pointer; font-size: 13px;">
+                    <strong>추세 전환</strong> - MACD 하향크로스 or 펀더멘털 악화
+                </label>
+            </div>
+            <div style="margin-left: 30px; color: #B8B0A0; font-size: 12px;">
+                ∟ 다음 기회 대기 / 현금 복귀
+            </div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-top: 12px;">
+            <strong style="color: #D4A843;">⭐ 최종 원칙</strong><br>
+            계획(Plan) → 실행(Execute) → 점검(Monitor) → 조정(Adjust)<br>
+            이 4가지 사이클을 반복하는 것이 성공의 비결!
+        </div>
+        </div>
     </div></div>
 </section>
 
@@ -436,70 +1526,205 @@ body {
 <section class="section fade-up">
   <div class="section-label">VISUALIZATION</div>
   <h2 class="section-title">시각화 자료</h2>
-  <div class="chart-container">
-    <div class="chart-title">포지션 사이징 & 수익/손실 다이어그램 (2,800만원 포트폴리오)</div>
-    <svg viewBox="0 0 900 450" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
-      <!-- 제목 -->
-      <text x="450" y="25" text-anchor="middle" fill="#C9A84C" font-family="Noto Sans KR" font-size="14" font-weight="600">2,800만원 자산의 최적 분배 & 손익 구조</text>
+  
+<svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1000" height="450" fill="#0D0B08"/>
+  
+  <!-- Title -->
+  <text x="500" y="30" font-size="20" font-weight="bold" fill="#EDE8D8" text-anchor="middle">
+    분할 매수(DCA) vs 일괄 매수의 비교
+  </text>
+  
+  <!-- Grid -->
+  <line x1="50" y1="80" x2="950" y2="80" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="50" y1="140" x2="950" y2="140" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="50" y1="200" x2="950" y2="200" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="50" y1="260" x2="950" y2="260" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="50" y1="320" x2="950" y2="320" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  
+  <!-- Y-axis -->
+  <line x1="50" y1="80" x2="50" y2="380" stroke="#8A8272" stroke-width="2"/>
+  <text x="10" y="85" font-size="10" fill="#B8B0A0">100K</text>
+  <text x="10" y="145" font-size="10" fill="#B8B0A0">80K</text>
+  <text x="10" y="205" font-size="10" fill="#B8B0A0">60K</text>
+  <text x="10" y="265" font-size="10" fill="#B8B0A0">40K</text>
+  <text x="10" y="325" font-size="10" fill="#B8B0A0">20K</text>
+  
+  <!-- X-axis -->
+  <line x1="50" y1="380" x2="950" y2="380" stroke="#8A8272" stroke-width="2"/>
+  <text x="70" y="400" font-size="10" fill="#B8B0A0">월1</text>
+  <text x="230" y="400" font-size="10" fill="#B8B0A0">월2</text>
+  <text x="390" y="400" font-size="10" fill="#B8B0A0">월3</text>
+  <text x="550" y="400" font-size="10" fill="#B8B0A0">월4</text>
+  <text x="710" y="400" font-size="10" fill="#B8B0A0">월5</text>
+  <text x="870" y="400" font-size="10" fill="#B8B0A0">월6</text>
+  
+  <!-- Price line (trending down then recovery) -->
+  <polyline points="70,200 160,280 250,320 340,300 430,200 520,150 610,160 700,140 790,120 880,100" 
+            stroke="#3D9E6E" stroke-width="2.5" fill="none"/>
+  
+  <!-- Buy points for DCA (분할 매수) -->
+  <circle cx="70" cy="200" r="4" fill="#4AAF6A"/>
+  <text x="50" y="220" font-size="9" fill="#4AAF6A" font-weight="bold">1000</text>
+  
+  <circle cx="160" cy="280" r="4" fill="#4AAF6A"/>
+  <text x="140" y="300" font-size="9" fill="#4AAF6A" font-weight="bold">1000</text>
+  
+  <circle cx="250" cy="320" r="4" fill="#4AAF6A"/>
+  <text x="230" y="340" font-size="9" fill="#4AAF6A" font-weight="bold">1000</text>
+  
+  <!-- Lump-sum buy point -->
+  <circle cx="70" cy="200" r="6" fill="none" stroke="#C45A4A" stroke-width="2"/>
+  <text x="80" y="190" font-size="10" fill="#C45A4A" font-weight="bold">일괄매수</text>
+  
+  <!-- Legend -->
+  <rect x="600" y="100" width="320" height="120" fill="#1A1C20" rx="6" stroke="#2A2C30" stroke-width="1"/>
+  
+  <circle cx="620" cy="120" r="3" fill="#3D9E6E"/>
+  <text x="640" y="125" font-size="12" fill="#EDE8D8">가격 추이</text>
+  
+  <circle cx="620" cy="150" r="3" fill="#4AAF6A"/>
+  <text x="640" y="155" font-size="12" fill="#EDE8D8">분할 매수 지점 (월 1000씩)</text>
+  
+  <circle cx="620" cy="180" r="3" fill="none" stroke="#C45A4A" stroke-width="2"/>
+  <text x="640" y="185" font-size="12" fill="#EDE8D8">일괄 매수 지점</text>
+  
+  <text x="620" y="210" font-size="11" fill="#B8B0A0" font-weight="bold">결과:</text>
+  <text x="620" y="225" font-size="10" fill="#4AAF6A">분할매수 평단가: 267원</text>
+  <text x="620" y="240" font-size="10" fill="#C45A4A">일괄매수 평단가: 200원 (좋음!)</text>
+  
+  <!-- Annotation -->
+  <rect x="50" y="410" width="900" height="25" fill="#1A1C20" rx="4"/>
+  <text x="500" y="425" font-size="11" fill="#4AAF6A" text-anchor="middle" font-weight="bold">
+    분할매수의 장점: 심리적 안정감 & 변동성에 대한 방어 / 단점: 평단가가 높을 수 있음
+  </text>
+</svg>
 
-      <!-- 상단: 자산 분배 파이 차트 -->
-      <g transform="translate(200, 80)">
-        <circle cx="80" cy="80" r="70" fill="rgba(201,168,76,0.2)" stroke="#C9A84C" stroke-width="2"/>
-        <text x="80" y="85" text-anchor="middle" fill="#C9A84C" font-family="Noto Sans KR" font-size="12" font-weight="600">SK하이닉스</text>
-        <text x="80" y="102" text-anchor="middle" fill="#C9A84C" font-family="JetBrains Mono" font-size="10">1,200만 (43%)</text>
+<svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1000" height="450" fill="#0D0B08"/>
+  
+  <!-- Title -->
+  <text x="500" y="30" font-size="20" font-weight="bold" fill="#EDE8D8" text-anchor="middle">
+    손절선(Stop Loss) & 목표가(Target Price) 설정 원칙
+  </text>
+  
+  <!-- Grid -->
+  <line x1="50" y1="100" x2="950" y2="100" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="50" y1="160" x2="950" y2="160" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="50" y1="220" x2="950" y2="220" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="50" y1="280" x2="950" y2="280" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="50" y1="340" x2="950" y2="340" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  
+  <!-- Y-axis -->
+  <line x1="50" y1="100" x2="50" y2="400" stroke="#8A8272" stroke-width="2"/>
+  <text x="20" y="105" font-size="10" fill="#B8B0A0">100K</text>
+  <text x="20" y="165" font-size="10" fill="#B8B0A0">80K</text>
+  <text x="20" y="225" font-size="10" fill="#B8B0A0">60K</text>
+  <text x="20" y="285" font-size="10" fill="#B8B0A0">40K</text>
+  <text x="20" y="345" font-size="10" fill="#B8B0A0">20K</text>
+  
+  <!-- X-axis -->
+  <line x1="50" y1="400" x2="950" y2="400" stroke="#8A8272" stroke-width="2"/>
+  <text x="460" y="420" font-size="10" fill="#B8B0A0">시간 →</text>
+  
+  <!-- Target Price line -->
+  <line x1="50" y1="120" x2="950" y2="120" stroke="#4AAF6A" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="960" y="125" font-size="10" fill="#4AAF6A" font-weight="bold">목표가 +20%</text>
+  
+  <!-- Entry Price line -->
+  <line x1="50" y1="220" x2="950" y2="220" stroke="#D4A843" stroke-width="2"/>
+  <text x="960" y="225" font-size="10" fill="#D4A843" font-weight="bold">매수가</text>
+  
+  <!-- Stop Loss line -->
+  <line x1="50" y1="300" x2="950" y2="300" stroke="#C45A4A" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="960" y="305" font-size="10" fill="#C45A4A" font-weight="bold">손절선 -10%</text>
+  
+  <!-- Price movement -->
+  <polyline points="100,220 150,190 200,160 250,140 300,120 350,130 400,150 450,200 500,210 550,190 600,170 650,180 700,200 750,220 800,250 850,280 900,310" 
+            stroke="#3D9E6E" stroke-width="2.5" fill="none"/>
+  
+  <!-- Profit zone (green) -->
+  <rect x="50" y="100" width="900" height="120" fill="#4AAF6A" opacity="0.1"/>
+  <text x="970" y="160" font-size="9" fill="#4AAF6A">수익</text>
+  
+  <!-- Loss zone (red) -->
+  <rect x="50" y="300" width="900" height="100" fill="#C45A4A" opacity="0.1"/>
+  <text x="970" y="350" font-size="9" fill="#C45A4A">손실</text>
+  
+  <!-- Buy and Sell points -->
+  <circle cx="100" cy="220" r="5" fill="#D4A843"/>
+  <text x="105" y="215" font-size="9" fill="#D4A843" font-weight="bold">매수</text>
+  
+  <circle cx="300" cy="120" r="5" fill="#4AAF6A"/>
+  <text x="305" y="115" font-size="9" fill="#4AAF6A" font-weight="bold">목표가 도달!</text>
+  
+  <!-- Annotation -->
+  <rect x="50" y="410" width="900" height="25" fill="#1A1C20" rx="4"/>
+  <text x="500" y="425" font-size="11" fill="#D4A843" text-anchor="middle" font-weight="bold">
+    리스크/보상 비율: 손실액 vs 수익액 = 1:2 이상을 권장 (2% 손실 허용 → 4% 수익 목표)
+  </text>
+</svg>
 
-        <circle cx="220" cy="80" r="70" fill="rgba(74,158,191,0.2)" stroke="#4A9EBF" stroke-width="2"/>
-        <text x="220" y="85" text-anchor="middle" fill="#4A9EBF" font-family="Noto Sans KR" font-size="12" font-weight="600">삼성전자</text>
-        <text x="220" y="102" text-anchor="middle" fill="#4A9EBF" font-family="JetBrains Mono" font-size="10">1,200만 (43%)</text>
+<svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1000" height="450" fill="#0D0B08"/>
+  
+  <!-- Title -->
+  <text x="500" y="30" font-size="20" font-weight="bold" fill="#EDE8D8" text-anchor="middle">
+    포지션 사이징: 월급 3.6억(연) 기준 적정 투자액 배분
+  </text>
+  
+  <!-- Pie chart sections -->
+  <!-- 현금 40% -->
+  <path d="M 300,220 L 300,120 A 100,100 0 0,1 370,133.6 Z" fill="#3D9E6E" stroke="#0D0B08" stroke-width="2"/>
+  <text x="315" y="150" font-size="12" fill="#EDE8D8" font-weight="bold">현금</text>
+  <text x="310" y="165" font-size="11" fill="#EDE8D8">40%</text>
+  <text x="305" y="180" font-size="10" fill="#B8B0A0">(1.44억)</text>
+  
+  <!-- 안전자산 30% (채권, ETF) -->
+  <path d="M 300,220 L 370,133.6 A 100,100 0 0,1 400,220 Z" fill="#4AAF6A" stroke="#0D0B08" stroke-width="2"/>
+  <text x="360" y="165" font-size="12" fill="#0D0B08" font-weight="bold">채권</text>
+  <text x="360" y="180" font-size="11" fill="#0D0B08">30%</text>
+  <text x="355" y="195" font-size="10" fill="#0D0B08">(1.08억)</text>
+  
+  <!-- 주식 25% (분산 투자) -->
+  <path d="M 300,220 L 400,220 A 100,100 0 0,1 329.3,310.2 Z" fill="#D4A843" stroke="#0D0B08" stroke-width="2"/>
+  <text x="360" y="250" font-size="12" fill="#0D0B08" font-weight="bold">주식</text>
+  <text x="360" y="265" font-size="11" fill="#0D0B08">25%</text>
+  <text x="355" y="280" font-size="10" fill="#0D0B08">(0.9억)</text>
+  
+  <!-- 성장자산 5% (고위험) -->
+  <path d="M 300,220 L 329.3,310.2 A 100,100 0 0,1 300.4,320 Z" fill="#C45A4A" stroke="#0D0B08" stroke-width="2"/>
+  <text x="310" y="300" font-size="11" fill="#EDE8D8" font-weight="bold">고위험</text>
+  <text x="310" y="315" font-size="10" fill="#EDE8D8">5% (0.18억)</text>
+  
+  <!-- Rule Box -->
+  <rect x="550" y="120" width="380" height="220" fill="#1A1C20" rx="6" stroke="#2A2C30" stroke-width="1"/>
+  
+  <text x="570" y="140" font-size="12" fill="#D4A843" font-weight="bold">⚡ 포지션 사이징 규칙</text>
+  
+  <text x="570" y="165" font-size="11" fill="#EDE8D8" font-weight="bold">1. 한 번에 잃을 수 있는 최대 손실</text>
+  <text x="575" y="180" font-size="10" fill="#B8B0A0">= 순자산의 1~2%</text>
+  <text x="575" y="195" font-size="10" fill="#B8B0A0">예: 3.28억 × 2% = 656만원</text>
+  
+  <text x="570" y="220" font-size="11" fill="#EDE8D8" font-weight="bold">2. 한 종목의 최대 비중</text>
+  <text x="575" y="235" font-size="10" fill="#B8B0A0">= 포트폴리오의 5~10% 이하</text>
+  <text x="575" y="250" font-size="10" fill="#B8B0A0">예: 삼성 2,800만 = 전체의 8.5%</text>
+  
+  <text x="570" y="275" font-size="11" fill="#EDE8D8" font-weight="bold">3. 손절 거리 설정</text>
+  <text x="575" y="290" font-size="10" fill="#B8B0A0">= 손절액 ÷ 손절 거리</text>
+  <text x="575" y="305" font-size="10" fill="#B8B0A0">예: 656만 손실 허용 ÷ -10% = 6,560만원 매수 가능</text>
+  
+  <text x="570" y="330" font-size="11" fill="#EDE8D8" font-weight="bold">4. 현금 비중 유지</text>
+  <text x="575" y="345" font-size="10" fill="#B8B0A0">= 항상 40% 이상 현금 보유</text>
+  <text x="575" y="360" font-size="10" fill="#B8B0A0">(급락장 기회 매수 목적)</text>
+  
+  <!-- Bottom insight -->
+  <rect x="50" y="410" width="900" height="25" fill="#1A1C20" rx="4"/>
+  <text x="500" y="425" font-size="11" fill="#4AAF6A" text-anchor="middle" font-weight="bold">
+    황금 규칙: "한 번의 큰 손실이 많은 수익을 무를 수 있다" → 포지션 사이징이 생존 비결
+  </text>
+</svg>
 
-        <circle cx="350" cy="80" r="50" fill="rgba(74,191,122,0.2)" stroke="#4ABF7A" stroke-width="2"/>
-        <text x="350" y="82" text-anchor="middle" fill="#4ABF7A" font-family="Noto Sans KR" font-size="11" font-weight="600">현금</text>
-        <text x="350" y="98" text-anchor="middle" fill="#4ABF7A" font-family="JetBrains Mono" font-size="9">400만 (14%)</text>
-      </g>
-
-      <!-- 하단: 손익 구조 -->
-      <text x="450" y="220" text-anchor="middle" fill="#C9A84C" font-family="Noto Sans KR" font-size="13" font-weight="600">SK하이닉스 1,200만원 매매 시나리오</text>
-
-      <!-- 중앙선 (0%) -->
-      <line x1="100" y1="280" x2="800" y2="280" stroke="#9A9890" stroke-width="1" stroke-dasharray="2,2"/>
-      <text x="100" y="300" fill="#9A9890" font-family="JetBrains Mono" font-size="9">매수가</text>
-
-      <!-- 손실 영역 -->
-      <rect x="100" y="280" width="120" height="40" fill="rgba(191,74,74,0.15)" stroke="#BF4A4A" stroke-width="1"/>
-      <text x="160" y="305" text-anchor="middle" fill="#BF4A4A" font-family="Noto Sans KR" font-size="10">-15%</text>
-      <text x="160" y="320" text-anchor="middle" fill="#BF4A4A" font-family="JetBrains Mono" font-size="8">손절 -180만</text>
-
-      <!-- 중립 영역 -->
-      <rect x="220" y="280" width="280" height="40" fill="rgba(201,168,76,0.1)" stroke="#C9A84C" stroke-width="1"/>
-      <text x="360" y="305" text-anchor="middle" fill="#C9A84C" font-family="Noto Sans KR" font-size="9">보유</text>
-
-      <!-- 수익 영역 1 (30%) -->
-      <rect x="500" y="280" width="100" height="40" fill="rgba(74,191,122,0.2)" stroke="#4ABF7A" stroke-width="2"/>
-      <text x="550" y="300" text-anchor="middle" fill="#4ABF7A" font-family="Noto Sans KR" font-size="9">목표 1</text>
-      <text x="550" y="316" text-anchor="middle" fill="#4ABF7A" font-family="JetBrains Mono" font-size="8">+30% (+360만)</text>
-
-      <!-- 수익 영역 2 (50%) -->
-      <rect x="600" y="280" width="100" height="40" fill="rgba(74,191,122,0.3)" stroke="#4ABF7A" stroke-width="2"/>
-      <text x="650" y="300" text-anchor="middle" fill="#4ABF7A" font-family="Noto Sans KR" font-size="9">목표 2</text>
-      <text x="650" y="316" text-anchor="middle" fill="#4ABF7A" font-family="JetBrains Mono" font-size="8">+50% (+600만)</text>
-
-      <!-- 수익 영역 3 (100%) -->
-      <rect x="700" y="280" width="100" height="40" fill="rgba(74,191,122,0.4)" stroke="#4ABF7A" stroke-width="2"/>
-      <text x="750" y="300" text-anchor="middle" fill="#4ABF7A" font-family="Noto Sans KR" font-size="9">목표 3</text>
-      <text x="750" y="316" text-anchor="middle" fill="#4ABF7A" font-family="JetBrains Mono" font-size="8">+100% (+1,200만)</text>
-
-      <!-- 분할매수 설명 -->
-      <g transform="translate(100, 360)">
-        <text x="0" y="0" fill="#C9A84C" font-family="Noto Sans KR" font-size="11" font-weight="600">분할매수 4단계 (1,200만원):</text>
-        <text x="0" y="20" fill="#9A9890" font-family="Noto Sans KR" font-size="9">- 1차(D+0): 300만원 @ 50,000원 (신호 발생)</text>
-        <text x="0" y="35" fill="#9A9890" font-family="Noto Sans KR" font-size="9">- 2차(D+5): 300만원 @ 48,000원 (약 5% 하락)</text>
-        <text x="0" y="50" fill="#9A9890" font-family="Noto Sans KR" font-size="9">- 3차(D+15): 300만원 @ 46,000원 (약 10% 하락)</text>
-        <text x="0" y="65" fill="#9A9890" font-family="Noto Sans KR" font-size="9">- 4차(D+30): 300만원 @ 44,000원 (약 15% 하락 = 손절 직전)</text>
-        <text x="0" y="85" fill="#C9A84C" font-family="Noto Sans KR" font-size="9" font-weight="600">평균 매수가: (50K+48K+46K+44K) / 4 = 47,000원</text>
-        <text x="0" y="100" fill="#9A9890" font-family="Noto Sans KR" font-size="8">(즉, 한 번에 샀다면 50K → 평균 47K로 낮춤. 3K × 60주 = 180만원 절감)</text>
-      </g>
-    </svg>
-  </div>
 </section>
 
 
@@ -507,48 +1732,219 @@ body {
 <section class="section fade-up">
   <div class="section-label">DEEP DIVE</div>
   <h2 class="section-title">심화 학습</h2>
-  <details class="deep-dive">
-    <summary>Kelly 공식과 최적 포지션 사이징</summary>
+  
+<details class="deep-dive">
+    <summary>🔍 심화학습 1: 왜 투자자는 항상 "최고점에서 매수, 최저점에서 매도"하는가?</summary>
     <div class="deep-dive-content">
-      <p><strong>Kelly 공식:</strong> 장기적으로 자산을 최대화하는 최적의 베팅 비율을 계산합니다.</p>
-      <div class="formula-block">
-        <div class="formula-highlight">Kelly 공식:</div>
-        <div class="formula-line">  f* = (p × b - q) / b</div>
-        <div class="formula-line">  f* = 전체 자산의 몇 %를 베팅할지</div>
-        <div class="formula-line">  p = 이기는 확률 (예: 60%)</div>
-        <div class="formula-line">  q = 지는 확률 (40%)</div>
-        <div class="formula-line">  b = 이길 때의 수익률 (예: 50%)</div>
-        <br>
-        <div class="formula-highlight">예시 계산:</div>
-        <div class="formula-line">  p = 0.60, q = 0.40, b = 0.50</div>
-        <div class="formula-line">  f* = (0.60 × 0.50 - 0.40) / 0.50</div>
-        <div class="formula-line">     = (0.30 - 0.40) / 0.50</div>
-        <div class="formula-line">     = -0.10 / 0.50 = <span class="formula-highlight">-0.20 (음수!)</span></div>
-      </div>
-      <p style="margin-top:1rem;"><strong>해석:</strong> 음수가 나오면 그 매매는 장기적으로 손실을 본다는 뜻입니다. 이기는 확률이 60%여도 수익률 구조가 안 맞으면 하지 말아야 합니다.</p>
-      <p style="margin-top:0.8rem;"><strong>실무 적용:</strong> 정확한 확률 계산은 어려우므로, 간단한 규칙을 사용하세요:</p>
-      <ul style="font-size:0.82rem;color:var(--text-secondary);margin-left:1.5rem;margin-top:0.6rem;">
-        <li>- 한 번의 매매에서 전체 자산의 2% 이상 손절하지 않기</li>
-        <li>- 최대 3배의 수익을 목표로 (50% 이상 손실 시 손절)</li>
-        <li>- 포트폴리오를 분산 (1개 종목에 40% 이상 투자 금지)</li>
-      </ul>
+        <p>
+            <strong>투자자의 영원한 고민:</strong>
+            분명 "저가 매수, 고가 매도"가 정답인데, 
+            왜 대부분은 정반대로 할까?
+        </p>
+        
+        <p style="margin-top: 12px;">
+            <strong>뇌 과학 답변: Recency Bias (최근 편향)</strong>
+        </p>
+        
+        <div style="background: #1A1C20; padding: 10px; border-radius: 6px; margin: 12px 0;">
+            <div style="color: #B8B0A0; font-size: 13px;">
+                1단계: 주식이 100원 → 80원으로 폭락<br>
+                → 뇌가 "정말 망할 거 같은데?" 공포감 (Loss Aversion)<br>
+                <br>
+                2단계: 일주일 후 75원까지 더 내림<br>
+                → 이전 90원이 "쌌다"고 후회 (Hindsight Bias)<br>
+                → "더 떨어질 거 같은데, 사지 말자" (최근 악재에 의존)<br>
+                <br>
+                3단계: 갑자기 반등해서 95원이 됨<br>
+                → "아, 내가 사했으면 수익을 얻었을 텐데!" 후회<br>
+                → 방심하다가 100원 도달<br>
+                <br>
+                4단계: 105원까지 올라감<br>
+                → "이것도 계속 오를 거 같은데?" (탐욕심)<br>
+                → 드디어 매수! (최고점 근처)<br>
+                <br>
+                5단계: 반등해서 115원까지 올라감<br>
+                → 생각: "내가 105원에 샀는데 수익 났으니까 팔까?"<br>
+                → 아니, 계속 오를 거 같은데 빼앗기기 싫어서 보유<br>
+                <br>
+                6단계: 100원으로 내림<br>
+                → 최악의 상황: 최고점에서 매수, 손절 못함
+            </div>
+        </div>
+        
+        <p style="margin-top: 12px; background: #1A1C20; padding: 10px; border-radius: 6px;">
+            <strong style="color: #D4A843;">💡 해결책:</strong>
+            감정을 배제하는 유일한 방법 = "사전에 정한 규칙을 자동 실행"<br>
+            손절선 설정 → 자동 매도<br>
+            분할 매수 스케줄 → 자동 매수<br>
+            감정이 개입할 틈을 주지 않기!
+        </p>
     </div>
-  </details>
-  <details class="deep-dive">
-    <summary>평균단가 낮추기 vs 물타기: 언제까지?</summary>
+</details>
+
+<details class="deep-dive">
+    <summary>🔍 심화학습 2: 포지션 사이징 없이는 절대 부자가 될 수 없다</summary>
     <div class="deep-dive-content">
-      <p><strong>문제:</strong> 분할매수가 "평균단가를 낮춘다"는 게 맞지만, 계속 떨어지면 "물타기"가 되어 더 큰 손실을 불러옵니다.</p>
-      <div class="formula-block">
-        <div class="formula-highlight">경계선: -15% 손절선</div>
-        <div class="formula-line">  매수가: 50,000원</div>
-        <div class="formula-line">  분할매수 진행: 50K → 48K → 46K → 44K</div>
-        <div class="formula-line">  42,500원 (=50K × 0.85) 도달 시 → 무조건 손절!</div>
-        <div class="formula-comment">// 이 라인을 넘으면 이제는 "물타기"입니다</div>
-      </div>
-      <p style="margin-top:1rem;"><strong>핵심 규칙:</strong> "매수가 최대 3번까지만. 3번 모두 손절되면 이 종목과는 작별."</p>
-      <p style="margin-top:0.8rem;"><strong>심리 관리:</strong> 자존심이 상하더라도 손절하세요. 한 번의 손실(180만원)이 반복되는 손실(500만원+)보다 낫습니다.</p>
+        <p>
+            <strong>투자의 비극:</strong>
+            "좋은 종목을 찾는 것"보다 
+            "한 번에 얼마를 투자할지"가 훨씬 중요하다.
+        </p>
+        
+        <div style="background: #1A1C20; padding: 10px; border-radius: 6px; margin: 12px 0;">
+            <strong style="color: #C45A4A;">❌ 나쁜 예: 포지션 사이징 없는 투자</strong>
+            <div style="color: #B8B0A0; font-size: 12px; margin-top: 8px;">
+                순자산: 1억원<br>
+                거래 1: APPLE 사기 (신호 좋음) → 5,000만 투자 → 20% 손실 = -1,000만<br>
+                → 남은 자본: 9,000만<br>
+                <br>
+                거래 2: TESLA 사기 (신호 좋음) → 9,000만 다 투자 → 30% 손실 = -2,700만<br>
+                → 남은 자본: 6,300만<br>
+                <br>
+                이제 원금으로 돌아오려면?<br>
+                (1억 ÷ 6,300만) = 1.587배 수익 필요 = 약 59% 상승<br>
+                <br>
+                반면 처음부터 2% 규칙을 지켰다면?<br>
+                거래 1: 200만 손실 → 남은 자본: 9,800만<br>
+                거래 2: 196만 손실 → 남은 자본: 9,604만<br>
+                → 원금 회복은? 약 4% 상승으로 충분!
+            </div>
+        </div>
+        
+        <p style="margin-top: 12px;">
+            <strong>이것이 Warren Buffett의 규칙 1번이다:</strong>
+        </p>
+        
+        <p style="margin-top: 12px; font-style: italic; color: #B8B0A0;">
+            "Rule No. 1: Never lose money."<br>
+            "Rule No. 2: Never forget Rule No. 1."
+        </p>
+        
+        <p style="margin-top: 12px;">
+            손실을 최소화하면, 
+            큰 수익을 올릴 기회가 오라는 의미다.
+        </p>
+        
+        <p style="margin-top: 12px; background: #1A1C20; padding: 10px; border-radius: 6px;">
+            <strong style="color: #D4A843;">⭐ 포지션 사이징의 마법:</strong>
+            2% 규칙 → 큰 손실 방지 → 자본 보존 → 다음 기회에 집중 가능 → 장기 생존 → 부자!
+        </p>
     </div>
-  </details>
+</details>
+
+<details class="deep-dive">
+    <summary>🔍 심화학습 3: Trailing Stop (트레일링 스탑): 수익을 극대화하는 기법</summary>
+    <div class="deep-dive-content">
+        <p>
+            <strong>딜레마:</strong>
+            "목표가 110원에 도달했는데, 혹시 120원까지 갈 수도 있지 않을까?"
+        </p>
+        
+        <p style="margin-top: 12px;">
+            <strong>해결책: Trailing Stop (추적 손절)</strong>
+        </p>
+        
+        <div style="background: #1A1C20; padding: 10px; border-radius: 6px; margin: 12px 0;">
+            <div style="color: #B8B0A0; font-size: 13px;">
+                매수가: 100원<br>
+                목표가: 110원 (1단계 수익실현 50% 판매)<br>
+                <br>
+                나머지 50%는?<br>
+                "가격이 올라갈 때까지 기다리되, <br>
+                최대 상승값에서 5% 이하로 떨어지면 자동 판매"<br>
+                <br>
+                예시:<br>
+                - 110원 도달 후 상승 계속 → 115원<br>
+                - Trailing Stop 선 = 115 × 95% = 109.25원<br>
+                - 115원까지 올라감 → 120원 시도 중<br>
+                - 갑자기 117원으로 하락<br>
+                - Trailing Stop 선 = 120 × 95% = 114원<br>
+                - 더 내려서 114원 도달 → 자동 판매 완료!<br>
+                <br>
+                결과: 50%는 110원, 50%는 114원에 판매<br>
+                평균 판매가: 112원 (수익 극대화!)
+            </div>
+        </div>
+        
+        <p style="margin-top: 12px;">
+            <strong>Trailing Stop의 장점:</strong>
+        </p>
+        <ul style="margin-left: 20px;">
+            <li>탐욕을 제한하면서도 수익을 극대화</li>
+            <li>추세가 계속되면 계속 따라가기</li>
+            <li>추세 전환 시 자동으로 탈출</li>
+        </ul>
+        
+        <p style="margin-top: 12px; background: #1A1C20; padding: 10px; border-radius: 6px;">
+            <strong style="color: #D4A843;">💡 실제 사용:</strong>
+            매도 신호 설정 시<br>
+            "고정 목표가" + "Trailing Stop"을 조합하면<br>
+            위험 관리와 수익 극대화를 동시에 달성 가능!
+        </p>
+    </div>
+</details>
+
+<details class="deep-dive">
+    <summary>🔍 심화학습 4: 심리적 편향이 포지션 사이징을 망치는 방법</summary>
+    <div class="deep-dive-content">
+        <p>
+            <strong>깨달음:</strong>
+            대부분의 투자자는 규칙을 알지만, 
+            규칙을 지키지 못한다.
+        </p>
+        
+        <p style="margin-top: 12px;">
+            <strong>왜?</strong>
+        </p>
+        
+        <div style="background: #1A1C20; padding: 10px; border-radius: 6px; margin: 12px 0;">
+            <strong style="color: #C45A4A;">심리적 편향 1: "과신(Overconfidence)"</strong>
+            <div style="color: #B8B0A0; font-size: 12px; margin-top: 8px;">
+                "이번엔 안 떨어질 것 같은데? 다 투자해 버릴까?"<br>
+                → 수익 난 경험 한두 번 후 규칙 무시<br>
+                → 결국 큰 손실<br>
+                <br>
+                해결책: 수익 나도 규칙 유지!<br>
+                승률 80%여도 20%는 질 수 있다는 걸 기억할 것.
+            </div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 10px; border-radius: 6px; margin: 12px 0;">
+            <strong style="color: #C45A4A;">심리적 편향 2: "FOMO (Fear of Missing Out)"</strong>
+            <div style="color: #B8B0A0; font-size: 12px; margin-top: 8px;">
+                "주식이 폭락 중인데, 기회가 아닌가?"<br>
+                → 현금이 부족해서 기회를 못 살림<br>
+                → 일부 추가 투자하려다가 전체 자본 투입<br>
+                → 더 떨어짐<br>
+                <br>
+                해결책: 현금 비중 40% 유지!<br>
+                급락장이 올 때 "나는 준비되었다"는 마음.
+            </div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 10px; border-radius: 6px; margin: 12px 0;">
+            <strong style="color: #C45A4A;">심리적 편향 3: "후회 회피(Regret Aversion)"</strong>
+            <div style="color: #B8B0A0; font-size: 12px; margin-top: 8px;">
+                "손절했는데 계속 올랐으면 어쩌지?"<br>
+                → 손절선을 높여 설정<br>
+                → 결국 큰 손실 입음<br>
+                <br>
+                해결책: "작은 손실"이 "후회"보다 낫다!<br>
+                -10% 손절했는데 계속 올라도,<br>
+                당신의 원금은 보존되고<br>
+                다음 기회에 투자할 수 있다!
+            </div>
+        </div>
+        
+        <p style="margin-top: 12px; background: #1A1C20; padding: 10px; border-radius: 6px;">
+            <strong style="color: #D4A843;">⭐ 최종 결론</strong><br>
+            포지션 사이징은 "기술"이 아니라 "규율(Discipline)"이다.<br>
+            이 규율이 있는 투자자만 장기적으로 생존하고<br>
+            결국 부자가 된다.
+        </p>
+    </div>
+</details>
+
 </section>
 
 
@@ -557,21 +1953,197 @@ body {
 <section class="section fade-up">
   <div class="section-label">APPLY TO MY ASSETS</div>
   <h2 class="section-title">내 자산에 직접 적용</h2>
-  <div class="sim-box">
-    <h3>💰 내 자산(2,800만원) 매매 계획 수립</h3>
-    <ul class="checklist">
-      <li><strong>자산 분배:</strong> SK하이닉스 ___만원, 삼성전자 ___만원, 현금 ___만원 (합 2,800만)</li>
-      <li><strong>SK하이닉스 분할매수:</strong> 1차 300만원 @ ___원 (목표가 설정), 2차 ___원 (약 -5%), 3차 ___원 (약 -10%), 4차 ___원 (약 -15% 손절선)</li>
-      <li><strong>손절선 고정:</strong> 매수가의 -15%. 이 가격에 도달하면 감정 없이 매도. 손실액 계산: _____만원</li>
-      <li><strong>목표가 3단계:</strong> 1차 목표 ___원 (+30%), 2차 ___원 (+50%), 3차 ___원 (+100%)</li>
-      <li><strong>수익 실현 계획:</strong> 1차 도달 시 포지션의 40% 매도 → 2차 도달 시 40% 추가 매도 → 3차는 20% 보유 (장기 성장 기대)</li>
-    </ul>
-    <div style="background:var(--red)" style="background:rgba(191,74,74,0.1);padding:1rem;border-radius:6px;margin-top:1.2rem;border-left:3px solid #BF4A4A;">
-      <p style="font-size:0.85rem;color:var(--text-primary);margin-bottom:0.5rem;"><strong>🔴 절대 규칙 (이것만 꼭 지키세요):</strong></p>
-      <p style="font-size:0.82rem;color:var(--text-secondary);">1. <strong>손절선:</strong> 매수가의 -15% 도달 시 무조건 매도 (감정 X)</p>
-      <p style="font-size:0.82rem;color:var(--text-secondary);">2. <strong>분할한계:</strong> 최대 3~4번 분할. 계속 떨어지면 그것은 "분할매수"가 아니라 "물타기"</p>
-      <p style="font-size:0.82rem;color:var(--text-secondary);">3. <strong>수익실현:</strong> 목표가 도달 시 반드시 일부 매도 (욕심 버리기)</p>
-      <p style="font-size:0.82rem;color:var(--text-secondary);">4. <strong>포지션한계:</strong> 1개 종목에 50% 이상 투자 금지 (계란을 한 바구니에)</p>
+  
+<div class="sim-box">
+    <div style="background: linear-gradient(135deg, #D4A843 0%, #3D9E6E 100%); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+        <h3 style="color: #0D0B08; margin: 0; font-size: 16px;">📊 실습: 당신의 첫 투자 계획 수립</h3>
+    </div>
+    
+    <div style="background: #1A1C20; padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+        <p style="color: #B8B0A0; font-size: 12px; margin: 0;">
+            삼성전자(현재 67,500원) 추가 매수 계획
+        </p>
+    </div>
+    
+    <div style="background: #0D0B08; padding: 12px; border-radius: 6px; margin-bottom: 16px; border-left: 3px solid #D4A843;">
+        <div style="color: #B8B0A0; font-size: 12px; margin-bottom: 8px;">
+            <strong>당신의 현황:</strong>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+                <div style="color: #B8B0A0; font-size: 11px;">순자산</div>
+                <div style="color: #D4A843; font-weight: bold;">3.28억</div>
+            </div>
+            <div>
+                <div style="color: #B8B0A0; font-size: 11px;">현금</div>
+                <div style="color: #3D9E6E; font-weight: bold;">1.28억 (39%)</div>
+            </div>
+            <div>
+                <div style="color: #B8B0A0; font-size: 11px;">분산 투자 목표</div>
+                <div style="color: #4AAF6A; font-weight: bold;">안정성 ↑</div>
+            </div>
+            <div>
+                <div style="color: #B8B0A0; font-size: 11px;">위험도</div>
+                <div style="color: #C45A4A; font-weight: bold;">낮음</div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+        <div style="color: #D4A843; font-weight: bold; margin-bottom: 12px;">🎯 추가 매수 계획:</div>
+        
+        <div style="margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <input type="checkbox" style="width: 18px; height: 18px; margin-right: 8px; cursor: pointer;">
+                <label style="cursor: pointer; color: #EDE8D8; font-size: 12px;">
+                    <strong>Step 1: 매수 전략 수립</strong>
+                </label>
+            </div>
+            <div style="margin-left: 26px; background: #0D0B08; padding: 8px; border-radius: 4px; font-size: 11px; color: #B8B0A0;">
+                분할 매수 (DCA) 선택:<br>
+                → 월 500만원 × 6개월 = 총 3,000만원<br>
+                → 심리적 안정감 + 변동성 방어
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <input type="checkbox" style="width: 18px; height: 18px; margin-right: 8px; cursor: pointer;">
+                <label style="cursor: pointer; color: #EDE8D8; font-size: 12px;">
+                    <strong>Step 2: 포지션 사이징</strong>
+                </label>
+            </div>
+            <div style="margin-left: 26px; background: #0D0B08; padding: 8px; border-radius: 4px; font-size: 11px; color: #B8B0A0;">
+                최대 손실액 = 순자산 × 2% = 656만원<br>
+                손절 거리 설정 = -10% (60,750원)<br>
+                → 월 500만 × 10% = 50만원 손실 허용<br>
+                → 656만원까지는 안전선 내
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <input type="checkbox" style="width: 18px; height: 18px; margin-right: 8px; cursor: pointer;">
+                <label style="cursor: pointer; color: #EDE8D8; font-size: 12px;">
+                    <strong>Step 3: 손절선 & 목표가</strong>
+                </label>
+            </div>
+            <div style="margin-left: 26px; background: #0D0B08; padding: 8px; border-radius: 4px; font-size: 11px; color: #B8B0A0;">
+                손절선: 60,750원 (-10%)<br>
+                목표가: 74,250원 (+10%) → 1단계 수익실현 50%<br>
+                리스크:보상 = 1:1 (보수적)<br>
+                Trailing Stop: 74,250원에서 5% 이하로 내려가면 자동 판매
+            </div>
+        </div>
+        
+        <div>
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <input type="checkbox" style="width: 18px; height: 18px; margin-right: 8px; cursor: pointer;">
+                <label style="cursor: pointer; color: #EDE8D8; font-size: 12px;">
+                    <strong>Step 4: 현금 관리</strong>
+                </label>
+            </div>
+            <div style="margin-left: 26px; background: #0D0B08; padding: 8px; border-radius: 4px; font-size: 11px; color: #B8B0A0;">
+                현금 유지: 최소 1.31억 (40%)<br>
+                매년 월 500만씩 투자해도<br>
+                → 남은 현금: 약 8,000만<br>
+                → 급락장 기회 매수 여력 확보!
+            </div>
+        </div>
+    </div>
+</div>
+
+</section>
+
+
+<!-- 아하 모먼트 -->
+<section class="section fade-up">
+  <div class="section-label">💡 AHA MOMENT</div>
+  <h2 class="section-title">하락장에서 매수하면 같은 돈으로 주식 40% 더 산다</h2>
+  <div style="background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(191,74,74,0.08));border:2px solid var(--gold);border-radius:12px;padding:2rem;margin:1.5rem 0;text-align:center;">
+    <p style="font-size:1.1rem;color:var(--gold);font-weight:600;margin-bottom:1.5rem;font-family:var(--font-display);">하락 = 세일 → 같은 돈으로 더 많이 산다 = DCA의 마법</p>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;margin:1.5rem 0;">
+      <div style="background:rgba(191,74,74,0.15);border:1px solid var(--red);border-radius:8px;padding:1.2rem;">
+        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--red);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">정상가 구매</div>
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--red);">주가 50,000원
+100만원 × 20주</div>
+      </div>
+      <div style="font-size:2rem;color:var(--gold);">→</div>
+      <div style="background:rgba(74,191,122,0.15);border:1px solid var(--green);border-radius:8px;padding:1.2rem;">
+        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--green);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">30% 하락 후 구매</div>
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--green);">주가 35,000원
+100만원 × 28.6주 (+43%)</div>
+      </div>
+    </div>
+    <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8;margin-top:1rem;text-align:left;">주가가 30% 하락할 때 같은 100만원으로 구매하면 28.6주를 살 수 있다. 이것이 Dolllar Cost Averaging(DCA)의 마법이다. 하락장을 두려워하지 말고 기계적으로 매수하면, 장기적으로는 같은 총 투자액으로 더 많은 주식을 보유하게 된다.</p>
+  </div>
+</section>
+
+<!-- 실패 케이스 -->
+<section class="section fade-up">
+  <div class="section-label">📉 FAILURE CASE</div>
+  <h2 class="section-title">완벽한 타이밍을 노리다가 10년간 투자 못 한 C씨</h2>
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <div style="border-left:3px solid var(--red);padding-left:1rem;margin-bottom:1.2rem;">
+      <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.9;font-style:italic;">2015년: "KOSPI 2,000에서 폭락 올 거야" → 대기. 2017년: "이제 너무 올랐어" → 대기. 2020년: "코로나 폭락! 더 떨어질 거야" → 대기. 2024년: KOSPI 2,700. 결국 10년간 손을 놓고 있었다.</p>
+    </div>
+    <div style="padding:1rem;background:rgba(201,168,76,0.06);border:1px solid var(--gold-dim);border-radius:6px;">
+      <p style="font-size:0.82rem;color:var(--gold);font-weight:500;margin-bottom:0.5rem;">💡 교훈</p>
+      <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8;">완벽한 타이밍은 존재하지 않는다. 2015년에 샀으면 지금 +35% 수익이었다. 타이밍을 기다리다가 기회를 잃는 것이 가장 큰 손실이다. 투자는 타이밍이 아니라 '꾸준함'에서 이긴다.</p>
+      <p style="font-size:0.78rem;color:var(--text-dim);margin-top:0.8rem;font-family:var(--font-mono);">2015 기다림 → 2017 기다림 → 2020 기다림 → 2024 후회
+if 2015 투자: +35% | actual: 0% 수익</p>
+    </div>
+  </div>
+</section>
+
+<!-- 엔지니어 시스템 비유 -->
+<section class="section fade-up">
+  <div class="section-label">🔧 ENGINEER'S PERSPECTIVE</div>
+  <h2 class="section-title">엔지니어 시스템 사고</h2>
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <h3 style="font-family:var(--font-body);font-size:0.95rem;font-weight:500;color:var(--gold);margin-bottom:1rem;"><span class="engineer-tag">엔지니어 사고법</span> DCA = 적분 (Integration)</h3>
+    <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.9;margin-bottom:1rem;">미분은 순간의 변화를 보여주고, 적분은 누적된 면적을 보여준다. DCA는 주가의 순간 변동성(미분)을 무시하고, 일정 기간 동안의 누적 평균(적분)을 추구한다. 적분하면 노이즈가 사라지고 평균값에 수렴하는데, 이것이 바로 DCA가 장기투자에서 가장 강력한 이유다.</p>
+    <div class="formula-block">
+• 순간 가격 = 미분값 (dP/dt) → 변동 심함, 감정적
+• DCA 평균 매입가 = 적분값 (∫P dt) → 변동 평활화
+• 적분하면 노이즈 사라짐 → 평균값에 수렴
+• 시간이 길수록 적분 정확도 ↑ = DCA 효과 ↑
+    </div>
+  </div>
+</section>
+
+<!-- 감정 온도계 -->
+<section class="section fade-up">
+  <div class="section-label">🌡️ EMOTION CHECK</div>
+  <h2 class="section-title">지금 내 감정 체크</h2>
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1.2rem;">DCA를 처음 배울 때와 실행할 때의 감정은 다르다. 이론으로는 "좋은데", 실제로 주가가 폭락할 때 사는 것은 '집단적 공포'에 맞서는 것이다. 그 공포감이 정상이다. 그것이 바로 이득을 낼 수 있는 기회의 신호다.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.8rem;">
+      <div style="padding:1rem;background:rgba(191,74,74,0.08);border:1px solid rgba(191,74,74,0.3);border-radius:6px;cursor:pointer;" onclick="this.style.borderColor='var(--red)';this.style.borderWidth='2px';">
+        <div style="font-size:1.2rem;margin-bottom:0.3rem;">😰 불안</div>
+        <p style="font-size:0.75rem;color:var(--text-dim);line-height:1.5;"><span class="neuro-tag">편도체</span> 손실 신호 감지 중. 정상 반응입니다.</p>
+      </div>
+      <div style="padding:1rem;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:6px;cursor:pointer;" onclick="this.style.borderColor='var(--gold)';this.style.borderWidth='2px';">
+        <div style="font-size:1.2rem;margin-bottom:0.3rem;">😤 저항감</div>
+        <p style="font-size:0.75rem;color:var(--text-dim);line-height:1.5;"><span class="neuro-tag">전전두엽</span> 기존 믿음 방어 중. 변화의 신호입니다.</p>
+      </div>
+      <div style="padding:1rem;background:rgba(74,191,122,0.08);border:1px solid rgba(74,191,122,0.3);border-radius:6px;cursor:pointer;" onclick="this.style.borderColor='var(--green)';this.style.borderWidth='2px';">
+        <div style="font-size:1.2rem;margin-bottom:0.3rem;">🤔 호기심</div>
+        <p style="font-size:0.75rem;color:var(--text-dim);line-height:1.5;"><span class="neuro-tag">도파민</span> 학습 모드 활성화! 최적 상태입니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 액션 체크리스트 -->
+<section class="section fade-up">
+  <div class="section-label">🎯 THIS WEEK'S ACTION</div>
+  <h2 class="section-title">이번 주 실행 아이템</h2>
+  <div style="background:linear-gradient(135deg,rgba(74,191,122,0.06),rgba(201,168,76,0.06));border:1px solid var(--green);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <ul class="checklist"><li>지난 5년간 KOSPI 월별 데이터로 DCA 백테스트하기 <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(15분)</span></li><li>일시 투자 vs DCA 시뮬레이션 비교 분석 <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(10분)</span></li><li>내 월급에서 '불변 금액' 정하기 (자동 투자 설정) <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(5분)</span></li></ul>
+    <div style="display:flex;justify-content:space-between;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);">
+      <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">⏱ 예상 소요: 30분</span>
+      <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--green);">📈 10년 예상 효과: 타이밍 공포 극복 +70%, 장기투자 신뢰도 +85%, 심리적 안정감 +90%</span>
     </div>
   </div>
 </section>
@@ -582,10 +2154,63 @@ body {
   <h2 class="section-title">오늘의 투자 심리</h2>
   <div class="psych-box">
     <h3>행동재무학 편향</h3>
-    <div class="bias-name">손실회피 편향과 과신 (Loss Aversion + Overconfidence)</div>
-    <p><span class="neuro-tag">뇌과학</span> 신경경제학 연구에 따르면, 뇌의 편도체는 같은 크기의 손실과 이익에 대해 손실을 약 2배 강하게 느낍니다. 따라서 합리적 손절을 감정이 방해합니다.</p>
-    <p><span class="engineer-tag">엔지니어링</span> <strong>자동화 시스템:</strong> 손절과 목표가를 "사전에 정해서" 기계적으로 실행하세요. 매매 시점에 판단하지 마세요. 나머지 4주 동안 차트를 보지 않는 것도 방법입니다.</p>
-    <p><strong style="color:var(--gold);">대응:</strong> "이번에는 다르다" "장기 보유하면 살아난다"는 낙관을 버립니다. 대신 Day 10(재무분석)에서 정한 기업이라면, 기술적 조정(Day 11)으로 떨어진 순간이 오히려 분할매수 기회입니다. 하지만 -15% 손절선은 절대 넘지 않습니다.</p>
+    
+<div style="background: linear-gradient(135deg, #1A1C20 0%, #2A2C30 100%); padding: 16px; border-radius: 8px; margin: 16px 0; border-left: 4px solid #D4A843;">
+    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+        <span style="font-size: 24px; margin-right: 12px;">🧠</span>
+        <strong style="font-size: 15px; color: #D4A843;">행동재무학: "감정적 의사결정(Emotional Decision Making)"의 함정</strong>
+    </div>
+    
+    <p style="color: #EDE8D8; font-size: 13px; margin-bottom: 12px;">
+        <strong>현상:</strong>
+        "분명 계획을 세웠는데, 시장이 오르락내리락하면 규칙을 무시한다"
+    </p>
+    
+    <p style="color: #EDE8D8; font-size: 13px; margin-bottom: 12px;">
+        <strong>뇌 과학:</strong>
+        투자 결정은 뇌의 편도체(Amygdala, 공포·탐욕 담당)가 담당하기도 한다.
+        때문에 "이성적인 규칙"과 "감정적 행동"이 충돌한다.
+    </p>
+    
+    <div style="background: #0D0B08; padding: 12px; border-radius: 6px; margin: 12px 0;">
+        <strong style="color: #3D9E6E;">🔬 엔지니어의 함정:</strong>
+        <div style="color: #B8B0A0; font-size: 12px; margin-top: 8px;">
+            엔지니어는 "합리적 사고"를 최고의 미덕으로 여긴다.
+            따라서 "감정적 투자"를 자신도 하지 않는다고 착각.
+            <br><br>
+            <strong style="color: #D4A843;">현실:</strong> 
+            엔지니어도 손절 미루고,<br>
+            목표가 넘어서 계속 보유하고,<br>
+            규칙을 무시한다.
+            <br><br>
+            이는 "합리성의 착각(The Illusion of Control)"<br>
+            = "나는 이성적이니까 상황을 통제할 수 있다"는 과신.
+        </div>
+    </div>
+    
+    <p style="color: #EDE8D8; font-size: 13px; margin-bottom: 12px;">
+        <strong>해결책:</strong>
+        감정을 없애는 게 아니라 "자동화"하는 것.
+        손절선 설정 후 자동 매도, 분할 매수 스케줄 자동 실행 등.
+        인간의 감정은 바뀔 수 없으므로,
+        의사결정 단계에서 감정의 개입을 사전에 차단!
+    </p>
+    
+    <p style="color: #EDE8D8; font-size: 13px; padding-top: 12px; border-top: 1px solid #2A2C30;">
+        <span class="neuro-tag">뇌과학</span>
+        신경영상 연구(fMRI)에 따르면
+        금전적 손실 시 뇌의 통증 센터가 활성화된다.
+        이는 신체적 통증과 동일한 수준.
+        그래서 투자자는 손절할 때 고통을 느낀다.
+        <br>
+        <span class="engineer-tag">엔지니어 체크</span>
+        해결책: 감정을 "소프트웨어"로 자동화하기.
+        거래 규칙을 코드처럼 작성하고,
+        규칙을 정했으면 무조건 따를 것!
+        "나는 이성적이다"는 착각 버리기.
+    </p>
+</div>
+
   </div>
 </section>
 
@@ -595,22 +2220,49 @@ body {
   <h2 class="section-title">복습 퀴즈</h2>
   <div class="quiz-section">
     <div class="quiz-q" id="q1">
-      <h4>Q1. 2,800만원 자산 중 한 종목에 투자하는 최대 비중은?</h4>
-      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 100% (한 종목에만)</li>
-<li onclick="checkAnswer(this,'q1',false)">② 60% (집중 투자)</li>
-<li onclick="checkAnswer(this,'q1',true)">③ 50% 이하 (분산 원칙)</li>
-<li onclick="checkAnswer(this,'q1',false)">④ 20% (극도로 분산)</li>
+      <h4>Q1. 분할 매수(DCA)의 가장 큰 장점은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 최저가에서 매수할 수 있다</li>
+<li onclick="checkAnswer(this,'q1',true)">② 심리적 부담을 줄이고 변동성 위험을 분산한다</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 수익률이 일괄 매수보다 항상 높다</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 거래 수수료를 줄일 수 있다</li>
 </ul>
-      <div class="quiz-answer" id="q1-answer"><strong>정답: ③</strong><br>포트폴리오 한 종목 비중은 50% 이하가 권장됩니다. 이유: 한 종목 손절 시 전체 자산의 최대 손실을 2.5%로 제한할 수 있기 때문입니다.</div>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>정답: ②번. DCA의 진정한 가치는 심리적 안정감과 변동성 방어다. 최저가 매수는 아니지만, 시장 타이밍 위험을 줄이고 감정적 의사결정을 방지한다. 초보 투자자가 시작하기에 최적의 전략이다.</div>
     </div>
     <div class="quiz-q" id="q2">
-      <h4>Q2. 분할매수 후 매수가 50,000원에서 42,500원으로 떨어졌을 때 취할 행동은?</h4>
-      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 손절하지 말고 계속 보유</li>
-<li onclick="checkAnswer(this,'q2',false)">② 추가 분할매수 (-25% 손실까지)</li>
-<li onclick="checkAnswer(this,'q2',true)">③ 무조건 손절 (손실 -180만원 감수)</li>
-<li onclick="checkAnswer(this,'q2',false)">④ 반반 나눠서 일부만 손절</li>
+      <h4>Q2. 손절선(Stop Loss) -10%를 설정했을 때, 올바른 해석은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 주가가 10% 떨어지면 반드시 회복한다</li>
+<li onclick="checkAnswer(this,'q2',true)">② 손실을 제한하고 다음 기회에 자본을 보존하는 전략</li>
+<li onclick="checkAnswer(this,'q2',false)">③ 손절은 패배이므로 피해야 한다</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 손절선은 참고용이고 필요시 무시해도 된다</li>
 </ul>
-      <div class="quiz-answer" id="q2-answer"><strong>정답: ③</strong><br>-15% 손절선은 절대 규칙입니다. 이것을 넘으면 더 이상은 '분할매수'가 아니라 '물타기'이며, 손실을 키울 수 있습니다.</div>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ②</strong><br>정답: ②번. 손절선은 '패배'가 아니라 '위험관리'다. 10% 손실로 멈춤으로써 50% 손실을 방지하고, 남은 자본으로 다음 기회를 노린다. 이것이 워런 버핏의 'Rule No.1: Never lose money'의 의미다.</div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. 목표가 설정 시 리스크/보상 비율 1:2는 무엇을 의미하는가?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 손실액이 수익액의 절반이라는 뜻</li>
+<li onclick="checkAnswer(this,'q3',true)">② 손실액 대비 수익액이 2배 이상이어야 함을 의미</li>
+<li onclick="checkAnswer(this,'q3',false)">③ 투자액의 1%가 손실, 2%가 수익이라는 뜻</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 2번의 거래에서 1번 이기고 2번 진다는 뜻</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ②</strong><br>정답: ②번. 손실액(예: -5%)에 대해 수익액이 최소 2배(+10%) 이상이어야 장기적으로 이른다는 뜻. 예: -5% 손실 허용 → +10% 목표가 설정. 이렇게 하면 승률이 낮아도 (40% 승률) 장기 수익이 난다.</div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. 포지션 사이징에서 '2% 규칙'의 의미는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① 한 거래에서 최대 순자산의 2%만큼 투자한다는 뜻</li>
+<li onclick="checkAnswer(this,'q4',true)">② 한 거래에서 잃을 수 있는 최대 손실액이 순자산의 2%라는 뜻</li>
+<li onclick="checkAnswer(this,'q4',false)">③ 월급의 2%를 투자금으로 할당한다는 뜻</li>
+<li onclick="checkAnswer(this,'q4',false)">④ 거래 수수료를 2% 이하로 제한한다는 뜻</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ②</strong><br>정답: ②번. 2% 규칙은 '손실액'을 제한하는 것이 핵심. 순자산 1억이면 한 거래에서 최대 200만원까지 손실 허용. 이를 손절 거리로 나누면 투자액이 결정된다. 이 규칙이 투자자 생존의 핵심.</div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. 다음 중 올바른 현금 관리는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',false)">① 수익이 나면 모든 자본을 투자에 쏟는다</li>
+<li onclick="checkAnswer(this,'q5',true)">② 좋은 기회를 잡기 위해 항상 현금 40% 이상 유지</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 급락장이 오면 그때 현금을 모아도 된다</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 분산 투자는 소액이므로 현금 비중은 무시해도 된다</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ②</strong><br>정답: ②번. 현금 비중 40% 유지는 급락장 기회 매수를 위한 것. 모든 자본을 투자하면 시장이 50% 떨어질 때 추가 매수할 여력이 없다. 따라서 항상 '탄약(현금)'을 비축해야 한다. 이것이 전술적 유연성을 만드는 핵심.</div>
     </div></div>
 </section>
 
@@ -628,7 +2280,7 @@ body {
   </div>
 </section>
 
-<nav class="nav-footer">
+<nav class="nav-footer" role="navigation" aria-label="강의 탐색">
   <a class="nav-btn" href="day11_technical_analysis.html">← Day 11</a>
   <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 12 / 23</span>
   <a class="nav-btn" href="day13_kospi_discount.html">Day 13 →</a>
@@ -639,12 +2291,15 @@ body {
   본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
   모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
   수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
-  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 El Dorado 투자 원정대 · 교육 목적 Only</span>
 </div>
 
 </div>
 
-<script>
+<!-- Gold Particle System -->
+<canvas id="goldParticles" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.6;"></canvas>
+<script defer>
+
 /* ═══ POMODORO TIMER ═══ */
 let timerRunning=false, timerSeconds=25*60, timerInterval=null;
 function toggleTimer() {
@@ -658,8 +2313,8 @@ function toggleTimer() {
       if (timerSeconds <= 0) {
         clearInterval(timerInterval);
         b.textContent = '✓ 완료!';
-        b.style.borderColor = '#4ABF7A';
-        b.style.color = '#4ABF7A';
+        b.style.borderColor = '#4AAF6A';
+        b.style.color = '#4AAF6A';
         timerRunning = false;
       }
     }, 1000);
@@ -692,6 +2347,507 @@ const fadeObserver = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+
+
+(function(){
+  const c=document.getElementById('goldParticles');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  let W,H;
+  const particles=[];
+  const N=window.innerWidth<480?12:window.innerWidth<768?20:35;
+
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+
+  class P{
+    constructor(){this.reset();}
+    reset(){
+      this.x=Math.random()*W;
+      this.y=Math.random()*H;
+      this.r=Math.random()*1.8+0.3;
+      this.vx=(Math.random()-0.5)*0.15;
+      this.vy=-Math.random()*0.3-0.05;
+      this.alpha=Math.random()*0.4+0.1;
+      this.fade=Math.random()*0.003+0.001;
+      this.phase=Math.random()*Math.PI*2;
+    }
+    update(){
+      this.x+=this.vx+Math.sin(this.phase)*0.1;
+      this.y+=this.vy;
+      this.phase+=0.01;
+      this.alpha-=this.fade;
+      if(this.alpha<=0||this.y<-10)this.reset();
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(212,168,67,${this.alpha})`;
+      ctx.fill();
+      if(this.r>1){
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.r*2,0,Math.PI*2);
+        ctx.fillStyle=`rgba(212,168,67,${this.alpha*0.15})`;
+        ctx.fill();
+      }
+    }
+  }
+
+  for(let i=0;i<N;i++)particles.push(new P());
+
+  let scrollY=0;
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY;},{passive:true});
+
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of particles){
+      p.y+=scrollY*0.0005;
+      p.update();
+      p.draw();
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+
+(function(){
+  /* ─── 1. Card Gold Light Trail ─── */
+  document.querySelectorAll('.concept-card').forEach(card => {
+    if(card.querySelector('.card-glow')) return;
+    const glow = document.createElement('div');
+    glow.className = 'card-glow';
+    card.appendChild(glow);
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      glow.style.left = (e.clientX - r.left) + 'px';
+      glow.style.top = (e.clientY - r.top) + 'px';
+    });
+  });
+
+  /* ─── 2. Quiz Correct Answer Particle Burst ─── */
+  function createBurst(container, x, y) {
+    let canvas = container.querySelector('.quiz-burst-canvas');
+    if (!canvas) {
+      canvas = document.createElement('canvas');
+      canvas.className = 'quiz-burst-canvas';
+      container.style.position = 'relative';
+      container.appendChild(canvas);
+    }
+    canvas.width = container.offsetWidth;
+    canvas.height = container.offsetHeight;
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const colors = ['#D4A843','#E8C65A','#C4793D','#3D9E6E','#EDE8D8'];
+    for (let i = 0; i < 40; i++) {
+      const angle = (Math.PI * 2 * i) / 40 + (Math.random() - 0.5) * 0.5;
+      const speed = 2 + Math.random() * 4;
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        r: Math.random() * 2.5 + 1,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 1,
+        decay: 0.015 + Math.random() * 0.01,
+        gravity: 0.06
+      });
+    }
+    let frame = 0;
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.vx *= 0.98;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) continue;
+        alive = true;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+        // glow
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha * 0.15;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      frame++;
+      if (alive && frame < 120) requestAnimationFrame(animate);
+      else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    }
+    animate();
+  }
+
+  // Enhance quiz click handler
+  document.querySelectorAll('.quiz-options li').forEach(li => {
+    const origClick = li.onclick;
+    li.addEventListener('click', function(e) {
+      setTimeout(() => {
+        if (li.classList.contains('correct')) {
+          const section = li.closest('.quiz-section');
+          if (section) {
+            const rect = li.getBoundingClientRect();
+            const sRect = section.getBoundingClientRect();
+            createBurst(section, rect.left - sRect.left + rect.width / 2, rect.top - sRect.top + rect.height / 2);
+          }
+        }
+      }, 50);
+    });
+  });
+
+  /* ─── 3. Scroll Compass Widget ─── */
+  if (!document.querySelector('.scroll-compass')) {
+    const compass = document.createElement('div');
+    compass.className = 'scroll-compass';
+    compass.innerHTML = `<svg viewBox="0 0 56 56">
+      <circle cx="28" cy="28" r="26" fill="rgba(13,11,8,0.9)" stroke="#D4A843" stroke-width="1.5"/>
+      <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(212,168,67,0.15)" stroke-width="1"/>
+      <!-- tick marks -->
+      <line x1="28" y1="4" x2="28" y2="8" stroke="#D4A843" stroke-width="1.5"/>
+      <line x1="28" y1="48" x2="28" y2="52" stroke="#8A8272" stroke-width="1"/>
+      <line x1="4" y1="28" x2="8" y2="28" stroke="#8A8272" stroke-width="1"/>
+      <line x1="48" y1="28" x2="52" y2="28" stroke="#8A8272" stroke-width="1"/>
+      <!-- needle (rotates via JS) -->
+      <g id="compassNeedle" style="transform-origin:28px 28px;">
+        <polygon points="28,8 25,28 28,26 31,28" fill="#D4A843"/>
+        <polygon points="28,48 25,28 28,30 31,28" fill="#C45A4A" opacity="0.6"/>
+      </g>
+      <!-- center -->
+      <circle cx="28" cy="28" r="3" fill="#D4A843"/>
+      <!-- progress arc -->
+      <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(212,168,67,0.1)" stroke-width="3"
+              stroke-dasharray="150.8" stroke-dashoffset="150.8"
+              id="compassProgress" transform="rotate(-90 28 28)"
+              stroke-linecap="round"/>
+      <!-- percentage text -->
+      <text x="28" y="43" text-anchor="middle" fill="#8A8272" font-family="JetBrains Mono,monospace" font-size="5.5" id="compassPct">0%</text>
+    </svg>`;
+    compass.title = 'Click to scroll to top';
+    compass.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+    document.body.appendChild(compass);
+
+    const needle = document.getElementById('compassNeedle');
+    const progressArc = document.getElementById('compassProgress');
+    const pctText = document.getElementById('compassPct');
+    const circumference = 150.8;
+
+    function updateCompass() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0;
+
+      // Show/hide
+      compass.classList.toggle('visible', scrollTop > 200);
+
+      // Rotate needle based on scroll (full rotation = full scroll)
+      const rotation = progress * 360;
+      if(needle) needle.style.transform = `rotate(${rotation}deg)`;
+
+      // Progress arc
+      if(progressArc) {
+        const offset = circumference - (progress * circumference);
+        progressArc.setAttribute('stroke-dashoffset', offset);
+        progressArc.setAttribute('stroke', progress > 0.8 ? '#4AAF6A' : '#D4A843');
+      }
+
+      // Percentage text
+      if(pctText) pctText.textContent = Math.round(progress * 100) + '%';
+    }
+
+    window.addEventListener('scroll', updateCompass, {passive: true});
+    updateCompass();
+  }
+
+  /* ─── 4. Section Reveal Gold Flash ─── */
+  document.querySelectorAll('.section').forEach(section => {
+    if(section.querySelector('.section-flash')) return;
+    section.style.position = 'relative';
+    const flash = document.createElement('div');
+    flash.className = 'section-flash';
+    section.prepend(flash);
+  });
+
+  const flashObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) {
+        entry.target.classList.add('flash-active');
+        setTimeout(() => entry.target.classList.remove('flash-active'), 800);
+        flashObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.2});
+
+  document.querySelectorAll('.section').forEach(s => flashObserver.observe(s));
+
+  /* ─── 5. Checklist Celebration ─── */
+  document.querySelectorAll('.checklist li').forEach(li => {
+    li.addEventListener('click', function() {
+      if(this.classList.contains('checked')) {
+        this.classList.add('just-checked');
+        setTimeout(() => this.classList.remove('just-checked'), 600);
+      }
+    });
+  });
+
+  /* ─── 6. Timer Button Active State ─── */
+  const timerBtn = document.getElementById('timerBtn');
+  if(timerBtn) {
+    const origToggle = window.toggleTimer;
+    if(origToggle) {
+      window.toggleTimer = function() {
+        origToggle();
+        timerBtn.classList.toggle('active');
+      };
+    }
+  }
+
+})();
+
+
+(function(){
+  /* ─── 1. Particle Performance Auto-Scaling ─── */
+  const canvas = document.getElementById('goldParticles');
+  if(canvas){
+    const isMobile = window.innerWidth < 768;
+    const isLowEnd = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if(prefersReduced){
+      canvas.style.display = 'none';
+    } else if(isMobile || isLowEnd){
+      // Reduce particle opacity and hide on very small screens
+      canvas.style.opacity = isMobile ? '0.3' : '0.4';
+      if(window.innerWidth < 400) canvas.style.display = 'none';
+    }
+
+    // Battery API: disable particles on low battery
+    if('getBattery' in navigator){
+      navigator.getBattery().then(batt => {
+        if(batt.level < 0.2 && !batt.charging){
+          canvas.style.display = 'none';
+        }
+        batt.addEventListener('levelchange', () => {
+          if(batt.level < 0.15 && !batt.charging) canvas.style.display = 'none';
+        });
+      }).catch(()=>{});
+    }
+
+    // Visibility: pause animation when tab is hidden
+    let rafId = null;
+    document.addEventListener('visibilitychange', () => {
+      if(document.hidden) {
+        canvas.style.display = 'none';
+      } else if(!prefersReduced && !(window.innerWidth < 400)){
+        canvas.style.display = '';
+      }
+    });
+  }
+
+  /* ─── 2. Illustration Lazy Load ─── */
+  const lazyObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const el = entry.target;
+        const svg = el.querySelector('svg');
+        if(svg) svg.style.opacity = '1';
+        el.classList.add('visible');
+        lazyObs.unobserve(el);
+      }
+    });
+  }, {rootMargin: '100px', threshold: 0.1});
+
+  document.querySelectorAll('.hero-illustration').forEach(ill => {
+    const svg = ill.querySelector('svg');
+    if(svg){
+      svg.style.opacity = '0';
+      svg.style.transition = 'opacity 0.8s ease-out';
+    }
+    lazyObs.observe(ill);
+  });
+
+  /* ─── 3. Touch Swipe Navigation ─── */
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+    touchStartTime = Date.now();
+  }, {passive: true});
+
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    const dy = e.changedTouches[0].screenY - touchStartY;
+    const dt = Date.now() - touchStartTime;
+
+    // Must be fast horizontal swipe (>80px, <300ms, mostly horizontal)
+    if(Math.abs(dx) > 80 && Math.abs(dx) > Math.abs(dy) * 2 && dt < 300){
+      const navBtns = document.querySelectorAll('.nav-btn:not(.disabled)');
+      if(dx > 0){
+        // Swipe right → prev
+        const prev = document.querySelector('.nav-btn[href*="day"]:first-of-type:not(.disabled)');
+        if(prev && prev.textContent.includes('Prev')) prev.click();
+      } else {
+        // Swipe left → next
+        const allBtns = Array.from(document.querySelectorAll('.nav-btn'));
+        const next = allBtns.find(b => b.textContent.includes('Next') && !b.classList.contains('disabled'));
+        if(next) next.click();
+      }
+    }
+  }, {passive: true});
+
+  /* ─── 4. Compass Touch Feedback ─── */
+  const compass = document.querySelector('.scroll-compass');
+  if(compass){
+    compass.addEventListener('touchstart', () => {
+      compass.style.transform = 'scale(0.9)';
+      compass.style.transition = 'transform 0.1s';
+    }, {passive: true});
+    compass.addEventListener('touchend', () => {
+      compass.style.transform = 'scale(1)';
+    }, {passive: true});
+  }
+
+  /* ─── 5. Viewport Height Fix for Mobile Browsers ─── */
+  function setVH(){
+    document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+  }
+  setVH();
+  window.addEventListener('resize', setVH);
+
+  /* ─── 6. Font Loading Optimization ─── */
+  if('fonts' in document){
+    document.fonts.ready.then(() => {
+      document.body.classList.add('fonts-loaded');
+    });
+  }
+
+  /* ─── 7. Smooth Scroll Polyfill for Older Safari ─── */
+  if(!('scrollBehavior' in document.documentElement.style)){
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if(target){
+          e.preventDefault();
+          target.scrollIntoView({behavior:'smooth',block:'start'});
+        }
+      });
+    });
+  }
+
+  /* ─── 8. Double-tap to top (mobile shortcut) ─── */
+  let lastTapTime = 0;
+  const header = document.querySelector('.sticky-header');
+  if(header){
+    header.addEventListener('touchend', () => {
+      const now = Date.now();
+      if(now - lastTapTime < 300){
+        window.scrollTo({top:0, behavior:'smooth'});
+      }
+      lastTapTime = now;
+    }, {passive: true});
+  }
+
+})();
+
+
+
+/* ═══ THEME TOGGLE LOGIC ═══ */
+(function(){
+  const toggle = document.getElementById('themeToggle');
+  if(!toggle) return;
+
+  // 1. Determine initial theme
+  function getPreferredTheme(){
+    const saved = localStorage.getItem('eldorado-theme');
+    if(saved) return saved;
+    // Respect system preference
+    if(window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
+    return 'dark';
+  }
+
+  function applyTheme(theme, animate){
+    const html = document.documentElement;
+    if(animate){
+      html.classList.add('theme-transitioning');
+      setTimeout(() => html.classList.remove('theme-transitioning'), 500);
+    }
+    if(theme === 'light'){
+      html.setAttribute('data-theme', 'light');
+      // Update meta theme-color
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.content = '#FAF6EE';
+    } else {
+      html.removeAttribute('data-theme');
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.content = '#0D0B08';
+    }
+    localStorage.setItem('eldorado-theme', theme);
+
+    // Update particle canvas colors if exists
+    updateParticleColors(theme);
+    // Update compass colors
+    updateCompassColors(theme);
+  }
+
+  function updateParticleColors(theme){
+    // Signal to particle system
+    window.__eldoradoTheme = theme;
+  }
+
+  function updateCompassColors(theme){
+    const compass = document.querySelector('.scroll-compass svg');
+    if(!compass) return;
+    const bgCircle = compass.querySelector('circle:first-of-type');
+    const texts = compass.querySelectorAll('text');
+    if(theme === 'light'){
+      if(bgCircle) bgCircle.setAttribute('fill', 'rgba(250,246,238,0.9)');
+      texts.forEach(t => {
+        if(t.getAttribute('fill') === '#8A8272' || t.getAttribute('fill') === 'var(--text-dim)')
+          t.setAttribute('fill', '#8A8070');
+      });
+    } else {
+      if(bgCircle) bgCircle.setAttribute('fill', 'rgba(13,11,8,0.85)');
+    }
+  }
+
+  // 2. Apply on load (no animation)
+  const initial = getPreferredTheme();
+  applyTheme(initial, false);
+
+  // 3. Toggle click
+  toggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    applyTheme(next, true);
+  });
+
+  // 4. Keyboard support
+  toggle.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      toggle.click();
+    }
+  });
+
+  // 5. Listen for system theme change
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+    if(!localStorage.getItem('eldorado-theme')){
+      applyTheme(e.matches ? 'light' : 'dark', true);
+    }
+  });
+})();
+/* ═══ END THEME TOGGLE ═══ */
+
 </script>
 </body>
 </html>

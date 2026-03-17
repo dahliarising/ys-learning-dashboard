@@ -4,164 +4,970 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Day 55: 풀카 모델 (Full-Vehicle Model) — 차량동역학 60일 완성</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
 <style>
-:root{--bg:#0A0C10;--surface:#12151C;--surface2:#1A1E28;--border:#252A38;--gold:#C9A84C;--gold-light:#E8C96A;--blue:#4A9EBF;--green:#4ABF8A;--purple:#8A6ABF;--orange:#BF6A4A;--text:#D8D3C8;--text-dim:#7A7A8A;--text-bright:#F0EBE0}
+/* ╔══════════════════════════════════════════╗
+   ║  CYBER FORMULA — ASURADA COCKPIT THEME  ║
+   ╚══════════════════════════════════════════╝ */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+:root{
+  --bg:#030712;
+  --surface:rgba(6,22,48,0.85);
+  --surface2:rgba(0,229,255,0.06);
+  --border:rgba(0,229,255,0.15);
+  --border-glow:rgba(0,229,255,0.4);
+  --cyan:#00e5ff;
+  --cyan-light:#67f0ff;
+  --cyan-dim:rgba(0,229,255,0.08);
+  --magenta:#ff2d78;
+  --magenta-dim:rgba(255,45,120,0.1);
+  --blue:#2979ff;
+  --green:#00e676;
+  --purple:#b388ff;
+  --orange:#ff9100;
+  --text:#c0d8ef;
+  --text-dim:#4a6a8a;
+  --text-bright:#e8f4ff;
+  --gold:#00e5ff;
+  --gold-light:#67f0ff;
+  --scanline:rgba(0,229,255,0.03)
+}
+
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-weight:300;line-height:1.8;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
-.sticky-header{position:sticky;top:0;z-index:100;background:rgba(10,12,16,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 0}
-.header-inner{max-width:960px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
-.header-brand{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:16px;color:var(--gold)}
-.header-progress-wrap{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-dim)}
-.header-progress-bar{width:120px;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
-.header-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px}
-.container{max-width:960px;margin:0 auto;padding:0 16px 60px}
-.series-info{text-align:center;padding:16px 0 0;font-size:13px;color:var(--text-dim);letter-spacing:.5px}
-.hero{text-align:center;padding:60px 0 48px;animation:fadeUp .8s ease both}
-.hero-day{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px}
-.hero-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:42px;color:var(--text-bright);line-height:1.2;margin-bottom:6px}
-.hero-title-en{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:20px;color:var(--text-dim);margin-bottom:32px}
 
-.gauge-wrap{display:flex;justify-content:center;margin-bottom:28px}
-.gauge-svg{width:100px;height:100px}
-.gauge-bg{fill:none;stroke:var(--surface2);stroke-width:6}
-.gauge-fill{fill:none;stroke:var(--gold);stroke-width:6;stroke-linecap:round;stroke-dasharray:251;transition:stroke-dashoffset 1s ease}
-.gauge-text{font-family:'JetBrains Mono',monospace;font-size:16px;fill:var(--gold-light);text-anchor:middle}
-.gauge-label{font-size:9px;fill:var(--text-dim);text-anchor:middle}
-.meta-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
-.meta-badge{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:13px;color:var(--text-dim)}
-.meta-badge span{color:var(--text-bright);font-weight:400}
-.section{margin-top:56px;padding:28px 0 16px;break-inside:avoid;animation:fadeUp .6s ease both}
-.section-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-.section-title{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:28px;color:var(--text-bright);margin-bottom:20px}
-.brain-box{background:linear-gradient(135deg,rgba(138,106,191,.1),rgba(138,106,191,.04));border:1px solid rgba(138,106,191,.3);border-radius:16px;padding:28px 32px}
-.brain-box h3{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--purple);margin-bottom:16px}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Rajdhani','Noto Sans KR',sans-serif;
+  font-weight:400;
+  line-height:1.8;
+  -webkit-font-smoothing:antialiased;
+  position:relative;
+  overflow-x:hidden
+}
+
+/* ── Scanline Overlay ── */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:9999;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    var(--scanline) 2px,
+    var(--scanline) 4px
+  );
+  opacity:0.4
+}
+
+/* ── Grid Background ── */
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(0,229,255,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(255,45,120,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(41,121,255,0.03) 0%, transparent 50%);
+}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--cyan);border-radius:2px;box-shadow:0 0 8px var(--cyan)}
+
+/* ══════ STICKY HEADER — HUD Cockpit ══════ */
+.sticky-header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:linear-gradient(180deg,rgba(3,7,18,0.97),rgba(3,7,18,0.92));
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border-glow);
+  padding:10px 0;
+  box-shadow:0 0 20px rgba(0,229,255,0.1),inset 0 -1px 0 rgba(0,229,255,0.2)
+}
+.header-inner{max-width:960px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
+.header-brand{
+  font-family:'Orbitron',sans-serif;
+  font-weight:700;
+  font-size:14px;
+  color:var(--cyan);
+  text-shadow:0 0 12px rgba(0,229,255,0.6);
+  letter-spacing:2px;
+  text-transform:uppercase
+}
+.header-brand a{color:inherit;text-decoration:none}
+.header-progress-wrap{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-dim);font-family:'Share Tech Mono',monospace}
+.header-progress-bar{
+  width:140px;
+  height:6px;
+  background:rgba(0,229,255,0.08);
+  border-radius:3px;
+  overflow:hidden;
+  border:1px solid rgba(0,229,255,0.2);
+  position:relative
+}
+.header-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--cyan),var(--magenta));
+  border-radius:3px;
+  box-shadow:0 0 12px rgba(0,229,255,0.6);
+  position:relative;
+  animation:boostPulse 2s ease-in-out infinite
+}
+@keyframes boostPulse{0%,100%{opacity:1}50%{opacity:0.7}}
+
+.container{max-width:960px;margin:0 auto;padding:0 16px 60px}
+
+/* ══════ SERIES INFO ══════ */
+.series-info{
+  text-align:center;
+  padding:16px 0 0;
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;
+  color:var(--text-dim);
+  letter-spacing:3px;
+  text-transform:uppercase
+}
+
+/* ══════ HERO — Race Start ══════ */
+.hero{text-align:center;padding:60px 0 48px;animation:fadeUp .8s ease both;position:relative}
+.hero::before{
+  content:'';
+  position:absolute;
+  top:0;left:50%;
+  transform:translateX(-50%);
+  width:200px;height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  box-shadow:0 0 20px var(--cyan)
+}
+.hero-day{
+  font-family:'Orbitron',sans-serif;
+  font-size:13px;
+  color:var(--magenta);
+  letter-spacing:6px;
+  text-transform:uppercase;
+  margin-bottom:14px;
+  text-shadow:0 0 10px rgba(255,45,120,0.5)
+}
+.hero-title{
+  font-family:'Orbitron',sans-serif;
+  font-weight:800;
+  font-size:36px;
+  color:var(--text-bright);
+  line-height:1.3;
+  margin-bottom:8px;
+  text-shadow:0 0 30px rgba(0,229,255,0.2);
+  background:linear-gradient(135deg,var(--text-bright),var(--cyan-light));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text
+}
+.hero-title-en{
+  font-family:'Orbitron',sans-serif;
+  font-weight:400;
+  font-size:16px;
+  color:var(--text-dim);
+  margin-bottom:32px;
+  letter-spacing:3px
+}
+
+/* ── Gauge — Boost Meter ── */
+.gauge-wrap{display:flex;justify-content:center;align-items:center;margin-bottom:28px}
+.gauge-svg{width:100px;height:100px;filter:drop-shadow(0 0 8px rgba(0,229,255,0.4))}
+.gauge-bg{fill:none;stroke:rgba(0,229,255,0.1);stroke-width:6}
+.gauge-fill{fill:none;stroke:url(#cyberGrad);stroke-width:6;stroke-linecap:round;stroke-dasharray:251;transition:stroke-dashoffset 1s ease}
+.gauge-text{font-family:'Orbitron',sans-serif;font-size:16px;fill:var(--cyan);text-anchor:middle}
+.gauge-label{font-family:'Share Tech Mono',monospace;font-size:9px;fill:var(--text-dim);text-anchor:middle;letter-spacing:2px}
+
+/* ── Meta Badges — Telemetry ── */
+.meta-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.meta-badge{
+  background:var(--cyan-dim);
+  border:1px solid var(--border-glow);
+  border-radius:4px;
+  padding:6px 14px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;
+  color:var(--text-dim);
+  position:relative;
+  clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)
+}
+.meta-badge span{color:var(--cyan-light);font-weight:500}
+
+/* ══════ SECTION — Data Panel ══════ */
+.section{
+  margin-top:48px;
+  padding:28px 0 16px;
+  break-inside:avoid;
+  animation:fadeUp .6s ease both;
+  position:relative
+}
+.section-label{
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;
+  color:var(--magenta);
+  letter-spacing:4px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+  text-shadow:0 0 8px rgba(255,45,120,0.4)
+}
+.section-title{
+  font-family:'Orbitron',sans-serif;
+  font-weight:700;
+  font-size:24px;
+  color:var(--text-bright);
+  margin-bottom:20px;
+  position:relative;
+  padding-left:16px
+}
+.section-title::before{
+  content:'';
+  position:absolute;
+  left:0;top:4px;bottom:4px;
+  width:3px;
+  background:linear-gradient(180deg,var(--cyan),var(--magenta));
+  border-radius:2px;
+  box-shadow:0 0 10px var(--cyan)
+}
+
+/* ══════ BRAIN BOX — AI System ══════ */
+.brain-box{
+  background:linear-gradient(135deg,rgba(179,136,255,0.08),rgba(179,136,255,0.02));
+  border:1px solid rgba(179,136,255,0.25);
+  border-radius:4px;
+  padding:24px 28px;
+  position:relative;
+  overflow:hidden
+}
+.brain-box::before{
+  content:'SYSTEM';
+  position:absolute;
+  top:8px;right:12px;
+  font-family:'Orbitron',sans-serif;
+  font-size:8px;
+  color:rgba(179,136,255,0.4);
+  letter-spacing:4px
+}
+.brain-box h3{font-family:'Orbitron',sans-serif;font-weight:600;font-size:16px;color:var(--purple);margin-bottom:14px}
 .brain-box p,.brain-box li{font-size:14px;color:var(--text);margin-bottom:8px}
 .brain-box ul{padding-left:20px}
 .brain-box li::marker{color:var(--purple)}
-.time-split{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
-.time-block{background:rgba(138,106,191,.08);border:1px solid rgba(138,106,191,.2);border-radius:8px;padding:10px;text-align:center;font-size:12px}
-.time-block .t-range{color:var(--purple);font-weight:700;font-size:13px;display:block;margin-bottom:2px}
-.time-block .t-desc{color:var(--text-dim)}
-.intuition-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 32px}
-.intuition-card p{font-size:15px;margin-bottom:12px}
-.highlight{color:var(--gold-light);font-weight:400}
-.deriv-card{background:var(--surface);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;padding:24px 28px;margin-bottom:20px}
-.deriv-step-num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
 
+/* ── Time Split ── */
+.time-split{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.time-block{
+  background:rgba(179,136,255,0.06);
+  border:1px solid rgba(179,136,255,0.15);
+  border-radius:4px;
+  padding:10px;
+  text-align:center;
+  font-size:12px
+}
+.time-block .t-range{color:var(--purple);font-family:'Share Tech Mono',monospace;font-weight:700;font-size:13px;display:block;margin-bottom:2px}
+.time-block .t-desc{color:var(--text-dim)}
+
+/* ══════ INTUITION CARD — Cockpit Display ══════ */
+.intuition-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:24px 28px;
+  position:relative;
+  overflow:hidden
+}
+.intuition-card::after{
+  content:'';
+  position:absolute;
+  top:0;right:0;
+  width:60px;height:60px;
+  background:linear-gradient(225deg,rgba(0,229,255,0.1),transparent);
+  pointer-events:none
+}
+.intuition-card p{font-size:15px;margin-bottom:12px}
+.highlight{color:var(--cyan-light);font-weight:500;text-shadow:0 0 6px rgba(0,229,255,0.3)}
+
+/* ══════ DERIVATION CARD — Telemetry Log ══════ */
+.deriv-card{
+  background:var(--surface);
+  border-left:3px solid;
+  border-image:linear-gradient(180deg,var(--cyan),var(--magenta)) 1;
+  border-radius:0 4px 4px 0;
+  padding:20px 24px;
+  margin-bottom:16px;
+  position:relative
+}
+.deriv-step-num{
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;
+  color:var(--cyan);
+  letter-spacing:4px;
+  text-transform:uppercase;
+  margin-bottom:10px;
+  text-shadow:0 0 6px rgba(0,229,255,0.4)
+}
 .deriv-explain{font-size:14px;color:var(--text)}
-.deriv-explain .label{color:var(--blue);font-weight:400}
+.deriv-explain .label{color:var(--cyan-light);font-weight:500}
 .deriv-explain p{margin-bottom:8px}
-.arrow-connector{text-align:center;color:var(--gold);font-size:24px;margin:-8px 0 12px;opacity:.5}
-.checkpoint{background:rgba(74,191,138,.08);border:1px solid rgba(74,191,138,.25);border-radius:10px;padding:14px 20px;margin:24px 0;font-size:14px;color:var(--green)}
-.checkpoint strong{color:var(--green);font-weight:700}
-.param-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+
+.arrow-connector{text-align:center;color:var(--cyan);font-size:24px;margin:-8px 0 12px;opacity:.5;text-shadow:0 0 8px var(--cyan)}
+
+/* ══════ CHECKPOINT — Pit Stop ══════ */
+.checkpoint{
+  background:rgba(0,230,118,0.06);
+  border:1px solid rgba(0,230,118,0.2);
+  border-radius:4px;
+  padding:14px 20px;
+  margin:24px 0;
+  font-size:14px;
+  color:var(--green);
+  font-family:'Rajdhani','Noto Sans KR',sans-serif;
+  position:relative
+}
+
+/* ══════ PARAM TABLE — Data Grid ══════ */
+.param-table-wrap{
+  overflow-x:auto;
+  border-radius:4px;
+  border:1px solid var(--border-glow);
+  box-shadow:0 0 12px rgba(0,229,255,0.05)
+}
 table.param-table{width:100%;border-collapse:collapse;font-size:13px}
-table.param-table th{background:var(--surface2);color:var(--gold);font-family:'JetBrains Mono',monospace;font-weight:500;padding:12px 14px;text-align:left;border-bottom:1px solid var(--border);font-size:11px;letter-spacing:1px;text-transform:uppercase}
+table.param-table th{
+  background:rgba(0,229,255,0.08);
+  color:var(--cyan);
+  font-family:'Orbitron',sans-serif;
+  font-weight:500;
+  padding:12px 14px;
+  text-align:left;
+  border-bottom:1px solid var(--border-glow);
+  font-size:10px;
+  letter-spacing:2px;
+  text-transform:uppercase
+}
 table.param-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top}
 table.param-table tr:last-child td{border-bottom:none}
-.sym{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:15px}
-.vehicle-example{background:linear-gradient(135deg,rgba(74,158,191,.08),rgba(74,158,191,.02));border:1px solid rgba(74,158,191,.25);border-radius:12px;padding:20px 24px;margin-top:20px}
-.vehicle-example h4{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:17px;color:var(--blue);margin-bottom:12px}
-.vehicle-example p{font-size:13px;margin-bottom:6px}
-.vehicle-example .calc{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:13px;background:#0D1017;padding:6px 12px;border-radius:6px;display:inline-block;margin:4px 0}
-.ride-criteria{background:var(--surface);border:1px solid rgba(191,106,74,.25);border-radius:12px;padding:16px 20px;margin-top:16px}
-.ride-criteria h4{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:16px;color:var(--orange);margin-bottom:8px}
-.ride-criteria p{font-size:13px;margin-bottom:4px}
-.simpack-module{background:var(--surface);border:1px solid rgba(74,158,191,.3);border-radius:16px;overflow:hidden}
-.simpack-header{background:linear-gradient(135deg,rgba(74,158,191,.15),rgba(74,158,191,.05));padding:16px 28px;border-bottom:1px solid rgba(74,158,191,.2);display:flex;align-items:center;gap:10px}
-.simpack-badge{background:var(--blue);color:#fff;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;padding:3px 10px;border-radius:4px;letter-spacing:1px}
-.simpack-header span{color:var(--blue);font-weight:400;font-size:15px}
-.simpack-body{padding:24px 28px}
-.simpack-row{background:var(--surface2);border-radius:10px;padding:16px 20px;margin-bottom:12px}
-.simpack-row .sp-sym{font-family:'JetBrains Mono',monospace;color:var(--gold-light);font-size:16px;font-weight:500}
-.simpack-row .sp-path{font-family:'JetBrains Mono',monospace;color:var(--blue);font-size:12px;margin:6px 0}
+table.param-table tr:hover td{background:rgba(0,229,255,0.03)}
+.sym{font-family:'Share Tech Mono',monospace;color:var(--cyan-light);font-size:15px}
+
+/* ══════ SIMPACK MODULE — External Link ══════ */
+.simpack-module{
+  background:var(--surface);
+  border:1px solid rgba(41,121,255,0.25);
+  border-radius:4px;
+  overflow:hidden
+}
+.simpack-header{
+  background:linear-gradient(135deg,rgba(41,121,255,0.12),rgba(41,121,255,0.04));
+  padding:14px 24px;
+  border-bottom:1px solid rgba(41,121,255,0.2);
+  display:flex;
+  align-items:center;
+  gap:10px
+}
+.simpack-badge{
+  background:var(--blue);
+  color:#fff;
+  font-family:'Orbitron',sans-serif;
+  font-size:9px;
+  font-weight:600;
+  padding:3px 10px;
+  border-radius:2px;
+  letter-spacing:2px
+}
+.simpack-header span{color:var(--blue);font-weight:500;font-size:14px}
+.simpack-body{padding:20px 24px}
+.simpack-row{
+  background:rgba(41,121,255,0.05);
+  border:1px solid rgba(41,121,255,0.12);
+  border-radius:4px;
+  padding:14px 18px;
+  margin-bottom:10px
+}
+.simpack-row .sp-sym{font-family:'Share Tech Mono',monospace;color:var(--cyan-light);font-size:15px;font-weight:500}
+.simpack-row .sp-path{font-family:'Share Tech Mono',monospace;color:var(--blue);font-size:12px;margin:6px 0}
 .simpack-row .sp-detail{font-size:13px;color:var(--text-dim)}
-.sp-warn{background:rgba(191,106,74,.1);border:1px solid rgba(191,106,74,.3);border-radius:8px;padding:10px 14px;margin-top:8px;font-size:12px;color:var(--orange)}
-.sp-workflow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
-.sp-wf-step{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
-.sp-wf-step .wf-num{font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--blue);font-weight:700;display:block}
-.sp-wf-step .wf-title{font-size:13px;color:var(--text-bright);font-weight:400;display:block;margin:4px 0}
-.sp-wf-step .wf-desc{font-size:11px;color:var(--text-dim)}
-.sp-wf-arrow{display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:20px}
-.accordion{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
-.accordion-toggle{width:100%;background:var(--surface);border:none;padding:18px 24px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;color:var(--text-bright);font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:400}
-.accordion-toggle:hover{background:var(--surface2)}
-.accordion-arrow{color:var(--gold);font-size:18px;transition:transform .3s}
-.accordion-content{display:none;background:var(--surface);padding:0}
+.sp-warn{
+  background:rgba(255,145,0,0.08);
+  border:1px solid rgba(255,145,0,0.25);
+  border-radius:4px;
+  padding:10px 14px;
+  margin-top:8px;
+  font-size:12px;
+  color:var(--orange)
+}
+
+/* ══════ ACCORDION — DEEP DIVE Panels ══════ */
+.accordion{
+  border:1px solid var(--border);
+  border-radius:4px;
+  overflow:hidden;
+  transition:border-color 0.3s
+}
+.accordion:hover{border-color:var(--border-glow)}
+.accordion-toggle{
+  width:100%;
+  background:var(--surface);
+  border:none;
+  padding:16px 20px;
+  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:var(--text-bright);
+  font-family:'Rajdhani','Noto Sans KR',sans-serif;
+  font-size:15px;
+  font-weight:500;
+  transition:all 0.2s
+}
+.accordion-toggle:hover{
+  background:rgba(0,229,255,0.04);
+  color:var(--cyan-light)
+}
+.accordion-arrow{color:var(--cyan);font-size:18px;transition:transform .3s;text-shadow:0 0 6px rgba(0,229,255,0.4)}
+.accordion-content{display:none;background:rgba(3,7,18,0.6);padding:0}
 .accordion-content.open{display:block;padding:0}
-.accordion-inner{padding:0 24px 24px}
+.accordion-inner{padding:0 20px 20px}
 .accordion-inner p{font-size:14px;margin-bottom:10px}
 .accordion-inner .deriv-equation{margin-top:12px}
-.quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:16px}
-.quiz-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:10px}
-.quiz-q{font-size:15px;color:var(--text-bright);margin-bottom:16px;font-weight:400}
+
+/* ══════ QUIZ — Race Challenge ══════ */
+.quiz-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:24px 28px;
+  margin-bottom:16px;
+  position:relative
+}
+.quiz-num{
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;
+  color:var(--magenta);
+  letter-spacing:3px;
+  margin-bottom:10px;
+  text-shadow:0 0 6px rgba(255,45,120,0.4)
+}
+.quiz-q{font-size:15px;color:var(--text-bright);margin-bottom:16px;font-weight:500}
 .quiz-options{display:grid;gap:8px}
-.quiz-opt{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;cursor:pointer;font-size:14px;color:var(--text);transition:all .2s}
-.quiz-opt:hover{border-color:var(--gold);color:var(--text-bright)}
-.quiz-opt.correct{background:rgba(74,191,138,.12);border-color:var(--green);color:var(--green)}
-.quiz-opt.wrong{background:rgba(191,74,74,.12);border-color:#bf4a4a;color:#bf4a4a}
-.quiz-opt.disabled{pointer-events:none;opacity:.7}
-.quiz-feedback{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;display:none}
+.quiz-opt{
+  background:rgba(0,229,255,0.03);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:12px 16px;
+  cursor:pointer;
+  font-size:14px;
+  color:var(--text);
+  transition:all .2s;
+  font-family:'Rajdhani','Noto Sans KR',sans-serif
+}
+.quiz-opt:hover{border-color:var(--cyan);color:var(--cyan-light);box-shadow:0 0 10px rgba(0,229,255,0.15)}
+.quiz-opt.correct{background:rgba(0,230,118,0.1);border-color:var(--green);color:var(--green);box-shadow:0 0 12px rgba(0,230,118,0.2)}
+.quiz-opt.wrong{background:rgba(255,45,120,0.1);border-color:var(--magenta);color:var(--magenta)}
+.quiz-opt.disabled{pointer-events:none;opacity:.6}
+
+.quiz-feedback{margin-top:10px;padding:10px 14px;border-radius:4px;font-size:13px;display:none}
 .quiz-feedback.show{display:block}
-.quiz-feedback.correct-fb{background:rgba(74,191,138,.08);color:var(--green)}
-.quiz-feedback.wrong-fb{background:rgba(191,74,74,.08);color:#bf4a4a}
-.solution-panel{display:none;margin-top:16px;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.2);border-radius:12px;overflow:hidden;animation:solReveal .4s ease}
+.quiz-feedback.correct-fb{background:rgba(0,230,118,0.06);color:var(--green)}
+.quiz-feedback.wrong-fb{background:rgba(255,45,120,0.06);color:var(--magenta)}
+
+/* ══════ SOLUTION PANEL ══════ */
+.solution-panel{
+  display:none;margin-top:16px;
+  background:linear-gradient(135deg,rgba(0,229,255,0.04),rgba(0,229,255,0.01));
+  border:1px solid rgba(0,229,255,0.15);
+  border-radius:4px;
+  overflow:hidden;
+  animation:solReveal .4s ease
+}
 .solution-panel.show{display:block}
 @keyframes solReveal{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.sol-header{background:rgba(201,168,76,.1);padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);font-weight:500;letter-spacing:1px;border-bottom:1px solid rgba(201,168,76,.15)}
-.sol-step{padding:10px 20px;font-size:13px;color:var(--text);border-bottom:1px solid rgba(201,168,76,.08);display:flex;align-items:baseline;gap:12px}
+.sol-header{
+  background:rgba(0,229,255,0.08);
+  padding:10px 20px;
+  font-family:'Orbitron',sans-serif;
+  font-size:11px;
+  color:var(--cyan);
+  font-weight:600;
+  letter-spacing:3px;
+  border-bottom:1px solid rgba(0,229,255,0.12)
+}
+.sol-step{padding:10px 20px;font-size:13px;color:var(--text);border-bottom:1px solid rgba(0,229,255,0.06);display:flex;align-items:baseline;gap:12px}
 .sol-step:last-of-type{border-bottom:none}
-.sol-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);font-weight:500;min-width:50px;letter-spacing:1px;flex-shrink:0}
-.sol-step.highlight-step{background:rgba(201,168,76,.08)}
-.sol-insight{padding:16px 20px;background:rgba(74,191,138,.06);border-top:1px solid rgba(74,191,138,.15);font-size:13px;color:var(--text);line-height:1.9}
+.sol-num{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan);font-weight:500;min-width:50px;letter-spacing:2px;flex-shrink:0}
+.sol-step.highlight-step{background:rgba(0,229,255,0.05)}
+.sol-insight{padding:14px 20px;background:rgba(0,230,118,0.04);border-top:1px solid rgba(0,230,118,0.12);font-size:13px;color:var(--text);line-height:1.9}
 .sol-insight strong{color:var(--green)}
-.footer{text-align:center;padding:40px 0 20px;font-size:12px;color:var(--text-dim);border-top:1px solid var(--border);margin-top:60px}
-.placeholder-box{background:var(--surface);border:2px dashed var(--border);border-radius:16px;padding:40px;text-align:center;color:var(--text-dim);font-size:14px;margin:20px 0}
+
+/* ══════ HERO EQUATION — Display HUD ══════ */
+.hero-equation{
+  background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(255,45,120,0.03));
+  border:1px solid rgba(0,229,255,0.2);
+  border-radius:4px;
+  padding:24px 32px;
+  margin:20px 0;
+  font-family:'Share Tech Mono',monospace;
+  font-size:18px;
+  color:var(--text-bright);
+  text-align:center;
+  position:relative;
+  overflow:hidden
+}
+.hero-equation::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  box-shadow:0 0 10px var(--cyan)
+}
+.hero-equation .katex-display{overflow:hidden!important}
+
+/* ══════ DERIV EQUATION ══════ */
+.deriv-equation{
+  background:rgba(0,229,255,0.03);
+  border-left:2px solid var(--cyan);
+  border-radius:0 4px 4px 0;
+  padding:16px 20px;
+  margin:12px 0;
+  font-family:'Share Tech Mono',monospace;
+  font-size:16px;
+  color:var(--text-bright);
+  overflow-x:auto;
+  position:relative
+}
+.deriv-equation::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;bottom:0;
+  width:2px;
+  box-shadow:0 0 8px var(--cyan)
+}
+
+/* ══════ KBOX — Formula Display ══════ */
+.kbox{
+  background:linear-gradient(135deg,rgba(0,229,255,0.05),rgba(0,229,255,0.01));
+  border:1px solid rgba(0,229,255,0.15);
+  border-radius:4px;
+  padding:16px 20px;
+  margin:12px 0;
+  text-align:center
+}
+
+/* ══════ TIP BOX — Renault Korea Pit Crew ══════ */
+.tip-box,.tip{
+  background:linear-gradient(135deg,rgba(255,45,120,0.06),rgba(255,45,120,0.02));
+  border:1px solid rgba(255,45,120,0.2);
+  border-radius:4px;
+  padding:16px 20px;
+  margin:12px 0;
+  font-size:14px;
+  color:var(--text);
+  position:relative
+}
+.tip-box::before,.tip::before{
+  content:'PIT CREW TIP';
+  font-family:'Orbitron',sans-serif;
+  font-size:8px;
+  letter-spacing:3px;
+  color:var(--magenta);
+  display:block;
+  margin-bottom:8px;
+  text-shadow:0 0 6px rgba(255,45,120,0.4)
+}
+
+/* ══════ FOOTER — Finish Line ══════ */
+.footer{
+  text-align:center;
+  padding:40px 0 20px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;
+  color:var(--text-dim);
+  border-top:1px solid var(--border);
+  margin-top:60px;
+  letter-spacing:2px;
+  position:relative
+}
+.footer::before{
+  content:'';
+  position:absolute;
+  top:-1px;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),var(--magenta),transparent);
+  box-shadow:0 0 12px rgba(0,229,255,0.3)
+}
+
+/* ══════ PLACEHOLDER ══════ */
+.placeholder-box{
+  background:var(--surface);
+  border:1px dashed var(--border-glow);
+  border-radius:4px;
+  padding:40px;
+  text-align:center;
+  color:var(--text-dim);
+  font-size:14px;
+  margin:20px 0
+}
 .placeholder-box .ph-icon{font-size:36px;margin-bottom:12px;display:block}
-.diagram-wrap{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin:20px 0;text-align:center;overflow-x:auto}
+
+/* ══════ DIAGRAM ══════ */
+.diagram-wrap{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:24px;
+  margin:20px 0;
+  text-align:center;
+  overflow-x:auto
+}
 .diagram-wrap svg{max-width:100%;height:auto}
-.diagram-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;text-align:center}
-.memory-hook{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:16px 20px;margin:16px 0;font-size:14px}
-.memory-hook strong{color:var(--gold-light)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-.hero-equation code{font-size:18px}.container{padding:0 16px 60px}.time-split{grid-template-columns:repeat(2,1fr)}.deriv-equation code{font-size:16px}.sp-workflow{grid-template-columns:1fr}}
-@media print{body{background:#fff;color:#222}.sticky-header{display:none}.section{break-inside:avoid}}
+.diagram-label{
+  font-family:'Orbitron',sans-serif;
+  font-size:9px;
+  color:var(--cyan);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+  text-align:center
+}
 
-/* 인라인 수식도 부드럽게 */
+/* ══════ MEMORY HOOK ══════ */
+.memory-hook{
+  background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(0,229,255,0.02));
+  border:1px solid rgba(0,229,255,0.15);
+  border-radius:4px;
+  padding:14px 18px;
+  margin:16px 0;
+  font-size:14px
+}
+.memory-hook strong{color:var(--cyan-light);text-shadow:0 0 6px rgba(0,229,255,0.3)}
 
-/* ══════ Mobile KaTeX Fix ══════ */
-.deriv-equation{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.deriv-equation code{white-space:normal;word-wrap:break-word}
+/* ══════ VEHICLE EXAMPLE ══════ */
+.vehicle-example{
+  background:linear-gradient(135deg,rgba(41,121,255,0.06),rgba(41,121,255,0.01));
+  border:1px solid rgba(41,121,255,0.2);
+  border-radius:4px;
+  padding:18px 22px;
+  margin-top:16px
+}
+.vehicle-example h4{font-family:'Orbitron',sans-serif;font-weight:600;font-size:14px;color:var(--blue);margin-bottom:10px}
+.vehicle-example p{font-size:13px;margin-bottom:6px}
+.vehicle-example .calc{font-family:'Share Tech Mono',monospace;color:var(--cyan-light);font-size:13px;background:rgba(0,229,255,0.05);padding:4px 10px;border-radius:2px;display:inline-block;margin:4px 0;border:1px solid rgba(0,229,255,0.1)}
+
+/* ══════ KaTeX SCROLLBAR FIX ══════ */
+.katex-display::-webkit-scrollbar{display:none}
+.katex-display{scrollbar-width:none}
 .katex{font-size:1.1em}
-@media(max-width:640px){
-  .hero-equation{padding:16px 20px !important;max-width:100%;overflow-x:auto !important;display:block !important;text-align:center}
-    .hero-equation code{font-size:15px !important;white-space:normal !important;word-break:break-all}
-  .deriv-equation{padding:12px 14px !important;margin-bottom:12px}
-    .deriv-equation code{font-size:14px !important}
-  .deriv-equation::before{width:2px}
-    .eq-tooltip{max-width:280px !important;font-size:12px !important}
-}
-@media(max-width:380px){
-      .hero-equation{padding:12px 14px !important}
-}
 
-/* ══════ Interactive Formula Explorer ══════ */
+/* ══════ EQUATION TOOLTIP ══════ */
 .eq-explorer{position:relative;cursor:pointer}
-.eq-tooltip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1A1E28,#12151C);border:1px solid var(--gold);border-radius:10px;padding:12px 16px;min-width:220px;max-width:340px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 12px rgba(201,168,76,.15);animation:tooltipIn .2s ease;pointer-events:none}
-.eq-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--gold)}
+.eq-tooltip{
+  display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,rgba(6,22,48,0.98),rgba(3,7,18,0.98));
+  border:1px solid var(--cyan);
+  border-radius:4px;
+  padding:12px 16px;
+  min-width:220px;max-width:340px;
+  z-index:200;
+  box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 20px rgba(0,229,255,0.2);
+  animation:tooltipIn .2s ease;
+  pointer-events:none
+}
+.eq-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--cyan)}
 .eq-explorer:hover .eq-tooltip,.eq-explorer:focus .eq-tooltip,.eq-explorer.active .eq-tooltip{display:block}
 @keyframes tooltipIn{from{opacity:0;transform:translateX(-50%) translateY(4px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-.eq-tooltip .tt-symbol{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--gold-light);font-weight:700;margin-bottom:6px}
+.eq-tooltip .tt-symbol{font-family:'Share Tech Mono',monospace;font-size:18px;color:var(--cyan-light);font-weight:700;margin-bottom:6px}
 .eq-tooltip .tt-name{font-size:13px;color:var(--text-bright);font-weight:400;margin-bottom:4px}
-.eq-tooltip .tt-unit{font-size:11px;color:var(--blue);font-family:'JetBrains Mono',monospace;margin-bottom:4px}
-.eq-tooltip .tt-ref{font-size:12px;color:var(--green);padding:6px 8px;background:rgba(74,191,138,.08);border-radius:6px;margin-top:6px}
-.eq-tooltip .tt-ref::before{content:'🚗 Ref: ';font-weight:700}
+.eq-tooltip .tt-unit{font-size:11px;color:var(--blue);font-family:'Share Tech Mono',monospace;margin-bottom:4px}
+.eq-tooltip .tt-xm3{font-size:12px;color:var(--green);padding:6px 8px;background:rgba(0,230,118,0.06);border-radius:4px;margin-top:6px}
+.eq-tooltip .tt-xm3::before{content:'DATA: ';font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px}
 .eq-tooltip .tt-meaning{font-size:12px;color:var(--text-dim);margin-top:4px;line-height:1.6}
 
-    </style>
+/* ══════ ANIMATIONS ══════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══════ RESPONSIVE ══════ */
+@media(max-width:640px){
+  .hero-title{font-size:24px}
+  .section-title{font-size:20px}
+  .hero-equation{padding:16px 18px!important;max-width:100%;overflow-x:auto!important;display:block!important;text-align:center}
+  .hero-equation code{font-size:15px!important;white-space:normal!important;word-break:break-all}
+  .deriv-equation{padding:12px 14px!important;margin-bottom:12px}
+  .deriv-equation code{font-size:14px!important}
+  .time-split{grid-template-columns:repeat(2,1fr)}
+  .eq-tooltip{max-width:280px!important;font-size:12px!important}
+  .meta-badge{clip-path:none;border-radius:4px}
+}
+
+@media print{
+  body{background:#fff;color:#222}
+  body::before,body::after{display:none}
+  .sticky-header{display:none}
+  .hero{padding:20px 0}
+  .diagram-wrap{border:1px solid #ccc}
+  .quiz-opt{border:1px solid #999}
+}
+
+
+
+/* ╔══════════════════════════════════════════════╗
+   ║  CYBER INTERACTIVE ENHANCEMENTS v2.0        ║
+   ╚══════════════════════════════════════════════╝ */
+
+/* ── 1. SYSTEM BOOT Overlay ── */
+.cyber-boot{
+  position:fixed;inset:0;z-index:99999;
+  background:#030712;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .6s ease,visibility .6s ease
+}
+.cyber-boot.done{opacity:0;visibility:hidden;pointer-events:none}
+.boot-logo{
+  font-family:'Orbitron',sans-serif;font-size:28px;font-weight:800;
+  background:linear-gradient(135deg,#00e5ff,#ff2d78);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;margin-bottom:24px;
+  animation:bootPulse 1s ease infinite alternate
+}
+.boot-status{
+  font-family:'Share Tech Mono',monospace;font-size:12px;
+  color:#4a6a8a;letter-spacing:3px;
+  overflow:hidden;white-space:nowrap;
+  border-right:2px solid #00e5ff;
+  animation:bootType 1.2s steps(24) forwards, bootBlink .5s step-end infinite alternate
+}
+.boot-bar-wrap{width:200px;height:3px;background:rgba(0,229,255,0.1);border-radius:2px;margin-top:16px;overflow:hidden}
+.boot-bar-fill{height:100%;width:0;background:linear-gradient(90deg,#00e5ff,#ff2d78);border-radius:2px;animation:bootFill 1.4s ease forwards}
+@keyframes bootPulse{from{opacity:.6;filter:brightness(.8)}to{opacity:1;filter:brightness(1.2)}}
+@keyframes bootType{from{width:0}to{width:24ch}}
+@keyframes bootBlink{50%{border-color:transparent}}
+@keyframes bootFill{0%{width:0}100%{width:100%}}
+
+/* ── 2. Gauge Boost Animation ── */
+@keyframes gaugeCharge{
+  0%{stroke-dashoffset:251}
+  100%{stroke-dashoffset:var(--gauge-target,100)}
+}
+@keyframes gaugeSpark{
+  0%,100%{filter:drop-shadow(0 0 4px rgba(0,229,255,0.3))}
+  50%{filter:drop-shadow(0 0 16px rgba(0,229,255,0.8)) drop-shadow(0 0 30px rgba(255,45,120,0.4))}
+}
+.gauge-svg.charged{animation:gaugeSpark 2s ease-in-out infinite}
+.gauge-svg.charged .gauge-fill{animation:gaugeCharge 1.5s cubic-bezier(.4,0,.2,1) forwards}
+
+/* Gauge particle ring */
+@keyframes orbitParticle{0%{transform:rotate(0deg) translateX(52px)}100%{transform:rotate(360deg) translateX(52px)}}
+.gauge-particle{
+  position:absolute;width:4px;height:4px;border-radius:50%;
+  background:#00e5ff;box-shadow:0 0 6px #00e5ff;
+  top:50%;left:50%;margin:-2px 0 0 -2px;
+  animation:orbitParticle 3s linear infinite;opacity:0;
+  transition:opacity .5s
+}
+.gauge-wrap{position:relative;display:flex;justify-content:center}
+.gauge-wrap.active .gauge-particle{opacity:1}
+
+/* ── 3. Card Hologram Hover ── */
+@keyframes holoShift{
+  0%{background-position:0% 0%}
+  100%{background-position:200% 200%}
+}
+@keyframes glitchFlicker{
+  0%,92%,100%{opacity:1;transform:translate(0)}
+  93%{opacity:.8;transform:translate(-2px,1px)}
+  95%{opacity:.9;transform:translate(1px,-1px)}
+  97%{opacity:.7;transform:translate(2px,0)}
+}
+.intuition-card,.brain-box,.deriv-card,.vehicle-example,.simpack-module,.checkpoint,.tip-box,.tip,.memory-hook{
+  transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease
+}
+.intuition-card:hover,.brain-box:hover,.deriv-card:hover,.vehicle-example:hover,.simpack-module:hover{
+  transform:translateY(-3px) scale(1.005);
+  box-shadow:0 8px 32px rgba(0,229,255,0.15),0 0 60px rgba(0,229,255,0.05);
+  border-color:rgba(0,229,255,0.4)
+}
+.intuition-card:hover::after,.brain-box:hover::before{
+  animation:glitchFlicker 2s linear infinite
+}
+
+/* Data stream on hover — top edge scanner */
+.intuition-card::before,.deriv-card::after,.vehicle-example::before{
+  content:'';position:absolute;top:0;left:0;width:0;height:1px;
+  background:linear-gradient(90deg,transparent,#00e5ff,#ff2d78,transparent);
+  box-shadow:0 0 10px #00e5ff;
+  transition:width .6s ease;pointer-events:none
+}
+.intuition-card:hover::before,.deriv-card:hover::after,.vehicle-example:hover::before{width:100%}
+
+/* ── 4. Accordion Cyber-Open ── */
+@keyframes accordionScan{
+  0%{height:0;opacity:0}
+  30%{height:100%;opacity:0.3}
+  100%{height:100%;opacity:1}
+}
+@keyframes dataStream{
+  0%{background-position:0 0}
+  100%{background-position:0 200px}
+}
+.accordion-content.cyber-open{
+  display:block!important;
+  animation:accordionScan .4s ease-out forwards;
+  overflow:hidden;
+  background:
+    linear-gradient(180deg,rgba(0,229,255,0.03) 0%,rgba(3,7,18,0.6) 10%),
+    rgba(3,7,18,0.6)
+}
+.accordion-toggle.active{
+  background:linear-gradient(90deg,rgba(0,229,255,0.08),rgba(255,45,120,0.04));
+  border-bottom:1px solid rgba(0,229,255,0.2)
+}
+.accordion-toggle.active .accordion-arrow{
+  color:#ff2d78;
+  text-shadow:0 0 8px rgba(255,45,120,0.6);
+  transform:rotate(180deg)
+}
+
+/* ── 5. Quiz BOOST / RETIRE Effects ── */
+@keyframes quizBoost{
+  0%{box-shadow:0 0 0 0 rgba(0,230,118,0.4)}
+  50%{box-shadow:0 0 20px 8px rgba(0,230,118,0.2),0 0 40px 16px rgba(0,230,118,0.1)}
+  100%{box-shadow:0 0 0 0 rgba(0,230,118,0)}
+}
+@keyframes quizRetire{
+  0%{box-shadow:0 0 0 0 rgba(255,45,120,0.4)}
+  50%{box-shadow:0 0 15px 6px rgba(255,45,120,0.2)}
+  100%{box-shadow:0 0 0 0 rgba(255,45,120,0)}
+}
+@keyframes correctPulse{
+  0%,100%{text-shadow:0 0 4px rgba(0,230,118,0.4)}
+  50%{text-shadow:0 0 16px rgba(0,230,118,0.8),0 0 30px rgba(0,230,118,0.3)}
+}
+.quiz-opt.correct{animation:quizBoost .8s ease-out}
+.quiz-opt.wrong{animation:quizRetire .6s ease-out}
+.quiz-feedback.correct-fb.show{animation:correctPulse 2s ease-in-out infinite}
+.quiz-card{transition:border-color .3s ease}
+.quiz-card.answered-correct{border-color:rgba(0,230,118,0.3)}
+.quiz-card.answered-wrong{border-color:rgba(255,45,120,0.2)}
+
+/* ── 6. Section HUD Entrance ── */
+@keyframes hudEntrance{
+  0%{opacity:0;transform:translateY(40px);filter:blur(4px)}
+  60%{opacity:0.7;filter:blur(0)}
+  100%{opacity:1;transform:translateY(0);filter:blur(0)}
+}
+.section{opacity:0;transform:translateY(40px)}
+.section.hud-visible{animation:hudEntrance .7s cubic-bezier(.22,.61,.36,1) forwards}
+
+/* Section label scanner line */
+.section-label{position:relative;overflow:hidden}
+.section.hud-visible .section-label::after{
+  content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,45,120,0.3),transparent);
+  animation:labelScan .8s ease .2s forwards
+}
+@keyframes labelScan{0%{left:-100%}100%{left:200%}}
+
+/* ── 7. Circuit Particle Background ── */
+#cyberParticles{
+  position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:0.4
+}
+
+/* ── 8. Progress Bar Nitro Flame ── */
+@keyframes nitroFlame{
+  0%{box-shadow:0 0 8px rgba(0,229,255,0.6),4px 0 12px rgba(255,45,120,0.3)}
+  50%{box-shadow:0 0 16px rgba(0,229,255,0.9),6px 0 20px rgba(255,45,120,0.5)}
+  100%{box-shadow:0 0 8px rgba(0,229,255,0.6),4px 0 12px rgba(255,45,120,0.3)}
+}
+.header-progress-fill{animation:nitroFlame 1.5s ease-in-out infinite,boostPulse 2s ease-in-out infinite}
+.header-progress-fill::after{
+  content:'';position:absolute;right:-3px;top:-3px;bottom:-3px;width:8px;
+  background:radial-gradient(circle,rgba(255,45,120,0.8),transparent);
+  border-radius:50%;filter:blur(2px)
+}
+
+/* ── 9. Hero Equation Glow Pulse ── */
+@keyframes eqGlow{
+  0%,100%{box-shadow:0 0 12px rgba(0,229,255,0.1),inset 0 0 12px rgba(0,229,255,0.02)}
+  50%{box-shadow:0 0 24px rgba(0,229,255,0.2),inset 0 0 20px rgba(0,229,255,0.04),0 0 60px rgba(0,229,255,0.05)}
+}
+.hero-equation{animation:eqGlow 4s ease-in-out infinite}
+
+/* ── 10. Quiz Num Counter Effect ── */
+.quiz-num{position:relative;display:inline-block}
+.quiz-num::after{
+  content:'';position:absolute;bottom:-2px;left:0;width:100%;height:1px;
+  background:linear-gradient(90deg,#ff2d78,transparent);
+  box-shadow:0 0 6px rgba(255,45,120,0.4)
+}
+
+/* ── 11. Table Row Hover Scanner ── */
+table.param-table tr{transition:background .3s ease}
+table.param-table tbody tr:hover td{
+  background:rgba(0,229,255,0.06);
+  text-shadow:0 0 4px rgba(0,229,255,0.2)
+}
+
+/* ── 12. Floating Tooltip Enhancement ── */
+.eq-explorer:hover .eq-tooltip{
+  animation:tooltipIn .2s ease, tooltipGlow 2s ease-in-out infinite .3s;
+}
+@keyframes tooltipGlow{
+  0%,100%{box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 20px rgba(0,229,255,0.2)}
+  50%{box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 30px rgba(0,229,255,0.35),0 0 60px rgba(0,229,255,0.1)}
+}
+
+/* ── 13. Checkpoint Pit Stop Indicator ── */
+.checkpoint{position:relative;overflow:hidden}
+.checkpoint::after{
+  content:'PIT STOP';position:absolute;top:8px;right:12px;
+  font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:3px;
+  color:rgba(0,230,118,0.3)
+}
+
+/* ── 14. Scroll Progress Indicator (top bar) ── */
+#scrollProgress{
+  position:fixed;top:0;left:0;height:2px;z-index:9998;
+  background:linear-gradient(90deg,#00e5ff,#ff2d78);
+  box-shadow:0 0 10px #00e5ff;
+  width:0;transition:width 50ms linear
+}
+
+/* ── 15. KBox formula shimmer ── */
+@keyframes kboxShimmer{
+  0%{background-position:-200% 0}
+  100%{background-position:200% 0}
+}
+.kbox{
+  background:linear-gradient(90deg,rgba(0,229,255,0.03),rgba(0,229,255,0.08),rgba(0,229,255,0.03));
+  background-size:200% 100%;
+  animation:kboxShimmer 6s ease-in-out infinite
+}
+
+/* ── Korean Font Fix: Orbitron → Noto Sans KR for Korean text ── */
+.hero-title{font-family:'Noto Sans KR','Rajdhani',sans-serif!important;font-weight:700;-webkit-text-fill-color:transparent}
+.hero-title-en{font-family:'Orbitron',sans-serif!important;font-weight:400}
+.section-title{font-family:'Noto Sans KR','Rajdhani',sans-serif!important;font-weight:700}
+.brain-box h3{font-family:'Noto Sans KR','Rajdhani',sans-serif!important;font-weight:600}
+.vehicle-example h4{font-family:'Noto Sans KR','Rajdhani',sans-serif!important;font-weight:600}
+.intuition-card p,.deriv-explain p,.accordion-inner p,.brain-box p{font-family:'Noto Sans KR','Rajdhani',sans-serif}
+.quiz-q{font-family:'Noto Sans KR','Rajdhani',sans-serif!important}
+.quiz-opt{font-family:'Noto Sans KR','Rajdhani',sans-serif!important}
+.part-title{font-family:'Noto Sans KR','Rajdhani',sans-serif!important;font-weight:700}
+
+/* ── Readability Improvements ── */
+.accordion-toggle{font-family:'Noto Sans KR','Rajdhani',sans-serif;font-weight:500}
+.deriv-card{margin-bottom:20px}
+.section{margin-top:52px}
+.checkpoint{font-family:'Noto Sans KR','Rajdhani',sans-serif}
+
+</style>
 <style id="katex-inline-css">@font-face{font-display:block;font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_AMS-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Script-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size1-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size2-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size3-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size4-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0;text-rendering:auto}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.16.38"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathboldfrak,.katex .textboldfrak{font-family:KaTeX_Fraktur;font-weight:700}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .mathsfit,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .smash{display:inline;line-height:0}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.2777777778em;margin-right:-.5555555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.1666666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.6666666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.4566666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.1466666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.7142857143em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.8571428571em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.1428571429em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.2857142857em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.4285714286em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.7142857143em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.0571428571em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.4685714286em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.9628571429em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.5542857143em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.7777777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.8888888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.1111111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.3044444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.7644444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.5833333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.7283333333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.0733333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.4861111111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.4402777778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.7277777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.2893518519em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.4050925926em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.462962963em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.5208333333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.2002314815em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.4398148148em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.2410800386em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.2892960463em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.337512054em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.3857280617em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.4339440694em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.4821600771em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.5785920926em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.6943105111em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.8331726133em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.1996142719em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.2009646302em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.2411575563em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.2813504823em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.3215434084em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.3617363344em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.4019292605em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.4823151125em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.578778135em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.6945337621em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.8336012862em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex svg{fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
 </style>
 <style id="math-enhanced-style">
@@ -169,50 +975,50 @@ table.param-table tr:last-child td{border-bottom:none}
 /* Hero equation - 메인 수식 */
 .hero-equation .katex-display{margin:0!important;padding:0!important;overflow:hidden!important}
 .katex-display::-webkit-scrollbar{display:none}.katex-display{scrollbar-width:none}
-.hero-equation .katex{font-size:1.5em!important;color:#E8C96A!important}
-.hero-equation .katex .mord{color:#E8C96A!important}
-.hero-equation .katex .mbin{color:#4A9EBF!important}
-.hero-equation .katex .mrel{color:#4ABF8A!important}
-.hero-equation .katex .mop{color:#E8C96A!important}
+.hero-equation .katex{font-size:1.5em!important;color:#67f0ff!important}
+.hero-equation .katex .mord{color:#67f0ff!important}
+.hero-equation .katex .mbin{color:#2979ff!important}
+.hero-equation .katex .mrel{color:#00e676!important}
+.hero-equation .katex .mop{color:#67f0ff!important}
 .hero-equation .katex .mopen,.hero-equation .katex .mclose{color:#BF8A4A!important}
-.hero-equation .katex .sqrt .sqrt-sign{color:#C9A84C!important}
-.hero-equation .katex .frac-line{border-bottom-color:#C9A84C!important}
-.hero-equation .katex .accent-body{color:#E8C96A!important}
+.hero-equation .katex .sqrt .sqrt-sign{color:#00e5ff!important}
+.hero-equation .katex .frac-line{border-bottom-color:#00e5ff!important}
+.hero-equation .katex .accent-body{color:#67f0ff!important}
 
 /* Derivation equation - 유도 단계 수식 */
 .deriv-equation .katex-display{margin:0!important;padding:0!important}
-.deriv-equation .katex{font-size:1.15em!important;color:#E8C96A!important}
-.deriv-equation .katex .mord{color:#E8C96A!important}
-.deriv-equation .katex .mord.mathnormal{color:#E8C96A!important}
-.deriv-equation .katex .mbin{color:#4A9EBF!important}
-.deriv-equation .katex .mrel{color:#4ABF8A!important}
-.deriv-equation .katex .mop{color:#E8C96A!important}
-.deriv-equation .katex .sqrt .sqrt-sign{color:#C9A84C!important}
-.deriv-equation .katex .sqrt .vlist{color:#E8C96A!important}
-.deriv-equation .katex .frac-line{border-bottom-color:#C9A84C!important}
+.deriv-equation .katex{font-size:1.15em!important;color:#67f0ff!important}
+.deriv-equation .katex .mord{color:#67f0ff!important}
+.deriv-equation .katex .mord.mathnormal{color:#67f0ff!important}
+.deriv-equation .katex .mbin{color:#2979ff!important}
+.deriv-equation .katex .mrel{color:#00e676!important}
+.deriv-equation .katex .mop{color:#67f0ff!important}
+.deriv-equation .katex .sqrt .sqrt-sign{color:#00e5ff!important}
+.deriv-equation .katex .sqrt .vlist{color:#67f0ff!important}
+.deriv-equation .katex .frac-line{border-bottom-color:#00e5ff!important}
 .deriv-equation .katex .mopen,.deriv-equation .katex .mclose{color:#BF8A4A!important}
-.deriv-equation .katex .accent-body{color:#E8C96A!important}
+.deriv-equation .katex .accent-body{color:#67f0ff!important}
 
 /* 일반 영역 수식 */
-.katex{color:#E8C96A!important}
-.katex .mord{color:#E8C96A!important}
-.katex .mbin{color:#4A9EBF!important}
-.katex .mrel{color:#4ABF8A!important}
-.katex .mop{color:#E8C96A!important}
-.katex .frac-line{border-bottom-color:rgba(201,168,76,0.6)!important}
-.katex .sqrt .sqrt-sign{color:#C9A84C!important}
+.katex{color:#67f0ff!important}
+.katex .mord{color:#67f0ff!important}
+.katex .mbin{color:#2979ff!important}
+.katex .mrel{color:#00e676!important}
+.katex .mop{color:#67f0ff!important}
+.katex .frac-line{border-bottom-color:rgba(0,229,255,0.6)!important}
+.katex .sqrt .sqrt-sign{color:#00e5ff!important}
 
 /* katex-display 블록 스타일 */
 .katex-display{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:4px 0}
 .katex-display>.katex{text-align:center!important}
 
 /* Hero equation 박스 강화 */
-.hero-equation{display:inline-block;background:linear-gradient(135deg,#0D1017 0%,#151A25 100%);border:1px solid rgba(201,168,76,0.3);border-radius:16px;padding:24px 48px;margin-bottom:32px;box-shadow:0 4px 20px rgba(201,168,76,0.1),0 0 40px rgba(201,168,76,0.03);position:relative;overflow:visible;max-width:100%}
-.hero-equation::before{content:'';position:absolute;inset:-1px;border-radius:16px;background:linear-gradient(135deg,rgba(201,168,76,0.2),transparent,rgba(201,168,76,0.1));z-index:0;pointer-events:none}
+.hero-equation{display:inline-block;background:linear-gradient(135deg,rgba(3,7,18,0.9) 0%,#151A25 100%);border:1px solid rgba(0,229,255,0.3);border-radius:16px;padding:24px 48px;margin-bottom:32px;box-shadow:0 4px 20px rgba(0,229,255,0.1),0 0 40px rgba(0,229,255,0.03);position:relative;overflow:visible;max-width:100%}
+.hero-equation::before{content:'';position:absolute;inset:-1px;border-radius:16px;background:linear-gradient(135deg,rgba(0,229,255,0.2),transparent,rgba(0,229,255,0.1));z-index:0;pointer-events:none}
 
 /* Deriv equation 박스 강화 */
-.deriv-equation{background:linear-gradient(135deg,rgba(13,16,23,0.8),rgba(21,26,37,0.6));border-left:3px solid #C9A84C;border-radius:0 12px 12px 0;padding:16px 20px;margin:12px 0;box-shadow:0 2px 12px rgba(0,0,0,0.3);transition:border-color 0.3s,box-shadow 0.3s}
-.deriv-equation:hover{border-left-color:#E8C96A;box-shadow:0 4px 16px rgba(201,168,76,0.15)}
+.deriv-equation{background:linear-gradient(135deg,rgba(13,16,23,0.8),rgba(21,26,37,0.6));border-left:3px solid #00e5ff;border-radius:0 12px 12px 0;padding:16px 20px;margin:12px 0;box-shadow:0 2px 12px rgba(0,0,0,0.3);transition:border-color 0.3s,box-shadow 0.3s}
+.deriv-equation:hover{border-left-color:#67f0ff;box-shadow:0 4px 16px rgba(0,229,255,0.15)}
 
 /* 모바일 반응형 */
 @media(max-width:640px){
@@ -232,7 +1038,7 @@ table.param-table tr:last-child td{border-bottom:none}
 td .katex,th .katex{font-size:0.9em!important}
 
 /* 수식 에러 폴백 */
-.katex-error{color:#E8C96A;font-family:'JetBrains Mono',monospace;font-style:italic}
+.katex-error{color:#67f0ff;font-family:'JetBrains Mono',monospace;font-style:italic}
 </style>
 
 <!-- KaTeX Auto-Render -->
@@ -267,7 +1073,7 @@ td .katex,th .katex{font-size:0.9em!important}
 <!-- ① STICKY HEADER -->
 <header class="sticky-header">
   <div class="header-inner">
-    <div class="header-brand"><a href="index.html" style="color:inherit;text-decoration:none;">YS · 진동학 마스터</a> / Day 55</div>
+    <div class="header-brand"><a href="index.html" style="color:inherit;text-decoration:none;">CYBER DYNAMICS</a> / Day 55</div>
     <div class="header-progress-wrap">
       <span>55 / 60</span>
       <div class="header-progress-bar"><div class="header-progress-fill" style="width:92%"></div></div>
@@ -285,7 +1091,7 @@ td .katex,th .katex{font-size:0.9em!important}
 
     <div class="container">
         <!-- Series Info -->
-        <div class="series-info">차량동역학 60일 완성 시리즈</div>
+        <div class="series-info">FUTURE GPX VEHICLE DYNAMICS — 60 DAY MASTER COURSE</div>
 
         <!-- Hero Section -->
         <div class="hero">
@@ -303,7 +1109,7 @@ td .katex,th .katex{font-size:0.9em!important}
             </div>
             <!-- Hero Equation: 7-DOF state vector -->
             <div class="math-block" style="margin:1.2rem 0;">
-                <span class="katex"><span class="katex-html"><span class="base"><span class="mord mathbf" style="color:var(--gold);">q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mopen">[</span><span class="mord mathnormal">z</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05556em;">θ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05556em;">ϕ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">FL</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">FR</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">RL</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">RR</span></span></span></span></span></span></span></span><span class="mclose">]</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span></span></span>
+                <span class="katex"><span class="katex-html"><span class="base"><span class="mord mathbf" style="color:var(--cyan);">q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mopen">[</span><span class="mord mathnormal">z</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05556em;">θ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05556em;">ϕ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">FL</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">FR</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">RL</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">RR</span></span></span></span></span></span></span></span><span class="mclose">]</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span></span></span>
             </div>
             <div class="meta-badges">
                 <span class="meta-badge">7-DOF 모델</span>
@@ -382,9 +1188,9 @@ td .katex,th .katex{font-size:0.9em!important}
         
 
 <!-- ══════ ENHANCED DERIVATION DETAIL ══════ -->
-<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue,#4A9EBF);">
-  <div class="deriv-step-num" style="color:var(--blue,#4A9EBF);">📐 상세 유도과정 (Step-by-Step)</div>
-  <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:20px;color:var(--text-bright,#E8E4D9);margin-bottom:16px;">중간 과정 완전 전개</h3>
+<div class="deriv-card" style="animation:fadeUp 0.6s ease both;border-left-color:var(--blue);">
+  <div class="deriv-step-num" style="color:var(--blue);">📐 상세 유도과정 (Step-by-Step)</div>
+  <h3 style="font-family:'Orbitron',sans-serif;font-weight:600;font-size:20px;color:var(--text-bright);margin-bottom:16px;">중간 과정 완전 전개</h3>
   <div class="sub-step">
     <p class="sub-label">① 7-DOF 풀카 상태벡터</p>
     <div class="sub-eq">$$\mathbf{x} = [z_s, \dot{z}_s, \phi, \dot{\phi}, \theta, \dot{\theta}, z_{uf}, \dot{z}_{uf}, z_{ur}, \dot{z}_{ur}, ...]^T$$</div>
@@ -507,7 +1313,7 @@ td .katex,th .katex{font-size:0.9em!important}
                 <text x="260" y="205" fill="var(--green)" font-size="12" font-weight="600">ϕ (Roll)</text>
                 <!-- Pitch arrow (curved) -->
                 <path d="M500,230 A40,40 0 0,0 540,230" fill="none" stroke="var(--purple)" stroke-width="2"/>
-                <text x="505" y="215" fill="var(--purple)" font-size="12" font-weight="600">$\theta$ (Pitch)</text>
+                <text x="505" y="215" fill="var(--purple)" font-size="12" font-weight="600">θ (Pitch)</text>
                 <!-- Dimension arrows -->
                 <line x1="150" y1="155" x2="400" y2="155" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4,3"/>
                 <text x="275" y="150" text-anchor="middle" fill="var(--muted)" font-size="10">a = 1.15 m</text>
@@ -565,7 +1371,7 @@ td .katex,th .katex{font-size:0.9em!important}
                 <!-- 4-Post Rig Section -->
                 <rect x="10" y="160" width="780" height="130" rx="8" fill="var(--surface)" stroke="var(--gold)" stroke-width="1.5"/>
                 <text x="400" y="185" text-anchor="middle" fill="var(--gold)" font-size="13" font-weight="600">4-Post Rig 시뮬레이션</text>
-                <text x="400" y="205" text-anchor="middle" fill="var(--muted)" font-size="10">4개 유압 실린더로 각 코너에 독립적 노면 가진 $\rightarrow$ Bounce/Roll/Pitch/Warp 모드 분리 가능</text>
+                <text x="400" y="205" text-anchor="middle" fill="var(--muted)" font-size="10">4개 유압 실린더로 각 코너에 독립적 노면 가진 → Bounce/Roll/Pitch/Warp 모드 분리 가능</text>
                 <!-- 4 actuators -->
                 <rect x="100" y="220" width="40" height="50" rx="3" fill="var(--blue)" opacity="0.6"/>
                 <text x="120" y="250" text-anchor="middle" fill="white" font-size="9">FL</text>
@@ -586,22 +1392,22 @@ td .katex,th .katex{font-size:0.9em!important}
             <div class="step">
                 <div class="step-number">01</div>
                 <div class="step-title">차체 Body 정의</div>
-                <p>SIMPACK Body 요소로 Sprung Mass 생성: 질량(M<sub>s</sub>), CG 위치, 관성 텐서(I<sub>xx</sub>, I<sub>yy</sub>, I<sub>zz</sub>, I<sub>xz</sub>) 입력. <code>Body $\rightarrow$ Properties $\rightarrow$ Inertia $\rightarrow$ Manual</code>에서 6개 관성모멘트 성분을 설정합니다.</p>
+                <p>SIMPACK Body 요소로 Sprung Mass 생성: 질량(M<sub>s</sub>), CG 위치, 관성 텐서(I<sub>xx</sub>, I<sub>yy</sub>, I<sub>zz</sub>, I<sub>xz</sub>) 입력. <span class="calc-code">Body $\rightarrow$ Properties $\rightarrow$ Inertia $\rightarrow$ Manual</span>에서 6개 관성모멘트 성분을 설정합니다.</p>
             </div>
             <div class="step">
                 <div class="step-number">02</div>
                 <div class="step-title">서스펜션 연결</div>
-                <p>4개 코너에 <code>Force Element $\rightarrow$ Spring-Damper Parallel</code> 배치. 전륜/후륜 별도 강성·감쇠 값 적용. ARB는 <code>Force Element $\rightarrow$ Torsion Spring</code>으로 좌·우 바퀴 상대 변위에 반력을 줍니다.</p>
+                <p>4개 코너에 <span class="calc-code">Force Element $\rightarrow$ Spring-Damper Parallel</span> 배치. 전륜/후륜 별도 강성·감쇠 값 적용. ARB는 <span class="calc-code">Force Element $\rightarrow$ Torsion Spring</span>으로 좌·우 바퀴 상대 변위에 반력을 줍니다.</p>
             </div>
             <div class="step">
                 <div class="step-number">03</div>
                 <div class="step-title">타이어 모델 연결</div>
-                <p><code>Tire $\rightarrow$ SIMPACK Road</code>에서 Belgian Block, ISO Class C 등 노면 프로파일 정의. 각 Unsprung Mass에 Point-Follower 또는 Pac2002 타이어 모델을 연결합니다.</p>
+                <p><span class="calc-code">Tire $\rightarrow$ SIMPACK Road</span>에서 Belgian Block, ISO Class C 등 노면 프로파일 정의. 각 Unsprung Mass에 Point-Follower 또는 Pac2002 타이어 모델을 연결합니다.</p>
             </div>
             <div class="step">
                 <div class="step-number">04</div>
                 <div class="step-title">4-Post Rig 가진 설정</div>
-                <p>4개 독립 가진(z<sub>r,FL</sub>~z<sub>r,RR</sub>)을 시간 이력 또는 PSD 입력으로 정의. <code>Excitation $\rightarrow$ Time History</code>에서 각 코너별 노면 프로파일을 설정하여 실제 시험과 동일한 조건을 재현합니다.</p>
+                <p>4개 독립 가진(z<sub>r,FL</sub>~z<sub>r,RR</sub>)을 시간 이력 또는 PSD 입력으로 정의. <span class="calc-code">Excitation $\rightarrow$ Time History</span>에서 각 코너별 노면 프로파일을 설정하여 실제 시험과 동일한 조건을 재현합니다.</p>
             </div>
             <div class="code-block">
                 <div class="code-header">SIMPACK 7-DOF 모델 설정 스크립트</div>
@@ -654,7 +1460,7 @@ td .katex,th .katex{font-size:0.9em!important}
                 <div class="math-block">
                     <span class="katex"><span class="katex-html"><span class="base"><span class="mord"><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">bounce</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mopen" style="font-size:1.2em;">(</span><span class="mord">1</span><span class="mord">/</span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.05556em;">π</span><span class="mclose" style="font-size:1.2em;">)</span></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.04em;"><span class="svg-align"><span class="mord" style="padding-left:0.833em;"><span class="mopen">(</span><span class="mord">2</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span></span></span></span></span></span></span></span><span class="mbin">+</span><span class="mord">2</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord">/</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
                 </div>
-                <p>= (1/2$\pi$) $\sqrt{\cdot}$((2$\times$25000 + 2$\times$22000) / 1400) = (1/2$\pi$) $\sqrt{\cdot}$(94000/1400) = (1/2$\pi$) $\sqrt{\cdot}$67.14 = <strong>1.30 Hz</strong></p>
+                <p>= (1/2$\pi$) $\sqrt{(2 \times 25000 + 2 \times 22000}$ / 1400) = (1/2$\pi$) $\sqrt{94000/1400}$ = (1/2$\pi$) $\sqrt{67.14}$ = <strong>1.30 Hz</strong></p>
             </div>
 
             <div class="step">
@@ -664,7 +1470,7 @@ td .katex,th .katex{font-size:0.9em!important}
                 <p>K<sub>roll,eff</sub> = 2k<sub>f</sub>·t<sub>f</sub>² + 2k<sub>r</sub>·t<sub>r</sub>² + k<sub>ARB,f</sub> + k<sub>ARB,r</sub></p>
                 <p>= 2$\times$25000$\times$0.78² + 2$\times$22000$\times$0.77² + 28000 + 15000</p>
                 <p>= 30,420 + 26,103 + 43,000 = 99,523 Nm/rad</p>
-                <p>f<sub>roll</sub> = (1/2$\pi$)$\sqrt{\cdot}$(K<sub>roll,eff</sub>/I<sub>xx</sub>) = (1/2$\pi$)$\sqrt{\cdot}$(99523/600) = <strong>2.05 Hz</strong></p>
+                <p>f<sub>roll</sub> = (1/2$\pi$)$\sqrt{K<sub>roll,eff</sub>/I<sub>xx</sub>}$ = (1/2$\pi$)$\sqrt{99523/600}$ = <strong>2.05 Hz</strong></p>
             </div>
 
             <div class="step">
@@ -673,14 +1479,14 @@ td .katex,th .katex{font-size:0.9em!important}
                 <p>K<sub>pitch,eff</sub> = 2k<sub>f</sub>·a² + 2k<sub>r</sub>·b²</p>
                 <p>= 2$\times$25000$\times$1.15² + 2$\times$22000$\times$1.55²</p>
                 <p>= 66,125 + 105,710 = 171,835 Nm/rad</p>
-                <p>f<sub>pitch</sub> = (1/2$\pi$)$\sqrt{\cdot}$(171835/2200) = (1/2$\pi$)$\sqrt{\cdot}$78.11 = <strong>1.41 Hz</strong></p>
+                <p>f<sub>pitch</sub> = (1/2$\pi$)$\sqrt{171835/2200}$ = (1/2$\pi$)$\sqrt{78.11}$ = <strong>1.41 Hz</strong></p>
             </div>
 
             <div class="step">
                 <div class="step-number">풀이 4</div>
                 <div class="step-title">Bounce 감쇠비</div>
-                <p>$\zeta$<sub>bounce</sub> = Σc / (2$\sqrt{\cdot}$(Σk · M<sub>s</sub>))</p>
-                <p>= (2$\times$2000 + 2$\times$1800) / (2$\sqrt{\cdot}$(94000 $\times$ 1400))</p>
+                <p>$\zeta$<sub>bounce</sub> = Σc / (2$\sqrt{Σk · M<sub>s</sub>}$)</p>
+                <p>= (2$\times$2000 + 2$\times$1800) / (2$\sqrt{94000  \times  1400}$)</p>
                 <p>= 7600 / (2 $\times$ 11,467.8) = 7600 / 22,935.6 = <strong>0.331</strong> (33.1%)</p>
             </div>
         </div>
@@ -730,7 +1536,7 @@ td .katex,th .katex{font-size:0.9em!important}
     addBtn('워프', ()=>{animMode=4;animT=0;run();});
     function run(){if(afId)cancelAnimationFrame(afId);animT+=0.05;draw();if(animT<15)afId=requestAnimationFrame(run);}
     function draw() {
-      ctx.fillStyle='#0a0c10'; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#020510'; ctx.fillRect(0,0,W,H);
       const cx=W/2,cy=H/2,cW=250,cH=100;
       const a=Math.sin(8*animT)*15;
       ctx.save();ctx.translate(cx,cy);
@@ -738,12 +1544,12 @@ td .katex,th .katex{font-size:0.9em!important}
       if(animMode===2)ctx.rotate(a*0.005);
       if(animMode===3){/*roll: tilt perspective*/ctx.transform(1,0,a*0.005,1,0,0);}
       if(animMode===4){ctx.transform(1,a*0.003,0,1,0,0);}
-      ctx.fillStyle='rgba(201,168,76,0.2)';ctx.strokeStyle='#C9A84C';ctx.lineWidth=2;
+      ctx.fillStyle='rgba(0,229,255,0.2)';ctx.strokeStyle='#00e5ff';ctx.lineWidth=2;
       ctx.fillRect(-cW/2,-cH/2,cW,cH);ctx.strokeRect(-cW/2,-cH/2,cW,cH);
-      ctx.fillStyle='#E06C75';ctx.beginPath();ctx.arc(0,0,4,0,2*Math.PI);ctx.fill();
+      ctx.fillStyle='#ff2d78';ctx.beginPath();ctx.arc(0,0,4,0,2*Math.PI);ctx.fill();
       ctx.restore();
       const modes=['','Bounce (상하)','Pitch (전후회전)','Roll (좌우회전)','Warp (비틀림)'];
-      ctx.fillStyle='#C9A84C';ctx.font='bold 14px sans-serif';ctx.fillText('Mode: '+modes[animMode],10,25);
+      ctx.fillStyle='#00e5ff';ctx.font='bold 13px Orbitron,monospace';ctx.fillText('Mode: '+modes[animMode],10,25);
       setMetrics([['모드 수','7개 (4 body + 4 wheel-hop - 1)'],['바운스','~1.2 Hz'],['피치','~1.5 Hz'],['롤','~1.8 Hz']]);
     }
 
@@ -809,8 +1615,8 @@ td .katex,th .katex{font-size:0.9em!important}
                 <div class="accordion-content">
                     <div class="accordion-inner">
                     <p>7-DOF에 Yaw, Lateral, Longitudinal, 그리고 4바퀴 회전($\omega$)을 추가하면 14-DOF가 됩니다. 이 모델은 <strong>조향 응답</strong>과 <strong>제동 안정성</strong>까지 해석할 수 있어 실제 차량 개발에서 가장 많이 사용됩니다. 특히 ESC(Electronic Stability Control) 알고리즘 개발에 필수적인 모델입니다.</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">풀카 DOF: 바디 $6$ DOF ($x, y, z, \phi, \theta, \psi$) + 휠 $4 \times 1$ DOF (바운스) + 스티어링 $= 11\text{~}14$ DOF</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">질량 행렬: $[M]_{14\times14}$, &nbsp; 강성 행렬: $[K]_{14\times14} \rightarrow$ 고유치 $14$개</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">풀카 DOF: 바디 $6$ DOF ($x, y, z, \phi, \theta, \psi$) + 휠 $4 \times 1$ DOF (바운스) + 스티어링 $= 11\text{~}14$ DOF</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">질량 행렬: $[M]_{14\times14}$, &nbsp; 강성 행렬: $[K]_{14\times14} \rightarrow$ 고유치 $14$개</p>
                     <p>추가 자유도: Yaw(ψ), Lateral(y), Longitudinal(x), $\omega$<sub>FL</sub>, $\omega$<sub>FR</sub>, $\omega$<sub>RL</sub>, $\omega$<sub>RR</sub></p>
                     </div>
                 </div>
@@ -824,8 +1630,8 @@ td .katex,th .katex{font-size:0.9em!important}
                 <div class="accordion-content">
                     <div class="accordion-inner">
                     <p>실제 서스펜션에서 스프링은 Progressive Rate(하중에 따라 강성 증가), 댐퍼는 속도 의존 비선형 특성을 가집니다. 7-DOF 모델에 이 비선형성을 추가하면:</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">비선형 스프링: $F_s = k_1 x + k_3 x^3 \rightarrow$ 진폭 의존 고유진동수: $\omega_n(A) = \omega_0\sqrt{1 + \frac{3k_3 A^2}{4k_1}}$</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">비대칭 댐퍼: $c(\dot{x}) = \begin{cases} c_b & \dot{x} > 0 \\ c_r & \dot{x} < 0 \end{cases}$ → $c_r/c_b \approx 2\text{~}3$</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">비선형 스프링: $F_s = k_1 x + k_3 x^3 \rightarrow$ 진폭 의존 고유진동수: $\omega_n(A) = \omega_0\sqrt{1 + \frac{3k_3 A^2}{4k_1}}$</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">비대칭 댐퍼: $c(\dot{x}) = \begin{cases} c_b & \dot{x} > 0 \\ c_r & \dot{x} < 0 \end{cases}$ → $c_r/c_b \approx 2\text{~}3$</p>
                     <p>• <strong>Bump Stop</strong>: 큰 변위에서 급격한 강성 증가 $\rightarrow$ Jounce/Rebound 리미트</p>
                     <p>• <strong>댐퍼 Blow-off</strong>: 고속 영역에서 밸브가 열려 감쇠력 포화</p>
                     <p>• <strong>부시 히스테리시스</strong>: 고무 부시의 에너지 흡수로 추가 감쇠 발생</p>
@@ -842,9 +1648,9 @@ td .katex,th .katex{font-size:0.9em!important}
                 <div class="accordion-content">
                     <div class="accordion-inner">
                     <p>풀카 모델의 가장 큰 가치는 <strong>Ride(승차감)</strong>와 <strong>Handling(조종성)</strong> 간의 트레이드오프를 정량적으로 분석할 수 있다는 점입니다.</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">승차감 지표: $a_w = \sqrt{\int W^2(f) \cdot S_a(f) \, df} \rightarrow$ ISO 2631</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">핸들링 지표: $\Delta F_z/F_z$ (접지 하중 변동률) $\rightarrow < 0.3$이면 양호</p>
-<p style="margin:10px 0;color:var(--gold-light);"><strong>르노코리아 실무 Tip:</strong> 풀카 모델에서 Ride와 Handling을 동시에 평가하려면 Sine Sweep + Step Steer를 순차 실행합니다.</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">승차감 지표: $a_w = \sqrt{\int W^2(f) \cdot S_a(f) \, df} \rightarrow$ ISO 2631</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">핸들링 지표: $\Delta F_z/F_z$ (접지 하중 변동률) $\rightarrow < 0.3$이면 양호</p>
+<p style="margin:10px 0;color:var(--cyan-light);"><strong>르노코리아 실무 Tip:</strong> 풀카 모델에서 Ride와 Handling을 동시에 평가하려면 Sine Sweep + Step Steer를 순차 실행합니다.</p>
                     <p><strong>전략 1: 전후 Roll 강성 배분</strong><br>전륜 ARB 강성↑ $\rightarrow$ Understeer 증가, Roll 감소. 후륜 ARB 강성↑ $\rightarrow$ Oversteer 경향, 후축 Ride 악화. 일반적으로 전:후 = 60:40 ~ 65:35 배분.</p>
                     <p><strong>전략 2: Bounce/Pitch 주파수 분리</strong><br>f<sub>pitch</sub>/f<sub>bounce</sub> $\approx$ 1.0~1.2일 때 최적. 비율이 1보다 크면 "Flat Ride"(갤럽 없는 주행감), 1보다 작으면 "Pitching" 발생.</p>
                     <p><strong>전략 3: 감쇠비 최적화</strong><br>Bounce $\zeta$ = 0.2~0.4, Roll $\zeta$ = 0.3~0.5가 일반적. 세미 액티브 댐퍼(CDC)를 사용하면 Comfort/Sport 모드 전환이 가능합니다.</p>
@@ -860,8 +1666,8 @@ td .katex,th .katex{font-size:0.9em!important}
                 <div class="accordion-content">
                     <div class="accordion-inner">
                     <p>실제 4-Post Rig 시험과 7-DOF 시뮬레이션을 비교하면 일반적으로:</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">4-Post 입력: $z_i(t) = A\sin(2\pi f t + \phi_i)$, &nbsp; $i = FL, FR, RL, RR$</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">상관성: $\frac{|H_{sim}(f) - H_{test}(f)|}{H_{test}(f)} < 10\%$ (주파수 $1\text{~}30$ Hz 대역)</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">4-Post 입력: $z_i(t) = A\sin(2\pi f t + \phi_i)$, &nbsp; $i = FL, FR, RL, RR$</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">상관성: $\frac{|H_{sim}(f) - H_{test}(f)|}{H_{test}(f)} < 10\%$ (주파수 $1\text{~}30$ Hz 대역)</p>
                     <p>• <strong>Bounce 주파수</strong>: $\pm$3% 이내 일치 (가장 정확)</p>
                     <p>• <strong>Roll 주파수</strong>: $\pm$5% (ARB 부시 강성 불확실성)</p>
                     <p>• <strong>Pitch 주파수</strong>: $\pm$4% (CG 위치 정확도 의존)</p>
@@ -879,8 +1685,8 @@ td .katex,th .katex{font-size:0.9em!important}
                 <div class="accordion-content">
                     <div class="accordion-inner">
                     <p>7-DOF 풀카 모델은 디지털 트윈의 <strong>물리 코어</strong> 역할을 합니다. 실시간 센서 데이터(가속도계, 자이로, 서스펜션 스트로크)를 입력받아 <strong>칼만 필터</strong>로 상태를 추정하고, 머신러닝으로 비선형 파라미터를 온라인 업데이트합니다.</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">실시간 요건: $t_{compute} < \Delta t_{step}$ → ROM: $n_{mode} \approx 20\text{~}50$개로 축소</p>
-<p style="margin:10px 0;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;">칼만 필터: $\hat{x}_{k+1} = A\hat{x}_k + Bu_k + K(y_k - C\hat{x}_k) \rightarrow$ 센서 데이터로 상태 보정</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">실시간 요건: $t_{compute} < \Delta t_{step}$ → ROM: $n_{mode} \approx 20\text{~}50$개로 축소</p>
+<p style="margin:10px 0;padding:10px;background:rgba(0,229,255,0.05);border-radius:6px;">칼만 필터: $\hat{x}_{k+1} = A\hat{x}_k + Bu_k + K(y_k - C\hat{x}_k) \rightarrow$ 센서 데이터로 상태 보정</p>
                     <p><strong>구현 파이프라인:</strong></p>
                     <p>1. 7-DOF 물리 모델 $\rightarrow$ State-Space 표현 (A, B, C, D 행렬)</p>
                     <p>2. Extended Kalman Filter $\rightarrow$ 실시간 상태 추정</p>
@@ -917,8 +1723,8 @@ td .katex,th .katex{font-size:0.9em!important}
         <div class="section-label">MEMORY</div>
         <div class="card">
             <h2>핵심 암기 포인트</h2>
-            <div class="highlight-box" style="border-left-color:var(--gold);">
-                <strong style="color:var(--gold);">7-DOF = 3 Body + 4 Wheel</strong><br>
+            <div class="highlight-box" style="border-left-color:var(--cyan);">
+                <strong style="color:var(--cyan);">7-DOF = 3 Body + 4 Wheel</strong><br>
                 차체: Bounce(z) + Roll(ϕ) + Pitch($\theta$) / 바퀴: z<sub>FL</sub>, z<sub>FR</sub>, z<sub>RL</sub>, z<sub>RR</sub>
             </div>
             <div class="highlight-box" style="border-left-color:var(--green);margin-top:0.8rem;">
@@ -974,72 +1780,308 @@ td .katex,th .katex{font-size:0.9em!important}
 }
 
 /* === Enhanced: Simulation & Sub-step Styles === */
-.sim-container{background:var(--surface,#12151C);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:24px;margin:24px 0}
-.sim-container h3{color:var(--gold,#C9A84C);margin:0 0 16px;font-size:18px}
-.sim-canvas-wrap{background:#0a0c10;border-radius:8px;overflow:hidden;margin-bottom:16px;text-align:center}
-.sim-canvas-wrap canvas{display:block;margin:0 auto}
+
+/* ╔══════════════════════════════════════════════════╗
+   ║  CYBER COCKPIT — SIMULATION MODULE v2.0         ║
+   ╚══════════════════════════════════════════════════╝ */
+
+/* ── Container: HUD Frame ── */
+.sim-container{
+  background:linear-gradient(135deg,rgba(6,22,48,0.92),rgba(3,7,18,0.95));
+  border:1px solid rgba(0,229,255,0.25);
+  border-radius:4px;
+  padding:0;margin:28px 0;
+  overflow:hidden;position:relative;
+  box-shadow:0 0 30px rgba(0,229,255,0.08),inset 0 0 60px rgba(0,229,255,0.02)
+}
+.sim-container::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,#00e5ff 30%,#ff2d78 70%,transparent);
+  box-shadow:0 0 12px rgba(0,229,255,0.5);z-index:2
+}
+.sim-container::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,229,255,0.3),transparent)
+}
+
+/* ── HUD Corner Brackets ── */
+.sim-container .sim-hud-corners{
+  position:absolute;inset:0;pointer-events:none;z-index:3
+}
+.sim-container .sim-hud-corners span{
+  position:absolute;width:16px;height:16px;
+  border-color:#00e5ff;border-style:solid;border-width:0;
+  opacity:0.6
+}
+.sim-container .sim-hud-corners span:nth-child(1){top:4px;left:4px;border-top-width:2px;border-left-width:2px}
+.sim-container .sim-hud-corners span:nth-child(2){top:4px;right:4px;border-top-width:2px;border-right-width:2px}
+.sim-container .sim-hud-corners span:nth-child(3){bottom:4px;left:4px;border-bottom-width:2px;border-left-width:2px}
+.sim-container .sim-hud-corners span:nth-child(4){bottom:4px;right:4px;border-bottom-width:2px;border-right-width:2px}
+
+/* ── Title Bar: System Header ── */
+.sim-title,.sim-container>h3{
+  font-family:'Orbitron',sans-serif!important;
+  font-weight:700;font-size:14px;
+  color:#00e5ff;
+  letter-spacing:3px;text-transform:uppercase;
+  background:linear-gradient(90deg,rgba(0,229,255,0.1),rgba(0,229,255,0.03));
+  padding:14px 24px;margin:0;
+  border-bottom:1px solid rgba(0,229,255,0.15);
+  display:flex;align-items:center;gap:12px;
+  position:relative
+}
+.sim-title::before,.sim-container>h3::before{
+  content:'◆';color:#ff2d78;font-size:10px;
+  animation:simTitleBlink 2s ease-in-out infinite;
+  text-shadow:0 0 8px rgba(255,45,120,0.6)
+}
+.sim-title::after,.sim-container>h3::after{
+  content:'SIMULATION MODULE';
+  position:absolute;right:24px;
+  font-size:9px;letter-spacing:4px;
+  color:rgba(0,229,255,0.3);font-weight:400
+}
+@keyframes simTitleBlink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* ── Canvas Viewport: Cockpit Window ── */
+.sim-canvas-wrap{
+  background:linear-gradient(180deg,#020510,#050d20);
+  border:none;border-radius:0;
+  padding:2px;margin:0;
+  position:relative;overflow:hidden;
+  border-top:1px solid rgba(0,229,255,0.1);
+  border-bottom:1px solid rgba(0,229,255,0.1)
+}
+.sim-canvas-wrap::before{
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,229,255,0.015) 3px,rgba(0,229,255,0.015) 4px),
+    linear-gradient(180deg,rgba(0,229,255,0.04),transparent 15%,transparent 85%,rgba(0,229,255,0.04));
+  border-radius:0
+}
+.sim-canvas-wrap::after{
+  content:'REC ●';position:absolute;top:12px;right:16px;z-index:2;
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  color:#ff2d78;letter-spacing:2px;
+  animation:recBlink 1.5s step-end infinite;
+  text-shadow:0 0 6px rgba(255,45,120,0.5)
+}
+@keyframes recBlink{0%,50%{opacity:1}51%,100%{opacity:0}}
+.sim-canvas-wrap canvas{
+  max-width:100%;border-radius:0;display:block;
+  position:relative;z-index:0
+}
+
+/* ── Controls Panel: Cockpit Instruments ── */
+.sim-controls{
+  display:flex;flex-wrap:wrap;gap:2px;
+  background:rgba(0,229,255,0.03);
+  padding:16px 20px;margin:0;
+  border-bottom:1px solid rgba(0,229,255,0.08)
+}
+
+/* ── Slider Group: Boost Lever ── */
+.sim-slider-group{
+  flex:1;min-width:180px;
+  background:linear-gradient(135deg,rgba(6,22,48,0.8),rgba(3,7,18,0.9));
+  border:1px solid rgba(0,229,255,0.12);
+  border-radius:4px;padding:14px 16px;
+  position:relative;overflow:hidden;
+  transition:border-color .3s
+}
+.sim-slider-group:hover{border-color:rgba(0,229,255,0.35)}
+.sim-slider-group::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,229,255,0.3),transparent)
+}
+.sim-slider-group label{
+  display:block;font-size:10px;color:#5a7a9a;
+  margin-bottom:8px;font-family:'Orbitron',sans-serif;
+  letter-spacing:2px;text-transform:uppercase
+}
+.sim-slider-group .sim-value,.sim-slider-group .sim-readout{
+  font-family:'Share Tech Mono',monospace;
+  font-size:18px;color:#00e5ff;text-align:right;
+  text-shadow:0 0 8px rgba(0,229,255,0.5);
+  margin-top:4px;
+  transition:color .2s,text-shadow .2s
+}
+
+/* ── Custom Range Slider ── */
+.sim-slider-group input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:6px;margin:8px 0;
+  background:linear-gradient(90deg,rgba(0,229,255,0.15),rgba(0,229,255,0.08));
+  border-radius:3px;outline:none;
+  border:1px solid rgba(0,229,255,0.1)
+}
+.sim-slider-group input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:18px;height:18px;border-radius:2px;
+  background:linear-gradient(135deg,#00e5ff,#2979ff);
+  cursor:pointer;
+  box-shadow:0 0 12px rgba(0,229,255,0.6),0 0 24px rgba(0,229,255,0.2);
+  border:2px solid rgba(255,255,255,0.3);
+  transition:box-shadow .2s,transform .1s
+}
+.sim-slider-group input[type=range]::-webkit-slider-thumb:hover{
+  box-shadow:0 0 18px rgba(0,229,255,0.8),0 0 36px rgba(0,229,255,0.3);
+  transform:scale(1.15)
+}
+.sim-slider-group input[type=range]::-webkit-slider-thumb:active{
+  background:linear-gradient(135deg,#ff2d78,#00e5ff);
+  box-shadow:0 0 20px rgba(255,45,120,0.6),0 0 40px rgba(0,229,255,0.3)
+}
+.sim-slider-group input[type=range]::-moz-range-thumb{
+  width:18px;height:18px;border-radius:2px;
+  background:linear-gradient(135deg,#00e5ff,#2979ff);
+  cursor:pointer;border:2px solid rgba(255,255,255,0.3);
+  box-shadow:0 0 12px rgba(0,229,255,0.6)
+}
+
+/* ── Buttons: Ignition Keys ── */
+.sim-btn{
+  background:linear-gradient(135deg,#00e5ff,#0097a7)!important;
+  color:#030712!important;
+  border:none!important;border-radius:4px!important;
+  padding:12px 28px!important;
+  font-family:'Orbitron',sans-serif!important;
+  font-size:12px!important;font-weight:700!important;
+  letter-spacing:2px!important;text-transform:uppercase!important;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:all .3s!important;
+  box-shadow:0 0 16px rgba(0,229,255,0.3),inset 0 1px 0 rgba(0,229,255,0.07)!important
+}
+.sim-btn:hover{
+  background:linear-gradient(135deg,#67f0ff,#00e5ff)!important;
+  transform:translateY(-2px)!important;
+  box-shadow:0 4px 20px rgba(0,229,255,0.5),0 0 30px rgba(0,229,255,0.2)!important
+}
+.sim-btn:active{
+  transform:translateY(0) scale(0.98)!important;
+  box-shadow:0 0 24px rgba(0,229,255,0.6),inset 0 0 12px rgba(0,229,255,0.3)!important
+}
+.sim-btn::after{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(circle,rgba(0,229,255,0.06),transparent 60%);
+  opacity:0;transition:opacity .3s;pointer-events:none
+}
+.sim-btn:hover::after{opacity:1}
+
+/* ── Secondary Button: System Command ── */
+.sim-btn-secondary{
+  background:rgba(6,22,48,0.8)!important;
+  color:#5a7a9a!important;
+  border:1px solid rgba(0,229,255,0.2)!important;
+  box-shadow:none!important;
+  letter-spacing:2px!important
+}
+.sim-btn-secondary:hover{
+  background:rgba(0,229,255,0.08)!important;
+  color:#00e5ff!important;
+  border-color:rgba(0,229,255,0.4)!important;
+  box-shadow:0 0 12px rgba(0,229,255,0.15)!important
+}
+
+/* ── Button Container ── */
+.sim-btn-group{
+  display:flex;gap:10px;padding:16px 20px;
+  background:rgba(0,229,255,0.02);
+  border-bottom:1px solid rgba(0,229,255,0.06)
+}
+
+/* ── Readout: Telemetry Display ── */
+.sim-readout{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:2px;margin:0;
+  background:rgba(0,229,255,0.03);padding:12px 20px
+}
+.sim-metric,.sim-metrics>div{
+  background:linear-gradient(135deg,rgba(6,22,48,0.9),rgba(3,7,18,0.95));
+  border:1px solid rgba(0,229,255,0.1);
+  border-radius:4px;padding:12px 14px;text-align:center;
+  position:relative;overflow:hidden;
+  transition:border-color .3s
+}
+.sim-metric:hover{border-color:rgba(0,229,255,0.3)}
+.sim-metric::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(0,229,255,0.2),transparent)
+}
+.sim-metric .sm-label,.sim-metric strong{
+  font-size:9px!important;color:#4a6a8a;
+  font-family:'Orbitron',sans-serif;
+  letter-spacing:2px;text-transform:uppercase;
+  font-weight:400!important;display:block;margin-bottom:4px
+}
+.sim-metric .sm-value{
+  font-family:'Share Tech Mono',monospace;
+  font-size:20px;color:#00e5ff;
+  font-weight:500;display:block;
+  text-shadow:0 0 10px rgba(0,229,255,0.5);
+  letter-spacing:1px;
+  transition:color .3s,text-shadow .3s
+}
+
+/* ── Metrics Container (Pattern B) ── */
+.sim-metrics{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:4px;padding:12px 20px;
+  background:rgba(0,229,255,0.02)
+}
+
+/* ── Running State Animation ── */
+@keyframes simRunning{
+  0%{border-color:rgba(0,229,255,0.25)}
+  50%{border-color:rgba(255,45,120,0.4)}
+  100%{border-color:rgba(0,229,255,0.25)}
+}
+@keyframes simRunningGlow{
+  0%{box-shadow:0 0 30px rgba(0,229,255,0.08)}
+  50%{box-shadow:0 0 40px rgba(0,229,255,0.15),0 0 60px rgba(255,45,120,0.05)}
+  100%{box-shadow:0 0 30px rgba(0,229,255,0.08)}
+}
+@keyframes telemetryFlash{
+  0%{color:#00e5ff;text-shadow:0 0 10px rgba(0,229,255,0.5)}
+  50%{color:#67f0ff;text-shadow:0 0 16px rgba(0,229,255,0.8)}
+  100%{color:#00e5ff;text-shadow:0 0 10px rgba(0,229,255,0.5)}
+}
+.sim-container.sim-running{
+  animation:simRunning 2s ease-in-out infinite,simRunningGlow 2s ease-in-out infinite
+}
+.sim-container.sim-running .sim-metric .sm-value{
+  animation:telemetryFlash 1.5s ease-in-out infinite
+}
+.sim-container.sim-running .sim-canvas-wrap::after{
+  color:#00e676;content:'LIVE ●'
+}
+
+/* ── Responsive ── */
+@media(max-width:640px){
+  .sim-controls{padding:12px}
+  .sim-slider-group{min-width:140px;padding:10px 12px}
+  .sim-slider-group .sim-value,.sim-slider-group .sim-readout{font-size:14px}
+  .sim-metric .sm-value{font-size:16px}
+  .sim-title::after,.sim-container>h3::after{display:none}
+}
+
 .sim-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
 .sim-slider-group{flex:1;min-width:180px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px}
 .sim-slider-group label{display:block;color:var(--text-dim,#8A8F98);font-size:12px;margin-bottom:4px}
-.sim-slider-group input[type=range]{width:100%;accent-color:var(--gold,#C9A84C)}
-.sim-readout{color:var(--gold,#C9A84C);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
+.sim-slider-group input[type=range]{width:100%;accent-color:var(--cyan)}
+.sim-readout{color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:4px}
 .sim-metrics{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
-.sim-metric{background:rgba(74,158,191,0.1);border:1px solid rgba(74,158,191,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue,#4A9EBF)}
-.sim-metric strong{color:var(--gold,#C9A84C)}
-.sim-btn{background:var(--gold,#C9A84C);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
+.sim-metric{background:rgba(41,121,255,0.1);border:1px solid rgba(41,121,255,0.3);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue)}
+.sim-metric strong{color:var(--cyan)}
+.sim-btn{background:var(--cyan);color:#000;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:13px}
 .sim-btn:hover{filter:brightness(1.15)}
-.sub-step{background:rgba(74,158,191,0.05);border-left:3px solid var(--blue,#4A9EBF);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
-.sub-step h4{color:var(--blue,#4A9EBF);margin:0 0 8px;font-size:15px}
-.derivation-detail{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:16px;margin:12px 0}
-.derivation-detail h4{color:var(--gold,#C9A84C);margin:0 0 8px}
+.sub-step{background:rgba(41,121,255,0.05);border-left:3px solid var(--blue);padding:16px;margin:12px 0;border-radius:0 8px 8px 0}
+.sub-step h4{color:var(--blue);margin:0 0 8px;font-size:15px}
+.derivation-detail{background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.15);border-radius:8px;padding:16px;margin:12px 0}
+.derivation-detail h4{color:var(--cyan);margin:0 0 8px}
 </style>
 
 <script>
-/* Accordion */
-document.addEventListener('click', function(e) {
-    var hdr = e.target.closest('.accordion-header, .accordion-toggle');
-    if (hdr) {
-        var content = hdr.nextElementSibling;
-        if (content) {
-            content.classList.toggle('open');
-            var nowOpen = content.classList.contains('open');
-            var arrow = hdr.querySelector('.accordion-arrow, span:last-child');
-            if (arrow) {
-                if (arrow.textContent === '+' || arrow.textContent === '−') {
-                    arrow.textContent = nowOpen ? '−' : '+';
-                } else {
-                    arrow.style.transform = nowOpen ? 'rotate(180deg)' : 'rotate(0deg)';
-                }
-            }
-        }
-    }
-    /* Quiz Pattern C: data-correct click delegation */
-    var opt = e.target.closest('.quiz-opt');
-    if (opt) {
-        var card = opt.closest('.quiz-card');
-        if (card && card.dataset.correct) {
-            var options = card.querySelectorAll('.quiz-opt');
-            var correctIdx = parseInt(card.dataset.correct) - 1;
-            var clickedIdx = Array.from(options).indexOf(opt);
-            var isCorrect = clickedIdx === correctIdx;
-            options.forEach(function(o, i) {
-                o.style.pointerEvents = 'none';
-                o.style.opacity = '0.6';
-                if (i === correctIdx) {
-                    o.style.border = '2px solid var(--green, #4ABF8A)';
-                    o.style.opacity = '1';
-                    o.style.color = 'var(--green, #4ABF8A)';
-                }
-                if (o === opt && !isCorrect) {
-                    o.style.border = '2px solid #e74c3c';
-                    o.style.color = '#e74c3c';
-                }
-            });
-            var fb = card.querySelector('.quiz-feedback');
-            if (fb) { fb.style.display = 'block'; }
-        }
-    }
-});
 /* Quiz Pattern A: checkAnswer */
 function checkAnswer(qId, el, isCorrect) {
     var container = el.closest('.quiz-options') || document.getElementById(qId);
@@ -1050,8 +2092,8 @@ function checkAnswer(qId, el, isCorrect) {
         o.style.opacity = '0.6';
     });
     el.style.opacity = '1';
-    el.style.border = isCorrect ? '2px solid var(--green, #4ABF8A)' : '2px solid #e74c3c';
-    el.style.color = isCorrect ? 'var(--green, #4ABF8A)' : '#e74c3c';
+    el.style.border = isCorrect ? '2px solid var(--green, #00e676)' : '2px solid #e74c3c';
+    el.style.color = isCorrect ? 'var(--green, #00e676)' : '#e74c3c';
     /* Show feedback if exists */
     var fb = document.getElementById(qId + '-fb');
     if (fb) fb.style.display = 'block';
@@ -1076,16 +2118,440 @@ function toggleAnswer(arg) {
     }
 }
 
-/* Intersection Observer for fade-in */
-var obs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, {threshold: 0.1});
-document.querySelectorAll('.section').forEach(function(s) { obs.observe(s); });
+/* Old IntersectionObserver removed — replaced by CYBER HUD entrance */
 </script>
+
+
+
+<!-- CYBER CANVAS HUD OVERLAY ENGINE -->
+<script>
+(function(){
+  'use strict';
+
+  /* ══════ CYBER CANVAS THEME ══════ */
+  var CYBER = {
+    bg: '#020510',
+    grid: 'rgba(0,229,255,0.05)',
+    gridMajor: 'rgba(0,229,255,0.1)',
+    cyan: '#00e5ff',
+    magenta: '#ff2d78',
+    blue: '#2979ff',
+    green: '#00e676',
+    dimText: '#3d6080',
+    brightText: '#67f0ff',
+    cornerColor: 'rgba(0,229,255,0.4)',
+    scanlineAlpha: 0.015
+  };
+
+  /* ── Enhance each simulation canvas ── */
+  function enhanceCanvas(canvas) {
+    if (!canvas || canvas.dataset.cyberEnhanced) return;
+    canvas.dataset.cyberEnhanced = 'true';
+
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    /* ── Monkey-patch fillRect to add HUD overlay after bg clear ── */
+    var origFillRect = ctx.fillRect.bind(ctx);
+    var W = canvas.width, H = canvas.height;
+
+    ctx.fillRect = function(x, y, w, h) {
+      origFillRect(x, y, w, h);
+
+      /* Detect full-canvas clear (background fill) */
+      if (x === 0 && y === 0 && w >= W - 1 && h >= H - 1) {
+        /* Draw subtle radial glow */
+        var grad = ctx.createRadialGradient(W*0.3, H*0.5, 0, W*0.3, H*0.5, W*0.6);
+        grad.addColorStop(0, 'rgba(0,229,255,0.02)');
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        origFillRect(0, 0, W, H);
+
+        var grad2 = ctx.createRadialGradient(W*0.8, H*0.3, 0, W*0.8, H*0.3, W*0.4);
+        grad2.addColorStop(0, 'rgba(255,45,120,0.015)');
+        grad2.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad2;
+        origFillRect(0, 0, W, H);
+      }
+    };
+
+    /* ── Add line glow via shadow ── */
+    var origStroke = ctx.stroke.bind(ctx);
+    ctx.stroke = function() {
+      var lw = ctx.lineWidth;
+      var sc = ctx.strokeStyle;
+      /* Add glow for main data lines (thick lines) */
+      if (lw >= 2 && typeof sc === 'string') {
+        ctx.save();
+        if (sc.indexOf('00e5ff') > -1 || sc === CYBER.cyan) {
+          ctx.shadowColor = 'rgba(0,229,255,0.5)';
+          ctx.shadowBlur = 8;
+        } else if (sc.indexOf('2979ff') > -1 || sc === CYBER.blue) {
+          ctx.shadowColor = 'rgba(41,121,255,0.4)';
+          ctx.shadowBlur = 6;
+        } else if (sc.indexOf('ff2d78') > -1 || sc === CYBER.magenta) {
+          ctx.shadowColor = 'rgba(255,45,120,0.4)';
+          ctx.shadowBlur = 6;
+        } else if (sc.indexOf('00e676') > -1 || sc === CYBER.green) {
+          ctx.shadowColor = 'rgba(0,230,118,0.4)';
+          ctx.shadowBlur = 6;
+        }
+        origStroke();
+        ctx.restore();
+        return;
+      }
+      origStroke();
+    };
+
+    /* ── Add text glow via shadow ── */
+    var origFillText = ctx.fillText.bind(ctx);
+    ctx.fillText = function(text, x, y, maxW) {
+      var fc = ctx.fillStyle;
+      if (typeof fc === 'string' && (fc.indexOf('00e5ff') > -1 || fc.indexOf('67f0ff') > -1)) {
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,229,255,0.5)';
+        ctx.shadowBlur = 4;
+        if (maxW !== undefined) origFillText(text, x, y, maxW);
+        else origFillText(text, x, y);
+        ctx.restore();
+        return;
+      }
+      if (maxW !== undefined) origFillText(text, x, y, maxW);
+      else origFillText(text, x, y);
+    };
+  }
+
+  /* ── Post-draw HUD overlay (drawn once at end) ── */
+  function drawHUDOverlay(canvas) {
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+
+    ctx.save();
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+
+    /* Corner brackets */
+    var size = 14, pad = 4, lw = 1.5;
+    ctx.strokeStyle = CYBER.cornerColor;
+    ctx.lineWidth = lw;
+
+    /* Top-left */
+    ctx.beginPath();
+    ctx.moveTo(pad, pad + size); ctx.lineTo(pad, pad); ctx.lineTo(pad + size, pad);
+    ctx.stroke();
+    /* Top-right */
+    ctx.beginPath();
+    ctx.moveTo(W - pad - size, pad); ctx.lineTo(W - pad, pad); ctx.lineTo(W - pad, pad + size);
+    ctx.stroke();
+    /* Bottom-left */
+    ctx.beginPath();
+    ctx.moveTo(pad, H - pad - size); ctx.lineTo(pad, H - pad); ctx.lineTo(pad + size, H - pad);
+    ctx.stroke();
+    /* Bottom-right */
+    ctx.beginPath();
+    ctx.moveTo(W - pad - size, H - pad); ctx.lineTo(W - pad, H - pad); ctx.lineTo(W - pad, H - pad - size);
+    ctx.stroke();
+
+    /* Top edge glow line */
+    var edgeGrad = ctx.createLinearGradient(0, 0, W, 0);
+    edgeGrad.addColorStop(0, 'transparent');
+    edgeGrad.addColorStop(0.3, 'rgba(0,229,255,0.15)');
+    edgeGrad.addColorStop(0.7, 'rgba(255,45,120,0.1)');
+    edgeGrad.addColorStop(1, 'transparent');
+    ctx.strokeStyle = edgeGrad;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, 0.5); ctx.lineTo(W, 0.5); ctx.stroke();
+
+    /* Bottom edge glow line */
+    ctx.beginPath(); ctx.moveTo(0, H - 0.5); ctx.lineTo(W, H - 0.5); ctx.stroke();
+
+    ctx.restore();
+  }
+
+  /* ── Apply to all sim canvases ── */
+  document.querySelectorAll('.sim-canvas-wrap canvas').forEach(function(c) {
+    enhanceCanvas(c);
+  });
+
+  /* ── Also apply to any canvas inside sim-container ── */
+  document.querySelectorAll('.sim-container canvas').forEach(function(c) {
+    enhanceCanvas(c);
+  });
+
+  /* ── Override requestAnimationFrame to add HUD after each draw cycle ── */
+  /* Instead, use MutationObserver to detect canvas updates */
+  /* Actually, simpler: just run HUD overlay periodically on visible canvases */
+  var hudInterval = setInterval(function() {
+    document.querySelectorAll('.sim-container canvas[data-cyber-enhanced]').forEach(function(c) {
+      /* Check if canvas has content (not blank) */
+      var ctx = c.getContext('2d');
+      var pixel = ctx.getImageData(c.width/2, c.height/2, 1, 1).data;
+      if (pixel[0] > 0 || pixel[1] > 0 || pixel[2] > 0) {
+        drawHUDOverlay(c);
+      }
+    });
+  }, 200);
+
+  /* Stop after 30 seconds to save CPU */
+  setTimeout(function() { clearInterval(hudInterval); }, 30000);
+
+})();
+</script>
+
+<!-- CYBER COCKPIT SIM ENGINE -->
+<script>
+(function(){
+  'use strict';
+
+  /* ── Add HUD corner brackets to all sim-containers ── */
+  document.querySelectorAll('.sim-container').forEach(function(container){
+    if(container.querySelector('.sim-hud-corners')) return;
+    var corners = document.createElement('div');
+    corners.className = 'sim-hud-corners';
+    corners.innerHTML = '<span></span><span></span><span></span><span></span>';
+    container.appendChild(corners);
+  });
+
+  /* ── Intercept start/reset buttons for running state ── */
+  document.querySelectorAll('.sim-btn').forEach(function(btn){
+    var orig = btn.onclick;
+    btn.addEventListener('click', function(){
+      var container = btn.closest('.sim-container');
+      if(!container) return;
+      var text = (btn.textContent||'').toLowerCase();
+      if(text.indexOf('리셋') > -1 || text.indexOf('reset') > -1 || text.indexOf('↻') > -1){
+        container.classList.remove('sim-running');
+      } else {
+        container.classList.add('sim-running');
+        // Auto-remove after animation likely done
+        setTimeout(function(){ container.classList.remove('sim-running'); }, 8000);
+      }
+    });
+  });
+
+  /* ── Slider value glow on change ── */
+  document.querySelectorAll('.sim-slider-group input[type=range]').forEach(function(slider){
+    slider.addEventListener('input', function(){
+      var valEl = slider.parentElement.querySelector('.sim-value, .sim-readout');
+      if(valEl){
+        valEl.style.color = '#ff2d78';
+        valEl.style.textShadow = '0 0 12px rgba(255,45,120,0.6)';
+        setTimeout(function(){
+          valEl.style.color = '';
+          valEl.style.textShadow = '';
+        }, 400);
+      }
+    });
+  });
+
+})();
+</script>
+
+<!-- CYBER INTERACTIVE ENGINE -->
+<div id="scrollProgress"></div>
+<canvas id="cyberParticles"></canvas>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ══════ SYSTEM BOOT ══════ */
+  var boot = document.createElement('div');
+  boot.className = 'cyber-boot';
+  boot.innerHTML = '<div class="boot-logo">CYBER DYNAMICS</div>'
+    + '<div class="boot-status">INITIALIZING SYSTEM...</div>'
+    + '<div class="boot-bar-wrap"><div class="boot-bar-fill"></div></div>';
+  document.body.prepend(boot);
+  setTimeout(function(){ boot.classList.add('done'); }, 1800);
+  setTimeout(function(){ boot.remove(); }, 2500);
+
+  /* ══════ SCROLL PROGRESS ══════ */
+  var sp = document.getElementById('scrollProgress');
+  if(sp){
+    window.addEventListener('scroll', function(){
+      var h = document.documentElement.scrollHeight - window.innerHeight;
+      sp.style.width = (h > 0 ? (window.scrollY / h * 100) : 0) + '%';
+    }, {passive:true});
+  }
+
+  /* ══════ SECTION HUD ENTRANCE ══════ */
+  var sections = document.querySelectorAll('.section');
+  if(sections.length){
+    var sObs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.classList.add('hud-visible');
+          sObs.unobserve(e.target);
+        }
+      });
+    }, {threshold:0.1, rootMargin:'0px 0px -60px 0px'});
+    sections.forEach(function(s){ sObs.observe(s); });
+  }
+
+  /* ══════ GAUGE SCROLL CHARGE ══════ */
+  var gauges = document.querySelectorAll('.gauge-svg');
+  if(gauges.length){
+    var gObs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.classList.add('charged');
+          var wrap = e.target.closest('.gauge-wrap');
+          if(wrap) wrap.classList.add('active');
+          gObs.unobserve(e.target);
+        }
+      });
+    }, {threshold:0.5});
+    gauges.forEach(function(g){ gObs.observe(g); });
+  }
+
+  /* ══════ ACCORDION CYBER-OPEN + QUIZ PATTERN C ══════ */
+  document.addEventListener('click', function(e){
+    /* --- Accordion --- */
+    var toggle = e.target.closest('.accordion-header, .accordion-toggle');
+    if(toggle){
+      var content = toggle.nextElementSibling;
+      if(!content) return;
+      var isOpen = content.classList.contains('cyber-open') || content.classList.contains('open');
+      if(isOpen){
+        content.classList.remove('cyber-open','open');
+        content.style.display = 'none';
+        toggle.classList.remove('active');
+      } else {
+        content.style.display = 'block';
+        content.classList.add('cyber-open','open');
+        toggle.classList.add('active');
+      }
+      var arrow = toggle.querySelector('.accordion-arrow, span:last-child');
+      if(arrow){
+        if(arrow.textContent === '+' || arrow.textContent === '−'){
+          arrow.textContent = isOpen ? '+' : '−';
+        } else {
+          arrow.textContent = isOpen ? '▸' : '▾';
+          arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+      }
+      return;
+    }
+
+    /* --- Quiz Pattern C: data-correct click delegation --- */
+    var opt = e.target.closest('.quiz-opt');
+    if(opt){
+      var card = opt.closest('.quiz-card');
+      if(card && card.dataset.correct){
+        var options = card.querySelectorAll('.quiz-opt');
+        var correctIdx = parseInt(card.dataset.correct) - 1;
+        var clickedIdx = Array.from(options).indexOf(opt);
+        var isCorrect = clickedIdx === correctIdx;
+        card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+        options.forEach(function(o, i){
+          o.style.pointerEvents = 'none';
+          o.style.opacity = '0.6';
+          if(i === correctIdx){
+            o.classList.add('correct');
+            o.style.opacity = '1';
+          }
+          if(o === opt && !isCorrect){
+            o.classList.add('wrong');
+          }
+        });
+        var fb = card.querySelector('.quiz-feedback');
+        if(fb){
+          fb.style.display = 'block';
+          fb.classList.add('show');
+          fb.classList.add(isCorrect ? 'correct-fb' : 'wrong-fb');
+        }
+      }
+    }
+  });
+
+  /* ══════ QUIZ BOOST/RETIRE ══════ */
+  window._cyberCheckAnswer = window.checkAnswer;
+  window.checkAnswer = function(qId, el, isCorrect) {
+    var card = el.closest('.quiz-card');
+    if(card){
+      card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+    }
+    if(window._cyberCheckAnswer){
+      window._cyberCheckAnswer(qId, el, isCorrect);
+    }
+  };
+
+  /* ══════ CIRCUIT PARTICLE CANVAS ══════ */
+  var canvas = document.getElementById('cyberParticles');
+  if(canvas){
+    var ctx = canvas.getContext('2d');
+    var particles = [];
+    var maxP = 30;
+
+    function resizeCanvas(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function Particle(){
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.vx = (Math.random() - 0.5) * 0.3;
+      this.vy = (Math.random() - 0.5) * 0.3;
+      this.r = Math.random() * 1.5 + 0.5;
+      this.alpha = Math.random() * 0.4 + 0.1;
+    }
+
+    for(var i = 0; i < maxP; i++) particles.push(new Particle());
+
+    function drawParticles(){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for(var i = 0; i < particles.length; i++){
+        var p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        if(p.x < 0) p.x = canvas.width;
+        if(p.x > canvas.width) p.x = 0;
+        if(p.y < 0) p.y = canvas.height;
+        if(p.y > canvas.height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,229,255,' + p.alpha + ')';
+        ctx.fill();
+
+        // Connect nearby particles
+        for(var j = i + 1; j < particles.length; j++){
+          var p2 = particles[j];
+          var dx = p.x - p2.x, dy = p.y - p2.y;
+          var dist = Math.sqrt(dx*dx + dy*dy);
+          if(dist < 150){
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = 'rgba(0,229,255,' + (0.08 * (1 - dist/150)) + ')';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+  }
+
+  /* ══════ GAUGE PARTICLE ORBIT ══════ */
+  document.querySelectorAll('.gauge-wrap').forEach(function(wrap){
+    for(var i = 0; i < 3; i++){
+      var dot = document.createElement('div');
+      dot.className = 'gauge-particle';
+      dot.style.animationDelay = (i * 1) + 's';
+      dot.style.animationDuration = (2.5 + i * 0.5) + 's';
+      wrap.appendChild(dot);
+    }
+  });
+
+})();
+</script>
+
 </body>
 </html>

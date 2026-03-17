@@ -2,198 +2,308 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Day 11 | 기술적 분석 기초 — 부자 마인드셋 스터디</title>
+<script>
+/* Prevent FOUC: apply saved theme before render */
+(function(){
+  var t = localStorage.getItem('eldorado-theme');
+  if(!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  if(t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+})();
+</script>
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Day 11 | 별자리로 항로를 읽다 — El Dorado 투자 원정대</title>
+<meta name="theme-color" content="#0D0B08">
+<meta name="description" content="El Dorado 투자 원정대 Day 11 — 기술적 분석의 기초와 차트 패턴을 학습합니다.">
+<meta name="robots" content="noindex">
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-/* ═══ DESIGN SYSTEM v2 ═══ */
+<style>/* LIGHTHOUSE_OPTIMIZED */
 :root {
-  --bg-primary: #0A0C10;
-  --bg-card: #12151C;
-  --bg-card-hover: #181C26;
-  --bg-accent: #1A1E2A;
-  --gold: #C9A84C;
-  --gold-dim: rgba(201,168,76,0.15);
-  --gold-glow: rgba(201,168,76,0.3);
-  --blue: #4A9EBF;
-  --blue-dim: rgba(74,158,191,0.15);
-  --blue-glow: rgba(74,158,191,0.3);
-  --text-primary: #E8E6E1;
-  --text-secondary: #9A9890;
-  --text-dim: #5A584F;
-  --border: #2A2D36;
-  --red: #BF4A4A;
-  --green: #4ABF7A;
+  --bg-primary: #0D0B08;
+  --bg-card: #16130E;
+  --bg-card-hover: #1E1A13;
+  --bg-accent: #1A1610;
+  --bg-temple: #110E09;
+  --gold: #D4A843;
+  --gold-bright: #E8C65A;
+  --gold-dim: rgba(212,168,67,0.12);
+  --gold-glow: rgba(212,168,67,0.25);
+  --gold-radiant: rgba(232,198,90,0.4);
+  --emerald: #3D9E6E;
+  --emerald-dim: rgba(61,158,110,0.12);
+  --emerald-glow: rgba(61,158,110,0.25);
+  --amber: #C4793D;
+  --amber-dim: rgba(196,121,61,0.12);
+  --copper: #A0634A;
+  --text-primary: #EDE8D8;
+  --text-secondary: #B8B0A0;
+  --text-dim: #8A8272;
+  --border: #2C261E;
+  --border-gold: rgba(212,168,67,0.2);
+  --red: #C45A4A;
+  --green: #4AAF6A;
   --font-display: 'Cormorant Garamond', serif;
   --font-body: 'Noto Sans KR', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; font-size: 16px; }
 body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: white !important;
+  background-image: radial-gradient(ellipse 70% 60% at 30% 0%, rgba(61,158,110,0.05) 0%, transparent 55%),
+  radial-gradient(ellipse 50% 40% at 80% 100%, rgba(212,168,67,0.03) 0%, transparent 50%);
+  color: #1a1a1a !important;
   font-family: var(--font-body);
   font-weight: 300;
   line-height: 1.8;
   -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
+  min-height: 100vh;
 }
-
-/* ═══ CUSTOM SCROLLBAR ═══ */
-::-webkit-scrollbar { width: 6px; }
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+  repeating-linear-gradient(90deg, rgba(212,168,67,0.015) 0px, rgba(212,168,67,0.015) 1px, transparent 1px, transparent 80px),
+  repeating-linear-gradient(0deg, rgba(212,168,67,0.015) 0px, rgba(212,168,67,0.015) 1px, transparent 1px, transparent 80px);
+  pointer-events: none;
+  z-index: 0;
+}
+::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
-
-/* ═══ FADE-UP ANIMATION ═══ */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--gold-dim), var(--gold-glow));
+  border-radius: 4px; border: 1px solid var(--border-gold);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 .fade-up {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition: opacity 0.7s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .fade-up.visible {
   opacity: 1;
   transform: translateY(0);
 }
-
-/* ═══ STICKY HEADER ═══ */
+@keyframes goldShimmer {
+  0%,100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+@keyframes templeGlow {
+  0%,100% { box-shadow: 0 0 20px rgba(212,168,67,0.05); }
+  50% { box-shadow: 0 0 40px rgba(212,168,67,0.12); }
+}
 .sticky-header {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: rgba(10,12,16,0.92);
+  background: rgba(13,11,8,0.94);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-gold);
   padding: 0.6rem 2rem;
   display: flex; justify-content: space-between; align-items: center;
   flex-wrap: wrap; gap: 0.5rem;
 }
+.sticky-header::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-glow), transparent);
+}
 .header-left { display: flex; align-items: center; gap: 1rem; }
 .header-day {
-  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold-bright);
   background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
   letter-spacing: 0.1em;
+  border: 1px solid var(--border-gold);
 }
 .header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
 .header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
-.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
-.badge-asset { color: var(--blue); background: var(--blue-dim); }
-.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.header-badge {
+  font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem;
+  border-radius: 4px; letter-spacing: 0.05em;
+}
+.badge-asset { color: var(--gold-bright); background: var(--gold-dim); border: 1px solid var(--border-gold); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.03); }
 .timer-btn {
-  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold-bright);
   font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
   border-radius: 4px; cursor: pointer; transition: all 0.3s;
 }
-.timer-btn:hover { background: var(--gold-glow); }
-
-/* ═══ LAYOUT ═══ */
-.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.timer-btn:hover { background: var(--gold-glow); box-shadow: 0 0 12px rgba(212,168,67,0.2); }
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; position: relative; z-index: 1; }
 .hero {
   text-align: center; padding: 3rem 0 2.5rem;
-  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+  border-bottom: 1px solid var(--border-gold); margin-bottom: 3rem;
+  position: relative;
 }
-.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
-.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
-.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
-.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero::before {
+  content: '';
+  position: absolute; top: -2rem; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.hero::after {
+  content: '◆';
+  position: absolute; top: -2.6rem; left: 50%; transform: translateX(-50%);
+  color: var(--gold); font-size: 0.7rem;
+  animation: goldShimmer 3s ease-in-out infinite;
+}
+.hero-part {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold);
+  letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem;
+}
+.hero-day {
+  font-family: var(--font-display); font-size: 4rem; font-weight: 700;
+  color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem;
+  text-shadow: 0 0 40px rgba(212,168,67,0.15);
+}
+.hero-subtitle {
+  font-family: var(--font-display); font-size: 1.8rem; font-weight: 400;
+  color: var(--gold); margin-bottom: 0.3rem;
+}
+.hero-eldorado-sub {
+  font-family: var(--font-display); font-size: 1.1rem; font-weight: 400;
+  color: var(--amber); font-style: italic; margin-bottom: 1.5rem;
+  letter-spacing: 0.05em;
+}
+.hero-quote {
+  font-family: var(--font-display); font-size: 1.1rem; font-style: italic;
+  color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6;
+}
 .hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
-.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge {
+  font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem;
+  border-radius: 4px; display: flex; align-items: center; gap: 0.4rem;
+}
 .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
-.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
-.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
-.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
-.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.hb-net { color: var(--gold-bright); background: var(--gold-dim); border: 1px solid var(--border-gold); }
+.hb-net .dot { background: var(--gold-bright); }
+.hb-house { color: var(--emerald); background: var(--emerald-dim); }
+.hb-house .dot { background: var(--emerald); }
+.hb-debt { color: var(--red); background: rgba(196,90,74,0.12); }
+.hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,175,106,0.12); }
+.hb-stock .dot { background: var(--green); }
 .series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
 .progress-wrap { margin: 1.5rem 0; }
-.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
-.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
-.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
-
-/* ═══ SECTIONS ═══ */
-.section { margin-bottom: 3rem; }
-.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
-.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
-
-/* ═══ BRAIN BOX ═══ */
-.brain-box {
-  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
-  border: 1px solid var(--border); border-left: 3px solid var(--blue);
-  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; border: 1px solid var(--border); }
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--gold-bright));
+  border-radius: 2px; transition: width 0.5s;
 }
-.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+.section { margin-bottom: 3rem; }
+.section-label {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.section-label::before { content: '◈'; font-size: 0.5rem; }
+.section-title {
+  font-family: var(--font-display); font-size: 1.6rem; font-weight: 600;
+  color: var(--text-primary); margin-bottom: 1rem;
+}
+.brain-box {
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--emerald);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+  position: relative; overflow: hidden;
+}
+.brain-box::before {
+  content: '';
+  position: absolute; top: 0; right: 0; width: 60px; height: 60px;
+  background: radial-gradient(circle at 100% 0%, rgba(61,158,110,0.08), transparent 70%);
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--emerald); margin-bottom: 0.8rem; }
 .brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
 .time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
-.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
-.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table th {
+  text-align: left; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border);
+}
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(44,38,30,0.5); }
 .time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
-
-/* ═══ CONCEPT CARDS ═══ */
 .cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
 .concept-card {
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
-  padding: 1.5rem; transition: all 0.3s;
+  background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.4s;
+  position: relative; overflow: hidden;
 }
-.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.concept-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold-glow), var(--gold-dim));
+  opacity: 0; transition: opacity 0.4s;
+}
+.concept-card:hover {
+  background: var(--bg-card-hover); border-color: var(--border-gold);
+  box-shadow: 0 4px 24px rgba(212,168,67,0.06);
+}
+.concept-card:hover::before { opacity: 1; }
 .card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
 .card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
 .card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
 .card-body p { margin-bottom: 0.6rem; }
-
-/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
 .formula-block {
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--gold);
-  border-radius: 6px;
-  padding: 1rem 1.2rem;
-  margin: 1rem 0;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  line-height: 2;
-  overflow-x: auto;
+  background: var(--bg-temple);
+  border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 6px; padding: 1rem 1.2rem; margin: 1rem 0;
+  font-family: var(--font-mono); font-size: 0.82rem; line-height: 2; overflow-x: auto;
 }
 .formula-line { color: var(--text-primary); }
 .formula-comment { color: var(--text-dim); font-size: 0.72rem; }
-.formula-highlight { color: var(--gold); }
-.formula-blue { color: var(--blue); }
-
-/* ═══ DATA TABLE ═══ */
+.formula-highlight { color: var(--gold-bright); }
+.formula-blue { color: var(--emerald); }
 .data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
 .data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
 .data-table th {
   font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
   letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
-  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+  border-bottom: 2px solid var(--border-gold); white-space: nowrap;
 }
 .data-table th:first-child { text-align: left; }
 .data-table td {
   padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
-  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+  border-bottom: 1px solid rgba(44,38,30,0.5); font-family: var(--font-mono); font-size: 0.78rem;
 }
 .data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
-.data-table tr:hover td { background: rgba(201,168,76,0.04); }
-.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
-
-/* ═══ CHART ═══ */
+.data-table tr:hover td { background: rgba(212,168,67,0.04); }
+.highlight-row td { color: var(--gold-bright) !important; font-weight: 500; background: var(--gold-dim) !important; }
 .chart-container {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
   padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.chart-container::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
 }
 .chart-title {
   font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
   letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
 }
-
-/* ═══ SIMULATION BOX ═══ */
 .sim-box {
-  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
-  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+  background: linear-gradient(135deg, rgba(212,168,67,0.04), rgba(61,158,110,0.04));
+  border: 1px solid var(--border-gold); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.sim-box::before {
+  content: '⬥';
+  position: absolute; top: -8px; left: 1.5rem; color: var(--gold);
+  font-size: 0.6rem; background: var(--bg-primary); padding: 0 0.3rem;
 }
 .sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
 .checklist { list-style: none; margin-top: 1rem; }
 .checklist li {
   font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
-  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+  position: relative; border-bottom: 1px solid rgba(44,38,30,0.3); cursor: pointer;
 }
 .checklist li::before {
   content: ''; position: absolute; left: 0; top: 0.65rem;
@@ -201,21 +311,19 @@ body {
 }
 .checklist li.checked::before { background: var(--gold); }
 .checklist li.checked::after {
-  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  content: '\u2713'; position: absolute; left: 2px; top: 0.42rem;
   color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
 }
-
-/* ═══ PSYCHOLOGY BOX ═══ */
 .psych-box {
-  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--amber);
   border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
 }
-.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--amber); margin-bottom: 0.8rem; }
 .psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
 .psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
 .neuro-tag {
   display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
-  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  color: var(--emerald); background: var(--emerald-dim); padding: 0.15rem 0.5rem;
   border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
 }
 .engineer-tag {
@@ -223,8 +331,6 @@ body {
   color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
   border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
 }
-
-/* ═══ DEEP DIVE ═══ */
 .deep-dive {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
   margin: 1rem 0; overflow: hidden;
@@ -237,7 +343,7 @@ body {
 }
 .deep-dive summary::-webkit-details-marker { display: none; }
 .deep-dive summary::before {
-  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  content: '\u25B8'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
   transition: transform 0.2s;
 }
 .deep-dive[open] summary::before { transform: rotate(90deg); }
@@ -246,9 +352,16 @@ body {
   padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
 }
 .deep-dive-content p { margin-bottom: 0.6rem; }
-
-/* ═══ QUIZ ═══ */
-.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-section {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.quiz-section::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--amber));
+}
 .quiz-q { margin-bottom: 1.5rem; }
 .quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
 .quiz-options { list-style: none; }
@@ -258,14 +371,12 @@ body {
   border: 1px solid transparent;
 }
 .quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
-.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
-.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-options li.correct { background: rgba(74,175,106,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(196,90,74,0.12); border-color: var(--red); color: var(--red); }
 .quiz-answer {
   display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
   border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
 }
-
-/* ═══ SR TRACKER ═══ */
 .sr-tracker {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
   padding: 1.5rem; margin: 1.5rem 0;
@@ -274,90 +385,788 @@ body {
   font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
   letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
 }
-.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 0.5rem; }
 .sr-slot {
   background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
   padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
 }
 .sr-slot:hover { border-color: var(--gold); }
-.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,175,106,0.08); }
 .sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
 .sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
-
-/* ═══ DISCLAIMER ═══ */
 .disclaimer {
-  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border-gold);
   font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
 }
-
-/* ═══ NAV FOOTER ═══ */
 .nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
 .nav-btn {
   font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
   text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
   border-radius: 4px; transition: all 0.3s;
 }
-.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px rgba(212,168,67,0.1); }
 .nav-btn.disabled { opacity: 0.3; pointer-events: none; }
-
-/* ═══ RESPONSIVE ═══ */
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+  radial-gradient(circle at 10% 70%, rgba(61,158,110,0.03) 0%, transparent 30%),
+  radial-gradient(circle at 90% 30%, rgba(61,158,110,0.02) 0%, transparent 25%);
+  pointer-events: none; z-index: 0;
+}
+.aztec-divider {
+  text-align: center;
+  margin: 2.5rem 0;
+  position: relative;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aztec-divider::before,
+.aztec-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
+}
+.aztec-divider .aztec-glyph {
+  padding: 0 1rem;
+  color: var(--gold);
+  font-size: 0.65rem;
+  opacity: 0.5;
+  letter-spacing: 0.3em;
+}
+.concept-card {
+  position: relative;
+  overflow: hidden;
+}
+.concept-card .card-glow {
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,168,67,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+.concept-card:hover .card-glow { opacity: 1; }
+.concept-card > * { position: relative; z-index: 1; }
+.quiz-section { position: relative; overflow: hidden; }
+.quiz-burst-canvas {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 10;
+}
+.scroll-compass {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  z-index: 99;
+  opacity: 0;
+  transition: opacity 0.5s;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+}
+.scroll-compass.visible { opacity: 1; }
+.scroll-compass svg { width: 100%; height: 100%; }
+.section-flash {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-bright), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.section.flash-active .section-flash { opacity: 1; }
+@keyframes checkPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+.checklist li.just-checked::before {
+  animation: checkPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+@keyframes checkGlow {
+  0% { box-shadow: 0 0 0 0 rgba(212,168,67,0.4); }
+  100% { box-shadow: 0 0 0 12px rgba(212,168,67,0); }
+}
+.checklist li.just-checked {
+  animation: checkGlow 0.6s ease-out;
+}
+.deep-dive[open] {
+  border-color: var(--border-gold);
+  box-shadow: 0 0 20px rgba(212,168,67,0.04);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+@keyframes timerPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(212,168,67,0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(212,168,67,0); }
+}
+.timer-btn.active {
+  animation: timerPulse 2s infinite;
+  background: var(--gold-glow);
+}
+@keyframes heroFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.hero-icon svg {
+  animation: heroFloat 4s ease-in-out infinite;
+}
+@keyframes barShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.progress-bar-fill {
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--gold-bright), var(--gold), var(--amber));
+  background-size: 200% 100%;
+  animation: barShimmer 4s linear infinite;
+}
+.sr-slot.done {
+  position: relative;
+  overflow: hidden;
+}
+.sr-slot.done::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+}
+.data-table tr {
+  transition: background 0.2s;
+}
+.data-table tr:hover td {
+  background: rgba(212,168,67,0.06);
+}
+.highlight-row td {
+  position: relative;
+}
+.hero-illustration {
+  margin: 0 -1.5rem 1.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(212,168,67,0.06);
+  position: relative;
+}
+.hero-illustration::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40px;
+  background: linear-gradient(to top, var(--bg-primary), transparent);
+  pointer-events: none;
+}
+@supports(padding: max(0px)) {
+  .sticky-header {
+  padding-left: max(0.8rem, env(safe-area-inset-left));
+  padding-right: max(0.8rem, env(safe-area-inset-right));
+  }
+  .container {
+  padding-left: max(0.8rem, env(safe-area-inset-left));
+  padding-right: max(0.8rem, env(safe-area-inset-right));
+  }
+  .scroll-compass {
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+@media print {
+  .sticky-header, .scroll-compass, #goldParticles, .timer-btn { display: none !important; }
+  body::before, body::after { display: none !important; }
+  .concept-card, .brain-box, .sim-box, .psych-box, .quiz-section, .sr-tracker {
+  border: 1px solid #ccc !important;
+  background: white !important;
+  break-inside: avoid;
+  }
+  .hero { border-bottom: 2px solid #333 !important; }
+  .nav-footer { display: none !important; }
+}
 @media (max-width: 640px) {
-  .sticky-header { padding: 0.5rem 1rem; }
+.sticky-header { padding: 0.5rem 1rem; }
   .hero-day { font-size: 2.5rem; }
   .hero-subtitle { font-size: 1.3rem; }
   .container { padding: 4.5rem 1rem 2rem; }
   .section-title { font-size: 1.3rem; }
   .sr-slots { grid-template-columns: repeat(2, 1fr); }
   .header-right { gap: 0.6rem; }
+.hero-illustration { margin: 0 -1rem 1rem; }
 }
+@media (prefers-reduced-motion: reduce) {
+.fade-up { opacity: 1; transform: none; transition: none; }
+  .hero-icon svg { animation: none; }
+  .progress-bar-fill { animation: none; }
+  .timer-btn.active { animation: none; }
+  #goldParticles { display: none !important; }
+  body::before { display: none; }
+  body::after { display: none; }
+}
+@media (max-width: 768px) {
+.hero-day { font-size: 3rem; }
+  .hero-subtitle { font-size: 1.5rem; }
+  .hero-eldorado-sub { font-size: 0.95rem; }
+  .hero-quote { font-size: 0.95rem; max-width: 90%; }
+  .hero-icon svg { width: 40px; height: 40px; }
+  .section-title { font-size: 1.4rem; }
+  .concept-card { padding: 1.2rem; }
+  .card-title { font-size: 1.15rem; }
+  .data-table { font-size: 0.75rem; }
+  .data-table th { font-size: 0.6rem; padding: 0.5rem; }
+  .data-table td { padding: 0.5rem; font-size: 0.72rem; }
+  .formula-block { font-size: 0.76rem; padding: 0.8rem 1rem; }
+  .scroll-compass { width: 48px; height: 48px; bottom: 1.5rem; right: 1.5rem; }
+}
+@media (max-width: 480px) {
+html { font-size: 15px; }
+  .sticky-header {
+  padding: 0.4rem 0.8rem;
+  gap: 0.3rem;
+  }
+  .header-day { font-size: 0.65rem; padding: 0.15rem 0.5rem; }
+  .header-title { font-size: 0.75rem; }
+  .header-badge { font-size: 0.6rem; padding: 0.15rem 0.4rem; }
+  .badge-series { display: none; }
+  .timer-btn { font-size: 0.65rem; padding: 0.25rem 0.6rem; }
+  .container { padding: 3.8rem 0.8rem 2rem; }
+  .hero { padding: 2rem 0 1.8rem; margin-bottom: 2rem; }
+  .hero-part { font-size: 0.6rem; letter-spacing: 0.2em; }
+  .hero-icon svg { width: 36px; height: 36px; }
+  .hero-day { font-size: 2.2rem; }
+  .hero-subtitle { font-size: 1.2rem; }
+  .hero-eldorado-sub { font-size: 0.85rem; }
+  .hero-quote { font-size: 0.85rem; line-height: 1.5; }
+  .hero-badges { gap: 0.4rem; }
+  .hero-badge { font-size: 0.6rem; padding: 0.25rem 0.5rem; }
+  .series-info { font-size: 0.6rem; }
+  .hero-illustration { margin: 0 -0.8rem 1rem; }
+  .section { margin-bottom: 2rem; }
+  .section-label { font-size: 0.58rem; }
+  .section-title { font-size: 1.2rem; }
+  .brain-box { padding: 1rem; }
+  .brain-box h3 { font-size: 0.82rem; }
+  .brain-box p { font-size: 0.8rem; }
+  .time-table { font-size: 0.72rem; }
+  .time-table th { font-size: 0.58rem; padding: 0.4rem 0.5rem; }
+  .time-table td { padding: 0.4rem 0.5rem; }
+  .concept-card { padding: 1rem; }
+  .card-num { font-size: 0.55rem; }
+  .card-title { font-size: 1.05rem; }
+  .card-body { font-size: 0.8rem; line-height: 1.7; }
+  .formula-block { font-size: 0.7rem; padding: 0.7rem 0.8rem; line-height: 1.8; }
+  .data-table-wrap { margin: 0.8rem -0.3rem; }
+  .data-table { font-size: 0.68rem; }
+  .data-table th { font-size: 0.55rem; padding: 0.4rem; }
+  .data-table td { padding: 0.4rem; font-size: 0.65rem; }
+  .chart-container { padding: 1rem; margin: 1rem 0; }
+  .chart-title { font-size: 0.6rem; }
+  .sim-box { padding: 1rem; }
+  .sim-box h3 { font-size: 0.85rem; }
+  .checklist li { font-size: 0.8rem; padding: 0.4rem 0 0.4rem 1.6rem; }
+  .psych-box { padding: 1rem; }
+  .psych-box h3 { font-size: 0.85rem; }
+  .psych-box .bias-name { font-size: 1rem; }
+  .deep-dive summary { padding: 0.8rem 1rem; font-size: 0.82rem; }
+  .deep-dive-content { padding: 0 1rem 1rem; font-size: 0.78rem; }
+  .quiz-section { padding: 1rem; }
+  .quiz-q h4 { font-size: 0.82rem; }
+  .quiz-options li { font-size: 0.76rem; padding: 0.45rem 0.6rem; }
+  .quiz-answer { font-size: 0.74rem; }
+  .sr-tracker { padding: 1rem; }
+  .sr-tracker h3 { font-size: 0.65rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
+  .sr-slot { padding: 0.5rem; }
+  .sr-slot .sr-label { font-size: 0.55rem; }
+  .sr-slot .sr-date { font-size: 0.65rem; }
+  .disclaimer { font-size: 0.65rem; padding: 1rem; }
+  .nav-footer { flex-direction: column; gap: 0.8rem; align-items: stretch; }
+  .nav-btn { text-align: center; font-size: 0.7rem; }
+  .scroll-compass { width: 42px; height: 42px; bottom: 1rem; right: 1rem; }
+  .aztec-divider { margin: 1.5rem 0; }
+  .aztec-divider .aztec-glyph { font-size: 0.55rem; }
+  .sim-box input[type="number"] {
+  width: 120px !important;
+  font-size: 0.85rem !important;
+  padding: 0.4rem 0.6rem !important;
+}
+@media (max-width: 360px) {
+html { font-size: 14px; }
+  .hero-day { font-size: 1.8rem; }
+  .hero-subtitle { font-size: 1rem; }
+  .container { padding: 3.5rem 0.6rem 1.5rem; }
+  .badge-asset { display: none; }
+  .hero-badges { flex-direction: column; align-items: center; }
+  .sr-slots { grid-template-columns: 1fr; }
+}
+@media ((hover: none) and (pointer: coarse)) {
+.quiz-options li {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  }
+  .checklist li {
+  .nav-btn {
+  justify-content: center;
+  .sr-slot {
+  flex-direction: column;
+  .timer-btn {
+  min-height: 40px;
+  .deep-dive summary {
+  min-height: 48px;
+  .concept-card .card-glow { display: none; }
+}
+@media ((max-height: 500px) and (orientation: landscape)) {
+.sticky-header { padding: 0.3rem 1rem; }
+  .hero { padding: 1.5rem 0 1rem; margin-bottom: 1.5rem; }
+  .hero-day { font-size: 2rem; }
+  .hero-illustration svg { max-height: 120px; }
+  .scroll-compass { width: 36px; height: 36px; bottom: 0.5rem; right: 0.5rem; }
+}
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.quiz-options li:focus-visible { border-color: var(--gold); }
+.nav-btn:focus-visible { border-color: var(--gold); color: var(--gold); }
+
+
+/* Content-visibility for off-screen rendering optimization */
+.section { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+.deep-dive { content-visibility: auto; contain-intrinsic-size: auto 200px; }
+.quiz-section { content-visibility: auto; contain-intrinsic-size: auto 400px; }
+.sr-tracker { content-visibility: auto; contain-intrinsic-size: auto 200px; }
+
+
+/* ═══ THEME TOGGLE ═══ */
+/* ── Toggle Button ── */
+.theme-toggle {
+  position: relative;
+  width: 52px; height: 28px;
+  background: var(--gold-dim);
+  border: 1px solid var(--border-gold);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex; align-items: center;
+  padding: 0 3px;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(212,168,67,0.2);
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.theme-toggle-knob {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--gold);
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  position: relative;
+}
+.theme-toggle-knob svg {
+  width: 14px; height: 14px;
+  transition: all 0.3s;
+}
+/* Dark mode icon (moon visible) */
+.theme-toggle .icon-moon { display: none; }
+.theme-toggle .icon-sun { display: block; }
+[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+[data-theme="light"] .theme-toggle-knob {
+  transform: translateX(24px);
+  background: #8B6914;
+}
+[data-theme="light"] .theme-toggle {
+  background: rgba(139,105,20,0.15);
+  border-color: rgba(139,105,20,0.3);
+}
+
+/* ── Light Theme Variables ── */
+[data-theme="light"] {
+  --bg-primary: #FAF6EE;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FFF9F0;
+  --bg-accent: #F5F0E5;
+  --bg-temple: #FBF7EF;
+  --gold: #8B6914;
+  --gold-bright: #A67C1A;
+  --gold-dim: rgba(139,105,20,0.08);
+  --gold-glow: rgba(139,105,20,0.15);
+  --gold-radiant: rgba(166,124,26,0.2);
+  --emerald: #2D7A52;
+  --emerald-dim: rgba(45,122,82,0.08);
+  --emerald-glow: rgba(45,122,82,0.15);
+  --amber: #9E5E28;
+  --amber-dim: rgba(158,94,40,0.08);
+  --copper: #7A4A30;
+  --text-primary: #2C2416;
+  --text-secondary: #5A5040;
+  --text-dim: #8A8070;
+  --border: #E0D8C8;
+  --border-gold: rgba(139,105,20,0.2);
+  --red: #B84A3A;
+  --green: #2D8A4A;
+}
+
+/* ── Light Theme Overrides ── */
+[data-theme="light"] body {
+  background: #FAF6EE !important;
+  color: #2C2416 !important;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139,105,20,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(158,94,40,0.03) 0%, transparent 50%) !important;
+}
+[data-theme="light"] body::before {
+  background-image:
+    repeating-linear-gradient(90deg, rgba(139,105,20,0.025) 0px, rgba(139,105,20,0.025) 1px, transparent 1px, transparent 80px),
+    repeating-linear-gradient(0deg, rgba(139,105,20,0.025) 0px, rgba(139,105,20,0.025) 1px, transparent 1px, transparent 80px) !important;
+}
+[data-theme="light"] body::after {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(139,105,20,0.03) 0%, transparent 25%),
+    radial-gradient(circle at 85% 80%, rgba(139,105,20,0.02) 0%, transparent 20%) !important;
+}
+[data-theme="light"] .sticky-header {
+  background: rgba(250,246,238,0.95) !important;
+  border-bottom-color: rgba(139,105,20,0.15) !important;
+}
+[data-theme="light"] .sticky-header::after {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.2), transparent) !important;
+}
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #F0EBE0;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(139,105,20,0.2), rgba(139,105,20,0.35));
+  border: 1px solid rgba(139,105,20,0.15);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(139,105,20,0.5);
+}
+[data-theme="light"] .header-day {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .header-title {
+  color: #5A5040;
+}
+[data-theme="light"] .badge-asset {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .badge-series {
+  color: #8A8070;
+  background: rgba(0,0,0,0.04);
+}
+[data-theme="light"] .timer-btn {
+  background: rgba(139,105,20,0.08);
+  border-color: #8B6914;
+  color: #8B6914;
+}
+[data-theme="light"] .timer-btn:hover {
+  background: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .hero {
+  border-bottom-color: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .hero::before {
+  background: linear-gradient(90deg, transparent, #8B6914, transparent);
+}
+[data-theme="light"] .hero-day {
+  color: #2C2416;
+  text-shadow: none;
+}
+[data-theme="light"] .hero-subtitle {
+  color: #8B6914;
+}
+[data-theme="light"] .hero-eldorado-sub {
+  color: #9E5E28;
+}
+[data-theme="light"] .hero-quote {
+  color: #5A5040;
+}
+[data-theme="light"] .concept-card {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+[data-theme="light"] .concept-card:hover {
+  background: #FFF9F0;
+  border-color: rgba(139,105,20,0.3);
+  box-shadow: 0 4px 16px rgba(139,105,20,0.08);
+}
+[data-theme="light"] .concept-card::before {
+  background: linear-gradient(90deg, rgba(139,105,20,0.1), rgba(139,105,20,0.3), rgba(139,105,20,0.1));
+}
+[data-theme="light"] .brain-box {
+  background: linear-gradient(135deg, #FFFFFF, #F8F4EC);
+  border-color: #E0D8C8;
+  border-left-color: #2D7A52;
+}
+[data-theme="light"] .brain-box::before {
+  background: radial-gradient(circle at 100% 0%, rgba(45,122,82,0.06), transparent 70%);
+}
+[data-theme="light"] .formula-block {
+  background: #FBF7EF;
+  border-color: #E0D8C8;
+  border-left-color: #8B6914;
+}
+[data-theme="light"] .sim-box {
+  background: linear-gradient(135deg, rgba(139,105,20,0.04), rgba(45,122,82,0.04));
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .sim-box::before {
+  background: #FAF6EE;
+}
+[data-theme="light"] .psych-box {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+  border-left-color: #9E5E28;
+}
+[data-theme="light"] .deep-dive {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .deep-dive summary:hover {
+  background: #F8F4EC;
+}
+[data-theme="light"] .deep-dive[open] {
+  border-color: rgba(139,105,20,0.3);
+  box-shadow: 0 0 15px rgba(139,105,20,0.05);
+}
+[data-theme="light"] .quiz-section {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .quiz-section::before {
+  background: linear-gradient(90deg, #9E5E28, #8B6914, #9E5E28);
+}
+[data-theme="light"] .quiz-options li:hover {
+  background: #F5F0E5;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .quiz-answer {
+  background: #F5F0E5;
+}
+[data-theme="light"] .sr-tracker {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .sr-slot {
+  background: #F5F0E5;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .sr-slot:hover {
+  border-color: #8B6914;
+}
+[data-theme="light"] .chart-container {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .data-table th {
+  border-bottom-color: rgba(139,105,20,0.3);
+}
+[data-theme="light"] .data-table td {
+  border-bottom-color: rgba(224,216,200,0.7);
+}
+[data-theme="light"] .data-table tr:hover td {
+  background: rgba(139,105,20,0.04);
+}
+[data-theme="light"] .highlight-row td {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+}
+[data-theme="light"] .nav-btn {
+  color: #5A5040;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .nav-btn:hover {
+  border-color: #8B6914;
+  color: #8B6914;
+}
+[data-theme="light"] .disclaimer {
+  border-top-color: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .progress-bar-bg {
+  background: #EDE8D8;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .progress-bar-fill {
+  background: linear-gradient(90deg, #9E5E28, #8B6914, #A67C1A);
+  background-size: 200% 100%;
+}
+[data-theme="light"] .aztec-divider::before,
+[data-theme="light"] .aztec-divider::after {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.15), transparent);
+}
+[data-theme="light"] .hero-illustration {
+  border-color: rgba(139,105,20,0.1);
+}
+[data-theme="light"] .hero-illustration::after {
+  background: linear-gradient(to top, #FAF6EE, transparent);
+}
+/* Light theme: SVG illustrations get warmer tones */
+[data-theme="light"] .hero-illustration svg {
+  filter: saturate(0.8) brightness(1.1);
+}
+/* Light theme: particles become subtle */
+[data-theme="light"] #goldParticles {
+  opacity: 0.3;
+}
+/* Scroll compass light adaptation */
+[data-theme="light"] .scroll-compass {
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+}
+/* Card glow adapts to light theme */
+[data-theme="light"] .concept-card .card-glow {
+  background: radial-gradient(circle, rgba(139,105,20,0.08) 0%, transparent 70%);
+}
+/* Section flash for light */
+[data-theme="light"] .section-flash {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.4), transparent);
+}
+/* Checklist in light */
+[data-theme="light"] .checklist li::before {
+  border-color: #8B6914;
+}
+[data-theme="light"] .checklist li.checked::before {
+  background: #8B6914;
+}
+[data-theme="light"] .checklist li.checked::after {
+  color: #FFFFFF;
+}
+/* Neuro & Engineer tags */
+[data-theme="light"] .neuro-tag {
+  color: #2D7A52;
+  background: rgba(45,122,82,0.08);
+}
+[data-theme="light"] .engineer-tag {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+}
+/* Time table */
+[data-theme="light"] .time-table td {
+  border-bottom-color: rgba(224,216,200,0.5);
+}
+/* Part texture backgrounds in light */
+[data-theme="light"] .bg-part-texture {
+  opacity: 0.3;
+}
+/* Smooth transition on theme change */
+html {
+  transition: none;
+}
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 0.4s, color 0.3s, border-color 0.3s, box-shadow 0.3s !important;
+}
+/* ═══ END THEME TOGGLE ═══ */
+
 </style>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 </head>
 <body>
+<a href="#main-content" class="skip-link" style="position:absolute;top:-100px;left:0;background:var(--gold);color:var(--bg-primary);padding:0.5rem 1rem;z-index:200;font-size:0.8rem;transition:top 0.2s;" onfocus="this.style.top='0'" onblur="this.style.top='-100px'">본문으로 건너뛰기</a>
 
-<header class="sticky-header">
+<header class="sticky-header" role="banner" aria-label="상단 네비게이션">
   <div class="header-left">
     <span class="header-day">DAY 11 / 23</span>
     <span class="header-title">기술적 분석 기초</span>
   </div>
   <div class="header-right">
+<button class="theme-toggle" id="themeToggle" aria-label="테마 전환" title="다크/라이트 모드 전환">
+  <div class="theme-toggle-knob">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </div>
+</button>
+
     <span class="header-badge badge-asset">순자산 3억 2,800만</span>
-    <span class="header-badge badge-series">PART 2 · 주식 투자 심화</span>
-    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+    <span class="header-badge badge-series">제2장 · 밀림 속 보물 탐색</span>
+    <button class="timer-btn" aria-label="포모도로 타이머 시작/정지" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
   </div>
 </header>
 
-<div class="container">
+<div class="container" id="main-content" role="main">
 
 <section class="hero">
-  <div class="hero-part">PART 2 — 주식 투자 심화</div>
+  <div class="hero-part">제2장 · 밀림 속 보물 탐색</div>
+  <div class="hero-icon" style="margin-bottom:1rem;opacity:0.7;display:flex;justify-content:center;"><svg viewBox="0 0 48 48" width="48" height="48"><circle cx="16" cy="12" r="2" fill="#D4A843" opacity="0.5"/><circle cx="28" cy="8" r="1.5" fill="#D4A843" opacity="0.4"/><circle cx="36" cy="16" r="2.5" fill="#D4A843" opacity="0.45"/><circle cx="20" cy="28" r="1.5" fill="#D4A843" opacity="0.35"/><circle cx="32" cy="32" r="2" fill="#D4A843" opacity="0.4"/><path d="M16 12 L28 8 L36 16 M20 28 L32 32" stroke="#D4A843" stroke-width="0.8" opacity="0.25" stroke-dasharray="3 3"/></svg></div>
   <h1 class="hero-day">Day 11</h1>
   <h2 class="hero-subtitle">기술적 분석 기초</h2>
-  <p class="hero-quote">"차트 패턴은 집단 심리의 결정화다.<br>가격은 감정이 만든다."</p>
+  <p class="hero-quote">"기술적 분석은 확률 게임이다. 100% 맞는 신호는 없다. 하지만 추세를 읽으면 정글에서 길을 잃지 않을 수 있다." — 알렉산더 엘더</p>
   <div class="hero-badges">
     <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
     <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
     <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
     <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
   </div>
-  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 2: 08~14</div>
+  <div class="series-info">El Dorado 원정 — 포모도로 1세션(25분) × 23일 | PART 2: 08~14</div>
   <div class="progress-wrap">
     <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:47.8%"></div></div>
     <div class="progress-label"><span>Day 11</span><span>11 / 23 완료 (47.8%)</span></div>
   </div>
 </section>
 
+<div class="hero-illustration fade-up"><svg viewBox="0 0 860 200" width="860" height="200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;margin:-1rem 0 1rem;opacity:0.85;" preserveAspectRatio="xMidYMid slice">
+  <rect width="860" height="200" fill="#0D0B08"/>
+  <!-- stars -->
+  <circle cx="100" cy="40" r="1.5" fill="#E8C65A" opacity="0.2"/><circle cx="200" cy="80" r="2" fill="#E8C65A" opacity="0.25"/>
+  <circle cx="300" cy="30" r="1" fill="#D4A843" opacity="0.15"/><circle cx="350" cy="110" r="2.5" fill="#E8C65A" opacity="0.2"/>
+  <circle cx="430" cy="50" r="2" fill="#E8C65A" opacity="0.25"/><circle cx="500" cy="90" r="1.5" fill="#D4A843" opacity="0.18"/>
+  <circle cx="580" cy="40" r="1" fill="#E8C65A" opacity="0.15"/><circle cx="650" cy="70" r="2.5" fill="#E8C65A" opacity="0.22"/>
+  <circle cx="720" cy="120" r="1.5" fill="#D4A843" opacity="0.18"/><circle cx="780" cy="55" r="2" fill="#E8C65A" opacity="0.2"/>
+  <!-- constellation lines -->
+  <path d="M100,40 L200,80 L350,110 L430,50 L500,90 L650,70 L780,55" fill="none" stroke="#D4A843" stroke-width="0.6" opacity="0.12"/>
+  <!-- trend channel -->
+  <path d="M80,160 L300,120 L500,140 L700,90 L850,110" fill="none" stroke="#E8C65A" stroke-width="1" opacity="0.1" stroke-dasharray="5 3"/>
+  <path d="M80,180 L300,140 L500,160 L700,110 L850,130" fill="none" stroke="#E8C65A" stroke-width="1" opacity="0.1" stroke-dasharray="5 3"/>
+  <!-- shooting star -->
+  <line x1="600" y1="20" x2="560" y2="35" stroke="#E8C65A" stroke-width="1.5" opacity="0.15"/>
+  <line x1="600" y1="20" x2="610" y2="18" stroke="#E8C65A" stroke-width="0.5" opacity="0.08"/>
+</svg>
+</div>
+
+
 <!-- 뇌과학 학습 전략 -->
 <section class="section fade-up">
   <div class="brain-box">
-    <h3>🧠 뇌과학 학습 전략: 패턴 인식과 추세 감지</h3>
-    <p>뇌의 측두엽과 두정엽은 시각적 패턴과 움직임 추세 감지에 특화되어 있습니다. 주가 차트의 이동평균선, RSI, MACD 같은 기술지표를 습득하면 '과매수/과매도' 상태를 객관적으로 판단할 수 있습니다.</p>
+    <h3>🧠 뇌과학 학습 전략: 
+기술적 분석(Technical Analysis)은 과거 가격·거래량 데이터로부터 
+미래 가격 변동을 예측하는 투자 방법입니다.
+</h3>
+    <p>
+<strong>Day 11 원칙: 기술적 분석의 3중 확인</strong><br>
+1️⃣ <strong>추세 (Trend)</strong>: 이동평균선(MA)으로 방향 판단<br>
+2️⃣ <strong>모멘텀 (Momentum)</strong>: RSI로 강도 판단<br>
+3️⃣ <strong>전환 (Reversal)</strong>: MACD로 추세 변화 포착<br>
+<br>
+<strong>핵심: 세 가지가 모두 같은 신호를 줄 때만 거래할 것!</strong>
+</p>
     <table class="time-table">
       <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
-      <tbody><tr><td class="time-col">0–6분</td><td>기술지표 4가지 (MA, RSI, MACD, BB)</td><td>개념 카드</td></tr>
-<tr><td class="time-col">6–13분</td><td>각 지표의 신호 해석과 한계</td><td>수식 풀이</td></tr>
-<tr><td class="time-col">13–18분</td><td>MA 골든크로스 / RSI 과매수 사례</td><td>차트 예시</td></tr>
-<tr><td class="time-col">18–23분</td><td>내 보유주 기술분석 실습</td><td>자기 적용</td></tr>
-<tr><td class="time-col">23–25분</td><td>복습 퀴즈</td><td>능동적 회상</td></tr>
+      <tbody><tr><td class="time-col">13:00 ~ 13:20</td><td>기술적 분석의 정의 & 3대 가정</td><td>차트 읽기는 과학인가, 예술인가? 기술적 분석의 기초 원칙</td></tr>
+<tr><td class="time-col">13:20 ~ 13:50</td><td>이동평균선(MA): 추세 판단의 기본</td><td>골든 크로스, 데드 크로스 / 단기·중기·장기 MA의 역할</td></tr>
+<tr><td class="time-col">13:50 ~ 14:20</td><td>RSI: 과매수·과매도 판단</td><td>70 이상 = 매도? / 다이버전스 현상 / 추세와 함께 봐야 함</td></tr>
+<tr><td class="time-col">14:20 ~ 14:50</td><td>MACD: 추세 변화의 신호</td><td>상향·하향 크로스오버 / 가장 신뢰할만한 지표</td></tr>
+<tr><td class="time-col">14:50 ~ 15:00</td><td>3중 확인 원칙 & 투자 결정</td><td>MA + RSI + MACD = 최강의 신호조합</td></tr>
 </tbody>
     </table>
   </div>
@@ -370,56 +1179,408 @@ body {
   <div class="cards-grid">
     <div class="concept-card fade-up">
       <div class="card-num">CONCEPT 01</div>
-      <div class="card-title">이동평균선 (Moving Average, MA)</div>
-      <div class="card-body"><p>과거 N일의 평균 주가를 선으로 나타냅니다. 단기(20일) MA와 장기(200일) MA의 교차('골든크로스')는 매매 신호로 사용됩니다.</p>
-<div class="formula-block">
-<div class="formula-highlight">이동평균 계산:</div>
-<div class="formula-line">  MA(20) = (오늘 + 1일전 + … + 20일전) ÷ 20</div>
-<br>
-<div class="formula-highlight">해석:</div>
-<div class="formula-line">  주가 > MA(20) > MA(200) → 상승세 (매수 신호)</div>
-<div class="formula-line">  주가 < MA(20) < MA(200) → 하락세 (매도 신호)</div>
-<div class="formula-line">  MA(20) ↗ MA(200) 교차 (골든크로스) → 강한 매수 신호</div>
-<div class="formula-line">  MA(20) ↘ MA(200) 교차 (데드크로스) → 강한 매도 신호</div>
-<div class="formula-comment">// 단점: 지표가 가격 변화를 쫒아가므로 늦음</div>
-<div class="formula-comment">// 추세 확인용으로만 사용 (선행지표 아님)</div>
-</div></div>
+      <div class="card-title">기술적 분석이란? (차트 읽기의 원칙)</div>
+      <div class="card-body">
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+            <strong style="color: #D4A843;">📊 기본 정의</strong>
+        </div>
+        
+        <div class="formula-block">
+            <div class="formula-line"><strong>기술적 분석(Technical Analysis)</strong></div>
+            <div class="formula-comment">
+                "과거 가격·거래량 데이터를 이용해 미래 가격 추세를 예측하는 방법"<br>
+                ≠ 펀더멘털 분석 (재무제표·경제지표 기반)<br>
+                핵심: 차트 패턴, 이동평균선, 지표 수치 해석
+            </div>
+        </div>
+        
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <tr><th>구분</th><th>기술적 분석</th><th>펀더멘털 분석</th></tr>
+                <tr>
+                    <td>분석 대상</td>
+                    <td>가격·거래량 차트</td>
+                    <td>재무제표·경영진</td>
+                </tr>
+                <tr>
+                    <td>투자 시간축</td>
+                    <td>단기 (일~주 단위)</td>
+                    <td>장기 (년~수년)</td>
+                </tr>
+                <tr>
+                    <td>예측 대상</td>
+                    <td>단기 추세 전환</td>
+                    <td>장기 가치 평가</td>
+                </tr>
+                <tr>
+                    <td>신뢰도</td>
+                    <td>60~70% (확률)</td>
+                    <td>80~90% (가능성)</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="formula-block">
+            <div class="formula-line"><strong>기술적 분석의 3대 가정:</strong></div>
+            <div class="formula-line">1️⃣ <strong style="color: #D4A843;">시장은 모든 정보를 반영</strong></div>
+            <div class="formula-comment">좋은 뉴스 나오면 이미 가격에 반영됨</div>
+            
+            <div class="formula-line">2️⃣ <strong style="color: #3D9E6E;">추세는 존재</strong></div>
+            <div class="formula-comment">위로 가는 주식은 계속 올라가는 경향</div>
+            
+            <div class="formula-line">3️⃣ <strong style="color: #4AAF6A;">역사는 반복</strong></div>
+            <div class="formula-comment">과거 차트 패턴이 미래에도 나타남</div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-top: 12px;">
+            <strong style="color: #C45A4A;">⚠️ 중요한 한계</strong><br>
+            기술적 분석만으로는 절대 판단 금지. 
+            "지표가 매수 신호지만 회사가 부도위험"이면 매수하면 안 됨.
+            반드시 펀더멘털(재무건전성) 확인 후 사용!
+        </div>
+        </div>
     </div>
     <div class="concept-card fade-up">
       <div class="card-num">CONCEPT 02</div>
-      <div class="card-title">RSI (Relative Strength Index) — 과매수/과매도 지표</div>
-      <div class="card-body"><p>0~100 범위의 지표로, 주가가 '너무 오르면' 70 이상(과매수), '너무 내리면' 30 이하(과매도) 상태입니다.</p>
-<div class="formula-block">
-<div class="formula-highlight">RSI 계산 (14일 기준):</div>
-<div class="formula-line">  상승폭 평균 = 최근 14일 중 상승한 날들의 평균 상승폭</div>
-<div class="formula-line">  하락폭 평균 = 최근 14일 중 하락한 날들의 평균 하락폭</div>
-<div class="formula-line">  RS = 상승폭 / 하락폭</div>
-<div class="formula-line">  RSI = 100 × RS / (1 + RS)</div>
-<br>
-<div class="formula-highlight">해석:</div>
-<div class="formula-line">  RSI > 70 → 과매수 (조정 가능성) → 매도 고려</div>
-<div class="formula-line">  RSI < 30 → 과매도 (반등 가능성) → 매수 고려</div>
-<div class="formula-line">  RSI 40~60 → 중립 상태</div>
-<div class="formula-comment">// 강한 추세장에서는 RSI > 70 계속 유지 가능</div>
-<div class="formula-comment">// 신호 단독으로는 신뢰 낮음. 다른 지표와 조합 필수</div>
-</div></div>
+      <div class="card-title">이동평균선(MA): 추세 판단의 가장 단순하고 강력한 지표</div>
+      <div class="card-body">
+        <div class="formula-block">
+            <div class="formula-line"><strong>이동평균선(Moving Average, MA) 정의:</strong></div>
+            <div class="formula-line">MA = 일정 기간 종가의 평균값</div>
+            <div class="formula-comment">예: 20일 MA = 최근 20일 종가 평균 / 50일 MA = 최근 50일 종가 평균</div>
+        </div>
+        
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <tr><th>이동평균 종류</th><th>계산 기간</th><th>의미</th><th>용도</th></tr>
+                <tr>
+                    <td>단기 MA</td>
+                    <td>5일, 10일, 20일</td>
+                    <td>최근 단기 추세</td>
+                    <td>일일 매매 신호</td>
+                </tr>
+                <tr style="background: #2A2C30;">
+                    <td><strong style="color: #D4A843;">중기 MA</strong></td>
+                    <td><strong>50일, 100일</strong></td>
+                    <td><strong>1~3개월 추세</strong></td>
+                    <td><strong>일반 투자자 기준</strong></td>
+                </tr>
+                <tr>
+                    <td>장기 MA</td>
+                    <td>200일</td>
+                    <td>연간 추세 (강세/약세)</td>
+                    <td>연간 방향 판단</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="formula-block">
+            <div class="formula-line"><strong>핵심 신호: 골든 크로스 & 데드 크로스</strong></div>
+            <div class="formula-line">📈 <strong style="color: #4AAF6A;">골든 크로스</strong> = 단기 MA가 장기 MA를 상향 돌파 = <strong>강세 신호 (매수)</strong></div>
+            <div class="formula-line">📉 <strong style="color: #C45A4A;">데드 크로스</strong> = 단기 MA가 장기 MA를 하향 돌파 = <strong>약세 신호 (매도)</strong></div>
+        </div>
+        
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <tr><th>추세 판단</th><th>조건</th><th>해석</th><th>투자 신호</th></tr>
+                <tr style="background: #2A2C30;">
+                    <td><strong style="color: #4AAF6A;">상승추세</strong></td>
+                    <td>가격 > 20일 MA > 50일 MA</td>
+                    <td>단기+장기 모두 상승</td>
+                    <td>🟢 매수 고려</td>
+                </tr>
+                <tr>
+                    <td>약한 상승</td>
+                    <td>가격 > 50일 MA > 20일 MA</td>
+                    <td>중장기는 상승, 단기 조정</td>
+                    <td>매매보류</td>
+                </tr>
+                <tr style="background: #2A2C30;">
+                    <td><strong style="color: #C45A4A;">하락추세</strong></td>
+                    <td>가격 < 20일 MA < 50일 MA</td>
+                    <td>단기+장기 모두 하락</td>
+                    <td>🔴 매도 고려</td>
+                </tr>
+                <tr>
+                    <td>약한 하락</td>
+                    <td>가격 < 50일 MA < 20일 MA</td>
+                    <td>중장기는 하락, 단기 반등</td>
+                    <td>매매보류</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-top: 12px;">
+            <strong style="color: #D4A843;">💡 실전 팁</strong><br>
+            "가격이 50일 MA를 위아래로 오갈 때가 위험"<br>
+            추세가 명확하지 않으므로 관망하는 게 정답.
+            골든크로스/데드크로스가 형성된 후 충분한 시간이 지날 때 사는 게 안전.
+        </div>
+        </div>
     </div>
     <div class="concept-card fade-up">
       <div class="card-num">CONCEPT 03</div>
-      <div class="card-title">MACD (Moving Average Convergence Divergence)</div>
-      <div class="card-body"><p>빠른 이동평균과 느린 이동평균의 차이를 그래프로 나타냅니다. 두 선의 교차점이 매매 신호입니다.</p>
-<div class="formula-block">
-<div class="formula-highlight">MACD 구성:</div>
-<div class="formula-line">  MACD선 = EMA(12) - EMA(26)</div>
-<div class="formula-line">  신호선 = EMA(MACD, 9)</div>
-<div class="formula-line">  히스토그램 = MACD - 신호선 (막대 차트)</div>
-<br>
-<div class="formula-highlight">해석:</div>
-<div class="formula-line">  MACD > 신호선 → 상승 신호 (매수)</div>
-<div class="formula-line">  MACD < 신호선 → 하락 신호 (매도)</div>
-<div class="formula-line">  MACD가 0선을 넘어감 → 추세 전환</div>
-<div class="formula-comment">// 적절한 중간 신호. 단독은 위험하지만 MA, RSI와 조합하면 효과적</div>
-</div></div>
+      <div class="card-title">RSI (Relative Strength Index): 과매수·과매도 판단</div>
+      <div class="card-body">
+        <div class="formula-block">
+            <div class="formula-line"><strong>RSI 정의 & 계산식:</strong></div>
+            <div class="formula-line">RSI = 상승폭의 평균 ÷ (상승폭의 평균 + 하락폭의 평균) × 100</div>
+            <div class="formula-comment">
+                범위: 0 ~ 100<br>
+                의미: 일정 기간(보통 14일) 동안 상승한 강도를 0~100 범위로 표현
+            </div>
+        </div>
+        
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <tr><th>RSI 수치</th><th>상황</th><th>해석</th><th>신호</th></tr>
+                <tr style="background: #2A2C30;">
+                    <td><strong style="color: #C45A4A;">70 이상</strong></td>
+                    <td>과매수</td>
+                    <td>가격이 과도하게 올라감</td>
+                    <td><strong>⚠️ 매도 신호</strong></td>
+                </tr>
+                <tr>
+                    <td>50~70</td>
+                    <td>강세</td>
+                    <td>상승 추세 진행 중</td>
+                    <td>보유</td>
+                </tr>
+                <tr style="background: #2A2C30;">
+                    <td><strong style="color: #D4A843;">30~50</strong></td>
+                    <td>중립</td>
+                    <td>방향 불명확</td>
+                    <td>관망</td>
+                </tr>
+                <tr>
+                    <td>30 이하</td>
+                    <td>과매도</td>
+                    <td>가격이 과도하게 내려감</td>
+                    <td>🟢 매수 신호</td>
+                </tr>
+                <tr style="background: #2A2C30;">
+                    <td><strong style="color: #4AAF6A;">0 ~ 30</strong></td>
+                    <td>약세</td>
+                    <td>하락 추세 진행 중</td>
+                    <td>회피</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="formula-block">
+            <div class="formula-line"><strong>RSI 해석 주의점:</strong></div>
+            <div class="formula-line">⚠️ <strong style="color: #C45A4A;">RSI 70 = 반드시 떨어진다는 뜻 아님!</strong></div>
+            <div class="formula-comment">
+                강한 상승장에서는 RSI가 70을 넘어 80~90까지 갈 수 있음<br>
+                오히려 이것은 "강한 추세" 신호일 수 있음<br>
+                따라서 <strong>추세 + RSI를 함께 봐야 함</strong>
+            </div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-top: 12px;">
+            <strong style="color: #4AAF6A;">✓ 올바른 사용법</strong><br>
+            상승추세 중 RSI 30 이하 = 단기 조정 기회 (더 쌀 때 사기)<br>
+            하락추세 중 RSI 70 이상 = 반등 시도 (여전히 위험)<br>
+            즉, <strong style="color: #D4A843;">RSI만으로는 절대 판단 금지</strong><br>
+            항상 추세 + RSI를 함께 확인!
+        </div>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">MACD (Moving Average Convergence Divergence): 추세 변화의 최강 신호</div>
+      <div class="card-body">
+        <div class="formula-block">
+            <div class="formula-line"><strong>MACD의 구성 (3가지):</strong></div>
+        </div>
+        
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <tr><th>구성요소</th><th>정의</th><th>계산</th><th>의미</th></tr>
+                <tr style="background: #2A2C30;">
+                    <td><strong style="color: #D4A843;">MACD선</strong></td>
+                    <td>핵심 지표</td>
+                    <td>12일 MA - 26일 MA</td>
+                    <td>빠른 이동평균과 느린 이동평균의 차이</td>
+                </tr>
+                <tr>
+                    <td>Signal선</td>
+                    <td>신호선</td>
+                    <td>MACD의 9일 이동평균</td>
+                    <td>MACD보다 느린 기준선</td>
+                </tr>
+                <tr style="background: #2A2C30;">
+                    <td>Histogram</td>
+                    <td>막대그래프</td>
+                    <td>MACD - Signal</td>
+                    <td>두 선의 거리 (차이를 시각화)</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="formula-block">
+            <div class="formula-line"><strong>🎯 핵심 신호: MACD 크로스오버</strong></div>
+            <div class="formula-line">📈 <strong style="color: #4AAF6A;">상향 크로스오버</strong> = MACD가 Signal을 상향 돌파</div>
+            <div class="formula-comment">
+                의미: 단기 강도가 중기 강도를 앞지름 = 추세 전환의 신호 
+                = <strong>매수 신호</strong>
+            </div>
+            
+            <div class="formula-line">📉 <strong style="color: #C45A4A;">하향 크로스오버</strong> = MACD가 Signal을 하향 돌파</div>
+            <div class="formula-comment">
+                의미: 단기 강도가 약해짐 = 상승 추세 약화 신호 
+                = <strong>매도 신호</strong>
+            </div>
+        </div>
+        
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <tr><th>신호 종류</th><th>조건</th><th>의미</th><th>신뢰도</th></tr>
+                <tr style="background: #2A2C30;">
+                    <td><strong style="color: #4AAF6A;">상향 크로스</strong></td>
+                    <td>MACD ↑ Signal 돌파</td>
+                    <td>강세로 전환 신호</td>
+                    <td>⭐⭐⭐⭐⭐</td>
+                </tr>
+                <tr>
+                    <td style="color: #B8B0A0;">Histogram ↑ (양수)</td>
+                    <td>MACD > Signal</td>
+                    <td>강세 진행 중</td>
+                    <td>⭐⭐⭐⭐</td>
+                </tr>
+                <tr style="background: #2A2C30;">
+                    <td><strong style="color: #C45A4A;">하향 크로스</strong></td>
+                    <td>MACD ↓ Signal 돌파</td>
+                    <td>약세로 전환 신호</td>
+                    <td>⭐⭐⭐⭐⭐</td>
+                </tr>
+                <tr>
+                    <td style="color: #B8B0A0;">Histogram ↓ (음수)</td>
+                    <td>MACD < Signal</td>
+                    <td>약세 진행 중</td>
+                    <td>⭐⭐⭐⭐</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-top: 12px;">
+            <strong style="color: #D4A843;">💡 MACD가 최고의 지표인 이유</strong><br>
+            ✅ 추세 방향이 명확함<br>
+            ✅ 추세 전환 시점을 잘 포착<br>
+            ✅ 거짓 신호가 적음<br>
+            ✅ 모든 시간대(일봉·주봉·월봉)에 사용 가능<br>
+            <br>
+            <strong style="color: #4AAF6A;">추천:</strong> 
+            MACD 상향 크로스오버 + 가격이 50일 MA 위 
+            = 가장 강한 매수 신호!
+        </div>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">기술적 분석 신호 종합 해석: 3중 확인 원칙</div>
+      <div class="card-body">
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+            <strong style="color: #D4A843;">⚡ 투자자의 딜레마</strong>
+        </div>
+        
+        <div style="background: #0D0B08; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 3px solid #C45A4A;">
+            <strong style="color: #C45A4A;">❌ 나쁜 예:</strong> 
+            "RSI가 30 이하니까 매수!"<br>
+            → 실은 하락추세 중이었음 → 더 떨어짐<br>
+            <br>
+            <strong style="color: #4AAF6A;">✅ 좋은 예:</strong> 
+            "MACD 상향크로스 + 가격이 50일 MA 위 + RSI 40~60 중심으로 상향"<br>
+            → 3중 확인 완료 → 매수 신호 강함
+        </div>
+        
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <tr><th>매수 신호</th><th>MA</th><th>RSI</th><th>MACD</th><th>신호 강도</th></tr>
+                <tr style="background: #2A2C30;">
+                    <td colspan="5"><strong style="color: #4AAF6A;">■ 매수 신호</strong></td>
+                </tr>
+                <tr>
+                    <td>강한 신호</td>
+                    <td>✅ 가격 > MA20 > MA50</td>
+                    <td>✅ 40~70</td>
+                    <td>✅ 상향크로스</td>
+                    <td><strong style="color: #4AAF6A;">🟢 매수 고GO!</strong></td>
+                </tr>
+                <tr>
+                    <td>보통 신호</td>
+                    <td>가격 > MA50</td>
+                    <td>30~40</td>
+                    <td>MACD > 0</td>
+                    <td>노랑 (관찰)</td>
+                </tr>
+                <tr style="background: #2A2C30;">
+                    <td colspan="5"><strong style="color: #C45A4A;">■ 매도 신호</strong></td>
+                </tr>
+                <tr>
+                    <td>강한 신호</td>
+                    <td>✅ 가격 < MA20 < MA50</td>
+                    <td>✅ 30~0</td>
+                    <td>✅ 하향크로스</td>
+                    <td><strong style="color: #C45A4A;">🔴 매도 NO!</strong></td>
+                </tr>
+                <tr>
+                    <td>보통 신호</td>
+                    <td>가격 < MA50</td>
+                    <td>60~70</td>
+                    <td>MACD < 0</td>
+                    <td>노랑 (관찰)</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="formula-block">
+            <div class="formula-line"><strong>3중 확인 원칙 (Confluence):</strong></div>
+            <div class="formula-line">최소 3가지 신호가 동시에 나타나야만 확신할 것</div>
+            <div class="formula-comment">
+                예: 이동평균선 강세 신호 + RSI 상향 + MACD 상향크로스<br>
+                = 세 지표가 동시에 강세 신호 = 매수 신호 매우 강함
+            </div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-top: 12px;">
+            <strong style="color: #D4A843;">🎯 투자 결정 체크리스트</strong>
+        </div>
+        
+        <div style="margin: 12px 0;">
+            <input type="checkbox" style="width: 18px; height: 18px; margin-right: 8px; cursor: pointer;">
+            <label style="cursor: pointer; font-size: 12px; color: #EDE8D8;">
+                <strong>1. 추세 확인</strong> - 가격이 주요 이동평균선 위에 있는가?
+            </label>
+        </div>
+        
+        <div style="margin: 12px 0;">
+            <input type="checkbox" style="width: 18px; height: 18px; margin-right: 8px; cursor: pointer;">
+            <label style="cursor: pointer; font-size: 12px; color: #EDE8D8;">
+                <strong>2. 모멘텀 확인</strong> - RSI가 과매수/과매도 아닌가?
+            </label>
+        </div>
+        
+        <div style="margin: 12px 0;">
+            <input type="checkbox" style="width: 18px; height: 18px; margin-right: 8px; cursor: pointer;">
+            <label style="cursor: pointer; font-size: 12px; color: #EDE8D8;">
+                <strong>3. 추세 전환 신호</strong> - MACD가 크로스오버했는가?
+            </label>
+        </div>
+        
+        <div style="margin: 12px 0;">
+            <input type="checkbox" style="width: 18px; height: 18px; margin-right: 8px; cursor: pointer;">
+            <label style="cursor: pointer; font-size: 12px; color: #EDE8D8;">
+                <strong>4. 펀더멘털 확인</strong> - 회사 재무는 건전한가?
+            </label>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-top: 12px; border-left: 3px solid #D4A843;">
+            <strong style="color: #D4A843;">⭐ 황금 규칙</strong><br>
+            기술적 분석 신호 + 기본 재무건전성 = 최강의 투자 신호!<br>
+            기술적 신호만으로는 절대 투자하지 말 것!
+        </div>
+        </div>
     </div></div>
 </section>
 
@@ -427,77 +1588,189 @@ body {
 <section class="section fade-up">
   <div class="section-label">VISUALIZATION</div>
   <h2 class="section-title">시각화 자료</h2>
-  <div class="chart-container">
-    <div class="chart-title">기술지표 예시: 삼성전자 가상 60일 데이터 (MA, RSI, MACD)</div>
-    <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
-      <!-- 배경 -->
-      <rect width="900" height="500" fill="rgba(10,12,16,0.5)"/>
+  
+<svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1000" height="450" fill="#0D0B08"/>
+  
+  <!-- Title -->
+  <text x="500" y="30" font-size="20" font-weight="bold" fill="#EDE8D8" text-anchor="middle">
+    이동평균선(MA)을 이용한 추세 판단
+  </text>
+  
+  <!-- Grid -->
+  <line x1="50" y1="80" x2="950" y2="80" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="50" y1="140" x2="950" y2="140" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="50" y1="200" x2="950" y2="200" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="50" y1="260" x2="950" y2="260" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="50" y1="320" x2="950" y2="320" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  
+  <!-- Y-axis -->
+  <line x1="50" y1="80" x2="50" y2="380" stroke="#8A8272" stroke-width="2"/>
+  <text x="25" y="385" font-size="11" fill="#B8B0A0">0</text>
+  <text x="10" y="85" font-size="10" fill="#B8B0A0">120K</text>
+  <text x="10" y="145" font-size="10" fill="#B8B0A0">100K</text>
+  <text x="10" y="205" font-size="10" fill="#B8B0A0">80K</text>
+  <text x="10" y="265" font-size="10" fill="#B8B0A0">60K</text>
+  <text x="10" y="325" font-size="10" fill="#B8B0A0">40K</text>
+  
+  <!-- X-axis -->
+  <line x1="50" y1="380" x2="950" y2="380" stroke="#8A8272" stroke-width="2"/>
+  <text x="70" y="400" font-size="10" fill="#B8B0A0">1월</text>
+  <text x="250" y="400" font-size="10" fill="#B8B0A0">4월</text>
+  <text x="430" y="400" font-size="10" fill="#B8B0A0">7월</text>
+  <text x="610" y="400" font-size="10" fill="#B8B0A0">10월</text>
+  <text x="790" y="400" font-size="10" fill="#B8B0A0">12월</text>
+  
+  <!-- Price line (random walk, generally uptrend) -->
+  <polyline points="70,300 120,280 170,290 220,260 270,240 320,250 370,200 420,180 470,150 520,140 570,120 620,130 670,100 720,110 770,80 820,90 870,70 920,60" 
+            stroke="#3D9E6E" stroke-width="2" fill="none"/>
+  
+  <!-- 20-day MA (Shorter MA) -->
+  <polyline points="100,285 150,270 200,275 250,255 300,235 350,240 400,190 450,165 500,145 550,130 600,125 650,110 700,105 750,90 800,85 850,75" 
+            stroke="#D4A843" stroke-width="2.5" fill="none" stroke-dasharray="5,5"/>
+  
+  <!-- 50-day MA (Longer MA) -->
+  <polyline points="150,310 200,295 250,280 300,260 350,245 400,220 450,190 500,165 550,145 600,135 650,125 700,115 750,100 800,90 850,80" 
+            stroke="#4AAF6A" stroke-width="2.5" fill="none" stroke-dasharray="5,5"/>
+  
+  <!-- Legend -->
+  <rect x="600" y="100" width="320" height="100" fill="#1A1C20" rx="6" stroke="#2A2C30" stroke-width="1"/>
+  
+  <circle cx="620" cy="120" r="3" fill="#3D9E6E"/>
+  <text x="640" y="125" font-size="12" fill="#EDE8D8">실제 가격 (Price)</text>
+  
+  <line x1="620" y1="145" x2="650" y2="145" stroke="#D4A843" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="665" y="150" font-size="12" fill="#EDE8D8">20일 이동평균 (MA20)</text>
+  
+  <line x1="620" y1="170" x2="650" y2="170" stroke="#4AAF6A" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="665" y="175" font-size="12" fill="#EDE8D8">50일 이동평균 (MA50)</text>
+  
+  <!-- Signal Box -->
+  <rect x="50" y="410" width="900" height="35" fill="#1A1C20" rx="4"/>
+  <text x="500" y="420" font-size="11" fill="#4AAF6A" text-anchor="middle" font-weight="bold">
+    ✅ 강세 신호: 가격 > MA20 > MA50 (골든 크로스: MA20이 MA50을 상향 돌파)
+  </text>
+  <text x="500" y="435" font-size="10" fill="#B8B0A0" text-anchor="middle">
+    약세 신호: 가격 < MA20 < MA50 (데드 크로스: MA20이 MA50을 하향 돌파)
+  </text>
+</svg>
 
-      <!-- 상단: 가격 & MA -->
-      <text x="450" y="25" text-anchor="middle" fill="#C9A84C" font-family="Noto Sans KR" font-size="13" font-weight="600">주가 & 이동평균선 (상위)</text>
+<svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1000" height="400" fill="#0D0B08"/>
+  
+  <!-- Title -->
+  <text x="500" y="30" font-size="20" font-weight="bold" fill="#EDE8D8" text-anchor="middle">
+    RSI (상대강도지수): 과매수/과매도 판단
+  </text>
+  
+  <!-- Y-axis background zones -->
+  <rect x="50" y="70" width="900" height="50" fill="#1A1C20" opacity="0.3"/>
+  <text x="980" y="90" font-size="10" fill="#C45A4A" text-anchor="start">과매수</text>
+  <text x="980" y="105" font-size="10" fill="#C45A4A" text-anchor="start">(70 이상)</text>
+  
+  <rect x="50" y="270" width="900" height="50" fill="#1A1C20" opacity="0.3"/>
+  <text x="980" y="290" font-size="10" fill="#D4A843" text-anchor="start">과매도</text>
+  <text x="980" y="305" font-size="10" fill="#D4A843" text-anchor="start">(30 이하)</text>
+  
+  <!-- Y-axis labels -->
+  <text x="30" y="75" font-size="10" fill="#B8B0A0">100</text>
+  <text x="40" y="150" font-size="10" fill="#B8B0A0">70</text>
+  <text x="40" y="225" font-size="10" fill="#B8B0A0">50</text>
+  <text x="40" y="300" font-size="10" fill="#B8B0A0">30</text>
+  <text x="30" y="375" font-size="10" fill="#B8B0A0">0</text>
+  
+  <!-- Axis lines -->
+  <line x1="50" y1="70" x2="950" y2="70" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="50" y1="120" x2="950" y2="120" stroke="#8A8272" stroke-width="1.5"/>
+  <text x="960" y="125" font-size="9" fill="#B8B0A0">70</text>
+  
+  <line x1="50" y1="225" x2="950" y2="225" stroke="#8A8272" stroke-width="1.5"/>
+  <text x="960" y="230" font-size="9" fill="#B8B0A0">50</text>
+  
+  <line x1="50" y1="330" x2="950" y2="330" stroke="#8A8272" stroke-width="1.5"/>
+  <text x="960" y="335" font-size="9" fill="#B8B0A0">30</text>
+  
+  <line x1="50" y1="370" x2="950" y2="370" stroke="#2A2C30" stroke-width="1" stroke-dasharray="3,3"/>
+  
+  <!-- Y-axis -->
+  <line x1="50" y1="70" x2="50" y2="370" stroke="#8A8272" stroke-width="2"/>
+  
+  <!-- X-axis -->
+  <line x1="50" y1="370" x2="950" y2="370" stroke="#8A8272" stroke-width="2"/>
+  
+  <!-- RSI Line (fluctuating between 20-80) -->
+  <polyline points="80,240 130,200 180,160 230,180 280,210 330,120 380,100 430,150 480,250 530,240 580,130 630,90 680,180 730,200 780,140 830,160 880,220 930,190" 
+            stroke="#3D9E6E" stroke-width="2.5" fill="none"/>
+  
+  <!-- Overbought zone (>70) -->
+  <circle cx="180" cy="160" r="5" fill="#C45A4A"/>
+  <text x="200" y="145" font-size="11" fill="#C45A4A" font-weight="bold">매도신호</text>
+  
+  <!-- Oversold zone (<30) -->
+  <circle cx="630" cy="90" r="5" fill="#D4A843"/>
+  <text x="650" y="95" font-size="11" fill="#D4A843" font-weight="bold">매수신호</text>
+  
+  <!-- Info box -->
+  <rect x="50" y="385" width="900" height="15" fill="#1A1C20" rx="3"/>
+  <text x="500" y="395" font-size="11" fill="#4AAF6A" text-anchor="middle" font-weight="bold">
+    RSI = 상승폭 ÷ (상승폭 + 하락폭) × 100  /  지표: 0~100 범위  /  매도: 70 이상  /  매수: 30 이하  /  중립: 40~60
+  </text>
+</svg>
 
-      <!-- Y축 (가격) -->
-      <text x="40" y="50" fill="#9A9890" font-family="JetBrains Mono" font-size="9">77,000</text>
-      <text x="40" y="120" fill="#9A9890" font-family="JetBrains Mono" font-size="9">75,000</text>
-      <text x="40" y="190" fill="#9A9890" font-family="JetBrains Mono" font-size="9">73,000</text>
-      <text x="40" y="260" fill="#9A9890" font-family="JetBrains Mono" font-size="9">71,000</text>
+<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1000" height="500" fill="#0D0B08"/>
+  
+  <!-- Title -->
+  <text x="500" y="30" font-size="20" font-weight="bold" fill="#EDE8D8" text-anchor="middle">
+    MACD: 추세 변화의 최강 신호
+  </text>
+  
+  <!-- Price Section (Top) -->
+  <rect x="50" y="60" width="900" height="140" fill="#0D0B08" stroke="#2A2C30" stroke-width="1" stroke-dasharray="5,5"/>
+  <text x="70" y="80" font-size="12" fill="#B8B0A0" font-weight="bold">가격 추이</text>
+  
+  <!-- Price trend line -->
+  <polyline points="80,180 130,160 180,130 230,140 280,110 330,100 380,120 430,80 480,75 530,90 580,65 630,70 680,50 730,60 780,40 830,35 880,50" 
+            stroke="#3D9E6E" stroke-width="2" fill="none"/>
+  
+  <!-- MACD Section (Bottom) -->
+  <rect x="50" y="220" width="900" height="230" fill="#0D0B08" stroke="#2A2C30" stroke-width="1" stroke-dasharray="5,5"/>
+  <text x="70" y="240" font-size="12" fill="#B8B0A0" font-weight="bold">MACD 지표</text>
+  
+  <!-- Zero line -->
+  <line x1="50" y1="325" x2="950" y2="325" stroke="#8A8272" stroke-width="2"/>
+  <text x="960" y="330" font-size="10" fill="#B8B0A0">0</text>
+  
+  <!-- MACD line -->
+  <polyline points="80,310 130,305 180,290 230,295 280,270 330,260 380,275 430,240 480,235 530,250 580,220 630,225 680,200 730,210 780,185 830,190 880,205" 
+            stroke="#D4A843" stroke-width="2" fill="none"/>
+  <text x="890" y="210" font-size="10" fill="#D4A843" font-weight="bold">MACD</text>
+  
+  <!-- Signal line (slower) -->
+  <polyline points="100,315 150,310 200,295 250,300 300,275 350,265 400,280 450,245 500,240 550,255 600,230 650,230 700,210 750,215 800,195 850,195 900,208" 
+            stroke="#4AAF6A" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+  <text x="920" y="210" font-size="10" fill="#4AAF6A" font-weight="bold">Signal</text>
+  
+  <!-- Histogram (MACD - Signal) -->
+  <rect x="75" y="320" width="8" height="10" fill="#4AAF6A" opacity="0.6"/>
+  <rect x="125" y="318" width="8" height="12" fill="#4AAF6A" opacity="0.6"/>
+  <rect x="175" y="305" width="8" height="25" fill="#4AAF6A" opacity="0.6"/>
+  <rect x="225" y="308" width="8" height="22" fill="#4AAF6A" opacity="0.6"/>
+  <rect x="275" y="295" width="8" height="30" fill="#4AAF6A" opacity="0.6"/>
+  
+  <!-- Crossover point (Signal) -->
+  <circle cx="330" cy="262" r="6" fill="#C45A4A" stroke="#D4A843" stroke-width="2"/>
+  <text x="340" y="255" font-size="10" fill="#C45A4A" font-weight="bold">매도!</text>
+  
+  <rect x="75" y="330" width="8" height="-10" fill="#C45A4A" opacity="0.6"/>
+  
+  <!-- Key insight -->
+  <rect x="50" y="470" width="900" height="25" fill="#1A1C20" rx="4"/>
+  <text x="500" y="485" font-size="11" fill="#D4A843" text-anchor="middle" font-weight="bold">
+    🎯 MACD 크로스오버: MACD가 Signal을 상향 돌파 = 강세 신호 (매수) / 하향 돌파 = 약세 신호 (매도)
+  </text>
+</svg>
 
-      <!-- X축 (기간) -->
-      <line x1="70" y1="280" x2="850" y2="280" stroke="var(--border)" stroke-width="1"/>
-      <text x="150" y="300" text-anchor="middle" fill="#9A9890" font-family="JetBrains Mono" font-size="9">D+10</text>
-      <text x="300" y="300" text-anchor="middle" fill="#9A9890" font-family="JetBrains Mono" font-size="9">D+30</text>
-      <text x="450" y="300" text-anchor="middle" fill="#9A9890" font-family="JetBrains Mono" font-size="9">D+50</text>
-      <text x="600" y="300" text-anchor="middle" fill="#9A9890" font-family="JetBrains Mono" font-size="9">D+70</text>
-
-      <!-- 주가 라인 (변동성) -->
-      <polyline points="70,200 150,160 200,180 250,140 300,150 350,130 400,170 450,120 500,130 550,100 600,110 650,90 700,140 750,120 800,150 850,160"
-                 fill="none" stroke="#BF4A4A" stroke-width="2.5" opacity="0.8"/>
-
-      <!-- MA20 라인 -->
-      <polyline points="70,210 150,190 200,185 250,170 300,160 350,155 400,160 450,150 500,145 550,130 600,125 650,120 700,125 750,135 800,145 850,155"
-                 fill="none" stroke="#4A9EBF" stroke-width="2"/>
-
-      <!-- MA200 라인 -->
-      <polyline points="70,230 150,225 200,220 250,215 300,210 350,210 400,210 450,210 500,210 550,205 600,200 650,195 700,190 750,185 800,180 850,175"
-                 fill="none" stroke="#C9A84C" stroke-width="2" opacity="0.6"/>
-
-      <!-- 범례 -->
-      <g transform="translate(70, 310)">
-        <line x1="0" y1="0" x2="15" y2="0" stroke="#BF4A4A" stroke-width="2"/>
-        <text x="20" y="4" fill="#BF4A4A" font-family="Noto Sans KR" font-size="9">주가</text>
-
-        <line x1="80" y1="0" x2="95" y2="0" stroke="#4A9EBF" stroke-width="2"/>
-        <text x="100" y="4" fill="#4A9EBF" font-family="Noto Sans KR" font-size="9">MA(20)</text>
-
-        <line x1="200" y1="0" x2="215" y2="0" stroke="#C9A84C" stroke-width="2" opacity="0.6"/>
-        <text x="220" y="4" fill="#C9A84C" font-family="Noto Sans KR" font-size="9">MA(200)</text>
-      </g>
-
-      <!-- 중단: RSI -->
-      <text x="450" y="360" text-anchor="middle" fill="#C9A84C" font-family="Noto Sans KR" font-size="13" font-weight="600">RSI (상대강도지수) (중위)</text>
-
-      <!-- RSI Y축 -->
-      <text x="40" y="385" fill="#9A9890" font-family="JetBrains Mono" font-size="8">100</text>
-      <text x="40" y="410" fill="#9A9890" font-family="JetBrains Mono" font-size="8">70</text>
-      <text x="40" y="435" fill="#9A9890" font-family="JetBrains Mono" font-size="8">50</text>
-      <text x="40" y="460" fill="#9A9890" font-family="JetBrains Mono" font-size="8">30</text>
-      <text x="40" y="480" fill="#9A9890" font-family="JetBrains Mono" font-size="8">0</text>
-
-      <!-- RSI 영역 표시 -->
-      <rect x="70" y="365" width="780" height="28" fill="rgba(191,74,74,0.1)" opacity="0.5"/>
-      <text x="75" y="378" fill="var(--red)" font-family="JetBrains Mono" font-size="8">과매수 70+</text>
-
-      <rect x="70" y="455" width="780" height="25" fill="rgba(74,191,122,0.1)" opacity="0.5"/>
-      <text x="75" y="468" fill="var(--green)" font-family="JetBrains Mono" font-size="8">과매도 &lt;30</text>
-
-      <!-- RSI 라인 -->
-      <polyline points="70,420 150,395 200,410 250,375 300,385 350,360 400,405 450,350 500,365 550,330 600,345 650,315 700,390 750,370 800,400 850,410"
-                 fill="none" stroke="#4ABF7A" stroke-width="2"/>
-
-      <!-- 하단: MACD -->
-      <text x="450" y="510" text-anchor="middle" fill="#C9A84C" font-family="Noto Sans KR" font-size="12" font-weight="600">MACD 히스토그램 (하위)</text>
-    </svg>
-  </div>
 </section>
 
 
@@ -505,40 +1778,216 @@ body {
 <section class="section fade-up">
   <div class="section-label">DEEP DIVE</div>
   <h2 class="section-title">심화 학습</h2>
-  <details class="deep-dive">
-    <summary>이동평균이 '지연 지표'인 이유와 보완 방법</summary>
+  
+<details class="deep-dive">
+    <summary>🔍 심화학습 1: 왜 이동평균선은 절대 완벽하지 않은가? (후행 지표의 한계)</summary>
     <div class="deep-dive-content">
-      <p><strong>문제:</strong> 이동평균선은 과거 N일의 평균이므로 현재 주가 급변화를 따라가지 못합니다. 주가가 떨어진 후에야 MA가 따라 내려옵니다.</p>
-      <div class="formula-block">
-        <div class="formula-highlight">예시:</div>
-        <div class="formula-line">  Day 1~20: 주가 꾸준히 100원</div>
-        <div class="formula-line">  Day 21: 주가 갑자기 50원으로 급락</div>
-        <div class="formula-line">  MA(20) (Day 21) = (100×20 + 50) / 21 = 95원 (아직 높음)</div>
-        <div class="formula-line">  → 이미 50원까지 떨어졌는데 MA는 95원 (신호 늦음)</div>
-      </div>
-      <p style="margin-top:1rem;"><strong>보완 방법:</strong></p>
-      <ul style="font-size:0.82rem;color:var(--text-secondary);margin-left:1.5rem;">
-        <li>- RSI, MACD 등 빠른 지표와 함께 사용</li>
-        <li>- 20일 MA (단기) 와 200일 MA (장기)의 각도 변화 주시</li>
-        <li>- 추세 확인용으로만 사용, 진입/청산 신호는 다른 지표와 조합</li>
-        <li>- 변동성이 큰 시기에는 더 빠른 지표(5일 MA) 사용</li>
-      </ul>
+        <p>
+            <strong>이동평균선의 비극적 현실:</strong>
+        </p>
+        
+        <p style="margin-top: 12px;">
+            이동평균선은 "과거 데이터의 평균"이다.
+            따라서 <strong>항상 가격 뒤에서 따라다닌다.</strong>
+            이를 "후행 지표(Lagging Indicator)"라 부른다.
+        </p>
+        
+        <div class="formula-block">
+            <div class="formula-line"><strong>비극적인 사례:</strong></div>
+            <div class="formula-line">1월: 주식이 100원에서 80원으로 폭락</div>
+            <div class="formula-line">2월: 여전히 80원 근처에서 약세</div>
+            <div class="formula-line">→ 50일 MA가 겨우 95원으로 내려옴 (데드크로스 발생!)</div>
+            <div class="formula-line">→ 투자자들이 "매도 신호!" 하고 팔기 시작</div>
+            <div class="formula-line">→ 실제로는 이미 20% 떨어진 후이므로 "저가 매도" 함정에 빠짐</div>
+        </div>
+        
+        <p style="margin-top: 12px;">
+            <strong>결론: 이동평균선은 "추세 확인" 용도지, 정확한 매매 타이밍은 아니다.</strong>
+        </p>
+        
+        <p style="margin-top: 12px;">
+            이것이 바로 MACD와 RSI 같은 "선행 지표(Leading Indicator)"가 
+            함께 필요한 이유.
+        </p>
+        
+        <p style="margin-top: 12px; background: #1A1C20; padding: 10px; border-radius: 6px;">
+            <strong style="color: #D4A843;">💡 실전 팁:</strong>
+            MA는 "이미 추세가 맞다"는 확인용. 
+            "지금 정확히 사고팔아야 한다"는 MACD·RSI로 판단할 것!
+        </p>
     </div>
-  </details>
-  <details class="deep-dive">
-    <summary>기술분석의 한계: 차트는 미래를 보지 못한다</summary>
+</details>
+
+<details class="deep-dive">
+    <summary>🔍 심화학습 2: RSI의 거짓 신호: "다이버전스" 현상</summary>
     <div class="deep-dive-content">
-      <p><strong>중요한 경고:</strong> 기술분석은 '역사를 반복하는 패턴'에 기반합니다. 하지만 반도체 산업처럼 급변하는 분야에서는 갑자기 게임 규칙이 바뀔 수 있습니다.</p>
-      <div class="formula-block">
-        <div class="formula-highlight">예시: SK하이닉스 HBM 돌풍 (2024)</div>
-        <div class="formula-line">  2023년 이전: DRAM 불황 → RSI < 30 (매도 신호)</div>
-        <div class="formula-line">  기술분석가: "SK하이닉스 주가 계속 내려간다" 예측</div>
-        <div class="formula-line">  하지만: 2024년 AI GPU 수요 폭증</div>
-        <div class="formula-line">  → SK하이닉스 HBM 공급 독점 → 주가 급등</div>
-      </div>
-      <p style="margin-top:1rem;"><strong>결론:</strong> 기술분석은 "과매수/과매도" 수치적 신호는 좋지만, 산업 구조 변화(Day 09)와 재무 건강도(Day 10)를 함께 봐야만 정확한 예측이 가능합니다.</p>
+        <p>
+            <strong>다이버전스(Divergence)란?</strong>
+        </p>
+        
+        <p style="margin-top: 12px;">
+            "가격은 올라가는데 RSI는 내려가는" 상황을 말한다.
+            이는 매우 위험한 신호일 수 있다.
+        </p>
+        
+        <div style="background: #1A1C20; padding: 10px; border-radius: 6px; margin: 12px 0;">
+            <div style="color: #B8B0A0; font-size: 13px;">
+                <strong style="color: #C45A4A;">❌ 약세 다이버전스 (Bearish Divergence):</strong><br>
+                가격은 고점을 갱신 (100원 → 105원)했는데<br>
+                RSI는 오히려 낮아짐 (75 → 65)<br>
+                <br>
+                의미: "가격은 올라갔지만, 상승 강도는 약해짐"<br>
+                결론: 상승이 곧 끝나고 하락할 신호! ⚠️
+            </div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 10px; border-radius: 6px; margin: 12px 0;">
+            <div style="color: #B8B0A0; font-size: 13px;">
+                <strong style="color: #4AAF6A;">✅ 강세 다이버전스 (Bullish Divergence):</strong><br>
+                가격은 저점을 갱신 (80원 → 75원)했는데<br>
+                RSI는 오히려 높아짐 (25 → 35)<br>
+                <br>
+                의미: "가격은 내려갔지만, 하락 강도는 약해짐"<br>
+                결론: 하락이 곧 끝나고 상승할 신호! 📈
+            </div>
+        </div>
+        
+        <p style="margin-top: 12px;">
+            <strong>다이버전스는 RSI의 가장 강력한 신호다.</strong>
+            단순 수치(70 이상 = 매도) 신호보다 훨씬 신뢰할 만하다.
+        </p>
+        
+        <p style="margin-top: 12px; background: #1A1C20; padding: 10px; border-radius: 6px;">
+            <strong style="color: #D4A843;">💡 투자 활용:</strong>
+            약세 다이버전스가 보이면 수익실현 시작할 때!<br>
+            강세 다이버전스가 보이면 저가 매수 기회!
+        </p>
     </div>
-  </details>
+</details>
+
+<details class="deep-dive">
+    <summary>🔍 심화학습 3: MACD의 함정: "화이트 노이즈" (거짓 신호)</summary>
+    <div class="deep-dive-content">
+        <p>
+            <strong>MACD도 항상 맞지는 않다.</strong>
+        </p>
+        
+        <p style="margin-top: 12px;">
+            횡보장(Sideways, 옆으로 가는 시장)에서는 MACD가 자주 크로스오버한다.
+            이를 "화이트 노이즈"라 부른다 = 쓸모없는 신호.
+        </p>
+        
+        <div style="background: #1A1C20; padding: 10px; border-radius: 6px; margin: 12px 0;">
+            <div style="color: #B8B0A0; font-size: 13px;">
+                <strong style="color: #C45A4A;">❌ 거짓 신호 사례:</strong><br>
+                1월: MACD 상향크로스 → 매수<br>
+                2일: 2% 올랐다가 바로 하락<br>
+                5일: MACD 하향크로스 → 손절<br>
+                10일: 다시 상향크로스 → 재매수<br>
+                ...<br>
+                결국 손해만 누적<br>
+                <br>
+                원인: 시장이 방향이 없었음 (횡보장)<br>
+                <strong style="color: #D4A843;">해결책: 추세가 명확할 때만 거래할 것!</strong>
+            </div>
+        </div>
+        
+        <p style="margin-top: 12px;">
+            <strong>MACD 신호의 신뢰도는 추세의 강도에 따라 달라진다.</strong>
+        </p>
+        
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <tr><th>시장 상황</th><th>MACD 신뢰도</th><th>대응 방법</th></tr>
+                <tr style="background: #2A2C30;">
+                    <td>명확한 상승추세</td>
+                    <td>⭐⭐⭐⭐⭐ 최고</td>
+                    <td>MACD 신호 따라도 OK</td>
+                </tr>
+                <tr>
+                    <td>약한 상승추세</td>
+                    <td>⭐⭐⭐ 중간</td>
+                    <td>MA와 함께 확인 필수</td>
+                </tr>
+                <tr style="background: #2A2C30;">
+                    <td><strong style="color: #C45A4A;">횡보장 (방향성 없음)</strong></td>
+                    <td><strong style="color: #C45A4A;">⭐ 최악</strong></td>
+                    <td><strong style="color: #C45A4A;">거래하지 말 것!</strong></td>
+                </tr>
+            </table>
+        </div>
+        
+        <p style="margin-top: 12px; background: #1A1C20; padding: 10px; border-radius: 6px;">
+            <strong style="color: #D4A843;">⭐ 황금 규칙:</strong>
+            "명확한 추세 + MACD 신호" = 매매<br>
+            "방향 없는 횡보 + MACD 신호" = 위험, 거래 금지!
+        </p>
+    </div>
+</details>
+
+<details class="deep-dive">
+    <summary>🔍 심화학습 4: 기술적 분석의 근본적 한계 (왜 완벽할 수 없는가?)</summary>
+    <div class="deep-dive-content">
+        <p>
+            <strong>현실의 비극:</strong>
+            기술적 분석의 신호가 정확하다면, 모든 투자자가 부자여야 한다.
+            하지만 그렇지 않다.
+        </p>
+        
+        <p style="margin-top: 12px;">
+            <strong>왜인가?</strong>
+        </p>
+        
+        <div style="background: #1A1C20; padding: 10px; border-radius: 6px; margin: 12px 0;">
+            <strong style="color: #C45A4A;">근본적 이유 1: 자체 예언의 파괴 (Self-Fulfilling Prophecy의 역)</strong>
+            <div style="color: #B8B0A0; font-size: 12px; margin-top: 8px;">
+                모두가 MACD 상향크로스를 보고 동시에 매수한다면?<br>
+                → 가격이 너무 빨리 올라서 RSI 70 넘음<br>
+                → 과매수 경고! 다들 팔기 시작<br>
+                → 신호 가치 상실<br>
+                <br>
+                <strong style="color: #D4A843;">결론:</strong> 
+                더 많은 사람이 같은 지표를 쓸수록 그 지표는 먹히지 않음
+            </div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 10px; border-radius: 6px; margin: 12px 0;">
+            <strong style="color: #C45A4A;">근본적 이유 2: 변수가 너무 많다</strong>
+            <div style="color: #B8B0A0; font-size: 12px; margin-top: 8px;">
+                갑자기 전쟁, 테러, 회장 사망, 상한가 뉴스 같은 <br>
+                "검은 백조(Black Swan)" 사건이 터지면?<br>
+                모든 기술적 분석은 무너진다.<br>
+                예) 2020년 코로나, 2022년 우크라이나 전쟁<br>
+                → 차트 패턴 무시하고 급등/급락
+            </div>
+        </div>
+        
+        <div style="background: #1A1C20; padding: 10px; border-radius: 6px; margin: 12px 0;">
+            <strong style="color: #C45A4A;">근본적 이유 3: 감정(Fear & Greed) 변수</strong>
+            <div style="color: #B8B0A0; font-size: 12px; margin-top: 8px;">
+                기술적 지표는 수학적, 투자자는 감정적이다.<br>
+                MACD 매도 신호가 나도 "혹시 반등하지?" 하다가<br>
+                 더 떨어진다 (공포감).<br>
+                또는 MACD 매수해도 2% 올랐다고 팔아버린다 (탐욕감).<br>
+                → 신호와 실제 행동이 다름
+            </div>
+        </div>
+        
+        <p style="margin-top: 12px; background: #1A1C20; padding: 10px; border-radius: 6px;">
+            <strong style="color: #D4A843;">⭐ 최종 결론</strong><br>
+            기술적 분석은 확률 게임이다 (60~70% 신뢰도).<br>
+            100% 맞는 지표는 없다.<br>
+            따라서:<br>
+            1. 기술적 신호 + 펀더멘털 함께 확인<br>
+            2. 손실 최소화 (손절선 설정)<br>
+            3. 포지션 사이징 (1회 손실 2% 이하)<br>
+            4. 장기 관점 유지 (단기 신호 추격 금지)<br>
+            <br>
+            이 4가지를 지켜야만 "기술적 분석으로 돈 버는 투자자"가 될 수 있다.
+        </p>
+    </div>
+</details>
+
 </section>
 
 
@@ -547,19 +1996,184 @@ body {
 <section class="section fade-up">
   <div class="section-label">APPLY TO MY ASSETS</div>
   <h2 class="section-title">내 자산에 직접 적용</h2>
-  <div class="sim-box">
-    <h3>📊 내 보유주 기술분석 실습</h3>
-    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">삼성전자와 SK하이닉스 차트를 보면서 아래를 체크하세요:</p>
-    <ul class="checklist">
-      <li><strong>이동평균 위치:</strong> 주가가 MA(20) 위에 있는가? (위 = 상승세)</li>
-      <li><strong>골든크로스 여부:</strong> MA(20)이 MA(200)을 상향 돌파했는가?</li>
-      <li><strong>RSI 수치:</strong> 현재 RSI가 몇인가? 과매수(70+) 또는 과매도(30-) 상태인가?</li>
-      <li><strong>MACD 신호:</strong> MACD선이 신호선 위에 있는가? (위 = 상승 신호)</li>
-      <li><strong>복합 신호:</strong> 위 4개 지표가 모두 같은 방향을 가리키는가? (강한 신호)</li>
-    </ul>
-    <div style="background:var(--gold-dim);padding:1rem;border-radius:6px;margin-top:1.2rem;">
-      <p style="font-size:0.85rem;color:var(--text-primary);margin-bottom:0.5rem;"><strong>⚠️ 중요 주의:</strong></p>
-      <p style="font-size:0.82rem;color:var(--text-secondary);">기술분석만으로 매매하지 마세요. 반드시 산업 분석(Day 09) + 재무분석(Day 10)과 함께 종합적으로 판단하세요. 특히 반도체처럼 변화가 빠른 산업은 기술분석이 뒤처질 수 있습니다.</p>
+  
+<div class="sim-box">
+    <div style="background: linear-gradient(135deg, #D4A843 0%, #3D9E6E 100%); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+        <h3 style="color: #0D0B08; margin: 0; font-size: 16px;">📊 실습: 당신의 주식(삼성전자)의 기술적 신호 분석</h3>
+    </div>
+    
+    <div style="background: #1A1C20; padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+        <p style="color: #B8B0A0; font-size: 12px; margin: 0;">
+            현재 포트폴리오: 삼성전자 2,800만 원어치
+        </p>
+    </div>
+    
+    <div style="background: #0D0B08; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 3px solid #D4A843;">
+        <div style="font-size: 12px; color: #EDE8D8; margin-bottom: 8px;">
+            <strong>2026년 3월 현황 (가정):</strong>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+                <div style="color: #B8B0A0; font-size: 11px;">현재 가격</div>
+                <div style="color: #D4A843; font-weight: bold;">67,500원</div>
+            </div>
+            <div>
+                <div style="color: #B8B0A0; font-size: 11px;">20일 MA</div>
+                <div style="color: #3D9E6E; font-weight: bold;">69,000원</div>
+            </div>
+            <div>
+                <div style="color: #B8B0A0; font-size: 11px;">50일 MA</div>
+                <div style="color: #4AAF6A; font-weight: bold;">71,500원</div>
+            </div>
+            <div>
+                <div style="color: #B8B0A0; font-size: 11px;">RSI</div>
+                <div style="color: #C45A4A; font-weight: bold;">28 (과매도)</div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="background: #1A1C20; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+        <div style="color: #D4A843; font-weight: bold; margin-bottom: 12px;">🎯 기술적 신호 종합:</div>
+        
+        <div style="margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <input type="checkbox" style="width: 18px; height: 18px; margin-right: 8px; cursor: pointer;">
+                <label style="cursor: pointer; color: #EDE8D8; font-size: 12px;">
+                    <strong>추세 신호 (MA)</strong>
+                </label>
+            </div>
+            <div style="margin-left: 26px; background: #0D0B08; padding: 8px; border-radius: 4px; font-size: 11px; color: #B8B0A0;">
+                가격(67,500) < MA20(69,000) < MA50(71,500)<br>
+                → 🔴 하락추세 진행 중 (위험)<br>
+                → 매도 신호
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <input type="checkbox" style="width: 18px; height: 18px; margin-right: 8px; cursor: pointer;">
+                <label style="cursor: pointer; color: #EDE8D8; font-size: 12px;">
+                    <strong>모멘텀 신호 (RSI)</strong>
+                </label>
+            </div>
+            <div style="margin-left: 26px; background: #0D0B08; padding: 8px; border-radius: 4px; font-size: 11px; color: #B8B0A0;">
+                RSI 28 (30 이하)<br>
+                → 🟢 과매도 상태 (반등 가능성)<br>
+                → 매수 기회 신호 (단, 추세 악화 조건)
+            </div>
+        </div>
+        
+        <div>
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <input type="checkbox" style="width: 18px; height: 18px; margin-right: 8px; cursor: pointer;">
+                <label style="cursor: pointer; color: #EDE8D8; font-size: 12px;">
+                    <strong>행동 결정</strong>
+                </label>
+            </div>
+            <div style="margin-left: 26px; background: #0D0B08; padding: 8px; border-radius: 4px; font-size: 11px; color: #B8B0A0;">
+                📌 상충하는 신호!<br>
+                추세는 약세 (매도)인데 RSI는 과매도 (매수)<br>
+                <br>
+                ✅ 올바른 판단:<br>
+                "추세 우선" 원칙 적용<br>
+                → <strong style="color: #C45A4A;">현재 매수 금지</strong><br>
+                → MACD가 상향크로스될 때까지 기다리기<br>
+                → 또는 7만원대 경보선에서 손절 검토
+            </div>
+        </div>
+    </div>
+</div>
+
+</section>
+
+
+<!-- 아하 모먼트 -->
+<section class="section fade-up">
+  <div class="section-label">💡 AHA MOMENT</div>
+  <h2 class="section-title">이동평균선은 '시장의 평균 감정'이다 — 200일선 아래 = 집단 공포</h2>
+  <div style="background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(191,74,74,0.08));border:2px solid var(--gold);border-radius:12px;padding:2rem;margin:1.5rem 0;text-align:center;">
+    <p style="font-size:1.1rem;color:var(--gold);font-weight:600;margin-bottom:1.5rem;font-family:var(--font-display);">차트는 숫자가 아니라 '감정의 지도'다</p>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;margin:1.5rem 0;">
+      <div style="background:rgba(191,74,74,0.15);border:1px solid var(--red);border-radius:8px;padding:1.2rem;">
+        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--red);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">20일 이동평균</div>
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--red);">단기 감정
+(1달간)</div>
+      </div>
+      <div style="font-size:2rem;color:var(--gold);">→</div>
+      <div style="background:rgba(74,191,122,0.15);border:1px solid var(--green);border-radius:8px;padding:1.2rem;">
+        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--green);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">200일 이동평균</div>
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--green);">장기 감정
+(1년간)</div>
+      </div>
+    </div>
+    <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8;margin-top:1rem;text-align:left;">이동평균선은 단순한 기술 지표가 아니라 시장 참여자들의 평균 심리를 보여주는 감정 온도계다. 20일선은 단기 변동성이 크고, 200일선 아래라는 것은 지난 1년간의 집단적 손실 심리가 누적되었다는 의미다.</p>
+  </div>
+</section>
+
+<!-- 실패 케이스 -->
+<section class="section fade-up">
+  <div class="section-label">📉 FAILURE CASE</div>
+  <h2 class="section-title">기술적 분석으로 미래를 예측하려던 트레이더</h2>
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <div style="border-left:3px solid var(--red);padding-left:1rem;margin-bottom:1.2rem;">
+      <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.9;font-style:italic;">어떤 트레이더가 골든크로스를 발견했다며 전액 투자했다. 차트상 완벽한 신호였다. 그러나 그 다음날 예상치 못한 뉴스가 터졌고, 차트는 패턴을 무시하고 폭락했다. 기술적 분석은 확률이지 절대 법칙이 아니었다.</p>
+    </div>
+    <div style="padding:1rem;background:rgba(201,168,76,0.06);border:1px solid var(--gold-dim);border-radius:6px;">
+      <p style="font-size:0.82rem;color:var(--gold);font-weight:500;margin-bottom:0.5rem;">💡 교훈</p>
+      <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8;">기술적 분석은 과거의 패턴을 인식하는 도구일 뿐, 미래를 100% 예측하는 방법이 아니다. 시장은 항상 새로운 정보에 반응하고, 그 정보는 차트 분석으로는 미리 알 수 없다. 기술적 분석은 확률 게임의 룰일 뿐, 절대 보장이 아니다.</p>
+      <p style="font-size:0.78rem;color:var(--text-dim);margin-top:0.8rem;font-family:var(--font-mono);">완벽한 골든크로스 → 다음날 악재 뉴스 → 기술적 분석 패턴 무시 → 손실 실현</p>
+    </div>
+  </div>
+</section>
+
+<!-- 엔지니어 시스템 비유 -->
+<section class="section fade-up">
+  <div class="section-label">🔧 ENGINEER'S PERSPECTIVE</div>
+  <h2 class="section-title">엔지니어 시스템 사고</h2>
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <h3 style="font-family:var(--font-body);font-size:0.95rem;font-weight:500;color:var(--gold);margin-bottom:1rem;"><span class="engineer-tag">엔지니어 사고법</span> 이동평균 = Low-Pass Filter</h3>
+    <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.9;margin-bottom:1rem;">엔지니어가 신호 처리에서 노이즈를 제거하기 위해 Low-Pass Filter를 사용하듯이, 투자자는 이동평균선을 통해 주가의 노이즈를 제거하고 진정한 추세를 본다. 20일 MA는 높은 cutoff로 빠른 반응을 하지만 노이즈가 많고, 200일 MA는 낮은 cutoff로 느리지만 깨끗한 추세를 보여준다.</p>
+    <div class="formula-block">
+• 주가 = 노이즈 포함 신호 (Raw signal with noise)
+• 20일 MA = 높은 cutoff → 빠른 반응, 많은 노이즈
+• 200일 MA = 낮은 cutoff → 느린 반응, 깨끗한 추세
+• 골든크로스 = 두 필터의 교차점 → 추세 전환 신호
+    </div>
+  </div>
+</section>
+
+<!-- 감정 온도계 -->
+<section class="section fade-up">
+  <div class="section-label">🌡️ EMOTION CHECK</div>
+  <h2 class="section-title">지금 내 감정 체크</h2>
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1.2rem;">기술적 분석을 배우면서 두 가지 감정이 진동한다. 첫째는 '차트로 미래를 맞출 수 있다'는 호기심(도파민 방출). 둘째는 '이건 도박 아닌가?'라는 저항감(전전두엽의 합리적 의심). 이 두 감정의 균형이 바로 현명한 투자자가 가져야 할 태도다.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.8rem;">
+      <div style="padding:1rem;background:rgba(191,74,74,0.08);border:1px solid rgba(191,74,74,0.3);border-radius:6px;cursor:pointer;" onclick="this.style.borderColor='var(--red)';this.style.borderWidth='2px';">
+        <div style="font-size:1.2rem;margin-bottom:0.3rem;">😰 불안</div>
+        <p style="font-size:0.75rem;color:var(--text-dim);line-height:1.5;"><span class="neuro-tag">편도체</span> 손실 신호 감지 중. 정상 반응입니다.</p>
+      </div>
+      <div style="padding:1rem;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:6px;cursor:pointer;" onclick="this.style.borderColor='var(--gold)';this.style.borderWidth='2px';">
+        <div style="font-size:1.2rem;margin-bottom:0.3rem;">😤 저항감</div>
+        <p style="font-size:0.75rem;color:var(--text-dim);line-height:1.5;"><span class="neuro-tag">전전두엽</span> 기존 믿음 방어 중. 변화의 신호입니다.</p>
+      </div>
+      <div style="padding:1rem;background:rgba(74,191,122,0.08);border:1px solid rgba(74,191,122,0.3);border-radius:6px;cursor:pointer;" onclick="this.style.borderColor='var(--green)';this.style.borderWidth='2px';">
+        <div style="font-size:1.2rem;margin-bottom:0.3rem;">🤔 호기심</div>
+        <p style="font-size:0.75rem;color:var(--text-dim);line-height:1.5;"><span class="neuro-tag">도파민</span> 학습 모드 활성화! 최적 상태입니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 액션 체크리스트 -->
+<section class="section fade-up">
+  <div class="section-label">🎯 THIS WEEK'S ACTION</div>
+  <h2 class="section-title">이번 주 실행 아이템</h2>
+  <div style="background:linear-gradient(135deg,rgba(74,191,122,0.06),rgba(201,168,76,0.06));border:1px solid var(--green);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <ul class="checklist"><li>최근 3년간 KOSPI 차트에서 20일, 60일, 200일 이동평균 그리기 <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(10분)</span></li><li>골든크로스, 데드크로스 사례 3개씩 찾아보기 <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(10분)</span></li><li>기술적 분석이 실패한 사례 분석 (뉴스와 차트 비교) <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(8분)</span></li></ul>
+    <div style="display:flex;justify-content:space-between;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);">
+      <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">⏱ 예상 소요: 28분</span>
+      <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--green);">📈 10년 예상 효과: 차트 읽기 능력 +50%, 추세 인식 능력 +45%, 패턴 인식의 한계 이해도 +80%</span>
     </div>
   </div>
 </section>
@@ -570,10 +2184,61 @@ body {
   <h2 class="section-title">오늘의 투자 심리</h2>
   <div class="psych-box">
     <h3>행동재무학 편향</h3>
-    <div class="bias-name">패턴 인식 과다 (Apophenia / Pattern Bias)</div>
-    <p><span class="neuro-tag">뇌과학</span> 인간의 뇌는 패턴을 찾으려고 진화했습니다. 따라서 랜덤한 주가 움직임 속에서도 "패턴"을 찾아낼 수 있습니다. 이것이 기술분석의 위험입니다.</p>
-    <p><span class="engineer-tag">엔지니어링</span> <strong>통계적 검증:</strong> 차트 패턴이 실제로 수익성 있는 신호인지 백테스트(과거 1년 데이터로 검증)해보세요. "이 패턴이 역사적으로 맞았을까?"를 묻지 않고 "다음 번에도 맞을까?"라고 묻는 것은 과신입니다.</p>
-    <p><strong style="color:var(--gold);">대응:</strong> 기술분석을 "신호 생성 도구"로만 사용하세요. 신호를 받으면 반드시 (1) 산업 구조 확인 (2) 재무 건강도 확인 (3) 위험 관리 계획 수립 후에만 매매하세요.</p>
+    
+<div style="background: linear-gradient(135deg, #1A1C20 0%, #2A2C30 100%); padding: 16px; border-radius: 8px; margin: 16px 0; border-left: 4px solid #D4A843;">
+    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+        <span style="font-size: 24px; margin-right: 12px;">🧠</span>
+        <strong style="font-size: 15px; color: #D4A843;">행동재무학: "패턴 인식 편향(Pattern Recognition Bias)"</strong>
+    </div>
+    
+    <p style="color: #EDE8D8; font-size: 13px; margin-bottom: 12px;">
+        <strong>현상:</strong>
+        "이 차트 패턴은 예전에 이대로 움직였으니, 이번에도 같을 거야!"
+    </p>
+    
+    <p style="color: #EDE8D8; font-size: 13px; margin-bottom: 12px;">
+        <strong>뇌 과학:</strong>
+        인간의 뇌는 "패턴을 찾으려고" 진화했다.
+        사자를 빨리 발견하기 위해 풀숲의 패턴을 찾던 조상의 유산.
+        결과적으로 <strong>"없는 패턴도 만들어낸다"</strong> (패러이들리아).
+    </p>
+    
+    <div style="background: #0D0B08; padding: 12px; border-radius: 6px; margin: 12px 0;">
+        <strong style="color: #3D9E6E;">🔬 엔지니어의 함정:</strong>
+        <div style="color: #B8B0A0; font-size: 12px; margin-top: 8px;">
+            엔지니어는 "규칙성"에 중독되어 있다.
+            신경망이 "헤드 & 숄더" 패턴을 발견하면,
+            "이건 확실히 역전 신호다"라고 과신함.
+            <br><br>
+            <strong style="color: #D4A843;">현실:</strong> 
+            같은 헤드 & 숄더 패턴도<br>
+            80% 확률로 역전되지만, <br>
+            20%는 그냥 노이즈일 수도 있음.
+        </div>
+    </div>
+    
+    <p style="color: #EDE8D8; font-size: 13px; margin-bottom: 12px;">
+        <strong>해결책:</strong>
+        패턴만 보고 판단하지 말 것.
+        <strong>"통계적 확률" 관점으로 생각</strong>해야 한다.
+        MACD 상향크로스 후 5거래일 이내 상승 확률 = 68% 정도.
+        즉, 32%는 그냥 거짓 신호.
+        따라서 손절선은 필수!
+    </p>
+    
+    <p style="color: #EDE8D8; font-size: 13px; padding-top: 12px; border-top: 1px solid #2A2C30;">
+        <span class="neuro-tag">뇌과학</span>
+        패턴 인식은 뇌의 측두엽과 전두엽이 담당.
+        시장 데이터를 보면 자동으로 과거 경험과 매칭하려 함.
+        이를 "편향된 휴리스틱(Biased Heuristic)"이라 부름.
+        <br>
+        <span class="engineer-tag">엔지니어 체크</span>
+        패턴이 보여도 "상관계수(Correlation)" 검증 필수:
+        "이 패턴이 정말 다음 움직임을 예측하는가?"
+        통계적으로 입증되지 않은 패턴은 피할 것!
+    </p>
+</div>
+
   </div>
 </section>
 
@@ -583,22 +2248,49 @@ body {
   <h2 class="section-title">복습 퀴즈</h2>
   <div class="quiz-section">
     <div class="quiz-q" id="q1">
-      <h4>Q1. 주가가 MA(20)을 상향 돌파하고, MA(20)이 MA(200)을 상향 돌파하는 현상을 뭐라고 부르는가?</h4>
-      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 데드크로스</li>
-<li onclick="checkAnswer(this,'q1',true)">② 골든크로스</li>
-<li onclick="checkAnswer(this,'q1',false)">③ RSI 신호</li>
-<li onclick="checkAnswer(this,'q1',false)">④ MACD 다이버전스</li>
+      <h4>Q1. 이동평균선(MA)에서 '골든 크로스'의 의미는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',true)">① 단기 MA가 장기 MA를 상향 돌파하는 현상</li>
+<li onclick="checkAnswer(this,'q1',false)">② 가격이 200일 MA를 뚫고 올라가는 현상</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 50일 MA와 100일 MA가 만나는 지점</li>
+<li onclick="checkAnswer(this,'q1',false)">④ RSI가 70을 넘는 현상</li>
 </ul>
-      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>단기 MA(20)이 장기 MA(200)을 위쪽으로 뚫고 나가는 것을 '골든크로스'라고 부르며, 강한 매수 신호입니다.</div>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ①</strong><br>정답: ①번. 골든 크로스(Golden Cross)는 단기 이동평균(예: 20일 MA)이 장기 이동평균(예: 50일 MA)을 상향 돌파하는 것. 이는 가장 강한 매수 신호다. 반대로 하향 돌파는 '데드 크로스'라 부르며 매도 신호다.</div>
     </div>
     <div class="quiz-q" id="q2">
-      <h4>Q2. RSI > 70일 때의 의미는?</h4>
-      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 주가가 계속 올라간다</li>
-<li onclick="checkAnswer(this,'q2',false)">② 매수 신호</li>
-<li onclick="checkAnswer(this,'q2',true)">③ 과매수 상태 (조정 가능성)</li>
-<li onclick="checkAnswer(this,'q2',false)">④ 하락세로 전환</li>
+      <h4>Q2. RSI가 70 이상일 때의 정확한 해석은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 반드시 주가가 떨어진다</li>
+<li onclick="checkAnswer(this,'q2',true)">② 과매수 상태 (주의 필요)이지만, 강한 상승추세에서는 정상일 수 있다</li>
+<li onclick="checkAnswer(this,'q2',false)">③ 매도해야 할 정확한 신호</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 거래량이 많다는 뜻</li>
 </ul>
-      <div class="quiz-answer" id="q2-answer"><strong>정답: ③</strong><br>RSI > 70은 '과매수(overbought)' 상태를 의미하며, 주가가 과도하게 오른 상태를 나타냅니다. 조정(하락)이 올 가능성이 있습니다.</div>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ②</strong><br>정답: ②번. RSI 70 이상은 과매수 신호지만, 추세가 강할 때는 80~90까지 갈 수 있다. 따라서 '반드시 떨어진다'는 잘못된 해석. 중요한 건 RSI + 추세를 함께 봐야 한다는 것. 상승추세에서 RSI 70은 정상, 하락추세에서 RSI 70은 반등 시도로 해석.</div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. MACD의 세 가지 구성 요소가 아닌 것은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① MACD선 (12일 MA - 26일 MA)</li>
+<li onclick="checkAnswer(this,'q3',false)">② Signal선 (MACD의 9일 이동평균)</li>
+<li onclick="checkAnswer(this,'q3',false)">③ Histogram (MACD - Signal)</li>
+<li onclick="checkAnswer(this,'q3',true)">④ Stochastic선</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ④</strong><br>정답: ④번. MACD는 3가지로 구성: MACD선, Signal선, Histogram. Stochastic은 완전히 다른 지표로, 가격이 일정 기간 내 범위 내에서 어디에 위치하는지 측정한다. MACD와 혼동하면 안 된다.</div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. MACD의 상향 크로스오버(MACD가 Signal을 상향 돌파)가 나타났을 때의 올바른 대응은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① 무조건 매수한다</li>
+<li onclick="checkAnswer(this,'q4',true)">② 추세(MA)와 함께 확인한 후, 강세 신호이면 매수 고려</li>
+<li onclick="checkAnswer(this,'q4',false)">③ RSI가 30 이하일 때만 매수한다</li>
+<li onclick="checkAnswer(this,'q4',false)">④ MACD 상향 크로스는 신뢰도가 낮으므로 무시한다</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ②</strong><br>정답: ②번. MACD 상향 크로스오버는 강력한 신호지만, 추세 없는 횡보장에서는 거짓 신호일 수 있다. 따라서 반드시 '이동평균선 추세' 확인 후 '가격이 MA 위에 있는가?'를 먼저 검증해야 한다. 그 후 MACD 신호를 따를 것.</div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. 다음 중 기술적 분석의 근본적 한계는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',false)">① 차트는 모든 정보를 이미 반영했다</li>
+<li onclick="checkAnswer(this,'q5',true)">② 과거가 항상 반복되지는 않으며, 검은 백조(Black Swan) 사건이 패턴을 무너뜨린다</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 이동평균선이 모든 신호를 정확히 포착한다</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 기술적 지표는 수학적이므로 감정의 영향을 받지 않는다</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ②</strong><br>정답: ②번. 기술적 분석의 가장 큰 한계는 '예측 불가능한 사건'(테러, 전쟁, 회장 사망 등)과 '투자자의 감정'이다. 2020년 코로나, 2022년 우크라이나 전쟁 같은 '검은 백조' 사건이 발생하면 모든 차트 패턴이 무너진다. 따라서 기술적 분석은 '확률 게임'이며 60~70% 신뢰도로만 봐야 한다.</div>
     </div></div>
 </section>
 
@@ -616,7 +2308,7 @@ body {
   </div>
 </section>
 
-<nav class="nav-footer">
+<nav class="nav-footer" role="navigation" aria-label="강의 탐색">
   <a class="nav-btn" href="day10_financial_statements.html">← Day 10</a>
   <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 11 / 23</span>
   <a class="nav-btn" href="day12_timing_principles.html">Day 12 →</a>
@@ -627,12 +2319,15 @@ body {
   본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
   모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
   수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
-  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 El Dorado 투자 원정대 · 교육 목적 Only</span>
 </div>
 
 </div>
 
-<script>
+<!-- Gold Particle System -->
+<canvas id="goldParticles" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.6;"></canvas>
+<script defer>
+
 /* ═══ POMODORO TIMER ═══ */
 let timerRunning=false, timerSeconds=25*60, timerInterval=null;
 function toggleTimer() {
@@ -646,8 +2341,8 @@ function toggleTimer() {
       if (timerSeconds <= 0) {
         clearInterval(timerInterval);
         b.textContent = '✓ 완료!';
-        b.style.borderColor = '#4ABF7A';
-        b.style.color = '#4ABF7A';
+        b.style.borderColor = '#4AAF6A';
+        b.style.color = '#4AAF6A';
         timerRunning = false;
       }
     }, 1000);
@@ -680,6 +2375,507 @@ const fadeObserver = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+
+
+(function(){
+  const c=document.getElementById('goldParticles');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  let W,H;
+  const particles=[];
+  const N=window.innerWidth<480?12:window.innerWidth<768?20:35;
+
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+
+  class P{
+    constructor(){this.reset();}
+    reset(){
+      this.x=Math.random()*W;
+      this.y=Math.random()*H;
+      this.r=Math.random()*1.8+0.3;
+      this.vx=(Math.random()-0.5)*0.15;
+      this.vy=-Math.random()*0.3-0.05;
+      this.alpha=Math.random()*0.4+0.1;
+      this.fade=Math.random()*0.003+0.001;
+      this.phase=Math.random()*Math.PI*2;
+    }
+    update(){
+      this.x+=this.vx+Math.sin(this.phase)*0.1;
+      this.y+=this.vy;
+      this.phase+=0.01;
+      this.alpha-=this.fade;
+      if(this.alpha<=0||this.y<-10)this.reset();
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(212,168,67,${this.alpha})`;
+      ctx.fill();
+      if(this.r>1){
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.r*2,0,Math.PI*2);
+        ctx.fillStyle=`rgba(212,168,67,${this.alpha*0.15})`;
+        ctx.fill();
+      }
+    }
+  }
+
+  for(let i=0;i<N;i++)particles.push(new P());
+
+  let scrollY=0;
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY;},{passive:true});
+
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of particles){
+      p.y+=scrollY*0.0005;
+      p.update();
+      p.draw();
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+
+(function(){
+  /* ─── 1. Card Gold Light Trail ─── */
+  document.querySelectorAll('.concept-card').forEach(card => {
+    if(card.querySelector('.card-glow')) return;
+    const glow = document.createElement('div');
+    glow.className = 'card-glow';
+    card.appendChild(glow);
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      glow.style.left = (e.clientX - r.left) + 'px';
+      glow.style.top = (e.clientY - r.top) + 'px';
+    });
+  });
+
+  /* ─── 2. Quiz Correct Answer Particle Burst ─── */
+  function createBurst(container, x, y) {
+    let canvas = container.querySelector('.quiz-burst-canvas');
+    if (!canvas) {
+      canvas = document.createElement('canvas');
+      canvas.className = 'quiz-burst-canvas';
+      container.style.position = 'relative';
+      container.appendChild(canvas);
+    }
+    canvas.width = container.offsetWidth;
+    canvas.height = container.offsetHeight;
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const colors = ['#D4A843','#E8C65A','#C4793D','#3D9E6E','#EDE8D8'];
+    for (let i = 0; i < 40; i++) {
+      const angle = (Math.PI * 2 * i) / 40 + (Math.random() - 0.5) * 0.5;
+      const speed = 2 + Math.random() * 4;
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        r: Math.random() * 2.5 + 1,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 1,
+        decay: 0.015 + Math.random() * 0.01,
+        gravity: 0.06
+      });
+    }
+    let frame = 0;
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.vx *= 0.98;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) continue;
+        alive = true;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+        // glow
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha * 0.15;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      frame++;
+      if (alive && frame < 120) requestAnimationFrame(animate);
+      else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    }
+    animate();
+  }
+
+  // Enhance quiz click handler
+  document.querySelectorAll('.quiz-options li').forEach(li => {
+    const origClick = li.onclick;
+    li.addEventListener('click', function(e) {
+      setTimeout(() => {
+        if (li.classList.contains('correct')) {
+          const section = li.closest('.quiz-section');
+          if (section) {
+            const rect = li.getBoundingClientRect();
+            const sRect = section.getBoundingClientRect();
+            createBurst(section, rect.left - sRect.left + rect.width / 2, rect.top - sRect.top + rect.height / 2);
+          }
+        }
+      }, 50);
+    });
+  });
+
+  /* ─── 3. Scroll Compass Widget ─── */
+  if (!document.querySelector('.scroll-compass')) {
+    const compass = document.createElement('div');
+    compass.className = 'scroll-compass';
+    compass.innerHTML = `<svg viewBox="0 0 56 56">
+      <circle cx="28" cy="28" r="26" fill="rgba(13,11,8,0.9)" stroke="#D4A843" stroke-width="1.5"/>
+      <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(212,168,67,0.15)" stroke-width="1"/>
+      <!-- tick marks -->
+      <line x1="28" y1="4" x2="28" y2="8" stroke="#D4A843" stroke-width="1.5"/>
+      <line x1="28" y1="48" x2="28" y2="52" stroke="#8A8272" stroke-width="1"/>
+      <line x1="4" y1="28" x2="8" y2="28" stroke="#8A8272" stroke-width="1"/>
+      <line x1="48" y1="28" x2="52" y2="28" stroke="#8A8272" stroke-width="1"/>
+      <!-- needle (rotates via JS) -->
+      <g id="compassNeedle" style="transform-origin:28px 28px;">
+        <polygon points="28,8 25,28 28,26 31,28" fill="#D4A843"/>
+        <polygon points="28,48 25,28 28,30 31,28" fill="#C45A4A" opacity="0.6"/>
+      </g>
+      <!-- center -->
+      <circle cx="28" cy="28" r="3" fill="#D4A843"/>
+      <!-- progress arc -->
+      <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(212,168,67,0.1)" stroke-width="3"
+              stroke-dasharray="150.8" stroke-dashoffset="150.8"
+              id="compassProgress" transform="rotate(-90 28 28)"
+              stroke-linecap="round"/>
+      <!-- percentage text -->
+      <text x="28" y="43" text-anchor="middle" fill="#8A8272" font-family="JetBrains Mono,monospace" font-size="5.5" id="compassPct">0%</text>
+    </svg>`;
+    compass.title = 'Click to scroll to top';
+    compass.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+    document.body.appendChild(compass);
+
+    const needle = document.getElementById('compassNeedle');
+    const progressArc = document.getElementById('compassProgress');
+    const pctText = document.getElementById('compassPct');
+    const circumference = 150.8;
+
+    function updateCompass() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0;
+
+      // Show/hide
+      compass.classList.toggle('visible', scrollTop > 200);
+
+      // Rotate needle based on scroll (full rotation = full scroll)
+      const rotation = progress * 360;
+      if(needle) needle.style.transform = `rotate(${rotation}deg)`;
+
+      // Progress arc
+      if(progressArc) {
+        const offset = circumference - (progress * circumference);
+        progressArc.setAttribute('stroke-dashoffset', offset);
+        progressArc.setAttribute('stroke', progress > 0.8 ? '#4AAF6A' : '#D4A843');
+      }
+
+      // Percentage text
+      if(pctText) pctText.textContent = Math.round(progress * 100) + '%';
+    }
+
+    window.addEventListener('scroll', updateCompass, {passive: true});
+    updateCompass();
+  }
+
+  /* ─── 4. Section Reveal Gold Flash ─── */
+  document.querySelectorAll('.section').forEach(section => {
+    if(section.querySelector('.section-flash')) return;
+    section.style.position = 'relative';
+    const flash = document.createElement('div');
+    flash.className = 'section-flash';
+    section.prepend(flash);
+  });
+
+  const flashObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) {
+        entry.target.classList.add('flash-active');
+        setTimeout(() => entry.target.classList.remove('flash-active'), 800);
+        flashObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.2});
+
+  document.querySelectorAll('.section').forEach(s => flashObserver.observe(s));
+
+  /* ─── 5. Checklist Celebration ─── */
+  document.querySelectorAll('.checklist li').forEach(li => {
+    li.addEventListener('click', function() {
+      if(this.classList.contains('checked')) {
+        this.classList.add('just-checked');
+        setTimeout(() => this.classList.remove('just-checked'), 600);
+      }
+    });
+  });
+
+  /* ─── 6. Timer Button Active State ─── */
+  const timerBtn = document.getElementById('timerBtn');
+  if(timerBtn) {
+    const origToggle = window.toggleTimer;
+    if(origToggle) {
+      window.toggleTimer = function() {
+        origToggle();
+        timerBtn.classList.toggle('active');
+      };
+    }
+  }
+
+})();
+
+
+(function(){
+  /* ─── 1. Particle Performance Auto-Scaling ─── */
+  const canvas = document.getElementById('goldParticles');
+  if(canvas){
+    const isMobile = window.innerWidth < 768;
+    const isLowEnd = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if(prefersReduced){
+      canvas.style.display = 'none';
+    } else if(isMobile || isLowEnd){
+      // Reduce particle opacity and hide on very small screens
+      canvas.style.opacity = isMobile ? '0.3' : '0.4';
+      if(window.innerWidth < 400) canvas.style.display = 'none';
+    }
+
+    // Battery API: disable particles on low battery
+    if('getBattery' in navigator){
+      navigator.getBattery().then(batt => {
+        if(batt.level < 0.2 && !batt.charging){
+          canvas.style.display = 'none';
+        }
+        batt.addEventListener('levelchange', () => {
+          if(batt.level < 0.15 && !batt.charging) canvas.style.display = 'none';
+        });
+      }).catch(()=>{});
+    }
+
+    // Visibility: pause animation when tab is hidden
+    let rafId = null;
+    document.addEventListener('visibilitychange', () => {
+      if(document.hidden) {
+        canvas.style.display = 'none';
+      } else if(!prefersReduced && !(window.innerWidth < 400)){
+        canvas.style.display = '';
+      }
+    });
+  }
+
+  /* ─── 2. Illustration Lazy Load ─── */
+  const lazyObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const el = entry.target;
+        const svg = el.querySelector('svg');
+        if(svg) svg.style.opacity = '1';
+        el.classList.add('visible');
+        lazyObs.unobserve(el);
+      }
+    });
+  }, {rootMargin: '100px', threshold: 0.1});
+
+  document.querySelectorAll('.hero-illustration').forEach(ill => {
+    const svg = ill.querySelector('svg');
+    if(svg){
+      svg.style.opacity = '0';
+      svg.style.transition = 'opacity 0.8s ease-out';
+    }
+    lazyObs.observe(ill);
+  });
+
+  /* ─── 3. Touch Swipe Navigation ─── */
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+    touchStartTime = Date.now();
+  }, {passive: true});
+
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    const dy = e.changedTouches[0].screenY - touchStartY;
+    const dt = Date.now() - touchStartTime;
+
+    // Must be fast horizontal swipe (>80px, <300ms, mostly horizontal)
+    if(Math.abs(dx) > 80 && Math.abs(dx) > Math.abs(dy) * 2 && dt < 300){
+      const navBtns = document.querySelectorAll('.nav-btn:not(.disabled)');
+      if(dx > 0){
+        // Swipe right → prev
+        const prev = document.querySelector('.nav-btn[href*="day"]:first-of-type:not(.disabled)');
+        if(prev && prev.textContent.includes('Prev')) prev.click();
+      } else {
+        // Swipe left → next
+        const allBtns = Array.from(document.querySelectorAll('.nav-btn'));
+        const next = allBtns.find(b => b.textContent.includes('Next') && !b.classList.contains('disabled'));
+        if(next) next.click();
+      }
+    }
+  }, {passive: true});
+
+  /* ─── 4. Compass Touch Feedback ─── */
+  const compass = document.querySelector('.scroll-compass');
+  if(compass){
+    compass.addEventListener('touchstart', () => {
+      compass.style.transform = 'scale(0.9)';
+      compass.style.transition = 'transform 0.1s';
+    }, {passive: true});
+    compass.addEventListener('touchend', () => {
+      compass.style.transform = 'scale(1)';
+    }, {passive: true});
+  }
+
+  /* ─── 5. Viewport Height Fix for Mobile Browsers ─── */
+  function setVH(){
+    document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+  }
+  setVH();
+  window.addEventListener('resize', setVH);
+
+  /* ─── 6. Font Loading Optimization ─── */
+  if('fonts' in document){
+    document.fonts.ready.then(() => {
+      document.body.classList.add('fonts-loaded');
+    });
+  }
+
+  /* ─── 7. Smooth Scroll Polyfill for Older Safari ─── */
+  if(!('scrollBehavior' in document.documentElement.style)){
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if(target){
+          e.preventDefault();
+          target.scrollIntoView({behavior:'smooth',block:'start'});
+        }
+      });
+    });
+  }
+
+  /* ─── 8. Double-tap to top (mobile shortcut) ─── */
+  let lastTapTime = 0;
+  const header = document.querySelector('.sticky-header');
+  if(header){
+    header.addEventListener('touchend', () => {
+      const now = Date.now();
+      if(now - lastTapTime < 300){
+        window.scrollTo({top:0, behavior:'smooth'});
+      }
+      lastTapTime = now;
+    }, {passive: true});
+  }
+
+})();
+
+
+
+/* ═══ THEME TOGGLE LOGIC ═══ */
+(function(){
+  const toggle = document.getElementById('themeToggle');
+  if(!toggle) return;
+
+  // 1. Determine initial theme
+  function getPreferredTheme(){
+    const saved = localStorage.getItem('eldorado-theme');
+    if(saved) return saved;
+    // Respect system preference
+    if(window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
+    return 'dark';
+  }
+
+  function applyTheme(theme, animate){
+    const html = document.documentElement;
+    if(animate){
+      html.classList.add('theme-transitioning');
+      setTimeout(() => html.classList.remove('theme-transitioning'), 500);
+    }
+    if(theme === 'light'){
+      html.setAttribute('data-theme', 'light');
+      // Update meta theme-color
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.content = '#FAF6EE';
+    } else {
+      html.removeAttribute('data-theme');
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.content = '#0D0B08';
+    }
+    localStorage.setItem('eldorado-theme', theme);
+
+    // Update particle canvas colors if exists
+    updateParticleColors(theme);
+    // Update compass colors
+    updateCompassColors(theme);
+  }
+
+  function updateParticleColors(theme){
+    // Signal to particle system
+    window.__eldoradoTheme = theme;
+  }
+
+  function updateCompassColors(theme){
+    const compass = document.querySelector('.scroll-compass svg');
+    if(!compass) return;
+    const bgCircle = compass.querySelector('circle:first-of-type');
+    const texts = compass.querySelectorAll('text');
+    if(theme === 'light'){
+      if(bgCircle) bgCircle.setAttribute('fill', 'rgba(250,246,238,0.9)');
+      texts.forEach(t => {
+        if(t.getAttribute('fill') === '#8A8272' || t.getAttribute('fill') === 'var(--text-dim)')
+          t.setAttribute('fill', '#8A8070');
+      });
+    } else {
+      if(bgCircle) bgCircle.setAttribute('fill', 'rgba(13,11,8,0.85)');
+    }
+  }
+
+  // 2. Apply on load (no animation)
+  const initial = getPreferredTheme();
+  applyTheme(initial, false);
+
+  // 3. Toggle click
+  toggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    applyTheme(next, true);
+  });
+
+  // 4. Keyboard support
+  toggle.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      toggle.click();
+    }
+  });
+
+  // 5. Listen for system theme change
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+    if(!localStorage.getItem('eldorado-theme')){
+      applyTheme(e.matches ? 'light' : 'dark', true);
+    }
+  });
+})();
+/* ═══ END THEME TOGGLE ═══ */
+
 </script>
 </body>
 </html>

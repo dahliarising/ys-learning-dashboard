@@ -4,1156 +4,581 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Day 16 — 공동 육아 철학 정렬</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&family=MedievalSharp&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════
-   RESET & BASE
-   ═══════════════════════════════════════ */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 :root {
-  --bg: #0A0C10;
-  --bg-card: #12151B;
-  --bg-card-alt: #181C24;
-  --green: #4ABF8A;
-  --green-dim: #2A7A56;
-  --gold: #C9A84C;
-  --gold-dim: #8A7333;
-  --text: #E8E6E1;
-  --text-dim: #9A9890;
-  --text-bright: #FFFFFF;
-  --danger: #E85D5D;
-  --serif: 'Cormorant Garamond', Georgia, serif;
-  --sans: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
-  --mono: 'JetBrains Mono', 'Fira Code', monospace;
-  --radius: 16px;
-  --radius-sm: 10px;
+  --parchment: #F5ECD7; --parchment-dark: #E8DCC6; --parchment-deep: #D4C5A9;
+  --ink: #2C1810; --ink-light: #4A3728; --ink-dim: #7A6B5D;
+  --crimson: #8B1A1A; --crimson-light: #A52A2A;
+  --royal-blue: #1B3A5C; --royal-blue-light: #2A5580;
+  --gold: #B8860B; --gold-light: #DAA520; --gold-dim: #8B6914;
+  --forest: #2D5016; --forest-light: #3A6B1E;
+  --medieval-border: #8B7355;
+  --shadow: rgba(44,24,16,0.12); --shadow-deep: rgba(44,24,16,0.25);
+  --title: 'Cinzel','Times New Roman',serif;
+  --body: 'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
+  --accent: 'MedievalSharp',cursive;
+  --mono: 'JetBrains Mono',monospace;
+  --radius: 12px; --radius-sm: 8px;
 }
-html { font-size: 16px; scroll-behavior: smooth; }
+html { font-size: 17px; scroll-behavior: smooth; }
+::-webkit-scrollbar { width: 14px; }
+::-webkit-scrollbar-track { background: var(--parchment-dark); }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg,var(--gold),var(--medieval-border)); border-radius: 7px; border: 3px solid var(--parchment-dark); }
+body { background: var(--parchment); color: var(--ink); font-family: var(--body); line-height: 1.85; -webkit-font-smoothing: antialiased; }
+body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100%; background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events:none; z-index:0; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+.fade-up { opacity:0; }
+.fade-up.visible { animation: fadeUp 0.7s ease-out forwards; }
+.container { max-width:780px; margin:0 auto; padding:0 24px 100px; position:relative; z-index:1; }
 
-/* ═══════════════════════════════════════
-   CUSTOM SCROLLBAR
-   ═══════════════════════════════════════ */
-::-webkit-scrollbar {
-  width: 12px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--green), var(--gold));
-  border-radius: 6px;
-  border: 2px solid var(--bg);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--green), var(--green-dim));
-}
+.chapter-header { text-align:center; padding:48px 0 40px; border-bottom:2px solid var(--medieval-border); margin-bottom:48px; position:relative; }
+.chapter-header::after { content:'⚜'; position:absolute; bottom:-16px; left:50%; transform:translateX(-50%); background:var(--parchment); padding:0 20px; font-size:1.4rem; color:var(--gold); }
+.series-badge { display:inline-block; font-family:var(--mono); font-size:0.65rem; letter-spacing:4px; text-transform:uppercase; color:var(--ink-dim); margin-bottom:6px; }
+.chapter-number { font-family:var(--title); font-size:0.85rem; font-weight:700; color:var(--crimson); letter-spacing:6px; text-transform:uppercase; margin-bottom:12px; }
+.part-banner { display:inline-block; background:var(--crimson); color:var(--parchment); font-family:var(--title); font-size:0.68rem; font-weight:600; letter-spacing:3px; text-transform:uppercase; padding:6px 20px; border-radius:4px; margin-bottom:20px; }
+.chapter-title { font-family:var(--title); font-size:clamp(1.6rem,4.5vw,2.6rem); font-weight:700; color:var(--ink); line-height:1.3; margin-bottom:16px; }
+.chapter-title em { font-style:italic; color:var(--crimson); }
+.chapter-subtitle { font-size:0.95rem; color:var(--ink-dim); max-width:540px; margin:0 auto 20px; line-height:1.75; }
+.aha-moment { display:inline-block; background:linear-gradient(135deg,rgba(139,26,26,0.08),rgba(184,134,11,0.08)); border:2px solid var(--crimson); border-radius:var(--radius-sm); padding:14px 24px; font-size:1rem; font-weight:700; color:var(--crimson); margin-bottom:20px; position:relative; }
+.aha-moment::before { content:'💡 Aha!'; position:absolute; top:-12px; left:16px; background:var(--parchment); padding:0 8px; font-family:var(--accent); font-size:0.8rem; color:var(--gold); }
+.age-tags { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.age-tag { font-family:var(--mono); font-size:0.72rem; padding:5px 16px; border-radius:20px; font-weight:600; }
+.age-tag.elder { background:rgba(27,58,92,0.1); color:var(--royal-blue); border:1px solid rgba(27,58,92,0.3); }
+.age-tag.younger { background:rgba(184,134,11,0.1); color:var(--gold-dim); border:1px solid rgba(184,134,11,0.3); }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--sans);
-  line-height: 1.75;
-  -webkit-font-smoothing: antialiased;
-}
-a { color: var(--green); text-decoration: none; }
-a:hover { text-decoration: underline; }
+.scroll-box { background:var(--parchment-dark); border:2px solid var(--medieval-border); border-radius:var(--radius); padding:28px; margin-bottom:44px; position:relative; }
+.scroll-box::before { content:''; position:absolute; top:-1px; left:20px; right:20px; height:4px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+.scroll-box h3 { font-family:var(--title); font-size:1.15rem; font-weight:700; color:var(--crimson); margin-bottom:14px; }
+.scroll-box > p { font-size:0.9rem; color:var(--ink-light); margin-bottom:20px; line-height:1.75; }
+.time-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+.time-table th { font-family:var(--mono); font-size:0.68rem; letter-spacing:2px; text-transform:uppercase; color:var(--gold-dim); text-align:left; padding:10px 12px; border-bottom:2px solid var(--medieval-border); }
+.time-table td { padding:10px 12px; border-bottom:1px solid rgba(139,115,85,0.2); vertical-align:top; }
+.time-table td:first-child { font-family:var(--mono); color:var(--crimson); font-weight:600; white-space:nowrap; width:90px; }
+.time-bar { height:5px; border-radius:3px; margin-top:6px; }
+.time-bar.bar-1 { background:var(--crimson); width:28%; }
+.time-bar.bar-2 { background:var(--gold); width:48%; }
+.time-bar.bar-3 { background:var(--royal-blue); width:24%; }
 
-/* ═══════════════════════════════════════
-   FADE UP ANIMATION
-   ═══════════════════════════════════════ */
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+.illuminated-cards { display:grid; gap:24px; margin-bottom:48px; }
+.illuminated-card { background:#FFF; border:2px solid var(--medieval-border); border-radius:var(--radius); overflow:hidden; box-shadow:0 4px 20px var(--shadow); transition:box-shadow 0.3s; }
+.illuminated-card:hover { box-shadow:0 8px 32px var(--shadow-deep); }
+.card-header { display:flex; align-items:flex-start; gap:14px; padding:22px 24px 14px; border-bottom:1px solid rgba(139,115,85,0.15); }
+.card-icon { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; border:2px solid; }
+.card-icon.crimson { background:rgba(139,26,26,0.08); border-color:var(--crimson); }
+.card-icon.blue { background:rgba(27,58,92,0.08); border-color:var(--royal-blue); }
+.card-icon.gold { background:rgba(184,134,11,0.08); border-color:var(--gold); }
+.card-header h4 { font-family:var(--title); font-size:1.05rem; font-weight:700; color:var(--ink); line-height:1.4; }
+.card-body { padding:16px 24px 24px; }
+.card-body p { font-size:0.9rem; color:var(--ink-light); margin-bottom:12px; line-height:1.8; }
+.research-tag { display:inline-flex; align-items:center; gap:6px; background:rgba(27,58,92,0.06); border:1px solid rgba(27,58,92,0.2); color:var(--royal-blue); font-family:var(--mono); font-size:0.7rem; padding:4px 12px; border-radius:20px; margin-right:6px; margin-bottom:6px; }
+.insight-box { background:rgba(184,134,11,0.06); border-left:4px solid var(--gold); padding:14px 18px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-top:12px; }
+.insight-box .label { font-family:var(--mono); font-size:0.66rem; color:var(--gold-dim); letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+.insight-box p { font-size:0.88rem; color:var(--ink); margin-bottom:0; }
+.age-compare { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+.age-col { padding:14px; border-radius:var(--radius-sm); font-size:0.86rem; line-height:1.7; }
+.age-col.elder-col { background:rgba(27,58,92,0.05); border:1px solid rgba(27,58,92,0.15); }
+.age-col.younger-col { background:rgba(184,134,11,0.05); border:1px solid rgba(184,134,11,0.15); }
+.age-col strong { display:block; font-family:var(--mono); font-size:0.72rem; letter-spacing:1px; margin-bottom:6px; }
+.age-col.elder-col strong { color:var(--royal-blue); }
+.age-col.younger-col strong { color:var(--gold-dim); }
+.deep-dive-toggle { background:rgba(27,58,92,0.05); border:1px solid rgba(27,58,92,0.2); border-radius:var(--radius-sm); padding:12px 16px; margin-top:14px; cursor:pointer; display:flex; align-items:center; gap:8px; font-size:0.86rem; color:var(--royal-blue); font-weight:600; transition:all 0.3s; }
+.deep-dive-toggle:hover { background:rgba(27,58,92,0.1); }
+.deep-dive-toggle .chevron { display:inline-block; transition:transform 0.3s; font-size:0.85rem; }
+.deep-dive-toggle.open .chevron { transform:rotate(180deg); }
+.deep-dive-content { display:none; background:rgba(27,58,92,0.03); border:1px solid rgba(27,58,92,0.12); border-top:none; padding:18px; border-radius:0 0 var(--radius-sm) var(--radius-sm); font-size:0.88rem; color:var(--ink-light); line-height:1.8; }
+.deep-dive-content.open { display:block; }
 
-.fade-up {
-  opacity: 0;
-  animation: fadeUp 0.8s ease-out forwards;
-}
+.diagram-section { margin-bottom:48px; }
+.diagram-frame { background:#FFF; border:2px solid var(--medieval-border); border-radius:var(--radius); padding:28px 20px; box-shadow:0 4px 20px var(--shadow); overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.diagram-frame svg { display:block; margin:0 auto; max-width:100%; height:auto; }
+.diagram-title { text-align:center; font-family:var(--title); font-size:1rem; font-weight:700; color:var(--ink); margin-bottom:16px; }
+.diagram-caption { text-align:center; margin-top:14px; font-size:0.78rem; color:var(--ink-dim); font-family:var(--mono); }
 
-/* ═══════════════════════════════════════
-   MAIN CONTAINER
-   ═══════════════════════════════════════ */
-.container {
-  max-width: 820px;
-  margin: 0 auto;
-  padding: 0 24px 120px;
-}
+.practice-section { margin-bottom:48px; }
+.section-ornament { font-family:var(--title); font-size:0.7rem; letter-spacing:4px; text-transform:uppercase; color:var(--crimson); margin-bottom:6px; }
+.section-heading { font-family:var(--title); font-size:1.5rem; font-weight:700; color:var(--ink); margin-bottom:24px; line-height:1.3; }
+.age-tab-group { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+.age-tab { font-family:var(--mono); font-size:0.78rem; padding:8px 20px; border-radius:6px; cursor:pointer; border:2px solid var(--medieval-border); background:#FFF; color:var(--ink-dim); transition:all 0.3s; font-weight:500; }
+.age-tab.active { background:var(--royal-blue); color:var(--parchment); border-color:var(--royal-blue); font-weight:700; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+.script-card { background:#FFF; border:2px solid rgba(139,115,85,0.2); border-radius:var(--radius); padding:24px; margin-bottom:16px; box-shadow:0 2px 12px var(--shadow); }
+.scenario-label { font-family:var(--accent); font-size:0.82rem; color:var(--gold-dim); margin-bottom:14px; padding-bottom:8px; border-bottom:1px dashed var(--medieval-border); }
+.dialog-line { display:flex; gap:12px; margin-bottom:14px; align-items:flex-start; }
+.dialog-label { font-family:var(--mono); font-size:0.68rem; font-weight:700; padding:3px 10px; border-radius:6px; flex-shrink:0; margin-top:3px; }
+.dialog-label.dad { background:rgba(27,58,92,0.12); color:var(--royal-blue); }
+.dialog-label.mom { background:rgba(184,134,11,0.12); color:var(--gold-dim); }
+.dialog-label.child { background:rgba(184,134,11,0.12); color:var(--gold-dim); }
+.dialog-text { font-size:0.92rem; color:var(--ink); line-height:1.7; }
+.dialog-text em { display:block; color:var(--ink-dim); font-style:italic; font-size:0.82rem; margin-top:4px; }
+.aha-callout { background:linear-gradient(135deg,rgba(139,26,26,0.06),rgba(184,134,11,0.06)); border:2px solid var(--gold); border-radius:var(--radius); padding:22px 24px; margin:24px 0; position:relative; }
+.aha-callout::before { content:'✦ AHA MOMENT ✦'; position:absolute; top:-12px; left:20px; background:var(--parchment); padding:0 12px; font-family:var(--title); font-size:0.7rem; font-weight:700; letter-spacing:3px; color:var(--gold); }
+.aha-callout p { font-size:1rem; font-weight:600; color:var(--crimson); line-height:1.7; }
+.do-dont { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:24px; }
+.do-box,.dont-box { padding:20px; border-radius:var(--radius-sm); font-size:0.88rem; }
+.do-box { background:rgba(45,80,22,0.05); border:2px solid rgba(45,80,22,0.2); }
+.dont-box { background:rgba(139,26,26,0.04); border:2px solid rgba(139,26,26,0.15); }
+.do-box h5 { color:var(--forest); font-family:var(--title); font-size:0.78rem; letter-spacing:2px; margin-bottom:12px; }
+.dont-box h5 { color:var(--crimson); font-family:var(--title); font-size:0.78rem; letter-spacing:2px; margin-bottom:12px; }
+.do-box li,.dont-box li { margin-bottom:8px; color:var(--ink-light); line-height:1.65; list-style:none; padding-left:22px; position:relative; }
+.do-box li::before { content:'✓'; position:absolute; left:0; color:var(--forest); font-weight:700; }
+.dont-box li::before { content:'✗'; position:absolute; left:0; color:var(--crimson); font-weight:700; }
 
-/* ═══════════════════════════════════════
-   HERO SECTION
-   ═══════════════════════════════════════ */
-.hero {
-  padding: 64px 0 48px;
-  text-align: center;
-  position: relative;
-}
-.hero::before {
-  content: '';
-  position: absolute;
-  top: -40px; left: 50%; transform: translateX(-50%);
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(74,191,138,0.08) 0%, transparent 70%);
-  pointer-events: none;
-}
-.hero .series-info {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  color: var(--text-dim);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.hero .total-days {
-  display: inline-block;
-  background: var(--bg-card);
-  border: 1px solid rgba(201,168,76,0.3);
-  color: var(--gold);
-  padding: 4px 14px;
-  border-radius: 20px;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  margin-bottom: 20px;
-}
-.hero .part-label {
-  font-family: var(--mono);
-  color: var(--green);
-  font-size: 0.85rem;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-.hero h1 {
-  font-family: var(--serif);
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  font-weight: 700;
-  color: var(--text-bright);
-  line-height: 1.25;
-  margin-bottom: 16px;
-}
-.hero h1 em {
-  font-style: italic;
-  color: var(--green);
-}
-.hero .subtitle {
-  font-size: 1.05rem;
-  color: var(--text-dim);
-  max-width: 560px;
-  margin: 0 auto 24px;
-  line-height: 1.7;
-}
-.hero .one-liner {
-  display: inline-block;
-  background: linear-gradient(135deg, rgba(74,191,138,0.12), rgba(201,168,76,0.12));
-  border: 1px solid rgba(74,191,138,0.25);
-  padding: 12px 28px;
-  border-radius: var(--radius-sm);
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--gold);
-  margin-bottom: 20px;
-}
-.badges {
-  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
-}
-.badge {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  padding: 5px 14px;
-  border-radius: 20px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
-.badge.first { background: rgba(74,191,138,0.15); color: var(--green); border: 1px solid rgba(74,191,138,0.3); }
-.badge.second { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+.tips-section { background:linear-gradient(135deg,var(--parchment-dark),rgba(184,134,11,0.06)); border:2px solid var(--medieval-border); border-radius:var(--radius); padding:28px; margin-bottom:48px; }
+.tips-section h3 { font-family:var(--title); font-size:1.15rem; color:var(--gold-dim); margin-bottom:16px; }
+.tips-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.tip-box { background:#FFF; border:1px solid rgba(139,115,85,0.2); padding:16px; border-radius:var(--radius-sm); font-size:0.88rem; line-height:1.65; }
+.tip-box strong { color:var(--crimson); display:block; margin-bottom:6px; font-size:0.9rem; }
 
-/* ═══════════════════════════════════════
-   SECTION TITLES
-   ═══════════════════════════════════════ */
-.section-label {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--green);
-  margin-bottom: 8px;
-}
-.section-title {
-  font-family: var(--serif);
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--text-bright);
-  margin-bottom: 24px;
-  line-height: 1.3;
-}
+.quiz-section { margin-bottom:48px; }
+.quiz-card { background:#FFF; border:2px solid rgba(139,115,85,0.2); border-radius:var(--radius); padding:24px; margin-bottom:16px; box-shadow:0 2px 12px var(--shadow); }
+.q-num { font-family:var(--title); font-size:0.72rem; color:var(--crimson); letter-spacing:3px; margin-bottom:10px; }
+.question { font-size:1rem; color:var(--ink); font-weight:600; margin-bottom:16px; line-height:1.6; }
+.quiz-options { display:flex; flex-direction:column; gap:8px; }
+.quiz-opt { background:var(--parchment-dark); border:2px solid rgba(139,115,85,0.15); border-radius:var(--radius-sm); padding:12px 16px; cursor:pointer; font-size:0.9rem; color:var(--ink); transition:all 0.3s; }
+.quiz-opt:hover { border-color:var(--royal-blue); background:rgba(27,58,92,0.04); }
+.quiz-opt.correct { border-color:var(--forest); background:rgba(45,80,22,0.08); color:var(--forest); font-weight:600; }
+.quiz-opt.wrong { border-color:var(--crimson); background:rgba(139,26,26,0.06); color:var(--crimson); }
+.quiz-explanation { display:none; margin-top:14px; padding:16px 18px; background:rgba(27,58,92,0.04); border-radius:var(--radius-sm); font-size:0.88rem; color:var(--ink-light); line-height:1.75; border-left:4px solid var(--royal-blue); }
+.quiz-explanation.show { display:block; }
 
-/* ═══════════════════════════════════════
-   STRATEGY BOX
-   ═══════════════════════════════════════ */
-.strategy-box {
-  background: var(--bg-card);
-  border: 1px solid rgba(74,191,138,0.2);
-  border-radius: var(--radius);
-  padding: 32px;
-  margin-bottom: 48px;
-}
-.strategy-box h3 {
-  font-family: var(--serif);
-  font-size: 1.3rem;
-  color: var(--green);
-  margin-bottom: 16px;
-}
-.strategy-box p {
-  color: var(--text-dim);
-  font-size: 0.92rem;
-  margin-bottom: 20px;
-}
-.time-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
-.time-table th {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--gold);
-  text-align: left;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(201,168,76,0.25);
-}
-.time-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  color: var(--text);
-  vertical-align: top;
-}
-.time-table td:first-child {
-  font-family: var(--mono);
-  color: var(--green);
-  font-weight: 600;
-  white-space: nowrap;
-  width: 100px;
-}
-.time-table tr:last-child td { border-bottom: none; }
-.time-bar {
-  height: 6px;
-  border-radius: 3px;
-  margin-top: 6px;
-}
-.time-bar.bar-1 { background: var(--green); width: 32%; }
-.time-bar.bar-2 { background: var(--gold); width: 48%; }
-.time-bar.bar-3 { background: var(--green); width: 20%; }
+.tracker { background:#FFF; border:2px solid var(--medieval-border); border-radius:var(--radius); padding:24px; box-shadow:0 2px 12px var(--shadow); }
+.tracker h4 { font-family:var(--title); font-size:0.78rem; letter-spacing:3px; text-transform:uppercase; color:var(--gold-dim); margin-bottom:16px; }
+.tracker-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+.tracker-day { text-align:center; padding:8px 4px; border-radius:var(--radius-sm); background:var(--parchment-dark); border:1px solid rgba(139,115,85,0.15); font-family:var(--mono); font-size:0.65rem; color:var(--ink-dim); cursor:pointer; transition:all 0.3s; }
+.tracker-day.today { border-color:var(--crimson); color:var(--crimson); font-weight:700; background:rgba(139,26,26,0.06); }
+.tracker-day.completed { background:rgba(45,80,22,0.1); color:var(--forest); border-color:var(--forest); }
+.tracker-day .day-num { display:block; font-weight:700; font-size:0.75rem; }
+.tracker-day .day-desc { font-size:0.55rem; opacity:0.7; }
+.chapter-footer { text-align:center; padding:32px 0; border-top:2px solid var(--medieval-border); font-family:var(--mono); font-size:0.7rem; color:var(--ink-dim); position:relative; }
+.chapter-footer::before { content:'⚜'; position:absolute; top:-14px; left:50%; transform:translateX(-50%); background:var(--parchment); padding:0 16px; font-size:1.2rem; color:var(--gold); }
 
-/* ═══════════════════════════════════════
-   SCIENCE CARDS
-   ═══════════════════════════════════════ */
-.science-cards {
-  display: grid;
-  gap: 20px;
-  margin-bottom: 48px;
+@media (max-width:768px) {
+  html { font-size:16px; }
+  .container { padding:0 16px 60px; }
+  .chapter-header { padding:32px 0 28px; }
+  .chapter-title { font-size:1.5rem; }
+  .chapter-subtitle { font-size:0.88rem; }
+  .scroll-box,.illuminated-card,.script-card,.quiz-card { padding:18px; }
+  .card-header { padding:16px 18px 12px; }
+  .card-body { padding:12px 18px 18px; }
+  .age-compare,.do-dont,.tips-grid { grid-template-columns:1fr; }
+  .diagram-frame { padding:16px 12px; }
+  .diagram-frame svg { min-width:340px; }
+  .tracker-grid { grid-template-columns:repeat(7,1fr); gap:4px; }
+  .tracker-day { padding:6px 2px; font-size:0.6rem; }
+}
+@media (max-width:400px) {
+  html { font-size:15px; }
+  .container { padding:0 12px 48px; }
+  .chapter-title { font-size:1.35rem; }
+  .age-tag { font-size:0.68rem; padding:4px 12px; }
 }
-.science-card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  border: 1px solid rgba(255,255,255,0.06);
-  overflow: hidden;
-  transition: border-color 0.3s;
-}
-.science-card:hover {
-  border-color: rgba(74,191,138,0.3);
-}
-.card-header {
-  padding: 20px 24px 0;
-  display: flex; align-items: center; gap: 12px;
-}
-.card-icon {
-  width: 44px; height: 44px;
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.3rem;
-  flex-shrink: 0;
-}
-.card-icon.green { background: rgba(74,191,138,0.15); }
-.card-icon.gold { background: rgba(201,168,76,0.15); }
-.card-header h4 {
-  font-family: var(--serif);
-  font-size: 1.2rem;
-  color: var(--text-bright);
-  font-weight: 600;
-}
-.card-body {
-  padding: 0 24px 24px;
-}
-.card-body p {
-  font-size: 0.92rem;
-  color: var(--text);
-  margin-bottom: 12px;
-}
-.neuro-tag {
-  display: inline-block;
-  background: rgba(74,191,138,0.12);
-  color: var(--green);
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.78rem;
-  margin-right: 8px;
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-.age-badge-inline {
-  display: inline-block;
-  background: rgba(201,168,76,0.15);
-  border: 1px solid rgba(201,168,76,0.3);
-  color: var(--gold);
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  padding: 2px 8px;
-  border-radius: 4px;
-  margin-left: 6px;
-}
-.behavior-box {
-  background: rgba(74,191,138,0.08);
-  border-left: 3px solid var(--green);
-  padding: 16px;
-  border-radius: 6px;
-  margin: 16px 0;
-}
-.behavior-box .label {
-  font-weight: 600;
-  color: var(--green);
-  font-size: 0.9rem;
-  margin-bottom: 8px;
-}
-.behavior-box p {
-  font-size: 0.85rem;
-  color: var(--text);
-}
-.deep-dive-toggle {
-  cursor: pointer;
-  color: var(--gold);
-  font-size: 0.9rem;
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 500;
-  user-select: none;
-}
-.deep-dive-toggle .chevron {
-  display: inline-block;
-  transition: transform 0.3s;
-}
-.deep-dive-toggle.open .chevron {
-  transform: rotate(180deg);
-}
-.deep-dive-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease-out;
-  margin-top: 0;
-}
-.deep-dive-content.open {
-  max-height: 1000px;
-  margin-top: 16px;
-}
-.deep-dive-content p {
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  margin-bottom: 10px;
-}
-
-/* ═══════════════════════════════════════
-   DIAGRAM SECTION
-   ═══════════════════════════════════════ */
-.diagram-section {
-  margin-bottom: 48px;
-}
-.diagram-wrap {
-  background: var(--bg-card);
-  border: 1px solid rgba(74,191,138,0.15);
-  border-radius: var(--radius);
-  padding: 32px 16px;
-  overflow-x: auto;
-}
-.diagram-wrap svg {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-}
-
-/* ═══════════════════════════════════════
-   PRACTICE SECTION
-   ═══════════════════════════════════════ */
-.practice-section {
-  margin-bottom: 48px;
-}
-.practice-header {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  margin-bottom: 24px;
-}
-.icon-circle {
-  font-size: 2.5rem;
-  flex-shrink: 0;
-}
-.age-tab-group {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-.age-tab {
-  cursor: pointer;
-  padding: 12px 16px;
-  font-size: 0.95rem;
-  color: var(--text-dim);
-  border-bottom: 2px solid transparent;
-  transition: all 0.3s;
-}
-.age-tab.active {
-  color: var(--green);
-  border-bottom-color: var(--green);
-}
-.tab-content {
-  display: none;
-}
-.tab-content.active {
-  display: block;
-}
-.script-card {
-  background: var(--bg-card-alt);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: var(--radius-sm);
-  padding: 24px;
-  margin-bottom: 20px;
-}
-.scenario {
-  font-family: var(--serif);
-  font-size: 1.1rem;
-  color: var(--gold);
-  margin-bottom: 16px;
-  font-weight: 600;
-}
-.dialog-line {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 12px;
-  align-items: flex-start;
-}
-.dialog-label {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  font-weight: 600;
-  flex-shrink: 0;
-  padding-top: 2px;
-  min-width: 50px;
-}
-.dialog-label.dad { color: var(--green); }
-.dialog-label.note { color: var(--text-dim); font-size: 0.65rem; }
-.dialog-text {
-  font-size: 0.92rem;
-  color: var(--text);
-  line-height: 1.6;
-}
-.dialog-text em {
-  color: var(--text-dim);
-  font-style: italic;
-  display: block;
-  font-size: 0.85rem;
-  margin-top: 4px;
-}
-.do-dont {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 24px;
-}
-.do-box, .dont-box {
-  border-radius: var(--radius-sm);
-  padding: 20px;
-}
-.do-box {
-  background: rgba(74,191,138,0.08);
-  border: 1px solid rgba(74,191,138,0.2);
-}
-.do-box h5 {
-  color: var(--green);
-  font-size: 0.95rem;
-  margin-bottom: 12px;
-  font-weight: 600;
-}
-.dont-box {
-  background: rgba(229,93,93,0.08);
-  border: 1px solid rgba(229,93,93,0.2);
-}
-.dont-box h5 {
-  color: var(--danger);
-  font-size: 0.95rem;
-  margin-bottom: 12px;
-  font-weight: 600;
-}
-.do-box ul, .dont-box ul {
-  list-style: none;
-}
-.do-box li, .dont-box li {
-  font-size: 0.85rem;
-  color: var(--text);
-  margin-bottom: 8px;
-  padding-left: 16px;
-  position: relative;
-}
-.do-box li::before { content: '✓'; position: absolute; left: 0; color: var(--green); }
-.dont-box li::before { content: '✕'; position: absolute; left: 0; color: var(--danger); }
-
-/* ═══════════════════════════════════════
-   TIP SECTIONS
-   ═══════════════════════════════════════ */
-.tip-section {
-  background: var(--bg-card);
-  border: 1px solid rgba(201,168,76,0.15);
-  border-radius: var(--radius);
-  padding: 32px;
-  margin-bottom: 48px;
-}
-.tip-section h3 {
-  font-family: var(--serif);
-  font-size: 1.3rem;
-  color: var(--gold);
-  margin-bottom: 16px;
-}
-.tip-section p {
-  font-size: 0.92rem;
-  color: var(--text);
-  line-height: 1.7;
-}
-
-/* ═══════════════════════════════════════
-   QUIZ SECTION
-   ═══════════════════════════════════════ */
-.quiz-section {
-  margin-bottom: 48px;
-}
-.quiz-card {
-  background: var(--bg-card);
-  border: 1px solid rgba(74,191,138,0.15);
-  border-radius: var(--radius);
-  padding: 28px;
-  margin-bottom: 24px;
-}
-.q-num {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 8px;
-}
-.question {
-  font-family: var(--serif);
-  font-size: 1.15rem;
-  color: var(--text-bright);
-  font-weight: 600;
-  margin-bottom: 18px;
-}
-.quiz-options {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.quiz-opt {
-  cursor: pointer;
-  padding: 12px 16px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  font-size: 0.9rem;
-  transition: all 0.3s;
-}
-.quiz-opt:hover {
-  background: rgba(74,191,138,0.1);
-  border-color: rgba(74,191,138,0.25);
-}
-.quiz-opt.correct {
-  background: rgba(74,191,138,0.15);
-  border-color: var(--green);
-  color: var(--green);
-}
-.quiz-opt.wrong {
-  background: rgba(229,93,93,0.15);
-  border-color: var(--danger);
-  color: var(--danger);
-}
-.quiz-explanation {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease-out;
-  margin-top: 0;
-  background: rgba(74,191,138,0.08);
-  border-left: 3px solid var(--green);
-}
-.quiz-explanation.show {
-  max-height: 500px;
-  margin-top: 16px;
-  padding: 16px;
-  border-radius: 4px;
-}
-.quiz-explanation p {
-  font-size: 0.85rem;
-  color: var(--text);
-  line-height: 1.6;
-}
-.quiz-explanation strong {
-  color: var(--green);
-}
-
-/* ═══════════════════════════════════════
-   TRACKER
-   ═══════════════════════════════════════ */
-.tracker {
-  background: var(--bg-card);
-  border: 1px solid rgba(74,191,138,0.15);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-top: 32px;
-}
-.tracker h4 {
-  font-family: var(--serif);
-  font-size: 1.1rem;
-  color: var(--green);
-  margin-bottom: 8px;
-}
-.tracker-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 12px;
-  margin-top: 16px;
-}
-.tracker-day {
-  cursor: pointer;
-  background: rgba(74,191,138,0.08);
-  border: 1px solid rgba(74,191,138,0.2);
-  border-radius: var(--radius-sm);
-  padding: 16px;
-  text-align: center;
-  transition: all 0.3s;
-}
-.tracker-day:hover {
-  background: rgba(74,191,138,0.12);
-}
-.tracker-day.completed {
-  background: rgba(74,191,138,0.2);
-  border-color: var(--green);
-}
-.day-label {
-  display: block;
-  font-family: var(--mono);
-  font-size: 0.8rem;
-  color: var(--green);
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-.day-desc {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--text-dim);
-}
-
-/* ═══════════════════════════════════════
-   FOOTER
-   ═══════════════════════════════════════ */
-.footer {
-  text-align: center;
-  padding: 48px 24px;
-  color: var(--text-dim);
-  font-size: 0.85rem;
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-.footer p { margin-bottom: 8px; }
-
-/* ═══════════════════════════════════════
-   MOBILE
-   ═══════════════════════════════════════ */
-@media (max-width: 640px) {
-  .container { padding: 0 16px 80px; }
-  .hero { padding: 40px 0 32px; }
-  .hero h1 { font-size: 1.8rem; }
-  .section-title { font-size: 1.4rem; }
-  .do-dont { grid-template-columns: 1fr; }
-}
-
-/* ═══════════════════════════════════════
-   MOBILE OPTIMIZATION
-   ═══════════════════════════════════════ */
-@media (max-width: 768px) {
-  html { font-size: 15px; }
-  body { line-height: 1.8; -webkit-text-size-adjust: 100%; }
-  .container { padding: 0 14px 60px; max-width: 100%; }
-  .hero { padding: 32px 0 24px; }
-  .hero h1 { font-size: 1.6rem; line-height: 1.3; word-break: keep-all; }
-  .hero .subtitle { font-size: 0.92rem; line-height: 1.7; }
-  .hero .one-liner { font-size: 0.88rem; padding: 12px 14px; }
-  .badges { flex-wrap: wrap; gap: 8px; }
-  .badge { font-size: 0.82rem; padding: 6px 14px; }
-  .part-label { font-size: 0.72rem; }
-  .series-info { font-size: 0.78rem; }
-  
-  h2, .section-title { font-size: 1.3rem; word-break: keep-all; }
-  h3 { font-size: 1.1rem; }
-  h4 { font-size: 1rem; }
-  
-  .strategy-box, .science-card, .card, .review-card,
-  .practice-card, .script-card, .tip-card, .tip-box,
-  .quiz-section, .tracker-section { 
-    padding: 16px 14px; 
-    border-radius: 12px;
-    margin-bottom: 16px;
-  }
-  
-  .time-table { font-size: 0.82rem; }
-  .time-table th, .time-table td { padding: 8px 6px; }
-  
-  .diagram-wrap, .svg-container { 
-    padding: 12px 8px; 
-    overflow-x: auto; 
-    -webkit-overflow-scrolling: touch;
-  }
-  .diagram-wrap svg, .svg-container svg { 
-    max-width: 100%; 
-    height: auto; 
-    min-width: 320px;
-  }
-  
-  .tab-buttons, .tabs { 
-    flex-wrap: wrap; 
-    gap: 6px; 
-  }
-  .tab-btn, .tab-button { 
-    font-size: 0.8rem; 
-    padding: 8px 14px; 
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-  
-  .do-dont, .do-dont-grid { grid-template-columns: 1fr; gap: 12px; }
-  .couple-tips-grid, .tips-grid { grid-template-columns: 1fr; gap: 12px; }
-  
-  .dialog-line, .script-line { 
-    padding: 10px 12px; 
-    font-size: 0.9rem; 
-    line-height: 1.7;
-    margin-bottom: 8px;
-  }
-  
-  .deep-dive-content, .deep-dive-body { 
-    padding: 14px; 
-    font-size: 0.88rem; 
-    line-height: 1.8;
-  }
-  
-  .quiz-question { font-size: 0.92rem; }
-  .quiz-option, .quiz-choice { font-size: 0.88rem; padding: 10px 12px; }
-  
-  table { font-size: 0.82rem; display: block; overflow-x: auto; }
-  
-  pre, code { font-size: 0.78rem; }
-}
-
-@media (max-width: 400px) {
-  html { font-size: 14px; }
-  .container { padding: 0 10px 48px; }
-  .hero h1 { font-size: 1.4rem; }
-  .badge { font-size: 0.78rem; padding: 5px 10px; }
-}
-
 </style>
 </head>
-
 <body>
-
 <div class="container">
 
-<section class="hero fade-up">
-  <div class="series-info">과학적 아빠 육아 · 포모도로 1세션 완결</div>
-  <div class="total-days">이 시리즈 예상 총 Day: 21일</div>
-  <div class="part-label">PART 3 — 부부관계 & 부모 웰빙</div>
-  <h1>공동 육아 철학 <em>정렬</em></h1>
-  <p class="subtitle">부부가 "아이를 키우는 방식"에 대해 다른 생각을 가질 때, 그 갈등이 아이의 스트레스 호르몬(코르티솔)을 42% 증가시키는 신경학적 메커니즘과 75% 정렬 상태에서 행동 문제를 60% 줄이는 실증 전략</p>
-  <div class="one-liner">💡 "엄마와 아빠가 다른 말을 하면, 아이의 뇌는 신경 회로 구축에 실패합니다"</div>
-  <div class="badges">
-    <span class="badge first">👧 첫째 (5-7세)</span>
-    <span class="badge second">👶 둘째 (2-4세)</span>
+<header class="chapter-header fade-up">
+  <div class="series-badge">과학적 아빠 육아 · 21일 스터디</div>
+  <div class="chapter-number">Chapter XVI</div>
+  <div class="part-banner">Part 3 — 부모 자신 돌봄</div>
+  <h1 class="chapter-title">공동 육아 <em>철학 정렬</em></h1>
+  <p class="chapter-subtitle">부모가 다르면 아이가 헷갈린다 — "한 목소리"의 전선전략, 일관성 있는 훈육, 연합된 부모의 과학적 신경효과</p>
+  <div class="aha-moment">"아이는 부모의 불일치를 감지하는 순간, 갈등의 대상으로 변한다"</div>
+  <div class="age-tags">
+    <span class="age-tag elder">👧 첫째 (5-7세)</span>
+    <span class="age-tag younger">👶 둘째 (2-4세)</span>
   </div>
-</section>
+</header>
 
-<section class="strategy-box fade-up">
-  <h3>🎯 오늘의 학습 전략</h3>
-  <p>오늘은 <strong>Feinberg 공동 양육 모델(Coparenting Model)</strong>을 통해 부부 간 육아 철학이 아이의 신경 발달에 미치는 영향을 이해합니다. 부부 간 갈등 상황이 아이의 편도체를 자극하여 코르티솔을 42% 증가시키는 메커니즘을 배운 후, 실제 충돌 상황에서 "통일된 입장"을 만드는 5단계 협상 프로세스를 체득합니다.</p>
+<section class="scroll-box fade-up">
+  <h3>📜 오늘의 학습 전략</h3>
+  <p><strong>부모 일관성(Parental Consistency)</strong>은 아이의 신경계 안정성과 직결됩니다. 하버드 심리학자 Siegel의 연구에 따르면, 부모가 같은 규칙을 일관되게 적용하는 가정의 아이는 <strong>불안감이 40% 낮습니다.</strong> 오늘은 부부가 다른 양육 철학을 가지고 있을 때, 어떻게 "연합된 부모"가 되는지를 배웁니다.</p>
   <table class="time-table">
-    <thead>
-      <tr><th>시간</th><th>활동</th><th>내용</th></tr>
-    </thead>
+    <thead><tr><th>시간</th><th>활동</th><th>내용</th></tr></thead>
     <tbody>
-      <tr>
-        <td>0–7분</td>
-        <td>📖 과학 배경</td>
-        <td>Feinberg 모델 + 부부 갈등이 아이 뇌에 미치는 영향<div class="time-bar bar-1"></div></td>
-      </tr>
-      <tr>
-        <td>7–18분</td>
-        <td>🔬 실제 시나리오</td>
-        <td>침대 시간, 간식 규칙, 훈육 방식 — 실제 부부 갈등 3가지 해결<div class="time-bar bar-2"></div></td>
-      </tr>
-      <tr>
-        <td>18–25분</td>
-        <td>🎯 5단계 협상</td>
-        <td>통일된 입장 만드는 구체적 프로세스 & 복습 퀴즈<div class="time-bar bar-3"></div></td>
-      </tr>
+      <tr><td>0–8분</td><td>🗣️ 부모 일관성</td><td>Parental Alliance & United Front — 부모의 불일치가 아이에게 미치는 영향<div class="time-bar bar-1"></div></td></tr>
+      <tr><td>8–18분</td><td>🎯 정렬 프레임</td><td>Co-Parenting Alignment Framework — 5가지 핵심 영역과 실전 전략<div class="time-bar bar-2"></div></td></tr>
+      <tr><td>18–25분</td><td>🛡️ 연합 전선</td><td>United Front 유지 & 아이 앞에서의 일관성<div class="time-bar bar-3"></div></td></tr>
     </tbody>
   </table>
 </section>
 
 <section class="fade-up">
-  <div class="section-label">NEUROSCIENCE</div>
-  <div class="section-title">공동 양육 과학</div>
-  <div class="science-cards">
-
-    <div class="science-card">
+  <div class="section-ornament">⚜ United Front ⚜</div>
+  <h2 class="section-heading">공동 육아 철학 정렬</h2>
+  <div class="illuminated-cards">
+    <article class="illuminated-card fade-up">
       <div class="card-header">
-        <div class="card-icon green">⚡</div>
-        <h4>부부 갈등 → 아이 스트레스 신경회로</h4>
+        <div class="card-icon crimson">🗣️</div>
+        <h4>부모 일관성 — "한 목소리"의 신경생물학</h4>
       </div>
       <div class="card-body">
-        <p>Cummings & Davies(2010)의 메타 분석에 따르면, 아이가 목격하는 부모 간 갈등 노출은 아이의 편도체(amygdala)를 과활성화시켜 코르티솔 분비를 약 42% 증가시킵니다.</p>
-        <div style="margin-bottom:12px;">
-          <span class="neuro-tag">🧠 편도체 과활성화</span>
-          <span class="neuro-tag">📈 코르티솔 42% 증가</span>
+        <p><strong>아이는 부모의 의견이 다르다는 것을 즉시 감지합니다.</strong> 더 문제는, 이 불일치가 반복되면 아이의 뇌에서 <strong>편도체가 과활성화되고, 스트레스 호르몬이 만성적으로 상승</strong>한다는 것입니다. (Cummings & Davies, 2010)</p>
+        <div style="margin-bottom:14px;">
+          <span class="research-tag">🧠 편도체 과활성</span>
+          <span class="research-tag">📊 코티솔 상승</span>
+          <span class="research-tag">⚠️ 아이의 "플레이"</span>
         </div>
-        <p><strong>5-7세</strong> <span class="age-badge-inline">FIRST CHILD</span>: 사회 인지력이 발달하면서 부모 간 갈등의 의미를 "이해하려고" 합니다.</p>
-        <p><strong>2-4세</strong> <span class="age-badge-inline">SECOND CHILD</span>: 의미 이해는 덜하지만, 부모의 목소리 톤과 신체 언어만으로도 신경 반응이 증폭됩니다.</p>
-        <div class="behavior-box">
-          <div class="label">이래서 아이가 이렇게 행동해요</div>
-          <p>부모가 싸우는 날 저녁, 아이가 유독 짜증을 내고 수면이 악화되며 다음날 집중력이 떨어지는 이유는 편도체가 활성화되고 코르티솔이 높아진 상태이기 때문입니다.</p>
+        <p><strong>부모 불일치의 3가지 패턴:</strong></p>
+        <ol style="margin-left:20px; margin-bottom:12px;">
+          <li style="margin-bottom:8px;"><strong>명시적 불일치</strong>: "아빠는 괜찮다고 했는데"라고 아이 앞에서 부모의 의견이 마주침</li>
+          <li style="margin-bottom:8px;"><strong>암시적 불일치</strong>: 부모가 말로는 같지만, 행동이나 톤이 다름 ("규칙은 지켜야 하지만... 이번엔 괜찮아")</li>
+          <li style="margin-bottom:8px;"><strong>시간차 불일치</strong>: 월요일엔 "공부부터", 토요일엔 "놀자" — 일관된 메시지 부재</li>
+        </ol>
+        <div class="insight-box">
+          <div class="label">💡 아이가 배우는 것</div>
+          <p>부모의 불일치를 경험하면, 아이는 "<strong>규칙은 상황에 따라 바뀐다</strong>", "<strong>부모가 신뢰할 수 없다</strong>", "<strong>나는 부모 사이에서 안전하지 않다</strong>"라고 학습합니다. 2-4세는 이것이 공포심으로, 5-7세는 "플레이"(부모 사이의 균열을 이용)로 나타납니다.</p>
         </div>
         <div class="deep-dive-toggle" onclick="toggleDeepDive(this)">
-          <span class="chevron">▼</span> 심화 학습: Feinberg 공동 양육 모델
+          <span class="chevron">▼</span> 심화: Parental Alliance의 3가지 차원
         </div>
         <div class="deep-dive-content">
-          <p><strong>Feinberg의 4가지 공동 양육 유형:</strong></p>
-          <p>팀(Team): 부부가 일관된 방향으로 움직임 (최적, 아이 행동 문제 60% 감소)<br>존중(Endorsement): 의견은 다르지만 상대를 지지 (양호, 문제 30~40% 감소)<br>갈등(Conflict): 부부가 아이 앞에서 의견 충돌 (위험)<br>비판(Undermining): 배우자의 양육 결정을 공개적으로 비판 (최악)</p>
+          <p><strong>Parental Alliance (Abidin, 1995):</strong> 부모 일관성의 3가지 차원</p>
+          <p>1. <strong>Task Contribution</strong> — "육아 책임을 공평하게 나누는가?"<br>
+          2. <strong>Degree of Parental Agreement</strong> — "양육 철학이 일치하는가?"<br>
+          3. <strong>Mutual Respect</strong> — "배우자를 양육자로 존중하는가?"</p>
+          <p><strong>연구 결과:</strong> 이 3가지가 높은 부모의 아이는:<br>
+          - 안정 애착률: 75%<br>
+          - 행동 문제: 30% 감소<br>
+          - 불안도: 40% 감소</p>
         </div>
       </div>
-    </div>
+    </article>
 
-    <div class="science-card">
+    <article class="illuminated-card fade-up">
       <div class="card-header">
-        <div class="card-icon gold">🔄</div>
-        <h4>일관성이 신경회로를 강화한다</h4>
+        <div class="card-icon blue">🎯</div>
+        <h4>공동 육아 정렬의 5가지 핵심 영역</h4>
       </div>
       <div class="card-body">
-        <p>뇌는 일관된 자극 패턴에 의해서만 강력한 신경회로를 형성합니다. 부모 A는 "과자는 안 돼", 부모 B는 "조용히 먹어도 괜찮아"라고 하면, 아이의 전두엽은 의사결정 회로를 구축할 수 없습니다.</p>
-        <div style="margin-bottom:12px;">
-          <span class="neuro-tag">🧬 신경가소성</span>
-          <span class="neuro-tag">✂️ 불명확한 신호 = 가지치기 실패</span>
+        <p>부부가 완벽히 같을 수는 없습니다. 하지만 <strong>다음 5가지 핵심 영역에서는 반드시 정렬되어야</strong> 합니다. 가트만과 Siegel의 통합 모델입니다.</p>
+        <div style="margin-bottom:14px;">
+          <span class="research-tag">📋 규칙</span>
+          <span class="research-tag">💪 훈육</span>
+          <span class="research-tag">🎓 가치관</span>
+          <span class="research-tag">❤️ 감정</span>
+          <span class="research-tag">⏰ 일정</span>
         </div>
-        <p><strong>신경학적 결과</strong>: 75% 정렬 상태에서는 아이의 행동 문제가 <strong>60% 감소</strong>합니다.</p>
-        <div class="behavior-box">
-          <div class="label">이래서 아이가 이렇게 행동해요</div>
-          <p>부모가 일관성 없을 때 아이가 "엄마는 안 돼 했는데 아빠는 괜찮다고 했어"라고 게임을 하는 이유는, 아이가 "조작적"이라서가 아니라 뇌가 불명확한 규칙 상황에서 합리적 행동을 하고 있기 때문입니다.</p>
+        <p><strong>①  규칙(Rules):</strong> "밥 먹기 전에 손을 씻어야 한다", "10시 이후는 스크린 금지" — 모두가 알아야 하고, 모두가 일관되게 적용해야 합니다.</p>
+        <p><strong>② 훈육(Discipline):</strong> 규칙을 어겼을 때의 결과. "한 번 경고, 두 번째는 타임아웃" 같은 구체적 기준이 있어야 합니다.</p>
+        <p><strong>③ 가치관(Values):</strong> 우리 가족이 소중히 여기는 것. "정직함", "노력", "친절" — 부모가 다르면 아이는 혼란스러워합니다.</p>
+        <p><strong>④ 감정 표현(Emotional Expression):</strong> "화낼 때는 소리 지르면 안 돼", "울어도 괜찮아" 같은 감정 규칙. 한 부모는 감정을 억압하고 다른 부모는 허용하면 안 됩니다.</p>
+        <p><strong>⑤ 일정과 루틴(Schedule & Routine):</strong> 아침 루틴, 저녁 식사 시간, 숙제 시간 — 예측 가능성이 아이 신경계를 안정시킵니다.</p>
+        <div class="insight-box">
+          <div class="label">💡 5-7세 vs 2-4세의 다른 반응</div>
+          <p><strong>5-7세:</strong> 부모의 불일치를 의식적으로 이용합니다. "엄마는 괜찮다고 했는데?" 하며 부모 사이의 균열을 벌립니다. <strong>2-4세:</strong> 불일치 자체를 위협으로 느껴 편도체가 만성 과활성화됩니다. "엄마 아빠가 싸우면 나를 버릴 수도 있겠다"는 불안.</p>
         </div>
         <div class="deep-dive-toggle" onclick="toggleDeepDive(this)">
-          <span class="chevron">▼</span> 심화 학습: 정렬도와 행동 문제의 관계
+          <span class="chevron">▼</span> 심화: "나쁜 부모 vs 좋은 부모" 역할 탈출
         </div>
         <div class="deep-dive-content">
-          <p><strong>부부 정렬도에 따른 아이 행동 문제:</strong></p>
-          <p>정렬도 90% 이상: 행동 문제 20% 이하<br>정렬도 75~89%: 행동 문제 20~40%<br>정렬도 50~74%: 행동 문제 40~60%<br>정렬도 25~49%: 행동 문제 60~80%</p>
+          <p><strong>일반적인 패턴:</strong> 한 부모는 엄격하고(Strict), 다른 부모는 관대합니다(Permissive).</p>
+          <p>이 역할 고착이 위험한 이유:<br>
+          1. 아이는 "관대한 부모"에게만 청을 합니다<br>
+          2. 엄격한 부모는 고립되고, 관대한 부모는 소비됩니다<br>
+          3. 결국 부부 갈등으로 이어집니다<br>
+          4. 아이는 "나는 부모를 조종할 수 있다"고 학습합니다</p>
+          <p><strong>해결책:</strong> 두 부모 모두 "설명적이면서도 일관된 (Authoritative)" 스타일로 정렬하세요.</p>
         </div>
       </div>
-    </div>
+    </article>
 
-    <div class="science-card">
+    <article class="illuminated-card fade-up">
       <div class="card-header">
-        <div class="card-icon green">🛠️</div>
-        <h4>부부 갈등을 "아이 앞에서" 해결하는 전략</h4>
+        <div class="card-icon gold">🛡️</div>
+        <h4>연합된 부모 전선(United Front) 유지 전략</h4>
       </div>
       <div class="card-body">
-        <p>역설적으로, 부부가 "완전히 일치된 의견만 표현하는" 것은 건강하지 않습니다. 아이 앞에서 다툼 없이 갈등을 해결하는 모습을 보이는 것이 오히려 아이의 사회 인지 발달과 갈등 해결 능력을 향상시킵니다.</p>
-        <div style="margin-bottom:12px;">
-          <span class="neuro-tag">💬 메타정서 코칭</span>
-          <span class="neuro-tag">🧠 사회 인지 발달</span>
+        <p>부모가 의견이 다를 때, <strong>"아이 앞에서는 절대 싸우지 않습니다."</strong> 이것이 United Front의 핵심 규칙입니다.</p>
+        <div style="margin-bottom:14px;">
+          <span class="research-tag">🤝 공개적 연합</span>
+          <span class="research-tag">🗨️ 사적 협의</span>
+          <span class="research-tag">🔄 신속한 조정</span>
         </div>
-        <p><strong>5단계 모델:</strong><br>① 차이 인정 → ② 각자 입장 표현 → ③ 공통 목표 확인 → ④ 타협안 제시 → ⑤ 아이에게 통일된 결정 전달</p>
-        <div class="behavior-box">
-          <div class="label">이래서 중요해요</div>
-          <p>부모가 아이 앞에서 갈등을 완전히 숨기는 것보다, "서로 다르지만 함께 해결할 수 있다"는 메시지를 보이는 것이 장기적으로 아이의 정서 회복탄력성을 높입니다.</p>
+        <p><strong>실천 원칙:</strong></p>
+        <ol style="margin-left:20px; margin-bottom:12px;">
+          <li style="margin-bottom:8px;"><strong>아이 앞에서 의견이 다르면 "나중에 얘기하자"로 연기</strong> — "엄마와 아빠가 이걸 함께 생각해볼게"라고 말합니다.</li>
+          <li style="margin-bottom:8px;"><strong>아이 없을 때 빠르게 협의</strong> — 그 날 저녁에 5-10분 정도 함께 정렬합니다.</li>
+          <li style="margin-bottom:8px;"><strong>조정된 의견을 아이에게 재공지</strong> — "우리가 생각해봤는데..." 형태로 함께 설명합니다.</li>
+          <li style="margin-bottom:8px;"><strong>틀렸으면 공개 정정</strong> — "엄마가 너무 성급했어. 미안해. 다시 생각해보니..." 이렇게 하면 아이는 "부모도 실수하고 수정할 수 있다"고 배웁니다.</li>
+        </ol>
+        <div class="insight-box">
+          <div class="label">💡 아이가 배우는 모델</div>
+          <p>부모가 <strong>불일치를 건강하게 처리하는 모습</strong>을 보면, 아이는 어른이 되어서도 같은 방식을 사용합니다. "의견은 다르지만, 우리는 함께다"라는 신경 회로를 형성합니다. 이것이 건강한 인간관계의 기초입니다.</p>
+        </div>
+        <div class="deep-dive-toggle" onclick="toggleDeepDive(this)">
+          <span class="chevron">▼</span> 심화: "한 발 물러섬" vs "양보"의 차이
+        </div>
+        <div class="deep-dive-content">
+          <p><strong>한 발 물러섬 (Stepping Back):</strong> 상황이 다르니까 이번엔 배우자의 방식을 존중하는 것. 나의 방식을 포기하지 않지만, 이 상황에서는 그들을 지지합니다.</p>
+          <p><strong>양보 (Concession):</strong> 내 원칙을 포기하고 상대의 방식을 따르는 것. 반복되면 자존감이 떨어집니다.</p>
+          <p><strong>건강한 United Front:</strong> 나와 배우자 중 누가 더 깊이 이 이슈에 관심이 있는가를 먼저 파악합니다. "너는 학용품이 정리되는 게 중요한 것 같은데, 나는 덜 신경 써. 이번엔 너의 방식으로 가자"는 한 발 물러섬입니다.</p>
         </div>
       </div>
-    </div>
-
+    </article>
   </div>
 </section>
 
 <section class="diagram-section fade-up">
-  <div class="section-label">VISUAL DIAGRAM</div>
-  <div class="section-title">공동 양육 의사결정 프레임워크</div>
-  <div class="diagram-wrap">
-    <svg viewBox="0 0 760 380" xmlns="http://www.w3.org/2000/svg" font-family="'Noto Sans KR'">
-      <defs>
-        <style>
-          .flow-box { fill:#12151B; stroke:#4ABF8A; stroke-width:2; }
-          .flow-text { font-size:12px; fill:#E8E6E1; text-anchor:middle; }
-          .flow-arrow { stroke:#4ABF8A; stroke-width:2; fill:none; marker-end:url(#head); }
-        </style>
-        <marker id="head" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0, 10 3, 0 6" fill="#4ABF8A"/></marker>
-      </defs>
-      <text x="380" y="25" style="font-size:11px;fill:#4ABF8A;text-anchor:center;letter-spacing:1px;text-transform:uppercase;">5-Step Coparenting Alignment</text>
+  <div class="section-ornament">⚜ Framework of Alignment ⚜</div>
+  <h2 class="section-heading">공동 육아 정렬 프레임워크</h2>
+  <div class="diagram-frame">
+    <div class="diagram-title">5가지 영역별 정렬 체크리스트</div>
+    <svg viewBox="0 0 760 500" xmlns="http://www.w3.org/2000/svg">
+      <rect width="760" height="500" fill="#FFF" rx="8"/>
+      <text x="380" y="25" text-anchor="middle" font-family="Cinzel,serif" font-size="13" font-weight="700" fill="#2C1810">공동 육아 정렬 5가지 영역</text>
       
-      <rect x="30" y="50" width="110" height="60" class="flow-box" rx="6"/>
-      <text x="85" y="80" class="flow-text">① 차이 인정</text>
-      <path d="M 140 80 L 175 80" class="flow-arrow"/>
-      
-      <rect x="175" y="50" width="110" height="60" class="flow-box" rx="6"/>
-      <text x="230" y="80" class="flow-text">② 입장 표현</text>
-      <path d="M 285 80 L 320 80" class="flow-arrow"/>
-      
-      <rect x="320" y="50" width="110" height="60" class="flow-box" rx="6"/>
-      <text x="375" y="80" class="flow-text">③ 목표 확인</text>
-      <path d="M 430 80 L 465 80" class="flow-arrow"/>
-      
-      <rect x="465" y="50" width="110" height="60" class="flow-box" rx="6"/>
-      <text x="520" y="80" class="flow-text">④ 타협안</text>
-      <path d="M 575 80 L 610 80" class="flow-arrow"/>
-      
-      <rect x="610" y="50" width="110" height="60" class="flow-box" rx="6"/>
-      <text x="665" y="80" class="flow-text">⑤ 통일 전달</text>
-      
-      <rect x="200" y="160" width="360" height="80" style="fill:rgba(74,191,138,0.08);stroke:rgba(74,191,138,0.3);stroke-width:1;border-radius:8px"/>
-      <text x="380" y="190" class="flow-text" style="font-size:13px;font-weight:600;">결과: 아이가 부모의 갈등 해결 과정을 배움</text>
-      <text x="380" y="210" class="flow-text" style="font-size:12px;">편도체 진정 ↓ | 회복탄력성 ↑ | 메타정서 능력 ↑</text>
-      <text x="380" y="230" class="flow-text" style="font-size:11px;fill:#4ABF8A;">vs. 아이 앞에서 싸우기 → 코르티솔 42% 증가</text>
+      <g>
+        <rect x="30" y="50" width="680" height="60" rx="4" fill="rgba(27,58,92,0.04)" stroke="#1B3A5C" stroke-width="1"/>
+        <text x="50" y="70" font-family="Noto Sans KR" font-size="9" fill="#2C1810"><strong>1️⃣ 규칙 (Rules)</strong> - 모두가 일관되게 지켜야 할 명확한 기준</text>
+        <text x="50" y="85" font-family="Noto Sans KR" font-size="8.5" fill="#4A3728">예) 밥 먹기 전 손 씻기, 침실 11시 입실, 짜증낼 땐 큰 목소리 금지</text>
+        <text x="50" y="99" font-family="Noto Sans KR" font-size="8.5" fill="#4A3728">✓ 체크: 우리 가족의 핵심 규칙 3-5개를 함께 적고, 두 부모 모두 같은 방식으로 적용하는가?</text>
+      </g>
+
+      <g>
+        <rect x="30" y="125" width="680" height="60" rx="4" fill="rgba(184,134,11,0.04)" stroke="#B8860B" stroke-width="1"/>
+        <text x="50" y="145" font-family="Noto Sans KR" font-size="9" fill="#2C1810"><strong>2️⃣ 훈육 (Discipline)</strong> - 규칙을 어겼을 때의 일관된 결과</text>
+        <text x="50" y="160" font-family="Noto Sans KR" font-size="8.5" fill="#4A3728">예) 경고 → 타임아웃(5분) → 특권 박탈 (장난감 1주) → 심각하면 부모 회의</text>
+        <text x="50" y="174" font-family="Noto Sans KR" font-size="8.5" fill="#4A3728">✓ 체크: "우리 아이가 규칙을 어기면 어떤 결과가 따르는가?" 두 부모의 대답이 같은가?</text>
+      </g>
+
+      <g>
+        <rect x="30" y="200" width="680" height="60" rx="4" fill="rgba(139,26,26,0.04)" stroke="#8B1A1A" stroke-width="1"/>
+        <text x="50" y="220" font-family="Noto Sans KR" font-size="9" fill="#2C1810"><strong>3️⃣ 가치관 (Values)</strong> - 우리 가족이 소중히 여기는 것</text>
+        <text x="50" y="235" font-family="Noto Sans KR" font-size="8.5" fill="#4A3728">예) 정직 > 성공, 노력 > 천재성, 친절 > 경쟁, 안전 > 독립</text>
+        <text x="50" y="249" font-family="Noto Sans KR" font-size="8.5" fill="#4A3728">✓ 체크: 아이가 선택의 순간에 마주칠 때 (거짓말 vs 혼남), 두 부모의 메시지가 일치하는가?</text>
+      </g>
+
+      <g>
+        <rect x="30" y="275" width="680" height="60" rx="4" fill="rgba(45,80,22,0.04)" stroke="#2D5016" stroke-width="1"/>
+        <text x="50" y="295" font-family="Noto Sans KR" font-size="9" fill="#2C1810"><strong>4️⃣ 감정 표현 (Emotional Expression)</strong> - 느낌을 어떻게 드러낼 것인가</text>
+        <text x="50" y="310" font-family="Noto Sans KR" font-size="8.5" fill="#4A3728">예) "울어도 괜찮아 (부모 A) vs 남자는 울지 않아 (부모 B)" — 아이가 혼란스러워함</text>
+        <text x="50" y="324" font-family="Noto Sans KR" font-size="8.5" fill="#4A3728">✓ 체크: 아이가 감정을 표현할 때 두 부모의 반응이 일관된가? (수용 vs 억압)</text>
+      </g>
+
+      <g>
+        <rect x="30" y="350" width="680" height="60" rx="4" fill="rgba(139,115,85,0.04)" stroke="#8B7355" stroke-width="1"/>
+        <text x="50" y="370" font-family="Noto Sans KR" font-size="9" fill="#2C1810"><strong>5️⃣ 일정과 루틴 (Schedule & Routine)</strong> - 예측 가능한 구조</text>
+        <text x="50" y="385" font-family="Noto Sans KR" font-size="8.5" fill="#4A3728">예) 아침 6:30 기상, 7:30 등교, 저녁 6시 식사, 8시 숙제, 9시 침실 준비, 9:30 자기</text>
+        <text x="50" y="399" font-family="Noto Sans KR" font-size="8.5" fill="#4A3728">✓ 체크: 주중/주말 루틴이 일관되는가? 월요일과 토요일의 기준이 너무 다르진 않은가?</text>
+      </g>
+
+      <g>
+        <rect x="30" y="430" width="680" height="50" rx="4" fill="rgba(27,58,92,0.06)" stroke="#1B3A5C" stroke-width="1.5"/>
+        <text x="380" y="455" text-anchor="middle" font-family="Noto Sans KR" font-size="9" font-weight="600" fill="#2C1810">⭐ 핵심: 5가지 모두 "완벽히 같을" 필요는 없습니다. 다만 "명확히 정렬되고", "의도적으로 일관되어야" 합니다.</text>
+      </g>
     </svg>
+    <p class="diagram-caption">Siegel & Hartzell (2003): 이 5가지 영역의 일관성이 높을수록 아이의 안정도가 높습니다</p>
   </div>
 </section>
+
+<div class="aha-callout fade-up">
+  <p>부모가 완벽하게 일치할 수는 없습니다. 하지만 <strong>의도적으로 불일치를 "최소화"하고, 의도적으로 일관성을 "최대화"</strong>하면, 아이는 안정감을 느낍니다. 그것이 United Front입니다.</p>
+</div>
 
 <section class="practice-section fade-up">
-  <div class="practice-header">
-    <div class="icon-circle">🎯</div>
-    <div>
-      <h3 style="font-family:var(--serif);font-size:1.2rem;color:var(--text-bright);">실제 충돌 상황 해결하기</h3>
-      <p style="font-size:0.85rem;color:var(--text-dim);">공동 양육 갈등의 3가지 시나리오</p>
+  <div class="section-ornament">⚜ Knight's Handbook ⚜</div>
+  <h2 class="section-heading">공동 육아 정렬 실전 스크립트</h2>
+
+  <div class="age-tab-group">
+    <div class="age-tab active" onclick="switchTab(this,'align1')">시나리오 1</div>
+    <div class="age-tab" onclick="switchTab(this,'align2')">시나리오 2</div>
+    <div class="age-tab" onclick="switchTab(this,'align3')">시나리오 3</div>
+    <div class="age-tab" onclick="switchTab(this,'align4')">시나리오 4</div>
+  </div>
+
+  <div class="tab-content active" id="align1">
+    <div class="script-card">
+      <div class="scenario-label">🏰 상황 1 — 아이 앞에서의 규칙 불일치</div>
+      <div class="dialog-line"><span class="dialog-label child">아이</span><span class="dialog-text">"엄마, 과자 먹어도 돼?"</span></div>
+      <div class="dialog-line"><span class="dialog-label mom">엄마</span><span class="dialog-text">"밥 먹고 나서야. 지금은 안 돼."</span></div>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"(개입하려다) 아, 그냥 조금 줘도 괜찮지 않을까?"<em>→ 명시적 불일치, 아이가 즉시 감지</em></span></div>
+      <div class="dialog-line"><span class="dialog-label child">아이</span><span class="dialog-text">"봐! 아빠는 된대!"</span></div>
+      
+      <p style="margin-top:16px; font-weight:600; color:#8B1A1A;">❌ 잘못된 상황 진행:</p>
+      <div class="dialog-line"><span class="dialog-label mom">엄마</span><span class="dialog-text">"(아빠한테 짜증) 넌 왜 자꾸 내 훈육을 방해해?"<em>→ 아이 앞에서 부모 싸움 시작</em></span></div>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"(방어적으로) 별 거 아닌데... 넌 너무 엄격해"<em>→ 아이가 관찰하는 와중에 갈등 심화</em></span></div>
+      
+      <p style="margin-top:16px; font-weight:600; color:#2D5016;">✅ 효과적인 대응:</p>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"(순간 멈추고) 아, 잠깐. 이건 엄마와 내가 함께 생각해볼 문제네. 아가, 너는 지금 밥 먹는 데 집중해. 우리가 나중에 얘기할게."<em>→ 즉시 연기, 일관성 유지</em></span></div>
+      <div class="dialog-line"><span class="dialog-label mom">엄마</span><span class="dialog-text">"맞아. 과자는 밥 후에. 그럼 밥 다 먹으면 조금 먹을 수 있어."<em>→ 엄마도 배우자를 지지</em></span></div>
+      <div class="dialog-line"><span class="dialog-label child">아이</span><span class="dialog-text">"(혼란이 줄어들음) 알겠어."</span></div>
+      
+      <p style="margin-top:16px; font-weight:600; color:var(--royal-blue); border-top:2px solid var(--royal-blue); padding-top:12px;">⭐ 저녁에 부부 협의:</p>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"아까는 미안해. 내가 순간 생각 없이 개입했어. 밥 전 과자는 규칙으로 정하고 지켜야겠어."</span></div>
+      <div class="dialog-line"><span class="dialog-label mom">엄마</span><span class="dialog-text">"그래 고마워. 그런데 너는 왜 그 규칙이 너무 엄격하다고 생각했어? 함께 얘기해보자."</span></div>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"사실 나는 아이가 스트레스 받지 않으면 좋겠어서... 그런데 너의 규칙이 합리적이라고 이제 알겠어. 함께 지키자."</span></div>
     </div>
   </div>
 
-  <div class="script-card">
-    <div class="scenario">상황 1 — 침대 시간 규칙 불일치</div>
-    <div class="dialog-line">
-      <span class="dialog-label dad">아빠</span>
-      <span class="dialog-text">"오늘 둘째가 9시 30분까지 깨어있었어. 정해진 시간이 9시인데..."</span>
-    </div>
-    <div class="dialog-line">
-      <span class="dialog-label note">엄마 반응</span>
-      <span class="dialog-text">"그날 아이가 피곤해 보였거든. 좀 더 놀려줬어."</span>
-    </div>
-    <div class="dialog-line">
-      <span class="dialog-label dad">아빠 (5단계)</span>
-      <span class="dialog-text">"알겠어. 넌 아이의 그 순간 기분을 중시하는 거고, 나는 규칙의 일관성을 중시하는 거네. (① 차이 인정) 난 불안정한 수면이 다음날 행동 문제를 만든다고 생각해. (② 입장) 우리 둘 다 아이의 건강한 발달을 원하잖아. (③ 목표) 평일은 9시, 주말은 9시 30분으로 하는 게 어떨까? (④ 타협) 다음부터 이 규칙으로 함께 할래?"</span>
-    </div>
-  </div>
-
-  <div class="script-card">
-    <div class="scenario">상황 2 — 간식 규칙 (5-7세)</div>
-    <div class="dialog-line">
-      <span class="dialog-label dad">아빠</span>
-      <span class="dialog-text">"(식탁에서) 과자는 정해진 시간에만 먹기로 했잖아."</span>
-    </div>
-    <div class="dialog-line">
-      <span class="dialog-label note">엄마 반응</span>
-      <span class="dialog-text">"(아이 앞에서) 아, 엄마는 괜찮다고 생각하는데?"</span>
-    </div>
-    <div class="dialog-line">
-      <span class="dialog-label dad">아빠 (나중에)</span>
-      <span class="dialog-text">"(아이가 없을 때) 미안해, 아이 앞에서 다르게 말한 건. 이렇게 되면 아이가 "엄마는 괜찮대"라고 내 말을 무시하게 돼. 우리가 일단 규칙을 정하고, 그 다음에 배우자 앞에서 그 규칙을 지켜주는 게 중요해."</span>
+  <div class="tab-content" id="align2">
+    <div class="script-card">
+      <div class="scenario-label">🏰 상황 2 — 훈육 방식의 불일치</div>
+      <div class="dialog-line"><span class="dialog-label child">아이</span><span class="dialog-text">"(언니에게 폭력) 싫어! (밀침)"</span></div>
+      <div class="dialog-line"><span class="dialog-label mom">엄마</span><span class="dialog-text">"(즉시) 타임아웃. 방에 가. 10분."<em>→ 엄마의 훈육 방식</em></span></div>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"(개입하려다) 아, 잠깐 봐. (아이한테) 왜 그랬어?"<em>→ 아빠는 "대화 후 이해" 방식</em></span></div>
+      <div class="dialog-line"><span class="dialog-label mom">엄마</span><span class="dialog-text">"(짜증) 아까 얘기했잖아. 맞히면 타임아웃이야. 넌 왜 자꾸 방해해?"</span></div>
+      
+      <p style="margin-top:16px; font-weight:600; color:#2D5016;">✅ 효과적인 대응:</p>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"(멈추고) 아, 맞다. 이건 우리가 정한 규칙이야. (아이한테) 타임아웃 가자. 나중에 이해하는 건 그 다음에 하자."<em>→ 공개적으로 배우자 지지</em></span></div>
+      <div class="dialog-line"><span class="dialog-label child">아이</span><span class="dialog-text">"(타임아웃 후) (아빠한테) 미안해..."</span></div>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"(함께 앉아) 응, 네가 미안하다는 걸 알겠어. 그런데 언니를 맞히면 안 돼. 다음번엔 뭐할 거야?"<em>→ 이제 "대화"가 가능한 상태</em></span></div>
+      
+      <p style="margin-top:16px; font-weight:600; color:var(--royal-blue); border-top:2px solid var(--royal-blue); padding-top:12px;">⭐ 부부 협의:</p>
+      <div class="dialog-line"><span class="dialog-label mom">엄마</span><span class="dialog-text">"내 훈육에 너가 개입하면 아이가 혼란스럽다는 걸 알게 됐어. 고마워."</span></div>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"내가 개입한 건 잘못했어. 하지만 내가 걱정한 건... 타임아웃 후에도 아이가 '왜 했는지'를 모르면 안 될 것 같았거든."</span></div>
+      <div class="dialog-line"><span class="dialog-label mom">엄마</span><span class="dialog-text">"그렇구나. 그럼 우리의 규칙은 이렇게 하자: 행동에는 즉시 결과(타임아웃), 그 다음에 대화로 이해시키기."<em>→ 두 방식의 통합</em></span></div>
     </div>
   </div>
 
-  <div class="script-card">
-    <div class="scenario">상황 3 — 훈육 방식의 차이</div>
-    <div class="dialog-line">
-      <span class="dialog-label dad">아빠</span>
-      <span class="dialog-text">"(5-7세 아이가 동생을 때렸을 때) 너는 방에 가서 10분 생각해."</span>
-    </div>
-    <div class="dialog-line">
-      <span class="dialog-label note">엄마 반응</span>
-      <span class="dialog-text">"(아이가 울며 저항할 때) 아, 괜찮아. 엄마가 안아줄게."</span>
-    </div>
-    <div class="dialog-line">
-      <span class="dialog-label dad">아빠 (나중에)</span>
-      <span class="dialog-text">"이 아이 훈육할 때마다 우리 방식이 다르면, 아이가 어느 쪽이 "정답"인지 모르게 돼. 우리가 일단 훈육 원칙을 하나 정해야 해. 넌 어느 쪽이 낫다고 생각해?"</span>
+  <div class="tab-content" id="align3">
+    <div class="script-card">
+      <div class="scenario-label">🏰 상황 3 — 감정 표현에서의 불일치</div>
+      <div class="dialog-line"><span class="dialog-label child">아이</span><span class="dialog-text">"(울며) 친구가 내 장난감을 안 가져가줬어... (팔팔댈며)"</span></div>
+      <div class="dialog-line"><span class="dialog-label mom">엄마</span><span class="dialog-text">"(안아주며) 그래, 울어도 돼. 슬픈 거 맞지. 엄마가 안아줄게."</span></div>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"(들어오며) (아이한테) 이정도 가지고? 남자는 울지 말고 그냥 참아."<em>→ 명시적 불일치, 감정 억압</em></span></div>
+      <div class="dialog-line"><span class="dialog-label child">아이</span><span class="dialog-text">"(더 울면서) 아빠는 싫어!"<em>→ 혼란과 불안</em></span></div>
+      
+      <p style="margin-top:16px; font-weight:600; color:#2D5016;">✅ 효과적인 대응:</p>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"(생각 후) (아이한테) 미안해. 울고 싶으면 울어도 돼. 엄마 말이 맞아. (엄마 옆에 앉으며)"<em>→ 공개 정정</em></span></div>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"(잠시 후) 그런데 이렇게 슬플 때 어떻게 하면 기분이 나아질까? 함께 생각해보자."<em>→ 감정 수용 + 해결</em></span></div>
+      <div class="dialog-line"><span class="dialog-label child">아이</span><span class="dialog-text">"(진정되며) 아빠가 우리 장난감을 가지고 놀아줄래?"</span></div>
+      
+      <p style="margin-top:16px; font-weight:600; color:var(--royal-blue); border-top:2px solid var(--royal-blue); padding-top:12px;">⭐ 부부 협의:</p>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"내가 자란 환경에서는 감정을 억압하도록 배웠어. 하지만 우리 아이에게는 그럴 필요 없겠다."</span></div>
+      <div class="dialog-line"><span class="dialog-label mom">엄마</span><span class="dialog-text">"고마워, 그렇게 받아줘서. 그리고... 내가 너무 감정을 많이 표현하는 건 아닐까 걱정되기도 해."</span></div>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"좋아. 감정을 수용하되, 우리는 행동은 조절하자. 그게 우리의 가치관이 될 수 있을 것 같아."</span></div>
     </div>
   </div>
 
-  <div class="do-dont">
-    <div class="do-box">
-      <h5>✅ DO — 이렇게 하세요</h5>
-      <ul>
-        <li>아이 없을 때 먼저 대화</li>
-        <li>상대의 입장을 먼저 인정</li>
-        <li>공통 목표 상기</li>
-        <li>타협안을 함께 제시</li>
-        <li>합의 후 아이 앞에서 통일</li>
-        <li>일관성 있게 실행</li>
-      </ul>
-    </div>
-    <div class="dont-box">
-      <h5>❌ DON'T — 이것은 피하세요</h5>
-      <ul>
-        <li>아이 앞에서 배우자 비판하기</li>
-        <li>과거 비난하기</li>
-        <li>아이를 선택지에 놓기</li>
-        <li>감정적으로 반응</li>
-        <li>합의 없이 규칙 바꾸기</li>
-        <li>배우자를 "나쁜 부모"로 그리기</li>
-      </ul>
+  <div class="tab-content" id="align4">
+    <div class="script-card">
+      <div class="scenario-label">🏰 상황 4 — "한 발 물러섬"으로 연합 유지하기</div>
+      <div class="dialog-line"><span class="dialog-label child">아이</span><span class="dialog-text">"(학용품이 흩어져 있음)"</span></div>
+      <div class="dialog-line"><span class="dialog-label mom">엄마</span><span class="dialog-text">"(나가며) 자기 전에 정리해야 해. 아빠, 너는 어때?"</span></div>
+      <div class="dialog-line"><span class="dialog-label dad">아빠</span><span class="dialog-text">"(솔직함) 사실 난 이걸 신경 안 써. 하지만 엄마는 깔끔함을 중요하게 생각하는 것 같아. (아이한테) 엄마 말 들어라. 자기 전에 정리하자."<em>→ 한 발 물러섬</em></span></div>
+      <div class="dialog-line"><span class="dialog-label child">아이</span><span class="dialog-text">"(순순히 정리함)"</span></div>
+      
+      <p style="margin-top:16px; font-weight:600; color:var(--royal-blue); border-top:2px solid var(--royal-blue); padding-top:12px;">⭐ 장기 효과:</p>
+      <p style="margin-top:8px; font-size:0.9rem; color:var(--ink);">아이는 "엄마가 중요하게 생각하면, 아빠도 그걸 존중한다"고 배웁니다. 아버지가 자신의 가치관을 포기하지 않으면서도, 배우자를 지지하는 모습을 봅니다. 이것이 "강한 아버지"의 모습입니다.</p>
     </div>
   </div>
 </section>
 
-<section class="tip-section fade-up">
-  <h3>💑 부부 관계가 곧 아이 뇌 환경</h3>
-  <p>공동 양육 정렬도가 높은 부부의 아이들은 행동 문제뿐만 아니라 또래 관계에서도 더 안정적이고, 스트레스 대처 능력이 뛰어납니다. 이것은 "아이를 위해 부부 싸움을 하지 말라"는 뜻이 아닙니다. 오히려 부부가 건강한 갈등 해결 과정을 아이 앞에서 보여주는 것이 아이의 메타정서 능력을 높입니다. 핵심은 "갈등을 어떻게 해결하는가"입니다.</p>
+<section class="fade-up">
+  <div class="do-dont">
+    <div class="do-box"><h5>✓ DO — 공동 육아</h5><ul>
+      <li>5가지 영역을 함께 명확히 정의하기</li>
+      <li>아이 앞에서 불일치하면 즉시 "나중에 얘기하자" 연기</li>
+      <li>아이 없을 때 빠르게 협의 (같은 날 저녁)</li>
+      <li>의견이 다르면 배우자를 먼저 지지</li>
+      <li>틀렸으면 아이 앞에서 공개 정정</li>
+      <li>"한 발 물러섬"으로 배우자 존중하기</li>
+      <li>아이에게 "엄마 아빠는 다르지만, 함께" 메시지 주기</li>
+    </ul></div>
+    <div class="dont-box"><h5>✗ DON'T</h5><ul>
+      <li>아이 앞에서 부모의 규칙 다르게 적용</li>
+      <li>"너는 너무 엄격해/관대해"라는 지적</li>
+      <li>배우자를 훈육자로 깎아내리기</li>
+      <li>일관되지 않은 후속 조치</li>
+      <li>"엄마는 안 된대도 아빠는 된대" 아이의 "플레이" 방치</li>
+      <li>심각한 불일치를 아이 앞에서 해결</li>
+      <li>배우자의 훈육에 항상 개입</li>
+    </ul></div>
+  </div>
+</section>
+
+<section class="tips-section fade-up">
+  <h3>🏰 공동 육아 정렬 팁</h3>
+  <div class="tips-grid">
+    <div class="tip-box"><strong>📋 규칙 문서화</strong>우리 가족의 5가지 핵심 규칙을 벽에 붙이세요. 부모뿐만 아니라 아이도 언제든 확인할 수 있으면, 불일치를 줄일 수 있습니다.</div>
+    <div class="tip-box"><strong>💬 주간 회의</strong>매주 일요일 저녁에 10분 "육아 회의"를 하세요. 그 주의 불일치 사항과 다음주의 목표를 공유합니다.</div>
+    <div class="tip-box"><strong>🎯 우선순위</strong>5가지 영역 중 "가장 중요한 2가지"를 정해서 집중하세요. 모든 영역을 동시에 정렬하려고 하면 피곤해집니다.</div>
+    <div class="tip-box"><strong>🔄 시뮬레이션</strong>부부가 함께 "만약 아이가 이렇게 하면?"이라는 상황을 시뮬레이션하고, 어떻게 대응할지 미리 정하세요. 실제 상황에서는 더 빠르게 대응할 수 있습니다.</div>
+  </div>
 </section>
 
 <section class="quiz-section fade-up">
-  <div class="section-label">REVIEW QUIZ</div>
-  <div class="section-title">복습 퀴즈 3문제</div>
-
-  <div class="quiz-card" id="quiz1">
-    <div class="q-num">QUESTION 01</div>
-    <div class="question">아이가 목격하는 부모 간 갈등이 아이의 스트레스 호르몬(코르티솔)을 어느 정도 증가시킨다고 연구에서 나왔는가?</div>
+  <div class="section-ornament">⚜ Quest of Knowledge ⚜</div>
+  <h2 class="section-heading">복습 퀴즈</h2>
+  <div class="quiz-card" id="q1">
+    <div class="q-num">QUESTION I</div>
+    <div class="question">부모 일관성(Parental Alliance)이 높은 가정의 아이 특징은?</div>
     <div class="quiz-options">
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz1',false)">① 약 10% 증가</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz1',false)">② 약 25% 증가</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz1',true)">③ 약 42% 증가</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz1',false)">④ 약 60% 증가</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q1',false)">① 더 독립적이고 반항심이 강함</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q1',true)">② 안정 애착률 75%, 행동 문제 30% 감소, 불안도 40% 감소</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q1',false)">③ 학업 성적이 높지만 사회성이 떨어짐</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q1',false)">④ 부모를 잘 조종할 수 있는 능력</div>
     </div>
-    <div class="quiz-explanation" id="quiz1-exp">
-      <strong>정답: ③</strong> — Cummings & Davies(2010)의 메타 분석에 따르면, 아이가 목격하는 부모 간 갈등은 편도체 과활성화를 통해 코르티솔 분비를 약 42% 증가시킵니다. 이는 만성 스트레스 상태로 이어져 아이의 행동 문제, 수면 장애, 학습 집중력 저하로 나타납니다.
-    </div>
+    <div class="quiz-explanation" id="q1-exp"><strong>정답: ②</strong> Parental Alliance가 높으면 아이는 신경계가 안정적이고, 행동 문제가 줄고, 불안감이 40% 감소합니다. (Siegel, 2012)</div>
   </div>
-
-  <div class="quiz-card" id="quiz2">
-    <div class="q-num">QUESTION 02</div>
-    <div class="question">부부의 공동 양육 정렬도가 75% 이상일 때, 아이의 행동 문제가 어느 정도 감소하는가?</div>
+  <div class="quiz-card" id="q2">
+    <div class="q-num">QUESTION II</div>
+    <div class="question">아이 앞에서 부모의 규칙이 다를 때 가장 효과적인 대응은?</div>
     <div class="quiz-options">
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz2',false)">① 약 20% 감소</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz2',false)">② 약 35% 감소</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz2',true)">③ 약 60% 감소</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz2',false)">④ 약 80% 감소</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q2',false)">① 즉시 어느 부모가 맞는지 투표하기</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q2',true)">② "이건 엄마 아빠가 함께 생각해볼 거야" 연기</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q2',false)">③ 아이에게 "우리는 의견이 다르다"고 솔직하게 설명</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q2',false)">④ 일관성을 위해 항상 한 부모의 방식 선택</div>
     </div>
-    <div class="quiz-explanation" id="quiz2-exp">
-      <strong>정답: ③</strong> — Feinberg 공동 양육 모델에 따르면, 부부가 양육 철학에서 75% 이상 정렬되어 있을 때 아이의 행동 문제가 약 60% 감소합니다.
-    </div>
+    <div class="quiz-explanation" id="q2-exp"><strong>정답: ②</strong> 아이 앞에서 불일치하는 순간, 즉시 연기해야 합니다. "나중에 얘기하자"는 메시지를 주고, 부모가 없을 때 협의해서 조정된 의견을 아이에게 재공지하는 것이 United Front입니다.</div>
   </div>
-
-  <div class="quiz-card" id="quiz3">
-    <div class="q-num">QUESTION 03</div>
-    <div class="question">부부가 아이 앞에서 갈등을 "올바르게 해결하는 모습"을 보여주는 것의 신경학적 의미는?</div>
+  <div class="quiz-card" id="q3">
+    <div class="q-num">QUESTION III</div>
+    <div class="question">공동 육아 정렬의 5가지 핵심 영역 중 포함되지 않은 것은?</div>
     <div class="quiz-options">
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz3',false)">① 아이가 부모의 약점을 인식하게 돼 존경심이 떨어진다</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz3',true)">② 아이가 "갈등은 해결 가능한 문제"라는 신경회로를 구축하고 메타정서 능력이 발달한다</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz3',false)">③ 아이의 불안감이 커져서 신경증적 특성이 생긴다</div>
-      <div class="quiz-opt" onclick="checkAnswer(this,'quiz3',false)">④ 아이가 양쪽 부모를 조종하려는 성향이 생긴다</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q3',false)">① 규칙(Rules)</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q3',false)">② 감정 표현(Emotional Expression)</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q3',true)">③ 부부의 성생활(Sex Life)</div>
+      <div class="quiz-opt" onclick="checkAnswer(this,'q3',false)">④ 일정과 루틴(Schedule & Routine)</div>
     </div>
-    <div class="quiz-explanation" id="quiz3-exp">
-      <strong>정답: ②</strong> — 부부가 갈등을 차분하게 인정하고 함께 해결하는 모습을 아이가 보면, 아이의 전두엽이 "문제는 해결 가능하다"는 긍정적 신경회로를 구축합니다. 이는 아이의 회복탄력성과 대인관계 기술을 크게 향상시킵니다.
-    </div>
-  </div>
-
-  <div class="tracker">
-    <h4>📅 간격 반복 트래커 (Spaced Repetition)</h4>
-    <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:16px;">클릭하면 완료 표시됩니다. 최적 복습 주기: 1일 → 3일 → 7일 → 14일</p>
-    <div class="tracker-grid">
-      <div class="tracker-day today" onclick="this.classList.toggle('completed')">
-        <span class="day-label">D16</span>
-        <span class="day-desc">오늘</span>
-      </div>
-      <div class="tracker-day" onclick="this.classList.toggle('completed')">
-        <span class="day-label">+1일</span>
-        <span class="day-desc">내일 복습</span>
-      </div>
-      <div class="tracker-day" onclick="this.classList.toggle('completed')">
-        <span class="day-label">+3일</span>
-        <span class="day-desc">3일 뒤</span>
-      </div>
-      <div class="tracker-day" onclick="this.classList.toggle('completed')">
-        <span class="day-label">+7일</span>
-        <span class="day-desc">1주 뒤</span>
-      </div>
-      <div class="tracker-day" onclick="this.classList.toggle('completed')">
-        <span class="day-label">+14일</span>
-        <span class="day-desc">2주 뒤</span>
-      </div>
-    </div>
+    <div class="quiz-explanation" id="q3-exp"><strong>정답: ③</strong> 5가지 핵심 영역은: 규칙, 훈육, 가치관, 감정 표현, 일정과 루틴입니다. 부부의 친밀함은 아이 앞에서 다루는 영역이 아닙니다.</div>
   </div>
 </section>
 
+<div class="tracker fade-up">
+  <h4>📜 간격 반복 트래커</h4>
+  <div class="tracker-grid">
+    <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D14</span><span class="day-desc">가트만</span></div>
+    <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D15</span><span class="day-desc">대화기술</span></div>
+    <div class="tracker-day today" onclick="this.classList.toggle('completed')"><span class="day-num">D16</span><span class="day-desc">공동육아</span></div>
+    <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D17</span><span class="day-desc">복습3</span></div>
+    <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D18</span><span class="day-desc">놀이설계</span></div>
+    <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D19</span><span class="day-desc">취침</span></div>
+    <div class="tracker-day" onclick="this.classList.toggle('completed')"><span class="day-num">D20</span><span class="day-desc">감정코치</span></div>
+  </div>
 </div>
 
-<footer class="footer">
-  <p>과학적 아빠 육아 스터디 · Day 16 of 21 · PART 3: 부부관계 & 부모 웰빙</p>
-  <p style="margin-top:6px;">내일 Day 17: Part 3 완성 복습 →</p>
-</footer>
+<footer class="chapter-footer">과학적 아빠 육아 21일 스터디 · Chapter XVI · Day 16 of 21</footer>
+
+</div>
 
 <script>
-const observerOptions = {
-  threshold: 0.1,
-  rootMargin: '0px 0px -50px 0px'
-};
-
 const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      entry.target.style.animationDelay = '0s';
-      observer.unobserve(entry.target);
-    }
+  entries.forEach(entry => {
+    if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
   });
-}, observerOptions);
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-document.querySelectorAll('.fade-up').forEach((el) => {
-  observer.observe(el);
-});
-
-function toggleDeepDive(el) {
-  el.classList.toggle('open');
-  const content = el.nextElementSibling;
-  content.classList.toggle('open');
+function toggleDeepDive(el) { el.classList.toggle('open'); el.nextElementSibling.classList.toggle('open'); }
+function switchTab(el, tabId) {
+  document.querySelectorAll('.age-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
 }
-
 function checkAnswer(el, quizId, isCorrect) {
   const card = document.getElementById(quizId);
   if (card.dataset.answered) return;
   card.dataset.answered = 'true';
-
-  if (isCorrect) {
-    el.classList.add('correct');
-  } else {
-    el.classList.add('wrong');
-  }
+  if (isCorrect) el.classList.add('correct'); else el.classList.add('wrong');
   document.getElementById(quizId + '-exp').classList.add('show');
 }
 </script>
-
 </body>
 </html>

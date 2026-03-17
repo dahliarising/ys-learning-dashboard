@@ -2,198 +2,308 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Day 22 | 재정 자동화 시스템 — 부자 마인드셋 스터디</title>
+<script>
+/* Prevent FOUC: apply saved theme before render */
+(function(){
+  var t = localStorage.getItem('eldorado-theme');
+  if(!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  if(t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+})();
+</script>
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Day 22 | 자동 황금 주조기 — El Dorado 투자 원정대</title>
+<meta name="theme-color" content="#0D0B08">
+<meta name="description" content="El Dorado 투자 원정대 Day 22 — 재정 자동화 시스템을 구축하는 방법을 배웁니다.">
+<meta name="robots" content="noindex">
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-/* ═══ DESIGN SYSTEM v2 ═══ */
+<style>/* LIGHTHOUSE_OPTIMIZED */
 :root {
-  --bg-primary: #0A0C10;
-  --bg-card: #12151C;
-  --bg-card-hover: #181C26;
-  --bg-accent: #1A1E2A;
-  --gold: #C9A84C;
-  --gold-dim: rgba(201,168,76,0.15);
-  --gold-glow: rgba(201,168,76,0.3);
-  --blue: #4A9EBF;
-  --blue-dim: rgba(74,158,191,0.15);
-  --blue-glow: rgba(74,158,191,0.3);
-  --text-primary: #E8E6E1;
-  --text-secondary: #9A9890;
-  --text-dim: #5A584F;
-  --border: #2A2D36;
-  --red: #BF4A4A;
-  --green: #4ABF7A;
+  --bg-primary: #0D0B08;
+  --bg-card: #16130E;
+  --bg-card-hover: #1E1A13;
+  --bg-accent: #1A1610;
+  --bg-temple: #110E09;
+  --gold: #D4A843;
+  --gold-bright: #E8C65A;
+  --gold-dim: rgba(212,168,67,0.12);
+  --gold-glow: rgba(212,168,67,0.25);
+  --gold-radiant: rgba(232,198,90,0.4);
+  --emerald: #3D9E6E;
+  --emerald-dim: rgba(61,158,110,0.12);
+  --emerald-glow: rgba(61,158,110,0.25);
+  --amber: #C4793D;
+  --amber-dim: rgba(196,121,61,0.12);
+  --copper: #A0634A;
+  --text-primary: #EDE8D8;
+  --text-secondary: #B8B0A0;
+  --text-dim: #8A8272;
+  --border: #2C261E;
+  --border-gold: rgba(212,168,67,0.2);
+  --red: #C45A4A;
+  --green: #4AAF6A;
   --font-display: 'Cormorant Garamond', serif;
   --font-body: 'Noto Sans KR', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; font-size: 16px; }
 body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: white !important;
+  background-image: radial-gradient(ellipse 90% 60% at 50% 10%, rgba(232,198,90,0.06) 0%, transparent 55%),
+  radial-gradient(ellipse 60% 50% at 50% 80%, rgba(212,168,67,0.04) 0%, transparent 50%);
+  color: #1a1a1a !important;
   font-family: var(--font-body);
   font-weight: 300;
   line-height: 1.8;
   -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
+  min-height: 100vh;
 }
-
-/* ═══ CUSTOM SCROLLBAR ═══ */
-::-webkit-scrollbar { width: 6px; }
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+  repeating-linear-gradient(90deg, rgba(212,168,67,0.015) 0px, rgba(212,168,67,0.015) 1px, transparent 1px, transparent 80px),
+  repeating-linear-gradient(0deg, rgba(212,168,67,0.015) 0px, rgba(212,168,67,0.015) 1px, transparent 1px, transparent 80px);
+  pointer-events: none;
+  z-index: 0;
+}
+::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
-
-/* ═══ FADE-UP ANIMATION ═══ */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--gold-dim), var(--gold-glow));
+  border-radius: 4px; border: 1px solid var(--border-gold);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 .fade-up {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition: opacity 0.7s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .fade-up.visible {
   opacity: 1;
   transform: translateY(0);
 }
-
-/* ═══ STICKY HEADER ═══ */
+@keyframes goldShimmer {
+  0%,100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+@keyframes templeGlow {
+  0%,100% { box-shadow: 0 0 20px rgba(212,168,67,0.05); }
+  50% { box-shadow: 0 0 40px rgba(212,168,67,0.12); }
+}
 .sticky-header {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: rgba(10,12,16,0.92);
+  background: rgba(13,11,8,0.94);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-gold);
   padding: 0.6rem 2rem;
   display: flex; justify-content: space-between; align-items: center;
   flex-wrap: wrap; gap: 0.5rem;
 }
+.sticky-header::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-glow), transparent);
+}
 .header-left { display: flex; align-items: center; gap: 1rem; }
 .header-day {
-  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold-bright);
   background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
   letter-spacing: 0.1em;
+  border: 1px solid var(--border-gold);
 }
 .header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
 .header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
-.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
-.badge-asset { color: var(--blue); background: var(--blue-dim); }
-.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.header-badge {
+  font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem;
+  border-radius: 4px; letter-spacing: 0.05em;
+}
+.badge-asset { color: var(--gold-bright); background: var(--gold-dim); border: 1px solid var(--border-gold); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.03); }
 .timer-btn {
-  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold-bright);
   font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
   border-radius: 4px; cursor: pointer; transition: all 0.3s;
 }
-.timer-btn:hover { background: var(--gold-glow); }
-
-/* ═══ LAYOUT ═══ */
-.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.timer-btn:hover { background: var(--gold-glow); box-shadow: 0 0 12px rgba(212,168,67,0.2); }
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; position: relative; z-index: 1; }
 .hero {
   text-align: center; padding: 3rem 0 2.5rem;
-  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+  border-bottom: 1px solid var(--border-gold); margin-bottom: 3rem;
+  position: relative;
 }
-.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
-.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
-.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
-.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero::before {
+  content: '';
+  position: absolute; top: -2rem; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.hero::after {
+  content: '◆';
+  position: absolute; top: -2.6rem; left: 50%; transform: translateX(-50%);
+  color: var(--gold); font-size: 0.7rem;
+  animation: goldShimmer 3s ease-in-out infinite;
+}
+.hero-part {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold);
+  letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem;
+}
+.hero-day {
+  font-family: var(--font-display); font-size: 4rem; font-weight: 700;
+  color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem;
+  text-shadow: 0 0 40px rgba(212,168,67,0.15);
+}
+.hero-subtitle {
+  font-family: var(--font-display); font-size: 1.8rem; font-weight: 400;
+  color: var(--gold); margin-bottom: 0.3rem;
+}
+.hero-eldorado-sub {
+  font-family: var(--font-display); font-size: 1.1rem; font-weight: 400;
+  color: var(--amber); font-style: italic; margin-bottom: 1.5rem;
+  letter-spacing: 0.05em;
+}
+.hero-quote {
+  font-family: var(--font-display); font-size: 1.1rem; font-style: italic;
+  color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6;
+}
 .hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
-.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge {
+  font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem;
+  border-radius: 4px; display: flex; align-items: center; gap: 0.4rem;
+}
 .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
-.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
-.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
-.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
-.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.hb-net { color: var(--gold-bright); background: var(--gold-dim); border: 1px solid var(--border-gold); }
+.hb-net .dot { background: var(--gold-bright); }
+.hb-house { color: var(--emerald); background: var(--emerald-dim); }
+.hb-house .dot { background: var(--emerald); }
+.hb-debt { color: var(--red); background: rgba(196,90,74,0.12); }
+.hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,175,106,0.12); }
+.hb-stock .dot { background: var(--green); }
 .series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
 .progress-wrap { margin: 1.5rem 0; }
-.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
-.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
-.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
-
-/* ═══ SECTIONS ═══ */
-.section { margin-bottom: 3rem; }
-.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
-.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
-
-/* ═══ BRAIN BOX ═══ */
-.brain-box {
-  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
-  border: 1px solid var(--border); border-left: 3px solid var(--blue);
-  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; border: 1px solid var(--border); }
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--gold-bright));
+  border-radius: 2px; transition: width 0.5s;
 }
-.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+.section { margin-bottom: 3rem; }
+.section-label {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.section-label::before { content: '◈'; font-size: 0.5rem; }
+.section-title {
+  font-family: var(--font-display); font-size: 1.6rem; font-weight: 600;
+  color: var(--text-primary); margin-bottom: 1rem;
+}
+.brain-box {
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--emerald);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+  position: relative; overflow: hidden;
+}
+.brain-box::before {
+  content: '';
+  position: absolute; top: 0; right: 0; width: 60px; height: 60px;
+  background: radial-gradient(circle at 100% 0%, rgba(61,158,110,0.08), transparent 70%);
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--emerald); margin-bottom: 0.8rem; }
 .brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
 .time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
-.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
-.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table th {
+  text-align: left; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border);
+}
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(44,38,30,0.5); }
 .time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
-
-/* ═══ CONCEPT CARDS ═══ */
 .cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
 .concept-card {
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
-  padding: 1.5rem; transition: all 0.3s;
+  background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.4s;
+  position: relative; overflow: hidden;
 }
-.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.concept-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold-glow), var(--gold-dim));
+  opacity: 0; transition: opacity 0.4s;
+}
+.concept-card:hover {
+  background: var(--bg-card-hover); border-color: var(--border-gold);
+  box-shadow: 0 4px 24px rgba(212,168,67,0.06);
+}
+.concept-card:hover::before { opacity: 1; }
 .card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
 .card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
 .card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
 .card-body p { margin-bottom: 0.6rem; }
-
-/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
 .formula-block {
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--gold);
-  border-radius: 6px;
-  padding: 1rem 1.2rem;
-  margin: 1rem 0;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  line-height: 2;
-  overflow-x: auto;
+  background: var(--bg-temple);
+  border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 6px; padding: 1rem 1.2rem; margin: 1rem 0;
+  font-family: var(--font-mono); font-size: 0.82rem; line-height: 2; overflow-x: auto;
 }
 .formula-line { color: var(--text-primary); }
 .formula-comment { color: var(--text-dim); font-size: 0.72rem; }
-.formula-highlight { color: var(--gold); }
-.formula-blue { color: var(--blue); }
-
-/* ═══ DATA TABLE ═══ */
+.formula-highlight { color: var(--gold-bright); }
+.formula-blue { color: var(--emerald); }
 .data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
 .data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
 .data-table th {
   font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
   letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
-  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+  border-bottom: 2px solid var(--border-gold); white-space: nowrap;
 }
 .data-table th:first-child { text-align: left; }
 .data-table td {
   padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
-  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+  border-bottom: 1px solid rgba(44,38,30,0.5); font-family: var(--font-mono); font-size: 0.78rem;
 }
 .data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
-.data-table tr:hover td { background: rgba(201,168,76,0.04); }
-.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
-
-/* ═══ CHART ═══ */
+.data-table tr:hover td { background: rgba(212,168,67,0.04); }
+.highlight-row td { color: var(--gold-bright) !important; font-weight: 500; background: var(--gold-dim) !important; }
 .chart-container {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
   padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.chart-container::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
 }
 .chart-title {
   font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
   letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
 }
-
-/* ═══ SIMULATION BOX ═══ */
 .sim-box {
-  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
-  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+  background: linear-gradient(135deg, rgba(212,168,67,0.04), rgba(61,158,110,0.04));
+  border: 1px solid var(--border-gold); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.sim-box::before {
+  content: '⬥';
+  position: absolute; top: -8px; left: 1.5rem; color: var(--gold);
+  font-size: 0.6rem; background: var(--bg-primary); padding: 0 0.3rem;
 }
 .sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
 .checklist { list-style: none; margin-top: 1rem; }
 .checklist li {
   font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
-  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+  position: relative; border-bottom: 1px solid rgba(44,38,30,0.3); cursor: pointer;
 }
 .checklist li::before {
   content: ''; position: absolute; left: 0; top: 0.65rem;
@@ -201,21 +311,19 @@ body {
 }
 .checklist li.checked::before { background: var(--gold); }
 .checklist li.checked::after {
-  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  content: '\u2713'; position: absolute; left: 2px; top: 0.42rem;
   color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
 }
-
-/* ═══ PSYCHOLOGY BOX ═══ */
 .psych-box {
-  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--amber);
   border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
 }
-.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--amber); margin-bottom: 0.8rem; }
 .psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
 .psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
 .neuro-tag {
   display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
-  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  color: var(--emerald); background: var(--emerald-dim); padding: 0.15rem 0.5rem;
   border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
 }
 .engineer-tag {
@@ -223,8 +331,6 @@ body {
   color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
   border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
 }
-
-/* ═══ DEEP DIVE ═══ */
 .deep-dive {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
   margin: 1rem 0; overflow: hidden;
@@ -237,7 +343,7 @@ body {
 }
 .deep-dive summary::-webkit-details-marker { display: none; }
 .deep-dive summary::before {
-  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  content: '\u25B8'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
   transition: transform 0.2s;
 }
 .deep-dive[open] summary::before { transform: rotate(90deg); }
@@ -246,9 +352,16 @@ body {
   padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
 }
 .deep-dive-content p { margin-bottom: 0.6rem; }
-
-/* ═══ QUIZ ═══ */
-.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-section {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.quiz-section::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--amber));
+}
 .quiz-q { margin-bottom: 1.5rem; }
 .quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
 .quiz-options { list-style: none; }
@@ -258,14 +371,12 @@ body {
   border: 1px solid transparent;
 }
 .quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
-.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
-.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-options li.correct { background: rgba(74,175,106,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(196,90,74,0.12); border-color: var(--red); color: var(--red); }
 .quiz-answer {
   display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
   border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
 }
-
-/* ═══ SR TRACKER ═══ */
 .sr-tracker {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
   padding: 1.5rem; margin: 1.5rem 0;
@@ -274,90 +385,450 @@ body {
   font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
   letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
 }
-.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 0.5rem; }
 .sr-slot {
   background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
   padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
 }
 .sr-slot:hover { border-color: var(--gold); }
-.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,175,106,0.08); }
 .sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
 .sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
-
-/* ═══ DISCLAIMER ═══ */
 .disclaimer {
-  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border-gold);
   font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
 }
-
-/* ═══ NAV FOOTER ═══ */
 .nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
 .nav-btn {
   font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
   text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
   border-radius: 4px; transition: all 0.3s;
 }
-.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px rgba(212,168,67,0.1); }
 .nav-btn.disabled { opacity: 0.3; pointer-events: none; }
-
-/* ═══ RESPONSIVE ═══ */
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+  radial-gradient(circle at 50% 0%, rgba(232,198,90,0.04) 0%, transparent 40%),
+  radial-gradient(circle at 30% 60%, rgba(212,168,67,0.02) 0%, transparent 30%),
+  radial-gradient(circle at 70% 60%, rgba(212,168,67,0.02) 0%, transparent 30%);
+  pointer-events: none; z-index: 0;
+}
+.aztec-divider {
+  text-align: center;
+  margin: 2.5rem 0;
+  position: relative;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aztec-divider::before,
+.aztec-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
+}
+.aztec-divider .aztec-glyph {
+  padding: 0 1rem;
+  color: var(--gold);
+  font-size: 0.65rem;
+  opacity: 0.5;
+  letter-spacing: 0.3em;
+}
+.concept-card {
+  position: relative;
+  overflow: hidden;
+}
+.concept-card .card-glow {
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,168,67,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+.concept-card:hover .card-glow { opacity: 1; }
+.concept-card > * { position: relative; z-index: 1; }
+.quiz-section { position: relative; overflow: hidden; }
+.quiz-burst-canvas {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 10;
+}
+.scroll-compass {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  z-index: 99;
+  opacity: 0;
+  transition: opacity 0.5s;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+}
+.scroll-compass.visible { opacity: 1; }
+.scroll-compass svg { width: 100%; height: 100%; }
+.section-flash {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-bright), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.section.flash-active .section-flash { opacity: 1; }
+@keyframes checkPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+.checklist li.just-checked::before {
+  animation: checkPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+@keyframes checkGlow {
+  0% { box-shadow: 0 0 0 0 rgba(212,168,67,0.4); }
+  100% { box-shadow: 0 0 0 12px rgba(212,168,67,0); }
+}
+.checklist li.just-checked {
+  animation: checkGlow 0.6s ease-out;
+}
+.deep-dive[open] {
+  border-color: var(--border-gold);
+  box-shadow: 0 0 20px rgba(212,168,67,0.04);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+@keyframes timerPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(212,168,67,0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(212,168,67,0); }
+}
+.timer-btn.active {
+  animation: timerPulse 2s infinite;
+  background: var(--gold-glow);
+}
+@keyframes heroFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.hero-icon svg {
+  animation: heroFloat 4s ease-in-out infinite;
+}
+@keyframes barShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.progress-bar-fill {
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--gold-bright), var(--gold), var(--amber));
+  background-size: 200% 100%;
+  animation: barShimmer 4s linear infinite;
+}
+.sr-slot.done {
+  position: relative;
+  overflow: hidden;
+}
+.sr-slot.done::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+}
+.data-table tr {
+  transition: background 0.2s;
+}
+.data-table tr:hover td {
+  background: rgba(212,168,67,0.06);
+}
+.highlight-row td {
+  position: relative;
+}
+.hero-illustration {
+  margin: 0 -1.5rem 1.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(212,168,67,0.06);
+  position: relative;
+}
+.hero-illustration::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40px;
+  background: linear-gradient(to top, var(--bg-primary), transparent);
+  pointer-events: none;
+}
+@supports(padding: max(0px)) {
+  .sticky-header {
+  padding-left: max(0.8rem, env(safe-area-inset-left));
+  padding-right: max(0.8rem, env(safe-area-inset-right));
+  }
+  .container {
+  padding-left: max(0.8rem, env(safe-area-inset-left));
+  padding-right: max(0.8rem, env(safe-area-inset-right));
+  }
+  .scroll-compass {
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+@media print {
+  .sticky-header, .scroll-compass, #goldParticles, .timer-btn { display: none !important; }
+  body::before, body::after { display: none !important; }
+  .concept-card, .brain-box, .sim-box, .psych-box, .quiz-section, .sr-tracker {
+  border: 1px solid #ccc !important;
+  background: white !important;
+  break-inside: avoid;
+  }
+  .hero { border-bottom: 2px solid #333 !important; }
+  .nav-footer { display: none !important; }
+}
 @media (max-width: 640px) {
-  .sticky-header { padding: 0.5rem 1rem; }
+.sticky-header { padding: 0.5rem 1rem; }
   .hero-day { font-size: 2.5rem; }
   .hero-subtitle { font-size: 1.3rem; }
   .container { padding: 4.5rem 1rem 2rem; }
   .section-title { font-size: 1.3rem; }
   .sr-slots { grid-template-columns: repeat(2, 1fr); }
   .header-right { gap: 0.6rem; }
+.hero-illustration { margin: 0 -1rem 1rem; }
 }
+@media (prefers-reduced-motion: reduce) {
+.fade-up { opacity: 1; transform: none; transition: none; }
+  .hero-icon svg { animation: none; }
+  .progress-bar-fill { animation: none; }
+  .timer-btn.active { animation: none; }
+  #goldParticles { display: none !important; }
+  body::before { display: none; }
+  body::after { display: none; }
+}
+@media (max-width: 768px) {
+.hero-day { font-size: 3rem; }
+  .hero-subtitle { font-size: 1.5rem; }
+  .hero-eldorado-sub { font-size: 0.95rem; }
+  .hero-quote { font-size: 0.95rem; max-width: 90%; }
+  .hero-icon svg { width: 40px; height: 40px; }
+  .section-title { font-size: 1.4rem; }
+  .concept-card { padding: 1.2rem; }
+  .card-title { font-size: 1.15rem; }
+  .data-table { font-size: 0.75rem; }
+  .data-table th { font-size: 0.6rem; padding: 0.5rem; }
+  .data-table td { padding: 0.5rem; font-size: 0.72rem; }
+  .formula-block { font-size: 0.76rem; padding: 0.8rem 1rem; }
+  .scroll-compass { width: 48px; height: 48px; bottom: 1.5rem; right: 1.5rem; }
+}
+@media (max-width: 480px) {
+html { font-size: 15px; }
+  .sticky-header {
+  padding: 0.4rem 0.8rem;
+  gap: 0.3rem;
+  }
+  .header-day { font-size: 0.65rem; padding: 0.15rem 0.5rem; }
+  .header-title { font-size: 0.75rem; }
+  .header-badge { font-size: 0.6rem; padding: 0.15rem 0.4rem; }
+  .badge-series { display: none; }
+  .timer-btn { font-size: 0.65rem; padding: 0.25rem 0.6rem; }
+  .container { padding: 3.8rem 0.8rem 2rem; }
+  .hero { padding: 2rem 0 1.8rem; margin-bottom: 2rem; }
+  .hero-part { font-size: 0.6rem; letter-spacing: 0.2em; }
+  .hero-icon svg { width: 36px; height: 36px; }
+  .hero-day { font-size: 2.2rem; }
+  .hero-subtitle { font-size: 1.2rem; }
+  .hero-eldorado-sub { font-size: 0.85rem; }
+  .hero-quote { font-size: 0.85rem; line-height: 1.5; }
+  .hero-badges { gap: 0.4rem; }
+  .hero-badge { font-size: 0.6rem; padding: 0.25rem 0.5rem; }
+  .series-info { font-size: 0.6rem; }
+  .hero-illustration { margin: 0 -0.8rem 1rem; }
+  .section { margin-bottom: 2rem; }
+  .section-label { font-size: 0.58rem; }
+  .section-title { font-size: 1.2rem; }
+  .brain-box { padding: 1rem; }
+  .brain-box h3 { font-size: 0.82rem; }
+  .brain-box p { font-size: 0.8rem; }
+  .time-table { font-size: 0.72rem; }
+  .time-table th { font-size: 0.58rem; padding: 0.4rem 0.5rem; }
+  .time-table td { padding: 0.4rem 0.5rem; }
+  .concept-card { padding: 1rem; }
+  .card-num { font-size: 0.55rem; }
+  .card-title { font-size: 1.05rem; }
+  .card-body { font-size: 0.8rem; line-height: 1.7; }
+  .formula-block { font-size: 0.7rem; padding: 0.7rem 0.8rem; line-height: 1.8; }
+  .data-table-wrap { margin: 0.8rem -0.3rem; }
+  .data-table { font-size: 0.68rem; }
+  .data-table th { font-size: 0.55rem; padding: 0.4rem; }
+  .data-table td { padding: 0.4rem; font-size: 0.65rem; }
+  .chart-container { padding: 1rem; margin: 1rem 0; }
+  .chart-title { font-size: 0.6rem; }
+  .sim-box { padding: 1rem; }
+  .sim-box h3 { font-size: 0.85rem; }
+  .checklist li { font-size: 0.8rem; padding: 0.4rem 0 0.4rem 1.6rem; }
+  .psych-box { padding: 1rem; }
+  .psych-box h3 { font-size: 0.85rem; }
+  .psych-box .bias-name { font-size: 1rem; }
+  .deep-dive summary { padding: 0.8rem 1rem; font-size: 0.82rem; }
+  .deep-dive-content { padding: 0 1rem 1rem; font-size: 0.78rem; }
+  .quiz-section { padding: 1rem; }
+  .quiz-q h4 { font-size: 0.82rem; }
+  .quiz-options li { font-size: 0.76rem; padding: 0.45rem 0.6rem; }
+  .quiz-answer { font-size: 0.74rem; }
+  .sr-tracker { padding: 1rem; }
+  .sr-tracker h3 { font-size: 0.65rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
+  .sr-slot { padding: 0.5rem; }
+  .sr-slot .sr-label { font-size: 0.55rem; }
+  .sr-slot .sr-date { font-size: 0.65rem; }
+  .disclaimer { font-size: 0.65rem; padding: 1rem; }
+  .nav-footer { flex-direction: column; gap: 0.8rem; align-items: stretch; }
+  .nav-btn { text-align: center; font-size: 0.7rem; }
+  .scroll-compass { width: 42px; height: 42px; bottom: 1rem; right: 1rem; }
+  .aztec-divider { margin: 1.5rem 0; }
+  .aztec-divider .aztec-glyph { font-size: 0.55rem; }
+  .sim-box input[type="number"] {
+  width: 120px !important;
+  font-size: 0.85rem !important;
+  padding: 0.4rem 0.6rem !important;
+}
+@media (max-width: 360px) {
+html { font-size: 14px; }
+  .hero-day { font-size: 1.8rem; }
+  .hero-subtitle { font-size: 1rem; }
+  .container { padding: 3.5rem 0.6rem 1.5rem; }
+  .badge-asset { display: none; }
+  .hero-badges { flex-direction: column; align-items: center; }
+  .sr-slots { grid-template-columns: 1fr; }
+}
+@media ((hover: none) and (pointer: coarse)) {
+.quiz-options li {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  }
+  .checklist li {
+  .nav-btn {
+  justify-content: center;
+  .sr-slot {
+  flex-direction: column;
+  .timer-btn {
+  min-height: 40px;
+  .deep-dive summary {
+  min-height: 48px;
+  .concept-card .card-glow { display: none; }
+}
+@media ((max-height: 500px) and (orientation: landscape)) {
+.sticky-header { padding: 0.3rem 1rem; }
+  .hero { padding: 1.5rem 0 1rem; margin-bottom: 1.5rem; }
+  .hero-day { font-size: 2rem; }
+  .hero-illustration svg { max-height: 120px; }
+  .scroll-compass { width: 36px; height: 36px; bottom: 0.5rem; right: 0.5rem; }
+}
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.quiz-options li:focus-visible { border-color: var(--gold); }
+.nav-btn:focus-visible { border-color: var(--gold); color: var(--gold); }
+
+
+/* Content-visibility for off-screen rendering optimization */
+.section { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+.deep-dive { content-visibility: auto; contain-intrinsic-size: auto 200px; }
+.quiz-section { content-visibility: auto; contain-intrinsic-size: auto 400px; }
+.sr-tracker { content-visibility: auto; contain-intrinsic-size: auto 200px; }
+
 </style>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 </head>
 <body>
+<a href="#main-content" class="skip-link" style="position:absolute;top:-100px;left:0;background:var(--gold);color:var(--bg-primary);padding:0.5rem 1rem;z-index:200;font-size:0.8rem;transition:top 0.2s;" onfocus="this.style.top='0'" onblur="this.style.top='-100px'">본문으로 건너뛰기</a>
 
-<header class="sticky-header">
+<header class="sticky-header" role="banner" aria-label="상단 네비게이션">
   <div class="header-left">
     <span class="header-day">DAY 22 / 23</span>
     <span class="header-title">재정 자동화 시스템</span>
   </div>
   <div class="header-right">
+<button class="theme-toggle" id="themeToggle" aria-label="테마 전환" title="다크/라이트 모드 전환">
+  <div class="theme-toggle-knob">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </div>
+</button>
+
     <span class="header-badge badge-asset">순자산 3억 2,800만</span>
-    <span class="header-badge badge-series">PART 4 · 세금 & 자산 시스템</span>
-    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+    <span class="header-badge badge-series">제4장 · 엘도라도의 문을 열다</span>
+    <button class="timer-btn" aria-label="포모도로 타이머 시작/정지" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
   </div>
 </header>
 
-<div class="container">
+<div class="container" id="main-content" role="main">
 
 <section class="hero">
-  <div class="hero-part">PART 4 — 세금 & 자산 시스템</div>
+  <div class="hero-part">제4장 · 엘도라도의 문을 열다</div>
+  <div class="hero-icon" style="margin-bottom:1rem;opacity:0.7;display:flex;justify-content:center;"><svg viewBox="0 0 48 48" width="48" height="48"><rect x="12" y="14" width="24" height="20" rx="3" fill="none" stroke="#D4A843" stroke-width="1.5" opacity="0.4"/><circle cx="24" cy="24" r="6" fill="none" stroke="#D4A843" stroke-width="1" opacity="0.3"/><path d="M21 24 L24 21 L27 24 L24 27 Z" fill="#D4A843" opacity="0.4"/><path d="M8 20 L12 20 M36 20 L40 20 M8 28 L12 28 M36 28 L40 28" stroke="#D4A843" stroke-width="1" opacity="0.3"/></svg></div>
   <h1 class="hero-day">Day 22</h1>
   <h2 class="hero-subtitle">재정 자동화 시스템</h2>
-  <p class="hero-quote">"자동화된 재정은 의지력을 이기고 시간을 이깁니다." — 제임스 클리어</p>
+  <p class="hero-quote">자동화는 일관성을 만들고, 일관성은 부를 만든다. - Automation creates consistency, and consistency creates wealth.</p>
   <div class="hero-badges">
     <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
     <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
     <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
     <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
   </div>
-  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 4: 20~23</div>
+  <div class="series-info">El Dorado 원정 — 포모도로 1세션(25분) × 23일 | PART 4: 20~23</div>
   <div class="progress-wrap">
     <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:95.7%"></div></div>
     <div class="progress-label"><span>Day 22</span><span>22 / 23 완료 (95.7%)</span></div>
   </div>
 </section>
 
+<div class="hero-illustration fade-up"><svg viewBox="0 0 860 200" width="860" height="200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;margin:-1rem 0 1rem;opacity:0.85;" preserveAspectRatio="xMidYMid slice">
+  <rect width="860" height="200" fill="#0D0B08"/>
+  <!-- machine frame -->
+  <rect x="280" y="40" width="300" height="130" rx="6" fill="#110E09" stroke="#D4A843" stroke-width="0.8" opacity="0.1"/>
+  <!-- gears -->
+  <circle cx="340" cy="80" r="20" fill="none" stroke="#D4A843" stroke-width="0.8" opacity="0.1"/>
+  <circle cx="340" cy="80" r="12" fill="none" stroke="#D4A843" stroke-width="0.5" opacity="0.08"/>
+  <circle cx="400" cy="95" r="15" fill="none" stroke="#D4A843" stroke-width="0.8" opacity="0.1"/>
+  <circle cx="400" cy="95" r="8" fill="none" stroke="#D4A843" stroke-width="0.5" opacity="0.08"/>
+  <!-- conveyor belt -->
+  <line x1="300" y1="140" x2="560" y2="140" stroke="#C4793D" stroke-width="1.5" opacity="0.12"/>
+  <!-- coins coming out -->
+  <circle cx="480" cy="135" r="6" fill="#D4A843" opacity="0.08" stroke="#E8C65A" stroke-width="0.5" opacity="0.1"/>
+  <circle cx="500" cy="135" r="6" fill="#D4A843" opacity="0.08" stroke="#E8C65A" stroke-width="0.5" opacity="0.1"/>
+  <circle cx="520" cy="135" r="6" fill="#D4A843" opacity="0.08" stroke="#E8C65A" stroke-width="0.5" opacity="0.1"/>
+  <circle cx="545" cy="135" r="6" fill="#E8C65A" opacity="0.1" stroke="#E8C65A" stroke-width="0.5" opacity="0.12"/>
+  <!-- input arrow -->
+  <path d="M240,100 L280,100" fill="none" stroke="#3D9E6E" stroke-width="1" opacity="0.12"/>
+  <polygon points="278,95 288,100 278,105" fill="#3D9E6E" opacity="0.12"/>
+  <!-- output arrow -->
+  <path d="M580,100 L620,100" fill="none" stroke="#E8C65A" stroke-width="1" opacity="0.12"/>
+  <polygon points="618,95 628,100 618,105" fill="#E8C65A" opacity="0.12"/>
+</svg>
+</div>
+
+
 <!-- 뇌과학 학습 전략 -->
 <section class="section fade-up">
   <div class="brain-box">
-    <h3>🧠 뇌과학 학습 전략: 습관의 고리(Cue-Routine-Reward)로 자동화 구축</h3>
-    <p>매달 계획을 세우는 것은 인지 부하가 크므로, 급여일(Cue)→자동이체(Routine)→통장 확인(Reward)의 습관 고리를 만들면, 3개월 후 자동으로 실행됩니다. 뇌가 의식 없이 처리하므로 신경 에너지를 절약합니다.</p>
+    <h3>🧠 뇌과학 학습 전략: 자동화 시스템의 심리적 효과: 의사결정 피로를 제거하고 감정적 투자 오류를 방지합니다. 월급이 입금되는 순간, 자동으로 투자 계좌로 흘러가는 시스템은 '계획된 행동(implementation intention)'이라는 행동심리학 개념을 활용합니다.</h3>
+    <p>매월 같은 시간에 같은 금액을 자동으로 투자하면, 뇌의 의사결정 중추(전두엽)가 부담을 덜어집니다. 이는 정신에너지를 보존하고 더 중요한 결정에 집중할 수 있게 합니다.</p>
     <table class="time-table">
       <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
-      <tbody><tr><td class="time-col">10:00 - 10:25</td><td>급여 흐름도 설계 (5단계)</td><td>플로우차트 작성</td></tr>
-<tr><td class="time-col">10:30 - 10:55</td><td>자동이체 구조 (투자·저축·생활)</td><td>은행별 설정</td></tr>
-<tr><td class="time-col">11:00 - 11:25</td><td>월 재정 리뷰 루틴 설계</td><td>체크리스트 만들기</td></tr>
-<tr><td class="time-col">11:30 - 11:55</td><td>재정 자동화 도구 비교</td><td>앱 실습</td></tr>
-<tr><td class="time-col">12:00 - 12:25</td><td>내 가족의 자동화 시스템 구축</td><td>실제 계획서 작성</td></tr>
+      <tbody><tr><td class="time-col">09:00</td><td>자동화 시스템 설계</td><td>learning</td></tr>
+<tr><td class="time-col">10:30</td><td>계좌 구조 및 분배 비율 결정</td><td>planning</td></tr>
+<tr><td class="time-col">13:00</td><td>자동화 도구 셋업 (뱅킹앱, 증권사앱)</td><td>action</td></tr>
+<tr><td class="time-col">14:30</td><td>월별 검토 프로세스 수립</td><td>planning</td></tr>
+<tr><td class="time-col">16:00</td><td>심리적 장애물 제거 및 습관화 전략</td><td>reflection</td></tr>
 </tbody>
     </table>
   </div>
@@ -370,61 +841,121 @@ body {
   <div class="cards-grid">
     <div class="concept-card fade-up">
       <div class="card-num">CONCEPT 01</div>
-      <div class="card-title">급여일 자동이체 5단계 흐름</div>
-      <div class="card-body">
-<p style="margin-bottom:1rem;"><strong>Step 1: 급여 입금 (월초)</strong><br/>
-직장 → 급여통장 (세후 급여)</p>
-
-<p style="margin-bottom:1rem;"><strong>Step 2: 세금·보험료 공제 (자동)</strong><br/>
-건강보험료, 국민연금, 소득세 공제 후 순입금</p>
-
-<p style="margin-bottom:1rem;"><strong>Step 3: 투자 분리 (자동이체)</strong><br/>
-ISA 2,000만 → 연금저축 50만 → 주식 매수 300만</p>
-
-<p style="margin-bottom:1rem;"><strong>Step 4: 저축 분리 (자동이체)</strong><br/>
-긴급자금(3개월) → 자녀교육기금 → 주택갈아타기 자금</p>
-
-<p><strong>Step 5: 생활비 정산 (수동 결산)</strong><br/>
-남은 잔액으로 생활비 지출 (식비·교육비·휴식비)</p>
-
-<div class="formula-block">
-<div class="formula-line"><span class="formula-highlight">월 흐름</span> = 급여 → 투자(자동) → 저축(자동) → 생활비(잔액)</div>
-<div class="formula-comment"># 의사결정 부담 최소화, 규율 최대화</div>
-</div>
-</div>
+      <div class="card-title">자동화 시스템의 3가지 핵심</div>
+      <div class="card-body"><formula-block>
+<h4>자동화 구조 (Automation Structure)</h4>
+<p><strong>수식:</strong> 자동화 효율성 = 자동 배분 비율 × 실행 일관성</p>
+<p>월급 → 자동분배(50% 생활비, 20% 저축, 30% 투자)</p>
+<table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%; margin: 10px 0; background-color: #1A1C20; border-color: #3A3C40;">
+  <tr style="background-color: #2A2C30;">
+    <th style="color: #EDE8D8; text-align: left;">구성요소</th>
+    <th style="color: #EDE8D8; text-align: center;">배분 비율</th>
+    <th style="color: #EDE8D8; text-align: left;">목적</th>
+  </tr>
+  <tr style="border-color: #3A3C40;">
+    <td style="color: #B8B0A0;">자동 생활비</td>
+    <td style="color: #EDE8D8; text-align: center;">50%</td>
+    <td style="color: #B8B0A0;">필수 지출</td>
+  </tr>
+  <tr style="background-color: #0D0B08; border-color: #3A3C40;">
+    <td style="color: #B8B0A0;">자동 저축</td>
+    <td style="color: #EDE8D8; text-align: center;">20%</td>
+    <td style="color: #B8B0A0;">긴급자금 (3-6개월)</td>
+  </tr>
+  <tr style="border-color: #3A3C40;">
+    <td style="color: #B8B0A0;">자동 투자</td>
+    <td style="color: #EDE8D8; text-align: center;">30%</td>
+    <td style="color: #B8B0A0;">자산 증식</td>
+  </tr>
+</table>
+</formula-block></div>
     </div>
     <div class="concept-card fade-up">
       <div class="card-num">CONCEPT 02</div>
-      <div class="card-title">월 재정 리뷰 루틴 (매월 마지막 일요일 30분)</div>
-      <div class="card-body">
-<p style="margin-bottom:1rem;"><strong>1단계: 투자 현황 확인 (5분)</strong></p>
-<ul style="margin:0.5rem 0 1rem 1.2rem;font-size:0.85rem;">
-  <li>주식 자산: 목표 변동폭(±5%) 확인</li>
-  <li>ISA/연금저축: 월 납입 실적</li>
-  <li>포트폴리오 수익률: 연 목표(8%) 대비 확인</li>
-</ul>
-
-<p style="margin-bottom:1rem;"><strong>2단계: 저축 목표 진도 (5분)</strong></p>
-<ul style="margin:0.5rem 0 1rem 1.2rem;font-size:0.85rem;">
-  <li>긴급자금: 3개월분(1,500만) 확보 여부</li>
-  <li>자녀 교육비: 연 1,200만원 누적률</li>
-  <li>주택갈아타기: 계약금 여유 진도</li>
-</ul>
-
-<p style="margin-bottom:1rem;"><strong>3단계: 지출 분석 (10분)</strong></p>
-<ul style="margin:0.5rem 0 1rem 1.2rem;font-size:0.85rem;">
-  <li>생활비: 월 1,500만원 한도 초과 여부</li>
-  <li>카테고리별 지출: 식비·의류·외식 추이</li>
-  <li>비상 지출: 예상 외 비용 파악</li>
-</ul>
-
-<p style="margin-bottom:1rem;"><strong>4단계: 다음 달 조정 (10분)</strong></p>
-<ul style="margin:0.5rem 0 1rem 1.2rem;font-size:0.85rem;">
-  <li>투자 배분 리밸런싱 (분기별)</li>
-  <li>자동이체 금액 조정 (필요 시)</li>
-  <li>특별 지출 계획 (휴가·명절)</li>
-</ul>
+      <div class="card-title">의사결정 피로 제거 (Decision Fatigue Elimination)</div>
+      <div class="card-body"><formula-block>
+<h4>월별 의사결정 부담 감소</h4>
+<p><strong>전통적 방식:</strong> 매월 투자 여부를 결정 → 감정적 변동성 → 의사결정 피로</p>
+<p><strong>자동화 방식:</strong> 미리 설정한 규칙 → 감정 개입 불가 → 의사결정 에너지 절약</p>
+<div style="background-color: #1A1C20; padding: 12px; border-left: 4px solid #3D9E6E; margin: 10px 0;">
+  <p><strong>neuroscience-insight:</strong> 의사결정 중추(배외측 전전두피질)의 에너지 소비는 하루에 제한됨. 자동화는 이 에너지를 절약하여 더 중요한 선택(장기 전략)에 집중할 수 있게 함.</p>
 </div>
+</formula-block></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">투자 포트폴리오 자동분배 전략</div>
+      <div class="card-body"><formula-block>
+<h4>DCA (Dollar-Cost Averaging) 자동화</h4>
+<p><strong>월 투자 구성:</strong></p>
+<table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%; margin: 10px 0; background-color: #1A1C20; border-color: #3A3C40;">
+  <tr style="background-color: #2A2C30;">
+    <th style="color: #EDE8D8;">ETF 종류</th>
+    <th style="color: #EDE8D8;">배분</th>
+    <th style="color: #EDE8D8;">특징</th>
+  </tr>
+  <tr style="border-color: #3A3C40;">
+    <td style="color: #B8B0A0;">한국 주식 ETF</td>
+    <td style="color: #EDE8D8;">40%</td>
+    <td style="color: #B8B0A0;">배당 + 성장</td>
+  </tr>
+  <tr style="background-color: #0D0B08; border-color: #3A3C40;">
+    <td style="color: #B8B0A0;">글로벌 선진국 ETF</td>
+    <td style="color: #EDE8D8;">50%</td>
+    <td style="color: #B8B0A0;">환위험 헤지</td>
+  </tr>
+  <tr style="border-color: #3A3C40;">
+    <td style="color: #B8B0A0;">채권 ETF</td>
+    <td style="color: #EDE8D8;">10%</td>
+    <td style="color: #B8B0A0;">안정성</td>
+  </tr>
+</table>
+<p style="margin-top: 10px;"><strong>효과:</strong> 매월 같은 금액으로 구매하므로 가격이 낮을 때 많이, 높을 때 적게 구매 → 평균 구매가 하락</p>
+</formula-block></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">월별 검토 루틴 (Monthly Review Protocol)</div>
+      <div class="card-body"><formula-block>
+<h4>30분 월별 검토 체크리스트</h4>
+<div style="background-color: #1A1C20; padding: 10px; margin: 10px 0; border-left: 4px solid #4AAF6A;">
+  <p style="margin: 5px 0;"><strong>1. 자동화 실행 확인 (5분)</strong></p>
+  <p style="margin-left: 15px; color: #B8B0A0;">- 월급 입금 확인</p>
+  <p style="margin-left: 15px; color: #B8B0A0;">- 자동 분배 완료 여부</p>
+  <p style="margin-left: 15px; color: #B8B0A0;">- 투자 매수 기록</p>
+</div>
+<div style="background-color: #1A1C20; padding: 10px; margin: 10px 0; border-left: 4px solid #3D9E6E;">
+  <p style="margin: 5px 0;"><strong>2. 지출 현황 분석 (10분)</strong></p>
+  <p style="margin-left: 15px; color: #B8B0A0;">- 실제 생활비 vs 목표 생활비 비교</p>
+  <p style="margin-left: 15px; color: #B8B0A0;">- 초과 지출 항목 확인</p>
+  <p style="margin-left: 15px; color: #B8B0A0;">- 다음 달 조정 필요 여부</p>
+</div>
+<div style="background-color: #1A1C20; padding: 10px; margin: 10px 0; border-left: 4px solid #D4A843;">
+  <p style="margin: 5px 0;"><strong>3. 자산 성장 추적 (10분)</strong></p>
+  <p style="margin-left: 15px; color: #B8B0A0;">- 투자 수익률 점검</p>
+  <p style="margin-left: 15px; color: #B8B0A0;">- 순자산 변화 기록</p>
+  <p style="margin-left: 15px; color: #B8B0A0;">- 12개월 성장 추이 시각화</p>
+</div>
+<p style="margin-top: 15px; color: #8A8272;"><strong>팁:</strong> 매월 같은 날(예: 매월 30일)에 30분씩 정해진 시간에 검토하면 습관화되어 부담이 적어집니다.</p>
+</formula-block></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">자동화의 심리적 장점과 함정</div>
+      <div class="card-body"><formula-block>
+<h4>자동화 습관화의 신경과학</h4>
+<p><strong>장점:</strong> 반복적 행동은 뇌의 기저핵(basal ganglia)에 '습관 회로'를 형성합니다. 3개월 후 자동화는 무의식적 행동이 되어 에너지 소비가 거의 없어집니다.</p>
+<div style="background-color: #1A1C20; padding: 12px; border-left: 4px solid #4AAF6A; margin: 10px 0;">
+  <p><strong>engineer-insight:</strong> 시스템 관점에서 자동화는 '인간 개입'이라는 변수를 제거함으로써 신뢰도(reliability)를 99%에 근처로 높입니다.</p>
+</div>
+<p style="margin-top: 10px;"><strong>함정 주의:</strong></p>
+<ul style="color: #B8B0A0;">
+  <li>자동화 설정 후 '구조적 망각': 계좌 구조 변경의 필요성을 놓침</li>
+  <li>라이프스테이지 변화(결혼, 출산, 퇴직)에 따른 미조정</li>
+  <li>시장 변화(금리 인상, 환율 급변)에 대한 대응 부재</li>
+</ul>
+<p style="margin-top: 10px;"><strong>해결책:</strong> 월별 검토는 필수. "자동화 ≠ 방치"입니다.</p>
+</formula-block></div>
     </div></div>
 </section>
 
@@ -433,80 +964,714 @@ ISA 2,000만 → 연금저축 50만 → 주식 매수 300만</p>
   <div class="section-label">VISUALIZATION</div>
   <h2 class="section-title">시각화 자료</h2>
   
-<div class="chart-container">
-  <div class="chart-title">자동화 플로우차트</div>
-  <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
-    <!-- 급여 -->
-    <rect x="300" y="10" width="200" height="50" rx="5" fill="#C9A84C" opacity="0.3" stroke="#C9A84C" stroke-width="2"/>
-    <text x="350" y="40" font-size="14" font-weight="600" fill="#C9A84C" text-anchor="middle">월급여 입금</text>
-    <text x="400" y="55" font-size="11" fill="#C9A84C" text-anchor="middle">(월 급여)</text>
+<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .automation-box { fill: #3D9E6E; stroke: #0D0B08; stroke-width: 2; }
+      .automation-label { fill: #EDE8D8; font-size: 16px; font-weight: bold; text-anchor: middle; }
+      .automation-arrow { stroke: #8A8272; stroke-width: 3; fill: none; marker-end: url(#arrowhead); }
+      .automation-process { fill: #4AAF6A; stroke: #0D0B08; stroke-width: 2; }
+      .automation-decision { fill: #D4A843; stroke: #0D0B08; stroke-width: 2; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#8A8272" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="500" y="30" style="fill: #B8B0A0; font-size: 24px; font-weight: bold; text-anchor: middle;">자동화 시스템 구조 (Automation System Architecture)</text>
+  
+  <!-- Step 1: Income -->
+  <rect x="50" y="80" width="140" height="80" class="automation-box" rx="10"/>
+  <text x="120" y="120" class="automation-label">월급 자동입금</text>
+  <text x="120" y="145" style="fill: #EDE8D8; font-size: 12px; text-anchor: middle;">Auto Deposit</text>
+  
+  <!-- Arrow 1 -->
+  <path d="M 190 120 L 250 120" class="automation-arrow"/>
+  
+  <!-- Step 2: Distribution Hub -->
+  <rect x="250" y="80" width="140" height="80" class="automation-decision" rx="10"/>
+  <text x="320" y="120" class="automation-label">자동 분배</text>
+  <text x="320" y="145" style="fill: #0D0B08; font-size: 12px; text-anchor: middle;">Auto Split</text>
+  
+  <!-- Arrow to savings -->
+  <path d="M 320 160 L 320 220" class="automation-arrow"/>
+  
+  <!-- Arrow to investment -->
+  <path d="M 380 120 L 450 120" class="automation-arrow"/>
+  
+  <!-- Arrow to buffer -->
+  <path d="M 250 120 L 180 200" class="automation-arrow"/>
+  
+  <!-- Step 3a: Savings Account -->
+  <rect x="250" y="220" width="140" height="80" class="automation-process" rx="10"/>
+  <text x="320" y="260" class="automation-label">자동저축계좌</text>
+  <text x="320" y="285" style="fill: #0D0B08; font-size: 12px; text-anchor: middle;">Emergency Fund</text>
+  
+  <!-- Step 3b: Investment Account -->
+  <rect x="450" y="80" width="140" height="80" class="automation-process" rx="10"/>
+  <text x="520" y="120" class="automation-label">자동투자계좌</text>
+  <text x="520" y="145" style="fill: #0D0B08; font-size: 12px; text-anchor: middle;">DCA ETF</text>
+  
+  <!-- Step 3c: Buffer Account -->
+  <rect x="100" y="220" width="140" height="80" class="automation-box" rx="10"/>
+  <text x="170" y="260" class="automation-label">월별 버퍼</text>
+  <text x="170" y="285" style="fill: #EDE8D8; font-size: 12px; text-anchor: middle;">Monthly Buffer</text>
+  
+  <!-- Arrow from savings to wealth -->
+  <path d="M 320 300 L 400 350" class="automation-arrow"/>
+  
+  <!-- Arrow from investment to wealth -->
+  <path d="M 520 160 L 500 340" class="automation-arrow"/>
+  
+  <!-- Final: Wealth Accumulation -->
+  <rect x="380" y="340" width="160" height="80" class="automation-decision" rx="10"/>
+  <text x="460" y="380" class="automation-label">순자산 증가</text>
+  <text x="460" y="405" style="fill: #0D0B08; font-size: 12px; text-anchor: middle;">Net Worth Growth</text>
+  
+  <!-- Monthly Review -->
+  <rect x="650" y="200" width="150" height="80" class="automation-box" rx="10"/>
+  <text x="725" y="240" class="automation-label">월별 검토</text>
+  <text x="725" y="265" style="fill: #EDE8D8; font-size: 12px; text-anchor: middle;">Monthly Review</text>
+  
+  <!-- Arrow from automation to review -->
+  <path d="M 590 240 L 650 240" class="automation-arrow"/>
+  
+  <!-- Feedback loop -->
+  <path d="M 725 200 Q 725 100, 390 100" class="automation-arrow" stroke-dasharray="5,5"/>
+  <text x="650" y="150" style="fill: #8A8272; font-size: 11px;">조정 피드백</text>
+</svg>
 
-    <!-- 화살표 아래 -->
-    <path d="M 400 60 L 400 90" stroke="#2A2D36" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .account-main { fill: #3D9E6E; stroke: #0D0B08; stroke-width: 2; }
+      .account-label { fill: #EDE8D8; font-size: 14px; font-weight: bold; text-anchor: middle; }
+      .flow-arrow { stroke: #8A8272; stroke-width: 2.5; fill: none; marker-end: url(#arrowhead2); }
+      .percentage-label { fill: #B8B0A0; font-size: 13px; font-weight: bold; }
+    </style>
+    <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#8A8272" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="500" y="30" style="fill: #B8B0A0; font-size: 24px; font-weight: bold; text-anchor: middle;">월급 분배 파이프라인 (Monthly Income Distribution)</text>
+  
+  <!-- Main Income -->
+  <circle cx="100" cy="100" r="45" class="account-main"/>
+  <text x="100" y="105" class="account-label" style="font-size: 12px;">월급</text>
+  <text x="100" y="120" style="fill: #EDE8D8; font-size: 11px; text-anchor: middle;">Monthly</text>
+  
+  <!-- Distribution arrows and labels -->
+  <!-- To living expenses -->
+  <path d="M 140 80 L 220 80" class="flow-arrow"/>
+  <text x="180" y="70" class="percentage-label">50%</text>
+  
+  <rect x="220" y="50" width="120" height="60" class="account-main" rx="5"/>
+  <text x="280" y="80" class="account-label" style="font-size: 13px;">생활비</text>
+  <text x="280" y="95" style="fill: #EDE8D8; font-size: 10px; text-anchor: middle;">(Housing, Food)</text>
+  
+  <!-- To savings -->
+  <path d="M 140 100 L 220 140" class="flow-arrow"/>
+  <text x="170" y="125" class="percentage-label">20%</text>
+  
+  <rect x="220" y="120" width="120" height="60" class="account-main" rx="5"/>
+  <text x="280" y="150" class="account-label" style="font-size: 13px;">자동저축</text>
+  <text x="280" y="165" style="fill: #EDE8D8; font-size: 10px; text-anchor: middle;">(Emergency)</text>
+  
+  <!-- To investment -->
+  <path d="M 140 120 L 220 210" class="flow-arrow"/>
+  <text x="170" y="170" class="percentage-label">30%</text>
+  
+  <rect x="220" y="190" width="120" height="60" class="account-main" rx="5"/>
+  <text x="280" y="220" class="account-label" style="font-size: 13px;">자동투자</text>
+  <text x="280" y="235" style="fill: #EDE8D8; font-size: 10px; text-anchor: middle;">(DCA ETF)</text>
+  
+  <!-- Investment breakdown -->
+  <g transform="translate(450, 150)">
+    <text x="0" y="-80" style="fill: #B8B0A0; font-size: 16px; font-weight: bold;">투자 포트폴리오 분배</text>
+    
+    <!-- 한국 주식 ETF -->
+    <rect x="0" y="0" width="100" height="60" fill="#4AAF6A" stroke="#0D0B08" stroke-width="2" rx="5"/>
+    <text x="50" y="25" style="fill: #0D0B08; font-size: 12px; font-weight: bold; text-anchor: middle;">한국 ETF</text>
+    <text x="50" y="40" style="fill: #0D0B08; font-size: 11px; text-anchor: middle;">40%</text>
+    
+    <!-- 글로벌 ETF -->
+    <rect x="120" y="0" width="100" height="60" fill="#3D9E6E" stroke="#0D0B08" stroke-width="2" rx="5"/>
+    <text x="170" y="25" style="fill: #EDE8D8; font-size: 12px; font-weight: bold; text-anchor: middle;">글로벌 ETF</text>
+    <text x="170" y="40" style="fill: #EDE8D8; font-size: 11px; text-anchor: middle;">50%</text>
+    
+    <!-- 채권 ETF -->
+    <rect x="240" y="0" width="100" height="60" fill="#D4A843" stroke="#0D0B08" stroke-width="2" rx="5"/>
+    <text x="290" y="25" style="fill: #0D0B08; font-size: 12px; font-weight: bold; text-anchor: middle;">채권 ETF</text>
+    <text x="290" y="40" style="fill: #0D0B08; font-size: 11px; text-anchor: middle;">10%</text>
+  </g>
+  
+  <!-- Bottom timeline -->
+  <g transform="translate(0, 360)">
+    <line x1="50" y1="0" x2="900" y2="0" stroke="#8A8272" stroke-width="2"/>
+    
+    <!-- Timeline labels -->
+    <circle cx="50" cy="0" r="6" fill="#3D9E6E"/>
+    <text x="50" y="30" style="fill: #B8B0A0; font-size: 12px; text-anchor: middle;">급여 입금</text>
+    <text x="50" y="45" style="fill: #8A8272; font-size: 11px; text-anchor: middle;">Day 1</text>
+    
+    <circle cx="250" cy="0" r="6" fill="#4AAF6A"/>
+    <text x="250" y="30" style="fill: #B8B0A0; font-size: 12px; text-anchor: middle;">자동 분배</text>
+    <text x="250" y="45" style="fill: #8A8272; font-size: 11px; text-anchor: middle;">Day 2</text>
+    
+    <circle cx="450" cy="0" r="6" fill="#D4A843"/>
+    <text x="450" y="30" style="fill: #B8B0A0; font-size: 12px; text-anchor: middle;">투자 매수</text>
+    <text x="450" y="45" style="fill: #8A8272; font-size: 11px; text-anchor: middle;">Day 3</text>
+    
+    <circle cx="650" cy="0" r="6" fill="#C45A4A"/>
+    <text x="650" y="30" style="fill: #B8B0A0; font-size: 12px; text-anchor: middle;">월말 검토</text>
+    <text x="650" y="45" style="fill: #8A8272; font-size: 11px; text-anchor: middle;">Day 30</text>
+  </g>
+</svg>
 
-    <!-- 자동이체 1: 투자 -->
-    <rect x="50" y="100" width="180" height="70" rx="5" fill="rgba(74,158,191,0.2)" stroke="#4A9EBF" stroke-width="2"/>
-    <text x="140" y="125" font-size="13" font-weight="600" fill="#4A9EBF" text-anchor="middle">투자 (자동)</text>
-    <text x="140" y="145" font-size="10" fill="#4A9EBF" text-anchor="middle">ISA 2,000만</text>
-    <text x="140" y="160" font-size="10" fill="#4A9EBF" text-anchor="middle">연금저축 50만</text>
+<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .axis-line { stroke: #8A8272; stroke-width: 2; }
+      .grid-line { stroke: #2A2C30; stroke-width: 1; stroke-dasharray: 5,5; }
+      .benefit-line { stroke: #4AAF6A; stroke-width: 3; fill: none; }
+      .habit-line { stroke: #3D9E6E; stroke-width: 3; fill: none; }
+      .axis-label { fill: #B8B0A0; font-size: 13px; }
+      .data-point { fill: #D4A843; r: 4; }
+    
+/* ═══ THEME TOGGLE ═══ */
+/* ── Toggle Button ── */
+.theme-toggle {
+  position: relative;
+  width: 52px; height: 28px;
+  background: var(--gold-dim);
+  border: 1px solid var(--border-gold);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex; align-items: center;
+  padding: 0 3px;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(212,168,67,0.2);
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.theme-toggle-knob {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--gold);
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  position: relative;
+}
+.theme-toggle-knob svg {
+  width: 14px; height: 14px;
+  transition: all 0.3s;
+}
+/* Dark mode icon (moon visible) */
+.theme-toggle .icon-moon { display: none; }
+.theme-toggle .icon-sun { display: block; }
+[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+[data-theme="light"] .theme-toggle-knob {
+  transform: translateX(24px);
+  background: #8B6914;
+}
+[data-theme="light"] .theme-toggle {
+  background: rgba(139,105,20,0.15);
+  border-color: rgba(139,105,20,0.3);
+}
 
-    <!-- 자동이체 2: 저축 -->
-    <rect x="310" y="100" width="180" height="70" rx="5" fill="rgba(74,191,122,0.2)" stroke="#4ABF7A" stroke-width="2"/>
-    <text x="400" y="125" font-size="13" font-weight="600" fill="#4ABF7A" text-anchor="middle">저축 (자동)</text>
-    <text x="400" y="145" font-size="10" fill="#4ABF7A" text-anchor="middle">긴급자금 200만</text>
-    <text x="400" y="160" font-size="10" fill="#4ABF7A" text-anchor="middle">교육비 100만</text>
+/* ── Light Theme Variables ── */
+[data-theme="light"] {
+  --bg-primary: #FAF6EE;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FFF9F0;
+  --bg-accent: #F5F0E5;
+  --bg-temple: #FBF7EF;
+  --gold: #8B6914;
+  --gold-bright: #A67C1A;
+  --gold-dim: rgba(139,105,20,0.08);
+  --gold-glow: rgba(139,105,20,0.15);
+  --gold-radiant: rgba(166,124,26,0.2);
+  --emerald: #2D7A52;
+  --emerald-dim: rgba(45,122,82,0.08);
+  --emerald-glow: rgba(45,122,82,0.15);
+  --amber: #9E5E28;
+  --amber-dim: rgba(158,94,40,0.08);
+  --copper: #7A4A30;
+  --text-primary: #2C2416;
+  --text-secondary: #5A5040;
+  --text-dim: #8A8070;
+  --border: #E0D8C8;
+  --border-gold: rgba(139,105,20,0.2);
+  --red: #B84A3A;
+  --green: #2D8A4A;
+}
 
-    <!-- 자동이체 3: 생활비 -->
-    <rect x="570" y="100" width="180" height="70" rx="5" fill="rgba(191,74,74,0.2)" stroke="#BF4A4A" stroke-width="2"/>
-    <text x="660" y="125" font-size="13" font-weight="600" fill="#BF4A4A" text-anchor="middle">생활비 (자동)</text>
-    <text x="660" y="145" font-size="10" fill="#BF4A4A" text-anchor="middle">식비·교육 1,500만</text>
-    <text x="660" y="160" font-size="10" fill="#BF4A4A" text-anchor="middle">아이 용돈 200만</text>
+/* ── Light Theme Overrides ── */
+[data-theme="light"] body {
+  background: #FAF6EE !important;
+  color: #2C2416 !important;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139,105,20,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(158,94,40,0.03) 0%, transparent 50%) !important;
+}
+[data-theme="light"] body::before {
+  background-image:
+    repeating-linear-gradient(90deg, rgba(139,105,20,0.025) 0px, rgba(139,105,20,0.025) 1px, transparent 1px, transparent 80px),
+    repeating-linear-gradient(0deg, rgba(139,105,20,0.025) 0px, rgba(139,105,20,0.025) 1px, transparent 1px, transparent 80px) !important;
+}
+[data-theme="light"] body::after {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(139,105,20,0.03) 0%, transparent 25%),
+    radial-gradient(circle at 85% 80%, rgba(139,105,20,0.02) 0%, transparent 20%) !important;
+}
+[data-theme="light"] .sticky-header {
+  background: rgba(250,246,238,0.95) !important;
+  border-bottom-color: rgba(139,105,20,0.15) !important;
+}
+[data-theme="light"] .sticky-header::after {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.2), transparent) !important;
+}
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #F0EBE0;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(139,105,20,0.2), rgba(139,105,20,0.35));
+  border: 1px solid rgba(139,105,20,0.15);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(139,105,20,0.5);
+}
+[data-theme="light"] .header-day {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .header-title {
+  color: #5A5040;
+}
+[data-theme="light"] .badge-asset {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .badge-series {
+  color: #8A8070;
+  background: rgba(0,0,0,0.04);
+}
+[data-theme="light"] .timer-btn {
+  background: rgba(139,105,20,0.08);
+  border-color: #8B6914;
+  color: #8B6914;
+}
+[data-theme="light"] .timer-btn:hover {
+  background: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .hero {
+  border-bottom-color: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .hero::before {
+  background: linear-gradient(90deg, transparent, #8B6914, transparent);
+}
+[data-theme="light"] .hero-day {
+  color: #2C2416;
+  text-shadow: none;
+}
+[data-theme="light"] .hero-subtitle {
+  color: #8B6914;
+}
+[data-theme="light"] .hero-eldorado-sub {
+  color: #9E5E28;
+}
+[data-theme="light"] .hero-quote {
+  color: #5A5040;
+}
+[data-theme="light"] .concept-card {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+[data-theme="light"] .concept-card:hover {
+  background: #FFF9F0;
+  border-color: rgba(139,105,20,0.3);
+  box-shadow: 0 4px 16px rgba(139,105,20,0.08);
+}
+[data-theme="light"] .concept-card::before {
+  background: linear-gradient(90deg, rgba(139,105,20,0.1), rgba(139,105,20,0.3), rgba(139,105,20,0.1));
+}
+[data-theme="light"] .brain-box {
+  background: linear-gradient(135deg, #FFFFFF, #F8F4EC);
+  border-color: #E0D8C8;
+  border-left-color: #2D7A52;
+}
+[data-theme="light"] .brain-box::before {
+  background: radial-gradient(circle at 100% 0%, rgba(45,122,82,0.06), transparent 70%);
+}
+[data-theme="light"] .formula-block {
+  background: #FBF7EF;
+  border-color: #E0D8C8;
+  border-left-color: #8B6914;
+}
+[data-theme="light"] .sim-box {
+  background: linear-gradient(135deg, rgba(139,105,20,0.04), rgba(45,122,82,0.04));
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .sim-box::before {
+  background: #FAF6EE;
+}
+[data-theme="light"] .psych-box {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+  border-left-color: #9E5E28;
+}
+[data-theme="light"] .deep-dive {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .deep-dive summary:hover {
+  background: #F8F4EC;
+}
+[data-theme="light"] .deep-dive[open] {
+  border-color: rgba(139,105,20,0.3);
+  box-shadow: 0 0 15px rgba(139,105,20,0.05);
+}
+[data-theme="light"] .quiz-section {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .quiz-section::before {
+  background: linear-gradient(90deg, #9E5E28, #8B6914, #9E5E28);
+}
+[data-theme="light"] .quiz-options li:hover {
+  background: #F5F0E5;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .quiz-answer {
+  background: #F5F0E5;
+}
+[data-theme="light"] .sr-tracker {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .sr-slot {
+  background: #F5F0E5;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .sr-slot:hover {
+  border-color: #8B6914;
+}
+[data-theme="light"] .chart-container {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .data-table th {
+  border-bottom-color: rgba(139,105,20,0.3);
+}
+[data-theme="light"] .data-table td {
+  border-bottom-color: rgba(224,216,200,0.7);
+}
+[data-theme="light"] .data-table tr:hover td {
+  background: rgba(139,105,20,0.04);
+}
+[data-theme="light"] .highlight-row td {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+}
+[data-theme="light"] .nav-btn {
+  color: #5A5040;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .nav-btn:hover {
+  border-color: #8B6914;
+  color: #8B6914;
+}
+[data-theme="light"] .disclaimer {
+  border-top-color: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .progress-bar-bg {
+  background: #EDE8D8;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .progress-bar-fill {
+  background: linear-gradient(90deg, #9E5E28, #8B6914, #A67C1A);
+  background-size: 200% 100%;
+}
+[data-theme="light"] .aztec-divider::before,
+[data-theme="light"] .aztec-divider::after {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.15), transparent);
+}
+[data-theme="light"] .hero-illustration {
+  border-color: rgba(139,105,20,0.1);
+}
+[data-theme="light"] .hero-illustration::after {
+  background: linear-gradient(to top, #FAF6EE, transparent);
+}
+/* Light theme: SVG illustrations get warmer tones */
+[data-theme="light"] .hero-illustration svg {
+  filter: saturate(0.8) brightness(1.1);
+}
+/* Light theme: particles become subtle */
+[data-theme="light"] #goldParticles {
+  opacity: 0.3;
+}
+/* Scroll compass light adaptation */
+[data-theme="light"] .scroll-compass {
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+}
+/* Card glow adapts to light theme */
+[data-theme="light"] .concept-card .card-glow {
+  background: radial-gradient(circle, rgba(139,105,20,0.08) 0%, transparent 70%);
+}
+/* Section flash for light */
+[data-theme="light"] .section-flash {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.4), transparent);
+}
+/* Checklist in light */
+[data-theme="light"] .checklist li::before {
+  border-color: #8B6914;
+}
+[data-theme="light"] .checklist li.checked::before {
+  background: #8B6914;
+}
+[data-theme="light"] .checklist li.checked::after {
+  color: #FFFFFF;
+}
+/* Neuro & Engineer tags */
+[data-theme="light"] .neuro-tag {
+  color: #2D7A52;
+  background: rgba(45,122,82,0.08);
+}
+[data-theme="light"] .engineer-tag {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+}
+/* Time table */
+[data-theme="light"] .time-table td {
+  border-bottom-color: rgba(224,216,200,0.5);
+}
+/* Part texture backgrounds in light */
+[data-theme="light"] .bg-part-texture {
+  opacity: 0.3;
+}
+/* Smooth transition on theme change */
+html {
+  transition: none;
+}
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 0.4s, color 0.3s, border-color 0.3s, box-shadow 0.3s !important;
+}
+/* ═══ END THEME TOGGLE ═══ */
 
-    <!-- 화살표들 -->
-    <path d="M 400 90 L 140 100" stroke="#2A2D36" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-    <path d="M 400 90 L 400 100" stroke="#2A2D36" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-    <path d="M 400 90 L 660 100" stroke="#2A2D36" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-
-    <!-- 월별 누적 -->
-    <rect x="150" y="210" width="500" height="220" rx="5" fill="var(--bg-card)" stroke="#2A2D36" stroke-width="1"/>
-    <text x="400" y="235" font-size="13" font-weight="600" fill="#C9A84C" text-anchor="middle">월별 누적 (12개월)</text>
-
-    <!-- 투자 누적 -->
-    <text x="170" y="265" font-size="11" font-weight="500" fill="#4A9EBF">투자</text>
-    <rect x="150" y="275" width="150" height="30" rx="3" fill="rgba(74,158,191,0.15)" stroke="#4A9EBF"/>
-    <text x="230" y="295" font-size="11" fill="#4A9EBF" text-anchor="middle">연 2억 4,600만</text>
-    <text x="230" y="310" font-size="9" fill="#9A9890" text-anchor="middle">ISA 2,400만 + 연금저축 600만</text>
-
-    <!-- 저축 누적 -->
-    <text x="360" y="265" font-size="11" font-weight="500" fill="#4ABF7A">저축</text>
-    <rect x="310" y="275" width="180" height="30" rx="3" fill="rgba(74,191,122,0.15)" stroke="#4ABF7A"/>
-    <text x="400" y="295" font-size="11" fill="#4ABF7A" text-anchor="middle">연 3,600만</text>
-    <text x="400" y="310" font-size="9" fill="#9A9890" text-anchor="middle">긴급자금 2,400만 + 교육비 1,200만</text>
-
-    <!-- 생활비 누적 -->
-    <text x="570" y="265" font-size="11" font-weight="500" fill="#BF4A4A">생활비</text>
-    <rect x="520" y="275" width="160" height="30" rx="3" fill="rgba(191,74,74,0.15)" stroke="#BF4A4A"/>
-    <text x="600" y="295" font-size="11" fill="#BF4A4A" text-anchor="middle">연 2억 400만</text>
-    <text x="600" y="310" font-size="9" fill="#9A9890" text-anchor="middle">월 1,700만 × 12개월</text>
-
-    <!-- 최종 성과 -->
-    <rect x="150" y="350" width="500" height="100" rx="5" fill="linear-gradient(135deg, rgba(201,168,76,0.1), rgba(74,158,191,0.1))" stroke="#C9A84C" stroke-width="2" stroke-dasharray="5,5"/>
-    <text x="400" y="380" font-size="13" font-weight="600" fill="#C9A84C" text-anchor="middle">12개월 자동화 성과</text>
-    <text x="400" y="410" font-size="12" fill="#text-secondary" text-anchor="middle">순자산 증가 예상: +약 2억 8,000만 (투자 수익 포함)</text>
-    <text x="400" y="435" font-size="12" fill="#text-secondary" text-anchor="middle">의사결정 부담: 월 1회 30분 리뷰로 최소화</text>
-
-    <!-- Arrow marker -->
-    <defs>
-      <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-        <polygon points="0 0, 10 3, 0 6" fill="#2A2D36"/>
-      </marker>
-    </defs>
-  </svg>
-</div>
+</style>
+  </defs>
+  
+  <!-- Title -->
+  <text x="500" y="30" style="fill: #B8B0A0; font-size: 24px; font-weight: bold; text-anchor: middle;">자동화의 누적 효과 (Cumulative Automation Benefits)</text>
+  
+  <!-- Y-axis -->
+  <line x1="80" y1="50" x2="80" y2="420" class="axis-line"/>
+  <!-- X-axis -->
+  <line x1="80" y1="420" x2="950" y2="420" class="axis-line"/>
+  
+  <!-- Y-axis label -->
+  <text x="30" y="235" style="fill: #B8B0A0; font-size: 12px; text-anchor: middle; transform: rotate(-90deg); transform-origin: 30px 235px;">효과 (Effect %)</text>
+  
+  <!-- X-axis label -->
+  <text x="515" y="455" style="fill: #B8B0A0; font-size: 12px; text-anchor: middle;">개월 (Months)</text>
+  
+  <!-- Grid lines -->
+  <line x1="80" y1="350" x2="950" y2="350" class="grid-line"/>
+  <line x1="80" y1="280" x2="950" y2="280" class="grid-line"/>
+  <line x1="80" y1="210" x2="950" y2="210" class="grid-line"/>
+  <line x1="80" y1="140" x2="950" y2="140" class="grid-line"/>
+  
+  <!-- Y-axis ticks -->
+  <line x1="75" y1="350" x2="85" y2="350" class="axis-line"/>
+  <text x="65" y="355" class="axis-label" text-anchor="end">20%</text>
+  
+  <line x1="75" y1="280" x2="85" y2="280" class="axis-line"/>
+  <text x="65" y="285" class="axis-label" text-anchor="end">40%</text>
+  
+  <line x1="75" y1="210" x2="85" y2="210" class="axis-line"/>
+  <text x="65" y="215" class="axis-label" text-anchor="end">60%</text>
+  
+  <line x1="75" y1="140" x2="85" y2="140" class="axis-line"/>
+  <text x="65" y="145" class="axis-label" text-anchor="end">80%</text>
+  
+  <!-- X-axis ticks -->
+  <line x1="200" y1="415" x2="200" y2="425" class="axis-line"/>
+  <text x="200" y="440" class="axis-label" text-anchor="middle">3개월</text>
+  
+  <line x1="350" y1="415" x2="350" y2="425" class="axis-line"/>
+  <text x="350" y="440" class="axis-label" text-anchor="middle">6개월</text>
+  
+  <line x1="500" y1="415" x2="500" y2="425" class="axis-line"/>
+  <text x="500" y="440" class="axis-label" text-anchor="middle">12개월</text>
+  
+  <line x1="650" y1="415" x2="650" y2="425" class="axis-line"/>
+  <text x="650" y="440" class="axis-label" text-anchor="middle">24개월</text>
+  
+  <line x1="800" y1="415" x2="800" y2="425" class="axis-line"/>
+  <text x="800" y="440" class="axis-label" text-anchor="middle">36개월</text>
+  
+  <!-- Habit Formation Curve (Effort required drops) -->
+  <polyline points="80,380 200,340 350,290 500,240 650,160 800,110 950,90" class="habit-line" stroke-dasharray="5,5"/>
+  
+  <!-- Data points for habit line -->
+  <circle cx="80" cy="380" class="data-point"/>
+  <circle cx="200" cy="340" class="data-point"/>
+  <circle cx="350" cy="290" class="data-point"/>
+  <circle cx="500" cy="240" class="data-point"/>
+  <circle cx="650" cy="160" class="data-point"/>
+  <circle cx="800" cy="110" class="data-point"/>
+  
+  <!-- Wealth Accumulation Curve (Accelerating) -->
+  <polyline points="80,390 200,360 350,310 500,220 650,100 800,50 950,30" class="benefit-line"/>
+  
+  <!-- Data points for wealth line -->
+  <circle cx="80" cy="390" class="data-point" fill="#4AAF6A"/>
+  <circle cx="200" cy="360" class="data-point" fill="#4AAF6A"/>
+  <circle cx="350" cy="310" class="data-point" fill="#4AAF6A"/>
+  <circle cx="500" cy="220" class="data-point" fill="#4AAF6A"/>
+  <circle cx="650" cy="100" class="data-point" fill="#4AAF6A"/>
+  <circle cx="800" cy="50" class="data-point" fill="#4AAF6A"/>
+  
+  <!-- Legend -->
+  <g transform="translate(700, 120)">
+    <line x1="0" y1="0" x2="20" y2="0" class="habit-line" stroke-dasharray="5,5"/>
+    <text x="30" y="5" style="fill: #B8B0A0; font-size: 12px;">의지력 필요도</text>
+    
+    <line x1="0" y1="25" x2="20" y2="25" class="benefit-line"/>
+    <text x="30" y="30" style="fill: #B8B0A0; font-size: 12px;">순자산 성장</text>
+  </g>
+</svg>
 
 </section>
 
 
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  
+<details>
+  <details-content>
+    <h3>Deep Dive 1: 의사결정 피로와 자동화</h3>
+    <p><strong>의사결정 피로(Decision Fatigue)란?</strong></p>
+    <p>하루종일 수많은 선택을 하다 보면 뇌의 전전두엽이 고갈되어 의사결정 능력이 저하됩니다. 투자자들도 마찬가지: 매달 "이번달엔 투자할까?"라고 고민하는 것 자체가 에너지를 소모합니다.</p>
+    <div style="background-color: #1A1C20; padding: 12px; border-left: 4px solid #3D9E6E; margin: 15px 0;">
+      <p><strong>neuroscience-tag:</strong> 전전두피질(Prefrontal Cortex)의 글루코스 고갈 → 의사결정 능력 저하</p>
+    </div>
+    <p><strong>자동화의 해결책:</strong></p>
+    <p>매월 투자 여부를 '고민'하는 단계를 제거합니다. 대신 1회 설정 후 자동으로 진행되므로:</p>
+    <ul>
+      <li>의사결정 에너지 절약 → 다른 중요한 선택에 집중</li>
+      <li>감정적 변동성 제거 → 일관된 투자 실행</li>
+      <li>규칙 기반 투자 → 장기 성공 확률 증가</li>
+    </ul>
+  </details-content>
+</details>
+
+<details>
+  <details-content>
+    <h3>Deep Dive 2: 습관화의 신경과학 - 3개월 규칙</h3>
+    <p><strong>습관이 형성되는 과정:</strong></p>
+    <p>뇌의 기저핵(Basal Ganglia)은 반복적 행동을 추적하여 '습관 회로'를 만듭니다. 처음엔 전전두엽(의식적 노력)이 필요하지만, 약 3개월(정확히는 66일 평균) 후 자동으로 실행됩니다.</p>
+    <table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%; margin: 15px 0; background-color: #1A1C20; border-color: #3A3C40;">
+      <tr style="background-color: #2A2C30;">
+        <th style="color: #EDE8D8;">단계</th>
+        <th style="color: #EDE8D8;">기간</th>
+        <th style="color: #EDE8D8;">뇌 활동</th>
+      </tr>
+      <tr style="border-color: #3A3C40;">
+        <td style="color: #B8B0A0;"><strong>1. 의식적 노력 단계</strong></td>
+        <td style="color: #EDE8D8;">1-2주</td>
+        <td style="color: #B8B0A0;">전전두엽 활성, 높은 에너지 소비</td>
+      </tr>
+      <tr style="background-color: #0D0B08; border-color: #3A3C40;">
+        <td style="color: #B8B0A0;"><strong>2. 통합 단계</strong></td>
+        <td style="color: #EDE8D8;">2-8주</td>
+        <td style="color: #B8B0A0;">전전두엽 + 기저핵 동시 활성</td>
+      </tr>
+      <tr style="border-color: #3A3C40;">
+        <td style="color: #B8B0A0;"><strong>3. 습관화 단계</strong></td>
+        <td style="color: #EDE8D8;">8주+</td>
+        <td style="color: #B8B0A0;">기저핵 주도, 에너지 최소화</td>
+      </tr>
+    </table>
+    <div style="background-color: #1A1C20; padding: 12px; border-left: 4px solid #3D9E6E; margin: 15px 0;">
+      <p><strong>neuroscience-insight:</strong> 자동화 설정 후 3개월은 '의식적 모니터링'이 필요합니다. 4개월차부터는 거의 무의식적으로 실행됩니다.</p>
+    </div>
+  </details-content>
+</details>
+
+<details>
+  <details-content>
+    <h3>Deep Dive 3: 자동화의 심리적 함정 - "Fire and Forget"의 위험</h3>
+    <p><strong>자동화의 어두운 면:</strong></p>
+    <p>자동화 시스템이 완벽하게 작동하면, 역설적으로 '무시'하기 쉬워집니다. 이를 행동경제학에서 "Status Quo Bias" (현상 유지 편향)라고 부릅니다.</p>
+    <div style="background-color: #C45A4A; opacity: 0.15; padding: 12px; margin: 15px 0; border-left: 4px solid #C45A4A;">
+      <p style="color: #EDE8D8;"><strong>⚠ 위험:</strong> 3년 동안 자동 투자한 후, 갑자기 금리가 3배 올랐는데도 채권 ETF 비중(10%)을 유지하면 기회 손실 발생</p>
+    </div>
+    <p><strong>실제 사례:</strong></p>
+    <ul>
+      <li>2021년 자동화 설정 후 2024년 금리 인상에 미대응 → 포트폴리오 불균형</li>
+      <li>결혼/출산 후에도 미혼자 배분 구조 유지 → 위험 수위 부적절</li>
+      <li>직장 변경 후 생활비 기준선 변경 미반영 → 저축률 저하</li>
+    </ul>
+    <p><strong>해결책:</strong> 월별 30분 검토는 "자동화 유지"를 위한 필수 투입입니다.</p>
+  </details-content>
+</details>
+
+<details>
+  <details-content>
+    <h3>Deep Dive 4: 자동화 설정 기술 - 은행 / 증권사 API 활용</h3>
+    <p><strong>단계별 구현:</strong></p>
+    <div style="background-color: #1A1C20; padding: 12px; margin: 15px 0; border-left: 4px solid #4AAF6A;">
+      <p><strong>1단계: 계좌 구조 설계</strong></p>
+      <ul style="color: #B8B0A0; margin-left: 20px;">
+        <li>급여 통장 (월급 입금)</li>
+        <li>생활비 통장 (자동이체)</li>
+        <li>저축 통장 (자동이체)</li>
+        <li>투자 계좌 (증권사)</li>
+      </ul>
+    </div>
+    <div style="background-color: #1A1C20; padding: 12px; margin: 15px 0; border-left: 4px solid #3D9E6E;">
+      <p><strong>2단계: 자동이체 설정</strong></p>
+      <ul style="color: #B8B0A0; margin-left: 20px;">
+        <li>급여 입금 다음날: 생활비(50%) 이체</li>
+        <li>급여 입금 2일차: 저축(20%) 이체</li>
+        <li>급여 입금 3일차: 투자 계좌 입금</li>
+      </ul>
+    </div>
+    <div style="background-color: #1A1C20; padding: 12px; margin: 15px 0; border-left: 4px solid #D4A843;">
+      <p><strong>3단계: 증권사 자동화</strong></p>
+      <ul style="color: #B8B0A0; margin-left: 20px;">
+        <li>정기정액매매(ISA/일반계좌): 매월 3-5일에 자동 매수</li>
+        <li>ETF 선택: 한국 40%, 글로벌 50%, 채권 10%</li>
+        <li>수수료: 0% (ISA) 또는 0.1% 이내</li>
+      </ul>
+    </div>
+    <div style="background-color: #1A1C20; padding: 12px; margin: 15px 0; border-left: 4px solid #C45A4A;">
+      <p style="color: #EDE8D8;"><strong>engineer-tip:</strong> 국내 주요 은행/증권사는 모두 자동화 API 지원. 모바일 앱의 '정기적금'/'정기정액매매' 메뉴 활용.</p>
+    </div>
+  </details-content>
+</details>
+
+</section>
 
 
 
@@ -515,46 +1680,192 @@ ISA 2,000만 → 연금저축 50만 → 주식 매수 300만</p>
   <div class="section-label">APPLY TO MY ASSETS</div>
   <h2 class="section-title">내 자산에 직접 적용</h2>
   
-<div class="sim-box">
-  <h3>내 가족의 자동화 시스템 구축</h3>
-  <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1.2rem;">
-    맞벌이 가정 기준 실제 시스템</p>
-
-  <h4 style="margin-top:1.2rem;margin-bottom:0.8rem;color:var(--gold);font-size:0.95rem;">급여 흐름 (월)</h4>
-  <div class="data-table-wrap">
-    <table class="data-table">
-      <thead><tr><th>단계</th><th>항목</th><th>금액</th><th>자동화 여부</th></tr></thead>
-      <tbody>
-        <tr><td>Step 1</td><td>세후 급여 입금</td><td>월 급여</td><td>회사</td></tr>
-        <tr><td>Step 2</td><td>ISA 자동이체</td><td>2,000만원</td><td>✓ 자동</td></tr>
-        <tr><td>Step 3</td><td>연금저축 자동이체</td><td>50만원</td><td>✓ 자동</td></tr>
-        <tr><td>Step 4</td><td>긴급자금 (매달)</td><td>200만원</td><td>✓ 자동</td></tr>
-        <tr><td>Step 5</td><td>자녀 교육기금</td><td>100만원</td><td>✓ 자동</td></tr>
-        <tr class="highlight-row"><td>Step 6</td><td>실제 생활비 (잔액)</td><td>1,850만원</td><td>수동</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <h4 style="margin-top:1.2rem;margin-bottom:0.8rem;color:var(--gold);font-size:0.95rem;">월 재정 리뷰 루틴 (매월 마지막 일요일 19:30)</h4>
-  <ul class="checklist">
-    <li>투자 현황: 주식 자산 목표(2억 8,000만±5%) 확인</li>
-    <li>저축 진도: 긴급자금 충분도, 교육비 누적액 확인</li>
-    <li>지출 분석: 생활비 월 1,850만원 한도 준수 여부</li>
-    <li>특별 지출 계획: 다음 달 예정된 큰 지출 사전 조정</li>
-    <li>배우자와 공유: 월 성과 공유 및 조정사항 상의</li>
-  </ul>
-
-  <h4 style="margin-top:1.2rem;margin-bottom:0.8rem;color:var(--blue);font-size:0.95rem;">예상 12개월 누적</h4>
-  <div style="padding:1rem;background:rgba(74,158,191,0.08);border-radius:6px;margin-bottom:1rem;">
-    <p style="font-size:0.85rem;margin-bottom:0.5rem;"><strong>투자 누적:</strong> 2억 4,600만원</p>
-    <p style="font-size:0.85rem;margin-bottom:0.5rem;"><strong>저축 누적:</strong> 3,600만원</p>
-    <p style="font-size:0.85rem;margin-bottom:0.5rem;"><strong>생활비 실지출:</strong> 약 2억 400만원</p>
-    <p style="font-size:0.85rem;font-weight:500;color:var(--gold);">→ 순자산 증가 예상: +2억 8,200만원 (투자 수익 8% 가정)</p>
-  </div>
+<div style="background-color: #0D0B08; padding: 20px; border-radius: 8px; margin: 20px 0;">
+  <h3 style="color: #EDE8D8; margin-bottom: 15px;">💡 자동화 시뮬레이션: 3년 후 순자산 변화</h3>
+  
+  <h4 style="color: #B8B0A0; margin: 15px 0 10px;">초기 상태 (현재)</h4>
+  <table border="1" cellpadding="10" style="border-collapse: collapse; width: 100%; background-color: #1A1C20; border-color: #3A3C40; margin-bottom: 15px;">
+    <tr style="background-color: #2A2C30;">
+      <th style="color: #EDE8D8; text-align: left;">항목</th>
+      <th style="color: #EDE8D8; text-align: right;">금액</th>
+      <th style="color: #EDE8D8; text-align: left;">비고</th>
+    </tr>
+    <tr style="border-color: #3A3C40;">
+      <td style="color: #B8B0A0;">순자산 현재</td>
+      <td style="color: #EDE8D8; text-align: right;">3.28억원</td>
+      <td style="color: #8A8272;">주택 7억 - 부채 4억 + 현금 2,800만</td>
+    </tr>
+    <tr style="background-color: #0D0B08; border-color: #3A3C40;">
+      <td style="color: #B8B0A0;">월 자동투자</td>
+      <td style="color: #EDE8D8; text-align: right;">300만원</td>
+      <td style="color: #8A8272;">월급의 30% 기준</td>
+    </tr>
+    <tr style="border-color: #3A3C40;">
+      <td style="color: #B8B0A0;">월 생활비</td>
+      <td style="color: #EDE8D8; text-align: right;">300만원</td>
+      <td style="color: #8A8272;">월급의 50%</td>
+    </tr>
+    <tr style="background-color: #0D0B08; border-color: #3A3C40;">
+      <td style="color: #B8B0A0;">월 저축</td>
+      <td style="color: #EDE8D8; text-align: right;">120만원</td>
+      <td style="color: #8A8272;">월급의 20%</td>
+    </tr>
+  </table>
+  
+  <h4 style="color: #B8B0A0; margin: 15px 0 10px;">3년 후 시나리오</h4>
+  <table border="1" cellpadding="10" style="border-collapse: collapse; width: 100%; background-color: #1A1C20; border-color: #3A3C40;">
+    <tr style="background-color: #2A2C30;">
+      <th style="color: #EDE8D8;">연도</th>
+      <th style="color: #EDE8D8;">자동투자 누적</th>
+      <th style="color: #EDE8D8;">투자 수익률</th>
+      <th style="color: #EDE8D8;">순자산 추정</th>
+    </tr>
+    <tr style="border-color: #3A3C40;">
+      <td style="color: #B8B0A0;">현재</td>
+      <td style="color: #EDE8D8;">0원</td>
+      <td style="color: #EDE8D8;">-</td>
+      <td style="color: #4AAF6A;">3.28억</td>
+    </tr>
+    <tr style="background-color: #0D0B08; border-color: #3A3C40;">
+      <td style="color: #B8B0A0;">1년 후</td>
+      <td style="color: #EDE8D8;">3,600만</td>
+      <td style="color: #EDE8D8;">+5%</td>
+      <td style="color: #4AAF6A;">3.60억</td>
+    </tr>
+    <tr style="border-color: #3A3C40;">
+      <td style="color: #B8B0A0;">2년 후</td>
+      <td style="color: #EDE8D8;">7,200만</td>
+      <td style="color: #EDE8D8;">+8%</td>
+      <td style="color: #4AAF6A;">3.88억</td>
+    </tr>
+    <tr style="background-color: #0D0B08; border-color: #3A3C40;">
+      <td style="color: #B8B0A0;">3년 후</td>
+      <td style="color: #EDE8D8;">10,800만</td>
+      <td style="color: #EDE8D8;">+10%</td>
+      <td style="color: #4AAF6A;">4.16억</td>
+    </tr>
+  </table>
+  
+  <p style="color: #8A8272; margin-top: 15px; font-size: 12px;"><strong>주의:</strong> 투자 수익률은 시나리오이며 실제 수익률은 시장 변동에 따라 다릅니다. 평균 연 7% 가정 시뮬레이션.</p>
 </div>
 
 </section>
 
+
+<!-- 아하 모먼트 -->
+<section class="section fade-up">
+  <div class="section-label">💡 AHA MOMENT</div>
+  <h2 class="section-title">자동화의 역설적 효율성</h2>
+  <div style="background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(191,74,74,0.08));border:2px solid var(--gold);border-radius:12px;padding:2rem;margin:1.5rem 0;text-align:center;">
+    <p style="font-size:1.1rem;color:var(--gold);font-weight:600;margin-bottom:1.5rem;font-family:var(--font-display);">매달 30분 투자관리 vs 매일 1시간 뉴스 확인 → 30분이 10년 뒤 수익 2배</p>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;margin:1.5rem 0;">
+      <div style="background:rgba(191,74,74,0.15);border:1px solid var(--red);border-radius:8px;padding:1.2rem;">
+        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--red);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">감정적 매매</div>
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--red);">연 5% 수익률</div>
+      </div>
+      <div style="font-size:2rem;color:var(--gold);">→</div>
+      <div style="background:rgba(74,191,122,0.15);border:1px solid var(--green);border-radius:8px;padding:1.2rem;">
+        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--green);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">자동화 시스템</div>
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--green);">연 9% 수익률</div>
+      </div>
+    </div>
+    <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8;margin-top:1rem;text-align:left;">시간 투입 1/60 감소하면서 수익률 1.8배 증가. 핵심은 감정적 개입 제거와 규칙 기반 실행. 자동화를 통해 시간뿐 아니라 심리적 에너지도 절약 → 장기 성과 극대화.</p>
+  </div>
+</section>
+<!-- 감정 온도계 -->
+<section class="section fade-up">
+  <div class="section-label">🌡️ EMOTION CHECK</div>
+  <h2 class="section-title">지금 내 감정 체크</h2>
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1.2rem;">자동화 설정을 앞두고 '내가 안 보면 큰일 날 것 같다'는 불안감이 생기나요? 이는 통제 욕구(도파민 중독)와 자아 보호(전전두엽 저항감)의 신호입니다.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.8rem;">
+      <div style="padding:1rem;background:rgba(191,74,74,0.08);border:1px solid rgba(191,74,74,0.3);border-radius:6px;cursor:pointer;" onclick="this.style.borderColor='var(--red)';this.style.borderWidth='2px';">
+        <div style="font-size:1.2rem;margin-bottom:0.3rem;">😰 불안</div>
+        <p style="font-size:0.75rem;color:var(--text-dim);line-height:1.5;"><span class="neuro-tag">편도체</span> 손실 신호 감지 중. 정상 반응입니다.</p>
+      </div>
+      <div style="padding:1rem;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:6px;cursor:pointer;" onclick="this.style.borderColor='var(--gold)';this.style.borderWidth='2px';">
+        <div style="font-size:1.2rem;margin-bottom:0.3rem;">😤 저항감</div>
+        <p style="font-size:0.75rem;color:var(--text-dim);line-height:1.5;"><span class="neuro-tag">전전두엽</span> 기존 믿음 방어 중. 변화의 신호입니다.</p>
+      </div>
+      <div style="padding:1rem;background:rgba(74,191,122,0.08);border:1px solid rgba(74,191,122,0.3);border-radius:6px;cursor:pointer;" onclick="this.style.borderColor='var(--green)';this.style.borderWidth='2px';">
+        <div style="font-size:1.2rem;margin-bottom:0.3rem;">🤔 호기심</div>
+        <p style="font-size:0.75rem;color:var(--text-dim);line-height:1.5;"><span class="neuro-tag">도파민</span> 학습 모드 활성화! 최적 상태입니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- 실패 케이스 -->
+<section class="section fade-up">
+  <div class="section-label">📉 FAILURE CASE</div>
+  <h2 class="section-title">자동화 해제 비극 — I씨의 후회</h2>
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <div style="border-left:3px solid var(--red);padding-left:1rem;margin-bottom:1.2rem;">
+      <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.9;font-style:italic;">I씨는 자동적립 월 100만원을 설정했습니다. 설정 2달 후 시장이 -15% 하락했고, '손해 보고 있다!'는 불안감에 자동화를 해제했습니다.</p>
+    </div>
+    <div style="padding:1rem;background:rgba(201,168,76,0.06);border:1px solid var(--gold-dim);border-radius:6px;">
+      <p style="font-size:0.82rem;color:var(--gold);font-weight:500;margin-bottom:0.5rem;">💡 교훈</p>
+      <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8;">하락기는 자동화의 가장 큰 시험입니다. 같은 금액으로 저가 매입하는 '달러코스트 애버리징'의 효과를 최대한 받을 때입니다. 감정이 신호가 되지 않도록, 자동화 설정 시 '6개월 이상 건드리지 않겠다'는 서약을 자신에게 하세요.</p>
+      <p style="font-size:0.78rem;color:var(--text-dim);margin-top:0.8rem;font-family:var(--font-mono);">해제 후 6개월간 시장 반등(+40%) → 놓친 수익 400만원. 만약 유지했다면 하락기 매입으로 더 큰 수익</p>
+    </div>
+  </div>
+</section>
+<!-- 엔지니어 시스템 비유 -->
+<section class="section fade-up">
+  <div class="section-label">🔧 ENGINEER'S PERSPECTIVE</div>
+  <h2 class="section-title">엔지니어 시스템 사고</h2>
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <h3 style="font-family:var(--font-body);font-size:0.95rem;font-weight:500;color:var(--gold);margin-bottom:1rem;"><span class="engineer-tag">엔지니어 사고법</span> 자동화 = 크루즈 컨트롤 (Cruise Control)</h3>
+    <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.9;margin-bottom:1rem;">수동 운전(감정적 매매)은 매번 속도를 확인하고 가속·감속을 반복합니다. 에너지 소모(연비)가 높고 피로가 축적됩니다. 크루즈 컨트롤(자동화)은 설정 속도 유지, 일정한 연비 효율. 투자도 같은 원리입니다. 매달 같은 금액, 같은 날, 같은 상품으로 감정 개입을 차단하는 것이 '연비(수익률) 최적화'입니다.</p>
+    <div class="formula-block">
+<div style='font-family:var(--font-mono);font-size:0.85rem;line-height:2;color:var(--text-secondary);'><div>【수동 운전(감정적)】: 기름 소비(↑) + 운전자 피로(↑) = 효율성(↓)</div><div>【크루즈 컨트롤(자동화)】: 기름 소비(↓) + 운전자 피로(↓) = 효율성(↑)</div><div style='margin-top:0.8rem;color:var(--gold);'>자동화 = 감정적 개입 제거 = 심리적 에너지 절약 = 장기 성과↑</div></div>
+    </div>
+  </div>
+</section>
+<!-- 액션 체크리스트 -->
+<section class="section fade-up">
+  <div class="section-label">🎯 THIS WEEK'S ACTION</div>
+  <h2 class="section-title">이번 주 실행 아이템</h2>
+  <div style="background:linear-gradient(135deg,rgba(74,191,122,0.06),rgba(201,168,76,0.06));border:1px solid var(--green);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <ul class="checklist"><li>자동이체 계좌 설정 (급여 수령일 기준, 3일 후 자동이체) <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(10분)</span></li><li>펀드/ETF 자동배분 설정 (월 100만 → 주식 60%, 채권 40%) <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(10분)</span></li><li>재정 자동화 달력 만들기 (분기별 리밸런싱 날짜 기록) <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(5분)</span></li><li>감정 트리거 대응 계획 (시장 -15% 시 '자동화 유지' 다짐) <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(5분)</span></li></ul>
+    <div style="display:flex;justify-content:space-between;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);">
+      <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">⏱ 예상 소요: 30분</span>
+      <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--green);">📈 10년 예상 효과: 연 0.5~2% 추가 수익률</span>
+    </div>
+  </div>
+</section>
+<!-- 위기 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">⚠️ CRISIS SIMULATION</div>
+  <h2 class="section-title">인생 첫 하락장 경험 — 2026년 예상 조정장 대비</h2>
+  <div style="background:linear-gradient(135deg,rgba(191,74,74,0.08),rgba(10,12,16,0.9));border:1px solid var(--red);border-left:3px solid var(--red);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <p style="font-size:0.95rem;color:var(--red);font-weight:500;margin-bottom:1rem;">🚨 시나리오: 전문가 예측: 2026년 상반기 10~20% 조정장 발생 가능성</p>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th style="text-align:left;">자산</th><th>현재</th><th>위기 후</th><th>변동</th></tr></thead>
+        <tbody><tr>
+          <td style="font-weight:500;">포트폴리오(기준 5,000만)</td>
+          <td style="text-align:right;">5,000만</td>
+          <td style="text-align:right;color:var(--red);font-weight:600;">4,250만</td>
+          <td style="text-align:right;color:var(--red);">-750만(-15%)</td>
+        </tr><tr>
+          <td style="font-weight:500;">월 자동이체 100만</td>
+          <td style="text-align:right;">5,000만당 가격</td>
+          <td style="text-align:right;color:var(--green);font-weight:600;">4,250만당 가격</td>
+          <td style="text-align:right;color:var(--green);">같은 돈으로 +17.6% 주식 매수</td>
+        </tr><tr>
+          <td style="font-weight:500;">심리 상태</td>
+          <td style="text-align:right;">안정감</td>
+          <td style="text-align:right;color:var(--red);font-weight:600;">불안감</td>
+          <td style="text-align:right;color:var(--red);">극심한 공포 신호</td>
+        </tr></tbody>
+      </table>
+    </div>
+    <div style="margin-top:1.5rem;padding:1rem;background:rgba(74,191,122,0.06);border:1px solid rgba(74,191,122,0.3);border-radius:6px;">
+      <p style="font-size:0.85rem;color:var(--green);font-weight:500;margin-bottom:0.8rem;">✅ 대응 전략</p>
+      <ul style="list-style:none;margin:0;padding:0;"><li style="padding:0.6rem 0;border-bottom:1px solid rgba(42,45,54,0.3);"><strong style="color:var(--gold);">Step 1.</strong> 조정장 진입 전에 '6개월 자동화 비건드 서약' 사전 작성</li><li style="padding:0.6rem 0;border-bottom:1px solid rgba(42,45,54,0.3);"><strong style="color:var(--gold);">Step 2.</strong> 매월 자동이체는 유지 → 저가 매입 기회로 인식 전환</li><li style="padding:0.6rem 0;border-bottom:1px solid rgba(42,45,54,0.3);"><strong style="color:var(--gold);">Step 3.</strong> 뉴스/커뮤니티 접근 최소화 (심리 과잉자극 방지)</li><li style="padding:0.6rem 0;border-bottom:1px solid rgba(42,45,54,0.3);"><strong style="color:var(--gold);">Step 4.</strong> 분기별 리밸런싱만 실행 (월별 점검 금지)</li><li style="padding:0.6rem 0;border-bottom:1px solid rgba(42,45,54,0.3);"><strong style="color:var(--gold);">Step 5.</strong> 신뢰할 수 있는 동료와 '버디 시스템' 구성 (감정 공유 및 확인)</li></ul>
+    </div>
+  </div>
+</section>
 <!-- 투자 심리 -->
 <section class="section fade-up">
   <div class="section-label">INVESTOR PSYCHOLOGY</div>
@@ -562,21 +1873,18 @@ ISA 2,000만 → 연금저축 50만 → 주식 매수 300만</p>
   <div class="psych-box">
     <h3>행동재무학 편향</h3>
     
-<div class="bias-name">의지력 고갈 (Ego Depletion)</div>
-<p>매일 투자·저축·지출 결정을 하면 뇌의 전전두엽이 피로해져,
-저녁에는 충동 구매를 하게 됩니다. (예: 아이들 학용품 중복 구매, 외식비 초과)</p>
+<h4 style="color: #EDE8D8; margin: 20px 0 10px;">심리학: Ego Depletion과 자동화</h4>
+<p style="color: #B8B0A0; margin: 10px 0;">매월 투자 여부를 '고민'하는 것은 자기통제 자원(self-control resources)을 소모합니다. 이를 <strong>Ego Depletion</strong>이라 하며, 의사결정 능력이 저하됩니다.</p>
 
-<div style="margin-top:1rem;padding:0.8rem;background:rgba(201,168,76,0.08);border-left:2px solid var(--gold);">
-  <strong>금색 조언 (심리적 자유):</strong><br>
-  의사결정을 '월 1회 30분'으로 집중하면 신경 에너지가 절약됩니다.<br>
-  자동이체로 투자·저축을 '의식 밖'으로 밀어내세요. 뇌가 편합니다.
+<div style="background-color: #1A1C20; padding: 12px; border-left: 4px solid #3D9E6E; margin: 15px 0;">
+  <p><strong style="color: #3D9E6E;">neuroscience-tag:</strong> 배외측 전전두피질(dlPFC, Dorsolateral Prefrontal Cortex)이 자기통제를 담당하며, 이 부위의 글루코스 고갈 → Ego Depletion 발생</p>
 </div>
 
-<div style="margin-top:0.8rem;padding:0.8rem;background:rgba(74,158,191,0.08);border-left:2px solid var(--blue);">
-  <strong>파란색 조언 (데이터 기반):</strong><br>
-  자동이체 가입 후 3개월은 '적응 기간'입니다.<br>
-  의지력이 필요 없으면, 자동으로 신습관이 형성됩니다.
+<div style="background-color: #1A1C20; padding: 12px; border-left: 4px solid #D4A843; margin: 15px 0;">
+  <p><strong style="color: #D4A843;">engineer-tag:</strong> 자동화는 '의사결정 트리'에서 반복적 가지(recursive branch)를 제거하는 알고리즘 최적화와 동일. 연산량 감소 → 처리 속도 향상</p>
 </div>
+
+<p style="color: #B8B0A0; margin: 15px 0;"><strong>해결책:</strong> 자동화로 매월 의사결정 에너지를 0으로 만들면, 그 에너지를 '더 중요한 결정'(경력 선택, 부동산 투자, 가족 계획)에 사용할 수 있습니다.</p>
 
   </div>
 </section>
@@ -587,22 +1895,49 @@ ISA 2,000만 → 연금저축 50만 → 주식 매수 300만</p>
   <h2 class="section-title">복습 퀴즈</h2>
   <div class="quiz-section">
     <div class="quiz-q" id="q1">
-      <h4>Q1. 월 급여 급여를 자동화했을 때 정확한 배분은?</h4>
-      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① ISA 2,000만 + 투자 300만 + 저축 300만 + 생활비 1,600만</li>
-<li onclick="checkAnswer(this,'q1',true)">② ISA 2,000만 + 연금저축 50만 + 저축 300만 + 생활비 1,850만</li>
-<li onclick="checkAnswer(this,'q1',false)">③ ISA 1,500만 + 투자 500만 + 저축 400만 + 생활비 1,800만</li>
-<li onclick="checkAnswer(this,'q1',false)">④ 투자 1,500만 + 저축 500만 + 생활비 2,200만</li>
+      <h4>Q1. 다음 중 의사결정 피로(Decision Fatigue)를 가장 효과적으로 제거하는 자동화 방식은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 매월 투자 여부를 신중하게 고민한 후 결정</li>
+<li onclick="checkAnswer(this,'q1',true)">② 미리 설정한 규칙에 따라 감정 개입 없이 자동 실행</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 분기별 1회만 투자 계획을 세우기</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 전문가 상담 후 맞춤형 투자 결정</li>
 </ul>
-      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>올바른 배분: ISA 2,000만 → 연금저축 50만 → 긴급자금 200만 → 교육기금 100만 = 2,350만, 생활비 잔액 1,850만원</div>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>의사결정 피로는 반복적인 '고민' 자체로부터 발생합니다. 자동화는 이 고민의 단계를 완전히 제거하여 전전두엽의 에너지를 절약합니다. 신경과학적으로, 의사결정 중추의 에너지(글루코스)는 하루에 한정되어 있습니다.</div>
     </div>
     <div class="quiz-q" id="q2">
-      <h4>Q2. 월 재정 리뷰 루틴이 필요한 이유는?</h4>
-      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 매일매일 투자 결정을 하기 위해</li>
-<li onclick="checkAnswer(this,'q2',true)">② 자동이체 설정 후 미세 조정 및 지출 추이 파악</li>
-<li onclick="checkAnswer(this,'q2',false)">③ 자동이체를 완전히 폐지하기 위해</li>
-<li onclick="checkAnswer(this,'q2',false)">④ 세금 계산을 위해</li>
+      <h4>Q2. 월급 자동분배에서 권장 비율은 '생활비 50%, 저축 20%, 투자 30%'입니다. 이 비율의 장점은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 세 항목이 모두 같은 중요도이기 때문</li>
+<li onclick="checkAnswer(this,'q2',false)">② 투자 비중이 가장 크기 때문</li>
+<li onclick="checkAnswer(this,'q2',true)">③ 생활비 안정성 + 긴급자금 확보 + 자산 증식의 균형</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 정부에서 공식 권장하는 비율이기 때문</li>
 </ul>
-      <div class="quiz-answer" id="q2-answer"><strong>정답: ②</strong><br>자동이체는 큰 방향만 정하고, 월 1회 검토로 예상 외 지출, 계절 변화, 목표 진도를 확인하고 미세 조정합니다.</div>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ③</strong><br>이 배분은 maslow의 욕구 위계를 반영합니다: 생활비(생리적 욕구) 확보 → 저축(안정 욕구) 충족 → 투자(자아실현) 추구. 동시에 인적 자본 손실 시 3-6개월 생활 가능한 긴급자금도 확보합니다.</div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. 자동화 설정 후 습관화(습관 회로 형성)까지 걸리는 평균 기간은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 1-2주</li>
+<li onclick="checkAnswer(this,'q3',false)">② 2-4주</li>
+<li onclick="checkAnswer(this,'q3',true)">③ 약 3개월 (정확히는 66일)</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 6개월 이상</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ③</strong><br>신경과학 연구에 따르면, 반복적 행동은 뇌의 기저핵에 습관 회로를 형성하는데 약 66일(약 3개월) 소요됩니다. 초기 1-2주는 의식적 노력이 필요하지만, 3개월 후엔 거의 무의식적으로 실행됩니다.</div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. 자동화의 심리적 함정 '구조적 망각(Status Quo Bias)'의 위험은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① 자동화가 제대로 작동하지 않을까봐 자꾸 확인하게 됨</li>
+<li onclick="checkAnswer(this,'q4',true)">② 자동화 설정 후 변화하는 시장/생활 상황에 대응하지 못함</li>
+<li onclick="checkAnswer(this,'q4',false)">③ 자동화로 인해 실제로 투자 손실이 발생함</li>
+<li onclick="checkAnswer(this,'q4',false)">④ 자동화 수수료가 점점 증가하게 됨</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ②</strong><br>자동화가 '잘 작동'하면 오히려 위험합니다. 금리 인상, 결혼/출산 등 라이프스테이지 변화, 시장 패러다임 전환 등에 미대응할 수 있습니다. 월별 30분 검토는 이 함정을 피하는 필수 장치입니다.</div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. 다음 중 효과적인 자동화 구현 순서는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',false)">① 투자 계좌 개설 → 자동 매수 설정 → 계좌 구조 설계</li>
+<li onclick="checkAnswer(this,'q5',true)">② 계좌 구조 설계 → 자동이체 설정 → 정기정액매매 설정</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 정기정액매매 설정 → 저축 계좌 개설 → 자동이체 설정</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 은행/증권사 상담 → 투자 결정 → 자동화 설정</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ②</strong><br>자동화는 체계적으로 설계해야 효과적입니다. 먼저 '어떤 계좌 구조가 필요한가'를 설계한 후, 계좌 간 자동이체를 설정하고, 마지막으로 증권사의 정기정액매매를 설정합니다. 역순으로 하면 계좌 간 중복이나 누락 발생 가능.</div>
     </div></div>
 </section>
 
@@ -620,7 +1955,7 @@ ISA 2,000만 → 연금저축 50만 → 주식 매수 300만</p>
   </div>
 </section>
 
-<nav class="nav-footer">
+<nav class="nav-footer" role="navigation" aria-label="강의 탐색">
   <a class="nav-btn" href="day21_financial_income_tax.html">← Day 21</a>
   <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 22 / 23</span>
   <a class="nav-btn" href="day23_final_roadmap.html">Day 23 →</a>
@@ -631,12 +1966,15 @@ ISA 2,000만 → 연금저축 50만 → 주식 매수 300만</p>
   본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
   모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
   수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
-  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 El Dorado 투자 원정대 · 교육 목적 Only</span>
 </div>
 
 </div>
 
-<script>
+<!-- Gold Particle System -->
+<canvas id="goldParticles" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.6;"></canvas>
+<script defer>
+
 /* ═══ POMODORO TIMER ═══ */
 let timerRunning=false, timerSeconds=25*60, timerInterval=null;
 function toggleTimer() {
@@ -650,8 +1988,8 @@ function toggleTimer() {
       if (timerSeconds <= 0) {
         clearInterval(timerInterval);
         b.textContent = '✓ 완료!';
-        b.style.borderColor = '#4ABF7A';
-        b.style.color = '#4ABF7A';
+        b.style.borderColor = '#4AAF6A';
+        b.style.color = '#4AAF6A';
         timerRunning = false;
       }
     }, 1000);
@@ -684,6 +2022,507 @@ const fadeObserver = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+
+
+(function(){
+  const c=document.getElementById('goldParticles');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  let W,H;
+  const particles=[];
+  const N=window.innerWidth<480?12:window.innerWidth<768?20:35;
+
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+
+  class P{
+    constructor(){this.reset();}
+    reset(){
+      this.x=Math.random()*W;
+      this.y=Math.random()*H;
+      this.r=Math.random()*1.8+0.3;
+      this.vx=(Math.random()-0.5)*0.15;
+      this.vy=-Math.random()*0.3-0.05;
+      this.alpha=Math.random()*0.4+0.1;
+      this.fade=Math.random()*0.003+0.001;
+      this.phase=Math.random()*Math.PI*2;
+    }
+    update(){
+      this.x+=this.vx+Math.sin(this.phase)*0.1;
+      this.y+=this.vy;
+      this.phase+=0.01;
+      this.alpha-=this.fade;
+      if(this.alpha<=0||this.y<-10)this.reset();
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(212,168,67,${this.alpha})`;
+      ctx.fill();
+      if(this.r>1){
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.r*2,0,Math.PI*2);
+        ctx.fillStyle=`rgba(212,168,67,${this.alpha*0.15})`;
+        ctx.fill();
+      }
+    }
+  }
+
+  for(let i=0;i<N;i++)particles.push(new P());
+
+  let scrollY=0;
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY;},{passive:true});
+
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of particles){
+      p.y+=scrollY*0.0005;
+      p.update();
+      p.draw();
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+
+(function(){
+  /* ─── 1. Card Gold Light Trail ─── */
+  document.querySelectorAll('.concept-card').forEach(card => {
+    if(card.querySelector('.card-glow')) return;
+    const glow = document.createElement('div');
+    glow.className = 'card-glow';
+    card.appendChild(glow);
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      glow.style.left = (e.clientX - r.left) + 'px';
+      glow.style.top = (e.clientY - r.top) + 'px';
+    });
+  });
+
+  /* ─── 2. Quiz Correct Answer Particle Burst ─── */
+  function createBurst(container, x, y) {
+    let canvas = container.querySelector('.quiz-burst-canvas');
+    if (!canvas) {
+      canvas = document.createElement('canvas');
+      canvas.className = 'quiz-burst-canvas';
+      container.style.position = 'relative';
+      container.appendChild(canvas);
+    }
+    canvas.width = container.offsetWidth;
+    canvas.height = container.offsetHeight;
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const colors = ['#D4A843','#E8C65A','#C4793D','#3D9E6E','#EDE8D8'];
+    for (let i = 0; i < 40; i++) {
+      const angle = (Math.PI * 2 * i) / 40 + (Math.random() - 0.5) * 0.5;
+      const speed = 2 + Math.random() * 4;
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        r: Math.random() * 2.5 + 1,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 1,
+        decay: 0.015 + Math.random() * 0.01,
+        gravity: 0.06
+      });
+    }
+    let frame = 0;
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.vx *= 0.98;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) continue;
+        alive = true;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+        // glow
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha * 0.15;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      frame++;
+      if (alive && frame < 120) requestAnimationFrame(animate);
+      else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    }
+    animate();
+  }
+
+  // Enhance quiz click handler
+  document.querySelectorAll('.quiz-options li').forEach(li => {
+    const origClick = li.onclick;
+    li.addEventListener('click', function(e) {
+      setTimeout(() => {
+        if (li.classList.contains('correct')) {
+          const section = li.closest('.quiz-section');
+          if (section) {
+            const rect = li.getBoundingClientRect();
+            const sRect = section.getBoundingClientRect();
+            createBurst(section, rect.left - sRect.left + rect.width / 2, rect.top - sRect.top + rect.height / 2);
+          }
+        }
+      }, 50);
+    });
+  });
+
+  /* ─── 3. Scroll Compass Widget ─── */
+  if (!document.querySelector('.scroll-compass')) {
+    const compass = document.createElement('div');
+    compass.className = 'scroll-compass';
+    compass.innerHTML = `<svg viewBox="0 0 56 56">
+      <circle cx="28" cy="28" r="26" fill="rgba(13,11,8,0.9)" stroke="#D4A843" stroke-width="1.5"/>
+      <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(212,168,67,0.15)" stroke-width="1"/>
+      <!-- tick marks -->
+      <line x1="28" y1="4" x2="28" y2="8" stroke="#D4A843" stroke-width="1.5"/>
+      <line x1="28" y1="48" x2="28" y2="52" stroke="#8A8272" stroke-width="1"/>
+      <line x1="4" y1="28" x2="8" y2="28" stroke="#8A8272" stroke-width="1"/>
+      <line x1="48" y1="28" x2="52" y2="28" stroke="#8A8272" stroke-width="1"/>
+      <!-- needle (rotates via JS) -->
+      <g id="compassNeedle" style="transform-origin:28px 28px;">
+        <polygon points="28,8 25,28 28,26 31,28" fill="#D4A843"/>
+        <polygon points="28,48 25,28 28,30 31,28" fill="#C45A4A" opacity="0.6"/>
+      </g>
+      <!-- center -->
+      <circle cx="28" cy="28" r="3" fill="#D4A843"/>
+      <!-- progress arc -->
+      <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(212,168,67,0.1)" stroke-width="3"
+              stroke-dasharray="150.8" stroke-dashoffset="150.8"
+              id="compassProgress" transform="rotate(-90 28 28)"
+              stroke-linecap="round"/>
+      <!-- percentage text -->
+      <text x="28" y="43" text-anchor="middle" fill="#8A8272" font-family="JetBrains Mono,monospace" font-size="5.5" id="compassPct">0%</text>
+    </svg>`;
+    compass.title = 'Click to scroll to top';
+    compass.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+    document.body.appendChild(compass);
+
+    const needle = document.getElementById('compassNeedle');
+    const progressArc = document.getElementById('compassProgress');
+    const pctText = document.getElementById('compassPct');
+    const circumference = 150.8;
+
+    function updateCompass() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0;
+
+      // Show/hide
+      compass.classList.toggle('visible', scrollTop > 200);
+
+      // Rotate needle based on scroll (full rotation = full scroll)
+      const rotation = progress * 360;
+      if(needle) needle.style.transform = `rotate(${rotation}deg)`;
+
+      // Progress arc
+      if(progressArc) {
+        const offset = circumference - (progress * circumference);
+        progressArc.setAttribute('stroke-dashoffset', offset);
+        progressArc.setAttribute('stroke', progress > 0.8 ? '#4AAF6A' : '#D4A843');
+      }
+
+      // Percentage text
+      if(pctText) pctText.textContent = Math.round(progress * 100) + '%';
+    }
+
+    window.addEventListener('scroll', updateCompass, {passive: true});
+    updateCompass();
+  }
+
+  /* ─── 4. Section Reveal Gold Flash ─── */
+  document.querySelectorAll('.section').forEach(section => {
+    if(section.querySelector('.section-flash')) return;
+    section.style.position = 'relative';
+    const flash = document.createElement('div');
+    flash.className = 'section-flash';
+    section.prepend(flash);
+  });
+
+  const flashObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) {
+        entry.target.classList.add('flash-active');
+        setTimeout(() => entry.target.classList.remove('flash-active'), 800);
+        flashObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.2});
+
+  document.querySelectorAll('.section').forEach(s => flashObserver.observe(s));
+
+  /* ─── 5. Checklist Celebration ─── */
+  document.querySelectorAll('.checklist li').forEach(li => {
+    li.addEventListener('click', function() {
+      if(this.classList.contains('checked')) {
+        this.classList.add('just-checked');
+        setTimeout(() => this.classList.remove('just-checked'), 600);
+      }
+    });
+  });
+
+  /* ─── 6. Timer Button Active State ─── */
+  const timerBtn = document.getElementById('timerBtn');
+  if(timerBtn) {
+    const origToggle = window.toggleTimer;
+    if(origToggle) {
+      window.toggleTimer = function() {
+        origToggle();
+        timerBtn.classList.toggle('active');
+      };
+    }
+  }
+
+})();
+
+
+(function(){
+  /* ─── 1. Particle Performance Auto-Scaling ─── */
+  const canvas = document.getElementById('goldParticles');
+  if(canvas){
+    const isMobile = window.innerWidth < 768;
+    const isLowEnd = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if(prefersReduced){
+      canvas.style.display = 'none';
+    } else if(isMobile || isLowEnd){
+      // Reduce particle opacity and hide on very small screens
+      canvas.style.opacity = isMobile ? '0.3' : '0.4';
+      if(window.innerWidth < 400) canvas.style.display = 'none';
+    }
+
+    // Battery API: disable particles on low battery
+    if('getBattery' in navigator){
+      navigator.getBattery().then(batt => {
+        if(batt.level < 0.2 && !batt.charging){
+          canvas.style.display = 'none';
+        }
+        batt.addEventListener('levelchange', () => {
+          if(batt.level < 0.15 && !batt.charging) canvas.style.display = 'none';
+        });
+      }).catch(()=>{});
+    }
+
+    // Visibility: pause animation when tab is hidden
+    let rafId = null;
+    document.addEventListener('visibilitychange', () => {
+      if(document.hidden) {
+        canvas.style.display = 'none';
+      } else if(!prefersReduced && !(window.innerWidth < 400)){
+        canvas.style.display = '';
+      }
+    });
+  }
+
+  /* ─── 2. Illustration Lazy Load ─── */
+  const lazyObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const el = entry.target;
+        const svg = el.querySelector('svg');
+        if(svg) svg.style.opacity = '1';
+        el.classList.add('visible');
+        lazyObs.unobserve(el);
+      }
+    });
+  }, {rootMargin: '100px', threshold: 0.1});
+
+  document.querySelectorAll('.hero-illustration').forEach(ill => {
+    const svg = ill.querySelector('svg');
+    if(svg){
+      svg.style.opacity = '0';
+      svg.style.transition = 'opacity 0.8s ease-out';
+    }
+    lazyObs.observe(ill);
+  });
+
+  /* ─── 3. Touch Swipe Navigation ─── */
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+    touchStartTime = Date.now();
+  }, {passive: true});
+
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    const dy = e.changedTouches[0].screenY - touchStartY;
+    const dt = Date.now() - touchStartTime;
+
+    // Must be fast horizontal swipe (>80px, <300ms, mostly horizontal)
+    if(Math.abs(dx) > 80 && Math.abs(dx) > Math.abs(dy) * 2 && dt < 300){
+      const navBtns = document.querySelectorAll('.nav-btn:not(.disabled)');
+      if(dx > 0){
+        // Swipe right → prev
+        const prev = document.querySelector('.nav-btn[href*="day"]:first-of-type:not(.disabled)');
+        if(prev && prev.textContent.includes('Prev')) prev.click();
+      } else {
+        // Swipe left → next
+        const allBtns = Array.from(document.querySelectorAll('.nav-btn'));
+        const next = allBtns.find(b => b.textContent.includes('Next') && !b.classList.contains('disabled'));
+        if(next) next.click();
+      }
+    }
+  }, {passive: true});
+
+  /* ─── 4. Compass Touch Feedback ─── */
+  const compass = document.querySelector('.scroll-compass');
+  if(compass){
+    compass.addEventListener('touchstart', () => {
+      compass.style.transform = 'scale(0.9)';
+      compass.style.transition = 'transform 0.1s';
+    }, {passive: true});
+    compass.addEventListener('touchend', () => {
+      compass.style.transform = 'scale(1)';
+    }, {passive: true});
+  }
+
+  /* ─── 5. Viewport Height Fix for Mobile Browsers ─── */
+  function setVH(){
+    document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+  }
+  setVH();
+  window.addEventListener('resize', setVH);
+
+  /* ─── 6. Font Loading Optimization ─── */
+  if('fonts' in document){
+    document.fonts.ready.then(() => {
+      document.body.classList.add('fonts-loaded');
+    });
+  }
+
+  /* ─── 7. Smooth Scroll Polyfill for Older Safari ─── */
+  if(!('scrollBehavior' in document.documentElement.style)){
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if(target){
+          e.preventDefault();
+          target.scrollIntoView({behavior:'smooth',block:'start'});
+        }
+      });
+    });
+  }
+
+  /* ─── 8. Double-tap to top (mobile shortcut) ─── */
+  let lastTapTime = 0;
+  const header = document.querySelector('.sticky-header');
+  if(header){
+    header.addEventListener('touchend', () => {
+      const now = Date.now();
+      if(now - lastTapTime < 300){
+        window.scrollTo({top:0, behavior:'smooth'});
+      }
+      lastTapTime = now;
+    }, {passive: true});
+  }
+
+})();
+
+
+
+/* ═══ THEME TOGGLE LOGIC ═══ */
+(function(){
+  const toggle = document.getElementById('themeToggle');
+  if(!toggle) return;
+
+  // 1. Determine initial theme
+  function getPreferredTheme(){
+    const saved = localStorage.getItem('eldorado-theme');
+    if(saved) return saved;
+    // Respect system preference
+    if(window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
+    return 'dark';
+  }
+
+  function applyTheme(theme, animate){
+    const html = document.documentElement;
+    if(animate){
+      html.classList.add('theme-transitioning');
+      setTimeout(() => html.classList.remove('theme-transitioning'), 500);
+    }
+    if(theme === 'light'){
+      html.setAttribute('data-theme', 'light');
+      // Update meta theme-color
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.content = '#FAF6EE';
+    } else {
+      html.removeAttribute('data-theme');
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.content = '#0D0B08';
+    }
+    localStorage.setItem('eldorado-theme', theme);
+
+    // Update particle canvas colors if exists
+    updateParticleColors(theme);
+    // Update compass colors
+    updateCompassColors(theme);
+  }
+
+  function updateParticleColors(theme){
+    // Signal to particle system
+    window.__eldoradoTheme = theme;
+  }
+
+  function updateCompassColors(theme){
+    const compass = document.querySelector('.scroll-compass svg');
+    if(!compass) return;
+    const bgCircle = compass.querySelector('circle:first-of-type');
+    const texts = compass.querySelectorAll('text');
+    if(theme === 'light'){
+      if(bgCircle) bgCircle.setAttribute('fill', 'rgba(250,246,238,0.9)');
+      texts.forEach(t => {
+        if(t.getAttribute('fill') === '#8A8272' || t.getAttribute('fill') === 'var(--text-dim)')
+          t.setAttribute('fill', '#8A8070');
+      });
+    } else {
+      if(bgCircle) bgCircle.setAttribute('fill', 'rgba(13,11,8,0.85)');
+    }
+  }
+
+  // 2. Apply on load (no animation)
+  const initial = getPreferredTheme();
+  applyTheme(initial, false);
+
+  // 3. Toggle click
+  toggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    applyTheme(next, true);
+  });
+
+  // 4. Keyboard support
+  toggle.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      toggle.click();
+    }
+  });
+
+  // 5. Listen for system theme change
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+    if(!localStorage.getItem('eldorado-theme')){
+      applyTheme(e.matches ? 'light' : 'dark', true);
+    }
+  });
+})();
+/* ═══ END THEME TOGGLE ═══ */
+
 </script>
 </body>
 </html>
