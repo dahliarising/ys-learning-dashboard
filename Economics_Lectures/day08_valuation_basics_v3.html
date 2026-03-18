@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 08 | 기업 가치 평가 기초 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #B5B3AB;
+  --text-dim: #8A8880;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 08 / 23</span>
+    <span class="header-title">기업 가치 평가 기초</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 2 · 주식 투자 심화</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 2 — 주식 투자 심화</div>
+  <h1 class="hero-day">Day 08</h1>
+  <h2 class="hero-subtitle">기업 가치 평가 기초</h2>
+  <p class="hero-quote">"기업의 본질은 현금 흐름이다. 나머지는 모두 의견이다." — 벤자민 그레이엄</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 2: 08~14</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:34.8%"></div></div>
+    <div class="progress-label"><span>Day 08</span><span>8 / 23 완료 (34.8%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 기업 가치를 어떻게 평가할까?</h3>
+    <p>미래 현금흐름을 현재가치로 할인한 것이 '정당한 주가'입니다. 하지만 예측의 불확실성이 70~80%입니다. 따라서 충분한 안전마진을 요구해야 합니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">0–5분</td><td>DCF 가치평가의 3가지 핵심 가정</td><td>개념 도표</td></tr>
+<tr><td class="time-col">5–12분</td><td>P/E 배수의 한계와 PEG 활용</td><td>수치 비교</td></tr>
+<tr><td class="time-col">12–18분</td><td>현금흐름 vs 회계이익 적신호 찾기</td><td>재무제표 분석</td></tr>
+<tr><td class="time-col">18–22분</td><td>안전마진(Margin of Safety) 계산</td><td>시뮬레이션</td></tr>
+<tr><td class="time-col">22–25분</td><td>투자 의사결정: DCF + 상대평가</td><td>능동적 회상</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">기업 가치 평가 기초</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">DCF 모델의 3가지 핵심 가정</div>
+      <div class="card-body"><p>기업을 평가하는 가장 기본적인 방식은 DCF(Discounted Cash Flow)입니다. 미래 현금흐름을 할인한 현재가치가 '정당한 주가'입니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">DCF 가치평가 공식:</div>
+<div class="formula-line">기업가치 = Σ(FCF₍t₎ / (1+WACC)ᵗ) + 터미널 가치 / (1+WACC)ⁿ</div>
+<div class="formula-comment">// FCF = Free Cash Flow, WACC = 가중평균자본비용</div>
+<br>
+<div class="formula-highlight">3가지 핵심 가정:</div>
+<div class="formula-line">① 매출 성장률 가정 (3~10년): 5~15%</div>
+<div class="formula-line">② 순이익률 가정: 현재 대비 개선폭</div>
+<div class="formula-line">③ 터미널 가치 비율: 70~90% (불확실성 극대)</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">P/E 배수와 PEG — 성장률 포함 평가</div>
+      <div class="card-body"><p>P/E는 기업을 평가하는 가장 간단한 지표이지만, 성장률을 고려하지 않으면 오판합니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>회사</th><th>P/E</th><th>성장률</th><th>PEG</th><th>평가</th></tr></thead>
+<tbody>
+<tr><td>NVIDIA</td><td>20배</td><td>+40%</td><td>0.5</td><td><span style="color:var(--green);">저평가</span></td></tr>
+<tr><td>Apple</td><td>30배</td><td>+8%</td><td>3.75</td><td>정상</td></tr>
+<tr><td>삼성전자</td><td>12배</td><td>+3%</td><td>4.0</td><td><span style="color:var(--gold);">고평가</span></td></tr>
+</tbody>
+</table>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">현금흐름 vs 회계이익 — 진짜 수익성 판단</div>
+      <div class="card-body"><p>회계이익이 높아도 현금이 없으면 의미가 없습니다. 순이익 > 영업현금흐름은 위험신호입니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">삼성전자 2023년 사례:</div>
+<div class="formula-line">  순이익: 6조 3,000억원</div>
+<div class="formula-line">  영업현금흐름: 25조원 ← 훨씬 크다!</div>
+<div class="formula-line">  차이 = 감가상각(5조) + 재고 증감(5조)</div>
+<div class="formula-line"></div>
+<div class="formula-highlight">적신호 체크리스트:</div>
+<div class="formula-line">① 순이익 > 영업CF (2년 이상)</div>
+<div class="formula-line">② 외상 급증 (매출은 100%, 외상 200%)</div>
+<div class="formula-line">③ 재고 급증 (팔리지 않는 상품)</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">가치주 vs 성장주 — 평가 방법의 선택</div>
+      <div class="card-body"><p>기업의 특성에 따라 평가 방법이 완전히 달라집니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>항목</th><th>가치주</th><th>성장주</th></tr></thead>
+<tbody>
+<tr><td>예시</td><td>제약사, 은행</td><td>AI, 반도체</td></tr>
+<tr><td>성장률</td><td>2~5%</td><td>20~50%+</td></tr>
+<tr><td>배당금</td><td>3~5%</td><td>0%</td></tr>
+<tr><td>최적 평가법</td><td>DCF + 배당할인</td><td>상대평가 + PEG</td></tr>
+</tbody>
+</table>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">안전마침(Margin of Safety) — 그레이엄의 투자 원칙</div>
+      <div class="card-body"><p>모든 분석은 오류가 있습니다. 따라서 최악의 경우를 보호하는 여유를 두어야 합니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">벤저민 그레이엄의 원칙:</div>
+<div class="formula-line">정당 주가 = 1,000원 ± 40% = 600~1,400원</div>
+<div class="formula-line"></div>
+<div class="formula-line">구매 규칙:</div>
+<div class="formula-line">  = 최악가(600원) × 80% 할인</div>
+<div class="formula-line">  = 480원 이하에서만 매수</div>
+<div class="formula-line">  = 최악 시나리오에서도 20% 수익 보장</div>
+</div></div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  <div class="chart-container"><svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="400" fill="#12151C" />
+  <text x="450" y="30" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" text-anchor="middle" font-weight="600">DCF 가치평가 모델</text>
+  <line x1="100" y1="60" x2="100" y2="350" stroke="#C9A84C" stroke-width="2" />
+  <line x1="100" y1="350" x2="850" y2="350" stroke="#C9A84C" stroke-width="2" />
+  <!-- 현금흐름 바 -->
+  <rect x="120" y="310" width="30" height="40" fill="#4A9EBF" opacity="0.7" />
+  <rect x="160" y="280" width="30" height="70" fill="#4A9EBF" opacity="0.7" />
+  <rect x="200" y="240" width="30" height="110" fill="#4A9EBF" opacity="0.7" />
+  <rect x="300" y="170" width="30" height="180" fill="#4A9EBF" opacity="0.7" />
+  <!-- 터미널 가치 -->
+  <rect x="380" y="80" width="80" height="270" fill="#4ABF7A" opacity="0.6" />
+  <text x="420" y="220" font-family="var(--font-mono)" font-size="12" fill="#E8E6E1" text-anchor="middle">터미널</text>
+  <text x="420" y="330" font-family="var(--font-mono)" font-size="11" fill="#4ABF7A">12,000억</text>
+  <!-- 총 가치 -->
+  <rect x="550" y="120" width="300" height="150" fill="#1A1E2A" stroke="#C9A84C" stroke-width="2" rx="4" />
+  <text x="565" y="150" font-family="var(--font-body)" font-size="12" fill="#C9A84C" font-weight="600">기업 총 가치</text>
+  <text x="565" y="175" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" font-weight="600">약 2조 4,000억원</text>
+  <text x="565" y="205" font-family="var(--font-body)" font-size="10" fill="#B5B3AB">±40% 불확실성</text>
+  <text x="565" y="230" font-family="var(--font-body)" font-size="10" fill="#BF4A4A">70~90%는 터미널 가치</text>
+</svg></div><div class="chart-container"><svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="400" fill="#12151C" />
+  <text x="450" y="30" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" text-anchor="middle" font-weight="600">P/E 배수와 PEG 비교</text>
+  <line x1="100" y1="60" x2="100" y2="350" stroke="#C9A84C" stroke-width="2" />
+  <line x1="100" y1="350" x2="850" y2="350" stroke="#C9A84C" stroke-width="2" />
+  <!-- NVIDIA -->
+  <rect x="120" y="220" width="50" height="130" fill="#4A9EBF" opacity="0.7" />
+  <text x="145" y="360" font-family="var(--font-mono)" font-size="11" fill="#B5B3AB" text-anchor="middle">NVIDIA</text>
+  <text x="145" y="210" font-family="var(--font-mono)" font-size="10" fill="#4A9EBF">20배</text>
+  <!-- Apple -->
+  <rect x="200" y="100" width="50" height="250" fill="#4ABF7A" opacity="0.7" />
+  <text x="225" y="360" font-family="var(--font-mono)" font-size="11" fill="#B5B3AB" text-anchor="middle">Apple</text>
+  <text x="225" y="80" font-family="var(--font-mono)" font-size="10" fill="#4ABF7A">30배</text>
+  <!-- Samsung -->
+  <rect x="280" y="290" width="50" height="60" fill="#C9A84C" opacity="0.7" />
+  <text x="305" y="360" font-family="var(--font-mono)" font-size="11" fill="#B5B3AB" text-anchor="middle">Samsung</text>
+  <text x="305" y="280" font-family="var(--font-mono)" font-size="10" fill="#C9A84C">12배</text>
+  <!-- 정보박스 -->
+  <rect x="450" y="100" width="350" height="200" fill="#1A1E2A" stroke="#C9A84C" stroke-width="2" rx="4" />
+  <text x="465" y="125" font-family="var(--font-body)" font-size="11" fill="#C9A84C" font-weight="600">투자 해석</text>
+  <text x="465" y="155" font-family="var(--font-body)" font-size="10" fill="#4A9EBF" font-weight="600">● NVIDIA (PEG=0.5)</text>
+  <text x="475" y="173" font-family="var(--font-body)" font-size="9" fill="#B5B3AB">저평가 (40% 성장)</text>
+  <text x="465" y="200" font-family="var(--font-body)" font-size="10" fill="#4ABF7A" font-weight="600">● Apple (PEG=3.75)</text>
+  <text x="475" y="218" font-family="var(--font-body)" font-size="9" fill="#B5B3AB">정상 평가 (8% 성장)</text>
+  <text x="465" y="245" font-family="var(--font-body)" font-size="10" fill="#C9A84C" font-weight="600">● Samsung (PEG=4.0)</text>
+  <text x="475" y="263" font-family="var(--font-body)" font-size="9" fill="#B5B3AB">고평가 (3% 성장)</text>
+</svg></div><div class="chart-container"><svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="400" fill="#12151C" />
+  <text x="450" y="30" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" text-anchor="middle" font-weight="600">안전마침(MOS) — 그레이엄의 투자 원칙</text>
+  <!-- Ranges -->
+  <rect x="100" y="80" width="200" height="50" fill="#4ABF7A" opacity="0.3" stroke="#4ABF7A" stroke-width="2" />
+  <text x="200" y="105" font-family="var(--font-body)" font-size="11" fill="#4ABF7A" text-anchor="middle">낙관</text>
+  <text x="200" y="125" font-family="var(--font-mono)" font-size="11" fill="#4ABF7A" text-anchor="middle">+40% = 1,400원</text>
+  
+  <rect x="100" y="150" width="200" height="60" fill="#C9A84C" opacity="0.4" stroke="#C9A84C" stroke-width="2" />
+  <text x="200" y="175" font-family="var(--font-body)" font-size="11" fill="#C9A84C" text-anchor="middle">정당가</text>
+  <text x="200" y="200" font-family="var(--font-mono)" font-size="12" fill="#C9A84C" text-anchor="middle">1,000원</text>
+  
+  <rect x="100" y="230" width="200" height="50" fill="#BF4A4A" opacity="0.3" stroke="#BF4A4A" stroke-width="2" />
+  <text x="200" y="255" font-family="var(--font-body)" font-size="11" fill="#BF4A4A" text-anchor="middle">비관</text>
+  <text x="200" y="275" font-family="var(--font-mono)" font-size="11" fill="#BF4A4A" text-anchor="middle">-40% = 600원</text>
+  
+  <!-- Buy rule -->
+  <rect x="450" y="120" width="380" height="160" fill="#1A1E2A" stroke="#4ABF7A" stroke-width="2" rx="4" />
+  <text x="465" y="150" font-family="var(--font-body)" font-size="12" fill="#4ABF7A" font-weight="600">구매 규칙</text>
+  <text x="465" y="175" font-family="var(--font-body)" font-size="11" fill="#E8E6E1">최악가 × 80% 할인</text>
+  <text x="475" y="200" font-family="var(--font-mono)" font-size="12" fill="#4ABF7A" font-weight="600">= 600원 × 0.8</text>
+  <text x="475" y="225" font-family="var(--font-mono)" font-size="12" fill="#4ABF7A" font-weight="600">= 480원 이하 매수</text>
+  <text x="465" y="255" font-family="var(--font-body)" font-size="10" fill="#B5B3AB">최악 시나리오에서도 20% 수익 보장</text>
+</svg></div>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 1: DCF 분석의 '터미널 가치' 함정</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p>DCF 분석에서 70~90%의 기업 가치는 '10년 이후의 현금흐름'에서 나옵니다. 이것이 가장 위험한 부분입니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>문제:</strong> 10년 이상 미래의 현금흐름을 정확히 예측할 수 없습니다. 터미널 가치의 비중이 70% 이상이면 분석 신뢰도가 매우 낮습니다.</p>
+  </div>
+</details>
+
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 2: 현금흐름 조작 적신호</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p>기업들은 회계 규칙을 악용합니다. '순이익은 높지만 현금은 없는' 함정에 빠지지 않으려면 적신호를 알아야 합니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>적신호:</strong> ① 순이익 > 영업현금흐름 (2년 이상), ② 외상 급증, ③ 재고 급증, ④ 자본지출 급감</p>
+  </div>
+</details>
+
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 3: 가치 함정 — 저P/E가 저평가일까?</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p>P/E가 낮은 회사는 시장이 이미 미래 부진을 반영한 것입니다. P/E가 낮다고 무조건 저평가는 아닙니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>저평가 조건:</strong> 시장이 싫어하지만, 기본이 튼튼하고 (ROE 15%, 부채 50% 이하), 여전히 성장 중 (3~5%), 배당금 안정적</p>
+  </div>
+</details>
+
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 4: 엔지니어의 정확성 환상</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p><strong>뇌과학:</strong> 엔지니어는 정확한 수식을 좋아합니다. DCF도 수식이니 '정확하다'고 느낍니다. 하지만 입력값이 불확실하면 출력값도 불확실합니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>예방:</strong> DCF는 의견일 뿐 사실이 아닙니다. 항상 '범위'로 표현하고, 최악가의 30% 저렴한 가격에만 매수합니다.</p>
+  </div>
+</details>
+
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  <div style="background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06)); border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;"><h3 style="font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem;">📊 DCF 가치평가 시뮬레이터</h3><p style="font-size:0.9rem; color:var(--text-secondary);">기업의 순이익, 성장률, 순이익률을 입력하여 DCF 가치와 안전마침을 계산해봅시다.</p></div>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    **정확성의 환상 (Illusion of Accuracy)**: 엔지니어들은 정확한 수식을 좋아합니다. DCF도 수식이니 '정확하다'고 느낍니다. 하지만 입력값이 불확실하면 출력값도 불확실합니다. 항상 '결과는 범위'라고 생각해야 합니다.
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. DCF 가치평가에서 가장 큰 불확실성은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 연간 매출 성장률</li>
+<li onclick="checkAnswer(this,'q1',false)">② 순이익률</li>
+<li onclick="checkAnswer(this,'q1',true)">③ 10년 이후의 터미널 가치</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 금리(WACC)</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ③</strong><br>DCF의 70~90%는 10년 이후 현금흐름에서 나옵니다. 이는 극도로 불확실하므로 (±40~50%), 터미널 가치 비중이 높으면 분석 신뢰도가 낮습니다.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. P/E 배수만으로 저평가를 판단할 수 없는 이유는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① P/E는 시장 심리의 반영일 뿐</li>
+<li onclick="checkAnswer(this,'q2',false)">② 성장률이 다르면 같은 P/E도 의미가 다름</li>
+<li onclick="checkAnswer(this,'q2',false)">③ 회사마다 자본구조가 다름</li>
+<li onclick="checkAnswer(this,'q2',true)">④ ②와 ③이 모두 맞음</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ④</strong><br>P/E 12배 (3% 성장)와 P/E 20배 (40% 성장)를 비교할 수 없습니다. PEG = P/E ÷ 성장률을 사용해야 공정합니다.</div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. 현금흐름과 회계이익이 다른 가장 큰 이유는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 법인세 차이</li>
+<li onclick="checkAnswer(this,'q3',true)">② 감가상각 및 재고 변동</li>
+<li onclick="checkAnswer(this,'q3',false)">③ 배당금 지출</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 이자 비용</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ②</strong><br>감가상각은 현금 지출이 아닌 회계상 비용입니다. 재고 증감, 외상 증감도 현금흐름에 큰 영향을 줍니다.</div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. 그레이엄의 안전마침이 중요한 이유는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① DCF 정확성 향상</li>
+<li onclick="checkAnswer(this,'q4',true)">② 최악의 시나리오에서도 수익 보장</li>
+<li onclick="checkAnswer(this,'q4',false)">③ 배당금 극대화</li>
+<li onclick="checkAnswer(this,'q4',false)">④ 세금 감면</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ②</strong><br>모든 분석은 오류가 있습니다. 최악가 × 80% 할인으로 매수하면 최악 시나리오에서도 20% 수익이 보장됩니다.</div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. 순이익은 높지만 영업현금흐름이 낮다면?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',false)">① 효율적이다</li>
+<li onclick="checkAnswer(this,'q5',true)">② 이익 조작이나 외상 증가 위험신호</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 성장이 빠르다</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 배당금을 더 많이 받을 수 있다</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ②</strong><br>순이익 > 영업CF는 비정상입니다. 외상 급증, 재고 쌓임, 회계 조작 등의 위험신호입니다. 정상적인 회사는 순이익 < 영업CF입니다.</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 08</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 15일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 17일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 21일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">03월 28일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 13일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day07_part1_review.html">← Day 07</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 08 / 23</span>
+  <a class="nav-btn" href="day09_semiconductor_analysis.html">Day 09 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

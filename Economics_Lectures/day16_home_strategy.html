@@ -1,0 +1,2440 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<script>
+/* Prevent FOUC: apply saved theme before render */
+(function(){
+  var t = localStorage.getItem('eldorado-theme');
+  if(!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  if(t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+})();
+</script>
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Day 16 | 신전의 기초를 놓다 — El Dorado 투자 원정대</title>
+<meta name="theme-color" content="#0D0B08">
+<meta name="description" content="El Dorado 투자 원정대 Day 16 — 주거 전략을 수립하고 주택 관련 의사결정을 합니다.">
+<meta name="robots" content="noindex">
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>/* LIGHTHOUSE_OPTIMIZED */
+:root {
+  --bg-primary: #0D0B08;
+  --bg-card: #16130E;
+  --bg-card-hover: #1E1A13;
+  --bg-accent: #1A1610;
+  --bg-temple: #110E09;
+  --gold: #D4A843;
+  --gold-bright: #E8C65A;
+  --gold-dim: rgba(212,168,67,0.12);
+  --gold-glow: rgba(212,168,67,0.25);
+  --gold-radiant: rgba(232,198,90,0.4);
+  --emerald: #3D9E6E;
+  --emerald-dim: rgba(61,158,110,0.12);
+  --emerald-glow: rgba(61,158,110,0.25);
+  --amber: #C4793D;
+  --amber-dim: rgba(196,121,61,0.12);
+  --copper: #A0634A;
+  --text-primary: #EDE8D8;
+  --text-secondary: #B8B0A0;
+  --text-dim: #8A8272;
+  --border: #2C261E;
+  --border-gold: rgba(212,168,67,0.2);
+  --red: #C45A4A;
+  --green: #4AAF6A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  background-image: radial-gradient(ellipse 60% 50% at 50% 20%, rgba(196,121,61,0.05) 0%, transparent 55%),
+  radial-gradient(ellipse 80% 40% at 20% 90%, rgba(160,99,74,0.03) 0%, transparent 50%);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
+  min-height: 100vh;
+}
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+  repeating-linear-gradient(90deg, rgba(212,168,67,0.015) 0px, rgba(212,168,67,0.015) 1px, transparent 1px, transparent 80px),
+  repeating-linear-gradient(0deg, rgba(212,168,67,0.015) 0px, rgba(212,168,67,0.015) 1px, transparent 1px, transparent 80px);
+  pointer-events: none;
+  z-index: 0;
+}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--gold-dim), var(--gold-glow));
+  border-radius: 4px; border: 1px solid var(--border-gold);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@keyframes goldShimmer {
+  0%,100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+@keyframes templeGlow {
+  0%,100% { box-shadow: 0 0 20px rgba(212,168,67,0.05); }
+  50% { box-shadow: 0 0 40px rgba(212,168,67,0.12); }
+}
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(13,11,8,0.94);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-gold);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.sticky-header::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-glow), transparent);
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold-bright);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--border-gold);
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge {
+  font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem;
+  border-radius: 4px; letter-spacing: 0.05em;
+}
+.badge-asset { color: var(--gold-bright); background: var(--gold-dim); border: 1px solid var(--border-gold); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.03); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold-bright);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); box-shadow: 0 0 12px rgba(212,168,67,0.2); }
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; position: relative; z-index: 1; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border-gold); margin-bottom: 3rem;
+  position: relative;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -2rem; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.hero::after {
+  content: '◆';
+  position: absolute; top: -2.6rem; left: 50%; transform: translateX(-50%);
+  color: var(--gold); font-size: 0.7rem;
+  animation: goldShimmer 3s ease-in-out infinite;
+}
+.hero-part {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold);
+  letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem;
+}
+.hero-day {
+  font-family: var(--font-display); font-size: 4rem; font-weight: 700;
+  color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem;
+  text-shadow: 0 0 40px rgba(212,168,67,0.15);
+}
+.hero-subtitle {
+  font-family: var(--font-display); font-size: 1.8rem; font-weight: 400;
+  color: var(--gold); margin-bottom: 0.3rem;
+}
+.hero-eldorado-sub {
+  font-family: var(--font-display); font-size: 1.1rem; font-weight: 400;
+  color: var(--amber); font-style: italic; margin-bottom: 1.5rem;
+  letter-spacing: 0.05em;
+}
+.hero-quote {
+  font-family: var(--font-display); font-size: 1.1rem; font-style: italic;
+  color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6;
+}
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge {
+  font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem;
+  border-radius: 4px; display: flex; align-items: center; gap: 0.4rem;
+}
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold-bright); background: var(--gold-dim); border: 1px solid var(--border-gold); }
+.hb-net .dot { background: var(--gold-bright); }
+.hb-house { color: var(--emerald); background: var(--emerald-dim); }
+.hb-house .dot { background: var(--emerald); }
+.hb-debt { color: var(--red); background: rgba(196,90,74,0.12); }
+.hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,175,106,0.12); }
+.hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; border: 1px solid var(--border); }
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--gold-bright));
+  border-radius: 2px; transition: width 0.5s;
+}
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+.section { margin-bottom: 3rem; }
+.section-label {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.section-label::before { content: '◈'; font-size: 0.5rem; }
+.section-title {
+  font-family: var(--font-display); font-size: 1.6rem; font-weight: 600;
+  color: var(--text-primary); margin-bottom: 1rem;
+}
+.brain-box {
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--emerald);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+  position: relative; overflow: hidden;
+}
+.brain-box::before {
+  content: '';
+  position: absolute; top: 0; right: 0; width: 60px; height: 60px;
+  background: radial-gradient(circle at 100% 0%, rgba(61,158,110,0.08), transparent 70%);
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--emerald); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th {
+  text-align: left; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border);
+}
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(44,38,30,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.4s;
+  position: relative; overflow: hidden;
+}
+.concept-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold-glow), var(--gold-dim));
+  opacity: 0; transition: opacity 0.4s;
+}
+.concept-card:hover {
+  background: var(--bg-card-hover); border-color: var(--border-gold);
+  box-shadow: 0 4px 24px rgba(212,168,67,0.06);
+}
+.concept-card:hover::before { opacity: 1; }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+.formula-block {
+  background: var(--bg-temple);
+  border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 6px; padding: 1rem 1.2rem; margin: 1rem 0;
+  font-family: var(--font-mono); font-size: 0.82rem; line-height: 2; overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold-bright); }
+.formula-blue { color: var(--emerald); }
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--border-gold); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(44,38,30,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(212,168,67,0.04); }
+.highlight-row td { color: var(--gold-bright) !important; font-weight: 500; background: var(--gold-dim) !important; }
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.chart-container::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sim-box {
+  background: linear-gradient(135deg, rgba(212,168,67,0.04), rgba(61,158,110,0.04));
+  border: 1px solid var(--border-gold); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.sim-box::before {
+  content: '⬥';
+  position: absolute; top: -8px; left: 1.5rem; color: var(--gold);
+  font-size: 0.6rem; background: var(--bg-primary); padding: 0 0.3rem;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(44,38,30,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '\u2713'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--amber);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--amber); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--emerald); background: var(--emerald-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '\u25B8'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+.quiz-section {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+  position: relative;
+}
+.quiz-section::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--amber));
+}
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,175,106,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(196,90,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,175,106,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border-gold);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px rgba(212,168,67,0.1); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+  radial-gradient(circle at 50% 10%, rgba(196,121,61,0.025) 0%, transparent 35%),
+  radial-gradient(circle at 50% 90%, rgba(160,99,74,0.02) 0%, transparent 25%);
+  pointer-events: none; z-index: 0;
+}
+.aztec-divider {
+  text-align: center;
+  margin: 2.5rem 0;
+  position: relative;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aztec-divider::before,
+.aztec-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
+}
+.aztec-divider .aztec-glyph {
+  padding: 0 1rem;
+  color: var(--gold);
+  font-size: 0.65rem;
+  opacity: 0.5;
+  letter-spacing: 0.3em;
+}
+.concept-card {
+  position: relative;
+  overflow: hidden;
+}
+.concept-card .card-glow {
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,168,67,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+.concept-card:hover .card-glow { opacity: 1; }
+.concept-card > * { position: relative; z-index: 1; }
+.quiz-section { position: relative; overflow: hidden; }
+.quiz-burst-canvas {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 10;
+}
+.scroll-compass {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  z-index: 99;
+  opacity: 0;
+  transition: opacity 0.5s;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+}
+.scroll-compass.visible { opacity: 1; }
+.scroll-compass svg { width: 100%; height: 100%; }
+.section-flash {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-bright), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.section.flash-active .section-flash { opacity: 1; }
+@keyframes checkPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+.checklist li.just-checked::before {
+  animation: checkPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+@keyframes checkGlow {
+  0% { box-shadow: 0 0 0 0 rgba(212,168,67,0.4); }
+  100% { box-shadow: 0 0 0 12px rgba(212,168,67,0); }
+}
+.checklist li.just-checked {
+  animation: checkGlow 0.6s ease-out;
+}
+.deep-dive[open] {
+  border-color: var(--border-gold);
+  box-shadow: 0 0 20px rgba(212,168,67,0.04);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+@keyframes timerPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(212,168,67,0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(212,168,67,0); }
+}
+.timer-btn.active {
+  animation: timerPulse 2s infinite;
+  background: var(--gold-glow);
+}
+@keyframes heroFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.hero-icon svg {
+  animation: heroFloat 4s ease-in-out infinite;
+}
+@keyframes barShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.progress-bar-fill {
+  background: linear-gradient(90deg, var(--amber), var(--gold), var(--gold-bright), var(--gold), var(--amber));
+  background-size: 200% 100%;
+  animation: barShimmer 4s linear infinite;
+}
+.sr-slot.done {
+  position: relative;
+  overflow: hidden;
+}
+.sr-slot.done::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+}
+.data-table tr {
+  transition: background 0.2s;
+}
+.data-table tr:hover td {
+  background: rgba(212,168,67,0.06);
+}
+.highlight-row td {
+  position: relative;
+}
+.hero-illustration {
+  margin: 0 -1.5rem 1.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(212,168,67,0.06);
+  position: relative;
+}
+.hero-illustration::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40px;
+  background: linear-gradient(to top, var(--bg-primary), transparent);
+  pointer-events: none;
+}
+@supports(padding: max(0px)) {
+  .sticky-header {
+  padding-left: max(0.8rem, env(safe-area-inset-left));
+  padding-right: max(0.8rem, env(safe-area-inset-right));
+  }
+  .container {
+  padding-left: max(0.8rem, env(safe-area-inset-left));
+  padding-right: max(0.8rem, env(safe-area-inset-right));
+  }
+  .scroll-compass {
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+@media print {
+  .sticky-header, .scroll-compass, #goldParticles, .timer-btn { display: none !important; }
+  body::before, body::after { display: none !important; }
+  .concept-card, .brain-box, .sim-box, .psych-box, .quiz-section, .sr-tracker {
+  border: 1px solid #ccc !important;
+  background: var(--bg-primary);
+  break-inside: avoid;
+  }
+  .hero { border-bottom: 2px solid #333 !important; }
+  .nav-footer { display: none !important; }
+}
+@media (max-width: 640px) {
+.sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+.hero-illustration { margin: 0 -1rem 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+.fade-up { opacity: 1; transform: none; transition: none; }
+  .hero-icon svg { animation: none; }
+  .progress-bar-fill { animation: none; }
+  .timer-btn.active { animation: none; }
+  #goldParticles { display: none !important; }
+  body::before { display: none; }
+  body::after { display: none; }
+}
+@media (max-width: 768px) {
+.hero-day { font-size: 3rem; }
+  .hero-subtitle { font-size: 1.5rem; }
+  .hero-eldorado-sub { font-size: 0.95rem; }
+  .hero-quote { font-size: 0.95rem; max-width: 90%; }
+  .hero-icon svg { width: 40px; height: 40px; }
+  .section-title { font-size: 1.4rem; }
+  .concept-card { padding: 1.2rem; }
+  .card-title { font-size: 1.15rem; }
+  .data-table { font-size: 0.75rem; }
+  .data-table th { font-size: 0.6rem; padding: 0.5rem; }
+  .data-table td { padding: 0.5rem; font-size: 0.72rem; }
+  .formula-block { font-size: 0.76rem; padding: 0.8rem 1rem; }
+  .scroll-compass { width: 48px; height: 48px; bottom: 1.5rem; right: 1.5rem; }
+}
+@media (max-width: 480px) {
+html { font-size: 15px; }
+  .sticky-header {
+  padding: 0.4rem 0.8rem;
+  gap: 0.3rem;
+  }
+  .header-day { font-size: 0.65rem; padding: 0.15rem 0.5rem; }
+  .header-title { font-size: 0.75rem; }
+  .header-badge { font-size: 0.6rem; padding: 0.15rem 0.4rem; }
+  .badge-series { display: none; }
+  .timer-btn { font-size: 0.65rem; padding: 0.25rem 0.6rem; }
+  .container { padding: 3.8rem 0.8rem 2rem; }
+  .hero { padding: 2rem 0 1.8rem; margin-bottom: 2rem; }
+  .hero-part { font-size: 0.6rem; letter-spacing: 0.2em; }
+  .hero-icon svg { width: 36px; height: 36px; }
+  .hero-day { font-size: 2.2rem; }
+  .hero-subtitle { font-size: 1.2rem; }
+  .hero-eldorado-sub { font-size: 0.85rem; }
+  .hero-quote { font-size: 0.85rem; line-height: 1.5; }
+  .hero-badges { gap: 0.4rem; }
+  .hero-badge { font-size: 0.6rem; padding: 0.25rem 0.5rem; }
+  .series-info { font-size: 0.6rem; }
+  .hero-illustration { margin: 0 -0.8rem 1rem; }
+  .section { margin-bottom: 2rem; }
+  .section-label { font-size: 0.58rem; }
+  .section-title { font-size: 1.2rem; }
+  .brain-box { padding: 1rem; }
+  .brain-box h3 { font-size: 0.82rem; }
+  .brain-box p { font-size: 0.8rem; }
+  .time-table { font-size: 0.72rem; }
+  .time-table th { font-size: 0.58rem; padding: 0.4rem 0.5rem; }
+  .time-table td { padding: 0.4rem 0.5rem; }
+  .concept-card { padding: 1rem; }
+  .card-num { font-size: 0.55rem; }
+  .card-title { font-size: 1.05rem; }
+  .card-body { font-size: 0.8rem; line-height: 1.7; }
+  .formula-block { font-size: 0.7rem; padding: 0.7rem 0.8rem; line-height: 1.8; }
+  .data-table-wrap { margin: 0.8rem -0.3rem; }
+  .data-table { font-size: 0.68rem; }
+  .data-table th { font-size: 0.55rem; padding: 0.4rem; }
+  .data-table td { padding: 0.4rem; font-size: 0.65rem; }
+  .chart-container { padding: 1rem; margin: 1rem 0; }
+  .chart-title { font-size: 0.6rem; }
+  .sim-box { padding: 1rem; }
+  .sim-box h3 { font-size: 0.85rem; }
+  .checklist li { font-size: 0.8rem; padding: 0.4rem 0 0.4rem 1.6rem; }
+  .psych-box { padding: 1rem; }
+  .psych-box h3 { font-size: 0.85rem; }
+  .psych-box .bias-name { font-size: 1rem; }
+  .deep-dive summary { padding: 0.8rem 1rem; font-size: 0.82rem; }
+  .deep-dive-content { padding: 0 1rem 1rem; font-size: 0.78rem; }
+  .quiz-section { padding: 1rem; }
+  .quiz-q h4 { font-size: 0.82rem; }
+  .quiz-options li { font-size: 0.76rem; padding: 0.45rem 0.6rem; }
+  .quiz-answer { font-size: 0.74rem; }
+  .sr-tracker { padding: 1rem; }
+  .sr-tracker h3 { font-size: 0.65rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
+  .sr-slot { padding: 0.5rem; }
+  .sr-slot .sr-label { font-size: 0.55rem; }
+  .sr-slot .sr-date { font-size: 0.65rem; }
+  .disclaimer { font-size: 0.65rem; padding: 1rem; }
+  .nav-footer { flex-direction: column; gap: 0.8rem; align-items: stretch; }
+  .nav-btn { text-align: center; font-size: 0.7rem; }
+  .scroll-compass { width: 42px; height: 42px; bottom: 1rem; right: 1rem; }
+  .aztec-divider { margin: 1.5rem 0; }
+  .aztec-divider .aztec-glyph { font-size: 0.55rem; }
+  .sim-box input[type="number"] {
+  width: 120px !important;
+  font-size: 0.85rem !important;
+  padding: 0.4rem 0.6rem !important;
+}
+@media (max-width: 360px) {
+html { font-size: 14px; }
+  .hero-day { font-size: 1.8rem; }
+  .hero-subtitle { font-size: 1rem; }
+  .container { padding: 3.5rem 0.6rem 1.5rem; }
+  .badge-asset { display: none; }
+  .hero-badges { flex-direction: column; align-items: center; }
+  .sr-slots { grid-template-columns: 1fr; }
+}
+@media ((hover: none) and (pointer: coarse)) {
+.quiz-options li {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  }
+  .checklist li {
+  .nav-btn {
+  justify-content: center;
+  .sr-slot {
+  flex-direction: column;
+  .timer-btn {
+  min-height: 40px;
+  .deep-dive summary {
+  min-height: 48px;
+  .concept-card .card-glow { display: none; }
+}
+@media ((max-height: 500px) and (orientation: landscape)) {
+.sticky-header { padding: 0.3rem 1rem; }
+  .hero { padding: 1.5rem 0 1rem; margin-bottom: 1.5rem; }
+  .hero-day { font-size: 2rem; }
+  .hero-illustration svg { max-height: 120px; }
+  .scroll-compass { width: 36px; height: 36px; bottom: 0.5rem; right: 0.5rem; }
+}
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.quiz-options li:focus-visible { border-color: var(--gold); }
+.nav-btn:focus-visible { border-color: var(--gold); color: var(--gold); }
+
+
+/* Content-visibility for off-screen rendering optimization */
+.section { content-visibility: auto; contain-intrinsic-size: auto 500px; }
+.deep-dive { content-visibility: auto; contain-intrinsic-size: auto 200px; }
+.quiz-section { content-visibility: auto; contain-intrinsic-size: auto 400px; }
+.sr-tracker { content-visibility: auto; contain-intrinsic-size: auto 200px; }
+
+
+/* ═══ THEME TOGGLE ═══ */
+/* ── Toggle Button ── */
+.theme-toggle {
+  position: relative;
+  width: 52px; height: 28px;
+  background: var(--gold-dim);
+  border: 1px solid var(--border-gold);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex; align-items: center;
+  padding: 0 3px;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(212,168,67,0.2);
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.theme-toggle-knob {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--gold);
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  position: relative;
+}
+.theme-toggle-knob svg {
+  width: 14px; height: 14px;
+  transition: all 0.3s;
+}
+/* Dark mode icon (moon visible) */
+.theme-toggle .icon-moon { display: none; }
+.theme-toggle .icon-sun { display: block; }
+[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+[data-theme="light"] .theme-toggle-knob {
+  transform: translateX(24px);
+  background: #8B6914;
+}
+[data-theme="light"] .theme-toggle {
+  background: rgba(139,105,20,0.15);
+  border-color: rgba(139,105,20,0.3);
+}
+
+/* ── Light Theme Variables ── */
+[data-theme="light"] {
+  --bg-primary: #FAF6EE;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FFF9F0;
+  --bg-accent: #F5F0E5;
+  --bg-temple: #FBF7EF;
+  --gold: #8B6914;
+  --gold-bright: #A67C1A;
+  --gold-dim: rgba(139,105,20,0.08);
+  --gold-glow: rgba(139,105,20,0.15);
+  --gold-radiant: rgba(166,124,26,0.2);
+  --emerald: #2D7A52;
+  --emerald-dim: rgba(45,122,82,0.08);
+  --emerald-glow: rgba(45,122,82,0.15);
+  --amber: #9E5E28;
+  --amber-dim: rgba(158,94,40,0.08);
+  --copper: #7A4A30;
+  --text-primary: #2C2416;
+  --text-secondary: #5A5040;
+  --text-dim: #8A8070;
+  --border: #E0D8C8;
+  --border-gold: rgba(139,105,20,0.2);
+  --red: #B84A3A;
+  --green: #2D8A4A;
+}
+
+/* ── Light Theme Overrides ── */
+[data-theme="light"] body {
+  background: #FAF6EE !important;
+  color: #2C2416 !important;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139,105,20,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(158,94,40,0.03) 0%, transparent 50%) !important;
+}
+[data-theme="light"] body::before {
+  background-image:
+    repeating-linear-gradient(90deg, rgba(139,105,20,0.025) 0px, rgba(139,105,20,0.025) 1px, transparent 1px, transparent 80px),
+    repeating-linear-gradient(0deg, rgba(139,105,20,0.025) 0px, rgba(139,105,20,0.025) 1px, transparent 1px, transparent 80px) !important;
+}
+[data-theme="light"] body::after {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(139,105,20,0.03) 0%, transparent 25%),
+    radial-gradient(circle at 85% 80%, rgba(139,105,20,0.02) 0%, transparent 20%) !important;
+}
+[data-theme="light"] .sticky-header {
+  background: rgba(250,246,238,0.95) !important;
+  border-bottom-color: rgba(139,105,20,0.15) !important;
+}
+[data-theme="light"] .sticky-header::after {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.2), transparent) !important;
+}
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #F0EBE0;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(139,105,20,0.2), rgba(139,105,20,0.35));
+  border: 1px solid rgba(139,105,20,0.15);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(139,105,20,0.5);
+}
+[data-theme="light"] .header-day {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .header-title {
+  color: #5A5040;
+}
+[data-theme="light"] .badge-asset {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .badge-series {
+  color: #8A8070;
+  background: rgba(0,0,0,0.04);
+}
+[data-theme="light"] .timer-btn {
+  background: rgba(139,105,20,0.08);
+  border-color: #8B6914;
+  color: #8B6914;
+}
+[data-theme="light"] .timer-btn:hover {
+  background: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .hero {
+  border-bottom-color: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .hero::before {
+  background: linear-gradient(90deg, transparent, #8B6914, transparent);
+}
+[data-theme="light"] .hero-day {
+  color: #2C2416;
+  text-shadow: none;
+}
+[data-theme="light"] .hero-subtitle {
+  color: #8B6914;
+}
+[data-theme="light"] .hero-eldorado-sub {
+  color: #9E5E28;
+}
+[data-theme="light"] .hero-quote {
+  color: #5A5040;
+}
+[data-theme="light"] .concept-card {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+[data-theme="light"] .concept-card:hover {
+  background: #FFF9F0;
+  border-color: rgba(139,105,20,0.3);
+  box-shadow: 0 4px 16px rgba(139,105,20,0.08);
+}
+[data-theme="light"] .concept-card::before {
+  background: linear-gradient(90deg, rgba(139,105,20,0.1), rgba(139,105,20,0.3), rgba(139,105,20,0.1));
+}
+[data-theme="light"] .brain-box {
+  background: linear-gradient(135deg, #FFFFFF, #F8F4EC);
+  border-color: #E0D8C8;
+  border-left-color: #2D7A52;
+}
+[data-theme="light"] .brain-box::before {
+  background: radial-gradient(circle at 100% 0%, rgba(45,122,82,0.06), transparent 70%);
+}
+[data-theme="light"] .formula-block {
+  background: #FBF7EF;
+  border-color: #E0D8C8;
+  border-left-color: #8B6914;
+}
+[data-theme="light"] .sim-box {
+  background: linear-gradient(135deg, rgba(139,105,20,0.04), rgba(45,122,82,0.04));
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .sim-box::before {
+  background: #FAF6EE;
+}
+[data-theme="light"] .psych-box {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+  border-left-color: #9E5E28;
+}
+[data-theme="light"] .deep-dive {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .deep-dive summary:hover {
+  background: #F8F4EC;
+}
+[data-theme="light"] .deep-dive[open] {
+  border-color: rgba(139,105,20,0.3);
+  box-shadow: 0 0 15px rgba(139,105,20,0.05);
+}
+[data-theme="light"] .quiz-section {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .quiz-section::before {
+  background: linear-gradient(90deg, #9E5E28, #8B6914, #9E5E28);
+}
+[data-theme="light"] .quiz-options li:hover {
+  background: #F5F0E5;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .quiz-answer {
+  background: #F5F0E5;
+}
+[data-theme="light"] .sr-tracker {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .sr-slot {
+  background: #F5F0E5;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .sr-slot:hover {
+  border-color: #8B6914;
+}
+[data-theme="light"] .chart-container {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .data-table th {
+  border-bottom-color: rgba(139,105,20,0.3);
+}
+[data-theme="light"] .data-table td {
+  border-bottom-color: rgba(224,216,200,0.7);
+}
+[data-theme="light"] .data-table tr:hover td {
+  background: rgba(139,105,20,0.04);
+}
+[data-theme="light"] .highlight-row td {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+}
+[data-theme="light"] .nav-btn {
+  color: #5A5040;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .nav-btn:hover {
+  border-color: #8B6914;
+  color: #8B6914;
+}
+[data-theme="light"] .disclaimer {
+  border-top-color: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .progress-bar-bg {
+  background: #EDE8D8;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .progress-bar-fill {
+  background: linear-gradient(90deg, #9E5E28, #8B6914, #A67C1A);
+  background-size: 200% 100%;
+}
+[data-theme="light"] .aztec-divider::before,
+[data-theme="light"] .aztec-divider::after {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.15), transparent);
+}
+[data-theme="light"] .hero-illustration {
+  border-color: rgba(139,105,20,0.1);
+}
+[data-theme="light"] .hero-illustration::after {
+  background: linear-gradient(to top, #FAF6EE, transparent);
+}
+/* Light theme: SVG illustrations get warmer tones */
+[data-theme="light"] .hero-illustration svg {
+  filter: saturate(0.8) brightness(1.1);
+}
+/* Light theme: particles become subtle */
+[data-theme="light"] #goldParticles {
+  opacity: 0.3;
+}
+/* Scroll compass light adaptation */
+[data-theme="light"] .scroll-compass {
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+}
+/* Card glow adapts to light theme */
+[data-theme="light"] .concept-card .card-glow {
+  background: radial-gradient(circle, rgba(139,105,20,0.08) 0%, transparent 70%);
+}
+/* Section flash for light */
+[data-theme="light"] .section-flash {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.4), transparent);
+}
+/* Checklist in light */
+[data-theme="light"] .checklist li::before {
+  border-color: #8B6914;
+}
+[data-theme="light"] .checklist li.checked::before {
+  background: #8B6914;
+}
+[data-theme="light"] .checklist li.checked::after {
+  color: #FFFFFF;
+}
+/* Neuro & Engineer tags */
+[data-theme="light"] .neuro-tag {
+  color: #2D7A52;
+  background: rgba(45,122,82,0.08);
+}
+[data-theme="light"] .engineer-tag {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+}
+/* Time table */
+[data-theme="light"] .time-table td {
+  border-bottom-color: rgba(224,216,200,0.5);
+}
+/* Part texture backgrounds in light */
+[data-theme="light"] .bg-part-texture {
+  opacity: 0.3;
+}
+/* Smooth transition on theme change */
+html {
+  transition: none;
+}
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 0.4s, color 0.3s, border-color 0.3s, box-shadow 0.3s !important;
+}
+/* ═══ END THEME TOGGLE ═══ */
+
+/* MOBILE_HEADER_FIX_V2 */
+
+/* ── Ultra-Simple Mobile Header ── */
+.sticky-header {
+  padding: 0.5rem 1rem;
+  gap: 0.5rem;
+}
+.header-left {
+  flex: 1;
+  min-width: 0;
+  gap: 0.6rem;
+}
+.header-day {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.header-title {
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+.header-right {
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+@media (max-width: 480px) {
+  .header-title { max-width: 140px; font-size: 0.72rem; }
+  .header-day { font-size: 0.6rem; padding: 0.1rem 0.4rem; }
+  .theme-toggle { width: 44px; height: 24px; }
+  .theme-toggle-knob { width: 18px; height: 18px; }
+  .theme-toggle-knob svg { width: 11px; height: 11px; }
+  [data-theme="light"] .theme-toggle-knob { transform: translateX(20px); }
+}
+@media (max-width: 360px) {
+  .header-title { max-width: 100px; font-size: 0.65rem; }
+}
+
+/* ── Dark Theme Body (default) ── */
+body {
+  background: var(--bg-primary);
+  background-image: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(212,168,67,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(196,121,61,0.04) 0%, transparent 50%);
+  color: var(--text-primary);
+}
+
+/* ── Light Theme: Complete Coverage ── */
+[data-theme="light"] body {
+  background: var(--bg-primary) !important;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139,105,20,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(158,94,40,0.03) 0%, transparent 50%) !important;
+  color: var(--text-primary) !important;
+}
+[data-theme="light"] body::before {
+  background-image:
+    repeating-linear-gradient(90deg, rgba(139,105,20,0.02) 0px, rgba(139,105,20,0.02) 1px, transparent 1px, transparent 80px),
+    repeating-linear-gradient(0deg, rgba(139,105,20,0.02) 0px, rgba(139,105,20,0.02) 1px, transparent 1px, transparent 80px) !important;
+}
+[data-theme="light"] body::after {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(139,105,20,0.02) 0%, transparent 25%),
+    radial-gradient(circle at 85% 80%, rgba(139,105,20,0.015) 0%, transparent 20%) !important;
+}
+/* Sticky header light */
+[data-theme="light"] .sticky-header {
+  background: rgba(250,246,238,0.96) !important;
+  border-bottom: 1px solid rgba(139,105,20,0.12) !important;
+}
+[data-theme="light"] .header-day {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+  border-color: rgba(139,105,20,0.2) !important;
+}
+[data-theme="light"] .header-title {
+  color: #5A5040 !important;
+}
+/* Hero light */
+[data-theme="light"] .hero {
+  border-bottom-color: rgba(139,105,20,0.15) !important;
+}
+[data-theme="light"] .hero::before {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.5), transparent) !important;
+}
+[data-theme="light"] .hero::after {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .hero-part {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .hero-day {
+  color: #2C2416 !important;
+  text-shadow: none !important;
+}
+[data-theme="light"] .hero-subtitle {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .hero-eldorado-sub {
+  color: #9E5E28 !important;
+}
+[data-theme="light"] .hero-quote {
+  color: #5A5040 !important;
+}
+[data-theme="light"] .hero-badge {
+  border: 1px solid rgba(0,0,0,0.1);
+}
+[data-theme="light"] .hb-net {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+  border-color: rgba(139,105,20,0.2) !important;
+}
+[data-theme="light"] .hb-net .dot { background: #8B6914 !important; }
+[data-theme="light"] .hb-house {
+  color: #2D7A52 !important;
+  background: rgba(45,122,82,0.08) !important;
+}
+[data-theme="light"] .hb-house .dot { background: #2D7A52 !important; }
+[data-theme="light"] .hb-debt {
+  color: #B84A3A !important;
+  background: rgba(184,74,58,0.08) !important;
+}
+[data-theme="light"] .hb-debt .dot { background: #B84A3A !important; }
+[data-theme="light"] .hb-stock {
+  color: #2D8A4A !important;
+  background: rgba(45,138,74,0.08) !important;
+}
+[data-theme="light"] .hb-stock .dot { background: #2D8A4A !important; }
+[data-theme="light"] .series-info {
+  color: #8A8070 !important;
+}
+/* Progress bar light */
+[data-theme="light"] .progress-bar-bg {
+  background: #EDE8D8 !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .progress-label {
+  color: #8A8070 !important;
+}
+/* Section labels light */
+[data-theme="light"] .section-label {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .section-label::before {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .section-title {
+  color: #2C2416 !important;
+}
+/* Brain box light */
+[data-theme="light"] .brain-box {
+  background: linear-gradient(135deg, #FFFFFF, #F8F4EC) !important;
+  border-color: #E0D8C8 !important;
+  border-left: 3px solid #2D7A52 !important;
+}
+[data-theme="light"] .brain-box::before {
+  background: radial-gradient(circle at 100% 0%, rgba(45,122,82,0.05), transparent 70%) !important;
+}
+[data-theme="light"] .brain-box h3 {
+  color: #2D7A52 !important;
+}
+[data-theme="light"] .brain-box p {
+  color: #5A5040 !important;
+}
+/* Time table light */
+[data-theme="light"] .time-table th {
+  color: #8A8070 !important;
+  border-bottom-color: #E0D8C8 !important;
+}
+[data-theme="light"] .time-table td {
+  color: #5A5040 !important;
+  border-bottom-color: rgba(224,216,200,0.5) !important;
+}
+[data-theme="light"] .time-table .time-col {
+  color: #8B6914 !important;
+}
+/* Concept card light */
+[data-theme="light"] .concept-card {
+  background: #FFFFFF !important;
+  border-color: #E0D8C8 !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+}
+[data-theme="light"] .concept-card:hover {
+  background: #FFF9F0 !important;
+  border-color: rgba(139,105,20,0.3) !important;
+  box-shadow: 0 4px 16px rgba(139,105,20,0.08) !important;
+}
+[data-theme="light"] .card-num {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .card-title {
+  color: #2C2416 !important;
+}
+[data-theme="light"] .card-body {
+  color: #5A5040 !important;
+}
+[data-theme="light"] .card-body p {
+  color: #5A5040 !important;
+}
+/* Formula block light */
+[data-theme="light"] .formula-block {
+  background: #FBF7EF !important;
+  border-color: #E0D8C8 !important;
+  border-left: 3px solid #8B6914 !important;
+}
+[data-theme="light"] .formula-line {
+  color: #2C2416 !important;
+}
+[data-theme="light"] .formula-comment {
+  color: #8A8070 !important;
+}
+[data-theme="light"] .formula-highlight {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .formula-blue {
+  color: #2D7A52 !important;
+}
+/* Data table light */
+[data-theme="light"] .data-table th {
+  color: #8B6914 !important;
+  border-bottom: 2px solid rgba(139,105,20,0.25) !important;
+}
+[data-theme="light"] .data-table td {
+  color: #5A5040 !important;
+  border-bottom-color: rgba(224,216,200,0.5) !important;
+}
+[data-theme="light"] .data-table td:first-child {
+  color: #2C2416 !important;
+}
+[data-theme="light"] .data-table tr:hover td {
+  background: rgba(139,105,20,0.04) !important;
+}
+[data-theme="light"] .highlight-row td {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+}
+/* Chart container light */
+[data-theme="light"] .chart-container {
+  background: #FFFFFF !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .chart-title {
+  color: #8A8070 !important;
+}
+/* Sim box light */
+[data-theme="light"] .sim-box {
+  background: linear-gradient(135deg, rgba(139,105,20,0.03), rgba(45,122,82,0.03)) !important;
+  border-color: rgba(139,105,20,0.2) !important;
+}
+[data-theme="light"] .sim-box::before {
+  color: #8B6914 !important;
+  background: #FAF6EE !important;
+}
+[data-theme="light"] .sim-box h3 {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .sim-box p,
+[data-theme="light"] .sim-box span,
+[data-theme="light"] .sim-box label {
+  color: #5A5040 !important;
+}
+[data-theme="light"] .sim-box input {
+  background: #FFFFFF !important;
+  color: #2C2416 !important;
+  border-color: #E0D8C8 !important;
+}
+/* Psych box light */
+[data-theme="light"] .psych-box {
+  background: #FFFFFF !important;
+  border-color: #E0D8C8 !important;
+  border-left: 3px solid #9E5E28 !important;
+}
+[data-theme="light"] .psych-box h3 {
+  color: #9E5E28 !important;
+}
+[data-theme="light"] .psych-box .bias-name {
+  color: #2C2416 !important;
+}
+[data-theme="light"] .psych-box p {
+  color: #5A5040 !important;
+}
+/* Deep dive light */
+[data-theme="light"] .deep-dive {
+  background: #FFFFFF !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .deep-dive summary {
+  color: #2C2416 !important;
+}
+[data-theme="light"] .deep-dive summary::before {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .deep-dive summary:hover {
+  background: #F8F4EC !important;
+}
+[data-theme="light"] .deep-dive[open] {
+  border-color: rgba(139,105,20,0.3) !important;
+}
+[data-theme="light"] .deep-dive-content {
+  color: #5A5040 !important;
+}
+[data-theme="light"] .deep-dive-content p {
+  color: #5A5040 !important;
+}
+/* Quiz section light */
+[data-theme="light"] .quiz-section {
+  background: #FFFFFF !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .quiz-q h4 {
+  color: #2C2416 !important;
+}
+[data-theme="light"] .quiz-options li {
+  color: #5A5040 !important;
+}
+[data-theme="light"] .quiz-options li:hover {
+  background: #F5F0E5 !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .quiz-options li.correct {
+  background: rgba(45,138,74,0.1) !important;
+  border-color: #2D8A4A !important;
+  color: #2D8A4A !important;
+}
+[data-theme="light"] .quiz-options li.wrong {
+  background: rgba(184,74,58,0.1) !important;
+  border-color: #B84A3A !important;
+  color: #B84A3A !important;
+}
+[data-theme="light"] .quiz-answer {
+  background: #F5F0E5 !important;
+  color: #5A5040 !important;
+}
+/* SR tracker light */
+[data-theme="light"] .sr-tracker {
+  background: #FFFFFF !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .sr-tracker h3 {
+  color: #8A8070 !important;
+}
+[data-theme="light"] .sr-slot {
+  background: #F5F0E5 !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .sr-slot:hover {
+  border-color: #8B6914 !important;
+}
+[data-theme="light"] .sr-slot .sr-label {
+  color: #8A8070 !important;
+}
+[data-theme="light"] .sr-slot .sr-date {
+  color: #5A5040 !important;
+}
+[data-theme="light"] .sr-slot.done {
+  border-color: #2D8A4A !important;
+  background: rgba(45,138,74,0.06) !important;
+}
+/* Checklist light */
+[data-theme="light"] .checklist li {
+  color: #5A5040 !important;
+  border-bottom-color: rgba(224,216,200,0.4) !important;
+}
+[data-theme="light"] .checklist li::before {
+  border-color: #8B6914 !important;
+}
+[data-theme="light"] .checklist li.checked::before {
+  background: #8B6914 !important;
+}
+[data-theme="light"] .checklist li.checked::after {
+  color: #FFFFFF !important;
+}
+/* Nav footer light */
+[data-theme="light"] .nav-btn {
+  color: #5A5040 !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .nav-btn:hover {
+  border-color: #8B6914 !important;
+  color: #8B6914 !important;
+}
+/* Disclaimer light */
+[data-theme="light"] .disclaimer {
+  color: #8A8070 !important;
+  border-top-color: rgba(139,105,20,0.12) !important;
+}
+/* Illustration light */
+[data-theme="light"] .hero-illustration {
+  border-color: rgba(139,105,20,0.08) !important;
+}
+[data-theme="light"] .hero-illustration::after {
+  background: linear-gradient(to top, #FAF6EE, transparent) !important;
+}
+[data-theme="light"] .hero-illustration svg {
+  filter: saturate(0.85) brightness(1.15) !important;
+}
+/* Aztec divider light */
+[data-theme="light"] .aztec-divider .aztec-glyph {
+  color: #8B6914 !important;
+}
+/* Particles subdued in light */
+[data-theme="light"] #goldParticles {
+  opacity: 0.2 !important;
+}
+/* Neuro/Engineer tags light */
+[data-theme="light"] .neuro-tag {
+  color: #2D7A52 !important;
+  background: rgba(45,122,82,0.08) !important;
+}
+[data-theme="light"] .engineer-tag {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+}
+/* Hero icon light */
+[data-theme="light"] .hero-icon svg {
+  filter: brightness(0.7) saturate(1.2) !important;
+}
+/* Scrollbar light */
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #F0EBE0 !important;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(139,105,20,0.2), rgba(139,105,20,0.35)) !important;
+  border-color: rgba(139,105,20,0.15) !important;
+}
+/* Skip link light */
+[data-theme="light"] .skip-link {
+  background: #8B6914 !important;
+  color: #FFFFFF !important;
+}
+/* Print — always light */
+@media print {
+  body { background: white !important; color: #222 !important; }
+}
+
+</style>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+</head>
+<body>
+<a href="#main-content" class="skip-link" style="position:absolute;top:-100px;left:0;background:var(--gold);color:var(--bg-primary);padding:0.5rem 1rem;z-index:200;font-size:0.8rem;transition:top 0.2s;" onfocus="this.style.top='0'" onblur="this.style.top='-100px'">본문으로 건너뛰기</a>
+
+<header class="sticky-header" role="banner" aria-label="상단 네비게이션">
+  <div class="header-left">
+    <span class="header-day">DAY 16 / 23</span>
+    <span class="header-title">내 집 전략 — 갈아타기 시뮬레이션</span>
+  </div>
+  <div class="header-right">
+<button class="theme-toggle" id="themeToggle" aria-label="테마 전환" title="다크/라이트 모드 전환">
+  <div class="theme-toggle-knob">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </div>
+</button>  </div>
+</header>
+
+<div class="container" id="main-content" role="main">
+
+<section class="hero">
+  <div class="hero-part">제3장 · 신전의 비밀 통로</div>
+  <div class="hero-icon" style="margin-bottom:1rem;opacity:0.7;display:flex;justify-content:center;"><svg viewBox="0 0 48 48" width="48" height="48"><path d="M12 38 L12 18 L24 10 L36 18 L36 38" fill="none" stroke="#D4A843" stroke-width="1.5" opacity="0.4"/><rect x="18" y="28" width="12" height="10" fill="none" stroke="#D4A843" stroke-width="1" opacity="0.3"/><line x1="12" y1="38" x2="36" y2="38" stroke="#D4A843" stroke-width="1.5" opacity="0.4"/></svg></div>
+  <h1 class="hero-day">Day 16</h1>
+  <h2 class="hero-subtitle">내 집 전략 — 갈아타기 시뮬레이션</h2>
+  <p class="hero-quote">내 집을 전략적으로 '갈아타기'하면, 세제 혜택을 받으면서 더 좋은 자산을 얻을 수 있습니다.</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">El Dorado 원정 — 포모도로 1세션(25분) × 23일 | PART 3: 15~19</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:69.6%"></div></div>
+    <div class="progress-label"><span>Day 16</span><span>16 / 23 완료 (69.6%)</span></div>
+  </div>
+</section>
+
+<div class="hero-illustration fade-up"><svg viewBox="0 0 860 200" width="860" height="200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;margin:-1rem 0 1rem;opacity:0.85;" preserveAspectRatio="xMidYMid slice">
+  <rect width="860" height="200" fill="#0D0B08"/>
+  <!-- foundation blocks -->
+  <rect x="250" y="160" width="360" height="25" rx="2" fill="#D4A843" opacity="0.05" stroke="#D4A843" stroke-width="0.8" opacity="0.1"/>
+  <rect x="280" y="135" width="300" height="25" rx="2" fill="#D4A843" opacity="0.04" stroke="#D4A843" stroke-width="0.6" opacity="0.08"/>
+  <rect x="310" y="110" width="240" height="25" rx="2" fill="#D4A843" opacity="0.03" stroke="#D4A843" stroke-width="0.5" opacity="0.06"/>
+  <!-- temple outline growing -->
+  <path d="M340,110 L340,70 L430,40 L520,70 L520,110" fill="none" stroke="#D4A843" stroke-width="1" opacity="0.1" stroke-dasharray="4 3"/>
+  <!-- columns -->
+  <rect x="360" y="70" width="8" height="40" fill="#D4A843" opacity="0.04"/>
+  <rect x="492" y="70" width="8" height="40" fill="#D4A843" opacity="0.04"/>
+  <!-- plumb line -->
+  <line x1="430" y1="30" x2="430" y2="110" stroke="#E8C65A" stroke-width="0.5" opacity="0.1" stroke-dasharray="3 2"/>
+  <circle cx="430" cy="112" r="2" fill="#E8C65A" opacity="0.1"/>
+</svg>
+</div>
+
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 
+    주택 갈아타기(Trade-up)는 단순한 이사가 아니라 전략적 자산 재구성입니다.
+    세법상 양도소득세 감면, 중도금 활용, 타이밍 조율 등 여러 변수가 있습니다.
+    실전 사례를 통해 최적 전략을 배웁니다.
+    </h3>
+    <p>올바른 갈아타기 전략은 순자산 증가와 세금 절감을 동시에 달성합니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">09:00 ~ 09:20</td><td>갈아타기의 기본</td><td>언제, 어디로, 어떻게</td></tr>
+<tr><td class="time-col">09:20 ~ 09:40</td><td>세제 혜택 분석</td><td>양도소득세 감면 조건</td></tr>
+<tr><td class="time-col">09:40 ~ 10:00</td><td>자금 계획</td><td>중도금, 대출, 현금 흐름</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">내 집 전략 — 갈아타기 시뮬레이션</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">갈아타기의 정의</div>
+      <div class="card-body"><p>자신이 거주하던 주택을 매도하고, 더 나은 조건의 주택을 매수하는 전략입니다.</p><div class='formula-block'>갈아타기 효과 = 기존 자산 매도 이득 + 신규 자산 상승 기대<br>세금 절감 + 더 좋은 위치 확보</div><p>단순한 이사와 달리, 자산 재구성과 세제 최적화를 고려한 투자 전략입니다.</p></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">1주택 양도소득세 감면</div>
+      <div class="card-body"><p><strong>비과세 조건:</strong> 보유 기간 2년 이상, 1주택 소유자, 매도가 9억 이하</p><div class='data-table'><table><tr><th>조건</th><th>세율</th></tr><tr><td>1주택 2년 이상 보유 (9억 이하)</td><td>비과세</td></tr><tr><td>1주택 (9억 초과)</td><td>20% 또는 누진</td></tr><tr><td>다주택</td><td>높은 세율</td></tr></table></div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">중도금 활용</div>
+      <div class="card-body"><p>기존 주택 매도 전에 신규 주택을 먼저 매수할 때 중도금이 중요합니다.</p><div class='formula-block'>전략: 기존 집 매도 예정가 - 중도금 = 신규 매수 가능액<br>타이밍이 맞으면 자금 부담 없이 갈아탈 수 있음</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">갈아타기 타이밍</div>
+      <div class="card-body"><p><strong>최적 타이밍:</strong> 기존 집이 성숙 단계, 신규 지역이 성장 단계</p><div class='data-table'><table><tr><th>시나리오</th><th>평가</th></tr><tr><td>강남 → 강북/신도시</td><td>강함</td></tr><tr><td>강남 → 강남</td><td>약함</td></tr><tr><td>강북 → 강남</td><td>위험</td></tr></table></div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">갈아타기 체크리스트</div>
+      <div class="card-body"><ul><li>기존 주택 시장가: ?</li><li>신규 매수 예상가: ?</li><li>중도금 필요: ?</li><li>세제 혜택 확인: ?</li><li>생활권 변화 수용: ?</li></ul></div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  <svg viewBox="0 0 500 400" style="background: #0D0B08;">
+<text x="250" y="30" text-anchor="middle" fill="#D4A843" font-size="20" font-weight="bold">갈아타기 자산 변화</text>
+<rect x="50" y="150" width="80" height="80" fill="#C45A4A" opacity="0.7"/>
+<text x="90" y="195" text-anchor="middle" fill="#EDE8D8" font-size="12">기존 집</text>
+<text x="90" y="210" text-anchor="middle" fill="#EDE8D8" font-size="11">7억</text>
+<path d="M 140 190 L 200 190" stroke="#8A8272" stroke-width="2" marker-end="url(#arrowhead)"/>
+<rect x="220" y="130" width="100" height="120" fill="#4AAF6A" opacity="0.7"/>
+<text x="270" y="190" text-anchor="middle" fill="#EDE8D8" font-size="12">신규 집</text>
+<text x="270" y="205" text-anchor="middle" fill="#EDE8D8" font-size="11">8.5억</text>
+<text x="250" y="300" text-anchor="middle" fill="#B8B0A0" font-size="11">순자산 증가 + 세금 절감</text>
+<defs><marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0, 10 3, 0 6" fill="#8A8272"/></marker></defs>
+</svg>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  <details class='deep-dive'><summary>Deep Dive: 갈아타기 실패 사례</summary>
+<div><p>갈아타기에 실패하는 경우:</p>
+<ul><li>기존 집이 팔리지 않아 중도금 부담</li>
+<li>신규 집 시세 하락으로 손실</li>
+<li>세제 혜택을 받지 못함 (1년 이내 재구입)</li>
+</ul></div></details>
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  <div class='simulation-section'><h4>시뮬레이션: 갈아타기 전략</h4>
+<div class='sim-content'>
+<p><strong>현재:</strong> 강북 집 7억 (부채 4억) → 순자산 3억</p>
+<p><strong>목표:</strong> 신도시 새 집 8.5억 (부채 4억) → 순자산 4.5억</p>
+<p><strong>효과:</strong> 순자산 1.5억 증가 + 세금 절감</p>
+</div></div>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    <div class='psychology-section'><h4>심리학: 갈아타기 결정</h4>
+<p><span class="neuro-tag">신경과학</span> 이사는 심리적 비용이 높습니다. 새 환경 적응, 기존 추억 상실 등.</p>
+<p><span class="engineer-tag">논리</span> 하지만 자산 증가와 세금 절감의 이득을 보면 결정이 쉬워집니다.</p>
+</div>
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 1주택 양도소득세가 비과세되는 조건은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',true)">① 보유 2년+, 9억 이하</li>
+<li onclick="checkAnswer(this,'q1',false)">② 어떤 가격이든 비과세</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 강남만 비과세</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 1년 이상</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ①</strong><br>1주택 소유자가 2년 이상 보유하고 9억 이하로 매도할 때만 비과세입니다.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 강남에서 신도시로 갈아타는 이유는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 도시가 발전</li>
+<li onclick="checkAnswer(this,'q2',true)">② 강남이 정점, 신도시가 성장</li>
+<li onclick="checkAnswer(this,'q2',false)">③ 무조건 저렴</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 기분</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ②</strong><br>강남은 성숙 단계, 신도시는 성장 단계이므로 미래 수익성이 높습니다.</div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. 갈아타기에서 중도금의 역할은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 이자 절감</li>
+<li onclick="checkAnswer(this,'q3',true)">② 기존 집 매도 전 신규 매수 가능</li>
+<li onclick="checkAnswer(this,'q3',false)">③ 세금 절감</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 시간 벌기</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ②</strong><br>중도금으로 기존 집 매도 전에 신규 집을 먼저 매수할 수 있어, 자금 흐름을 최적화합니다.</div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. 갈아타기의 최대 이점은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① 이사비 절감</li>
+<li onclick="checkAnswer(this,'q4',true)">② 순자산 증가 + 세금 절감 동시 달성</li>
+<li onclick="checkAnswer(this,'q4',false)">③ 새로운 환경</li>
+<li onclick="checkAnswer(this,'q4',false)">④ 지역 변경</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ②</strong><br>갈아타기는 자산 가치 증가와 세제 혜택을 함께 얻을 수 있는 효율적인 전략입니다.</div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. 갈아타기 실패의 주요 원인은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',false)">① 너무 높은 기대</li>
+<li onclick="checkAnswer(this,'q5',true)">② 기존 집이 팔리지 않아 중도금 부담</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 새 집이 싫어짐</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 가족 반대</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ②</strong><br>기존 집 매도가 늦어지면 중도금 이자 부담으로 손실이 발생할 수 있습니다.</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 16</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 23일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 25일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 29일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">04월 05일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 21일</div></div>
+</div>
+  </div>
+</section>
+
+<!-- 아하 모먼트 -->
+<section class="section fade-up">
+  <div class="section-label">💡 AHA MOMENT</div>
+  <h2 class="section-title">갈아타기 비용의 실체</h2>
+  <div style="background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(191,74,74,0.08));border:2px solid var(--gold);border-radius:12px;padding:2rem;margin:1.5rem 0;text-align:center;">
+    <p style="font-size:1.1rem;color:var(--gold);font-weight:600;margin-bottom:1.5rem;font-family:var(--font-display);">집을 한 번 갈아타면 거래 비용만 2,800만원 — 웬만한 직장인 연봉이다</p>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;margin:1.5rem 0;">
+      <div style="background:rgba(191,74,74,0.15);border:1px solid var(--red);border-radius:8px;padding:1.2rem;">
+        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--red);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">거래비용 체감</div>
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--red);">100~200만원쯤?</div>
+      </div>
+      <div style="font-size:2rem;color:var(--gold);">→</div>
+      <div style="background:rgba(74,191,122,0.15);border:1px solid var(--green);border-radius:8px;padding:1.2rem;">
+        <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--green);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem;">실제 거래비용</div>
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:var(--green);">2,800만원</div>
+      </div>
+    </div>
+    <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8;margin-top:1rem;text-align:left;">취득세(3.3%), 중개수수료(0.4~0.9%), 이사비, 인테리어, 대출 중도상환수수료... 7억 주택 갈아타기에 숨은 비용을 모두 합산하면 2,800만원입니다. 이 금액을 연 7% 복리로 10년 투자했다면 5,500만원이 됩니다. 갈아타기 결정은 이 '기회비용'까지 포함해야 합니다.</p>
+  </div>
+</section>
+
+<!-- 위기 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">⚠️ CRISIS SIMULATION</div>
+  <h2 class="section-title">갈아타기 직후 시장 폭락 시뮬레이션</h2>
+  <div style="background:linear-gradient(135deg,rgba(191,74,74,0.08),rgba(10,12,16,0.9));border:1px solid var(--red);border-left:3px solid var(--red);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <p style="font-size:0.95rem;color:var(--red);font-weight:500;margin-bottom:1rem;">🚨 시나리오: 10억 아파트로 갈아탄 직후 부동산 시장 20% 하락</p>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th style="text-align:left;">자산</th><th>현재</th><th>위기 후</th><th>변동</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:500;">신규 주택 가치</td>
+            <td style="text-align:right;">10억</td>
+            <td style="text-align:right;color:var(--red);font-weight:600;">8억</td>
+            <td style="text-align:right;color:var(--red);">-2억</td>
+          </tr>
+          <tr>
+            <td style="font-weight:500;">담보대출(LTV)</td>
+            <td style="text-align:right;">5억(50%)</td>
+            <td style="text-align:right;color:var(--red);font-weight:600;">5억(62.5%)</td>
+            <td style="text-align:right;color:var(--red);">LTV 급등</td>
+          </tr>
+          <tr>
+            <td style="font-weight:500;">순자산</td>
+            <td style="text-align:right;">5억</td>
+            <td style="text-align:right;color:var(--red);font-weight:600;">3억</td>
+            <td style="text-align:right;color:var(--red);">-2억</td>
+          </tr>
+          <tr>
+            <td style="font-weight:500;">DSR 부담</td>
+            <td style="text-align:right;">35%</td>
+            <td style="text-align:right;color:var(--green);font-weight:600;">35%(동일)</td>
+            <td style="text-align:right;color:var(--green);">상환 고정</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:1.5rem;padding:1rem;background:rgba(74,191,122,0.06);border:1px solid rgba(74,191,122,0.3);border-radius:6px;">
+      <p style="font-size:0.85rem;color:var(--green);font-weight:500;margin-bottom:0.8rem;">✅ 대응 전략</p>
+      <ul style="list-style:none;margin:0;padding:0;">
+        <li style="padding:0.6rem 0;border-bottom:1px solid rgba(42,45,54,0.3);"><strong style="color:var(--gold);">Step 1.</strong> 패닉 금지 — 부동산은 주식과 달리 18년 사이클. 3~5년 내 회복 가능성 높음</li>
+        <li style="padding:0.6rem 0;border-bottom:1px solid rgba(42,45,54,0.3);"><strong style="color:var(--gold);">Step 2.</strong> 추가 대출 절대 금지 — LTV 62.5%에서 추가 차입은 위험 구간 진입</li>
+        <li style="padding:0.6rem 0;border-bottom:1px solid rgba(42,45,54,0.3);"><strong style="color:var(--gold);">Step 3.</strong> 비상금 6개월분 확보 — 월 상환금 × 6 = 약 1,800만원 현금 유지</li>
+        <li style="padding:0.6rem 0;border-bottom:1px solid rgba(42,45,54,0.3);"><strong style="color:var(--gold);">Step 4.</strong> 임대수익 가능성 검토 — 전세/반전세 전환으로 현금흐름 방어</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 엔지니어 시스템 비유 -->
+<section class="section fade-up">
+  <div class="section-label">🔧 ENGINEER'S PERSPECTIVE</div>
+  <h2 class="section-title">엔지니어 시스템 사고</h2>
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <h3 style="font-family:var(--font-body);font-size:0.95rem;font-weight:500;color:var(--gold);margin-bottom:1rem;"><span class="engineer-tag">엔지니어 사고법</span> 갈아타기 = 시스템 마이그레이션</h3>
+    <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.9;margin-bottom:1rem;">서버를 옮기는 것과 같다. 기존 시스템(현재 집)에서 신규 시스템(새 집)으로 이전할 때 다운타임(이중 비용 기간), 데이터 손실(거래 비용), 호환성 문제(생활 적응)가 발생한다. 마이그레이션의 핵심은 '현재 시스템이 정말 한계인가?'를 먼저 판단하는 것이다. 섣부른 마이그레이션은 비용만 증가시킨다.</p>
+    <div class="formula-block">
+      <div style="font-family:var(--font-mono);font-size:0.82rem;color:var(--text-secondary);line-height:2;">갈아타기 순이익 = (신규 주택 예상 상승분) - (거래비용 + 이중 비용 + 기회비용)<br/>서스펜션 비유: 차량 세팅 변경 시 → 변경 비용 vs 성능 향상폭을 반드시 비교<br/>수익분기점 &lt; 3년이면 갈아타기 GO, &gt; 5년이면 HOLD</div>
+    </div>
+  </div>
+</section>
+
+<!-- 액션 체크리스트 -->
+<section class="section fade-up">
+  <div class="section-label">🎯 THIS WEEK'S ACTION</div>
+  <h2 class="section-title">이번 주 실행 아이템</h2>
+  <div style="background:linear-gradient(135deg,rgba(74,191,122,0.06),rgba(201,168,76,0.06));border:1px solid var(--green);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <ul class="checklist">
+      <li>현재 집 실거래가 조회 (국토부 실거래가 공개시스템) <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(10분)</span></li>
+      <li>희망 지역 매물 3개 시세 조사 (네이버 부동산) <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(15분)</span></li>
+      <li>갈아타기 비용 계산표 작성 (취득세+중개료+이사비+인테리어) <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(20분)</span></li>
+      <li>현재 대출 중도상환수수료 확인 (은행 앱) <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-dim);margin-left:0.5rem;">(5분)</span></li>
+    </ul>
+    <div style="display:flex;justify-content:space-between;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);">
+      <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">⏱ 예상 소요: 50분</span>
+      <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--green);">📈 10년 예상 효과: 불필요한 갈아타기 방지 시 절약 2,800만+ 원</span>
+    </div>
+  </div>
+</section>
+
+<!-- 실패 케이스 -->
+<section class="section fade-up">
+  <div class="section-label">📉 FAILURE CASE</div>
+  <h2 class="section-title">2022년 영끌 갈아타기의 비극</h2>
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:1.5rem 0;">
+    <div style="border-left:3px solid var(--red);padding-left:1rem;margin-bottom:1.2rem;">
+      <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.9;font-style:italic;">2021년 부동산 고점에서 '지금 안 사면 영원히 못 산다'는 FOMO에 9억 아파트에서 15억으로 갈아탔다. 대출 8억, LTV 53%. 2022년 금리 인상으로 이자 부담 월 80만 → 200만으로 폭증. 동시에 매매가 15억 → 12억 하락. 순자산 급감에 공포 매도 검토.</p>
+    </div>
+    <div style="padding:1rem;background:rgba(201,168,76,0.06);border:1px solid var(--gold-dim);border-radius:6px;">
+      <p style="font-size:0.82rem;color:var(--gold);font-weight:500;margin-bottom:0.5rem;">💡 교훈</p>
+      <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8;">갈아타기 타이밍에서 가장 위험한 신호는 '지금 아니면 늦는다'는 조급함입니다. 부동산 사이클(Day 15)을 기억하세요 — 18년 주기에서 어느 위치인지가 갈아타기 성패를 결정합니다. 고점 갈아타기는 거래비용 + 평가손실의 이중 타격을 받습니다.</p>
+      <p style="font-size:0.78rem;color:var(--text-dim);margin-top:0.8rem;font-family:var(--font-mono);">거래비용 4,200만 + 평가손실 3억 = 3.42억 손실 | 같은 기간 기존 집 보유 시 손실: 평가손실 1.8억만</p>
+    </div>
+  </div>
+</section>
+
+<nav class="nav-footer" role="navigation" aria-label="강의 탐색">
+  <a class="nav-btn" href="day15_real_estate_cycle.html">← Day 15</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 16 / 23</span>
+  <a class="nav-btn" href="day17_rebalancing.html">Day 17 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 El Dorado 투자 원정대 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<!-- Gold Particle System -->
+<canvas id="goldParticles" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.6;"></canvas>
+<script defer>
+
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4AAF6A';
+        b.style.color = '#4AAF6A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+
+
+(function(){
+  const c=document.getElementById('goldParticles');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  let W,H;
+  const particles=[];
+  const N=window.innerWidth<480?12:window.innerWidth<768?20:35;
+
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+
+  class P{
+    constructor(){this.reset();}
+    reset(){
+      this.x=Math.random()*W;
+      this.y=Math.random()*H;
+      this.r=Math.random()*1.8+0.3;
+      this.vx=(Math.random()-0.5)*0.15;
+      this.vy=-Math.random()*0.3-0.05;
+      this.alpha=Math.random()*0.4+0.1;
+      this.fade=Math.random()*0.003+0.001;
+      this.phase=Math.random()*Math.PI*2;
+    }
+    update(){
+      this.x+=this.vx+Math.sin(this.phase)*0.1;
+      this.y+=this.vy;
+      this.phase+=0.01;
+      this.alpha-=this.fade;
+      if(this.alpha<=0||this.y<-10)this.reset();
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(212,168,67,${this.alpha})`;
+      ctx.fill();
+      if(this.r>1){
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.r*2,0,Math.PI*2);
+        ctx.fillStyle=`rgba(212,168,67,${this.alpha*0.15})`;
+        ctx.fill();
+      }
+    }
+  }
+
+  for(let i=0;i<N;i++)particles.push(new P());
+
+  let scrollY=0;
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY;},{passive:true});
+
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of particles){
+      p.y+=scrollY*0.0005;
+      p.update();
+      p.draw();
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+
+(function(){
+  /* ─── 1. Card Gold Light Trail ─── */
+  document.querySelectorAll('.concept-card').forEach(card => {
+    if(card.querySelector('.card-glow')) return;
+    const glow = document.createElement('div');
+    glow.className = 'card-glow';
+    card.appendChild(glow);
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      glow.style.left = (e.clientX - r.left) + 'px';
+      glow.style.top = (e.clientY - r.top) + 'px';
+    });
+  });
+
+  /* ─── 2. Quiz Correct Answer Particle Burst ─── */
+  function createBurst(container, x, y) {
+    let canvas = container.querySelector('.quiz-burst-canvas');
+    if (!canvas) {
+      canvas = document.createElement('canvas');
+      canvas.className = 'quiz-burst-canvas';
+      container.style.position = 'relative';
+      container.appendChild(canvas);
+    }
+    canvas.width = container.offsetWidth;
+    canvas.height = container.offsetHeight;
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const colors = ['#D4A843','#E8C65A','#C4793D','#3D9E6E','#EDE8D8'];
+    for (let i = 0; i < 40; i++) {
+      const angle = (Math.PI * 2 * i) / 40 + (Math.random() - 0.5) * 0.5;
+      const speed = 2 + Math.random() * 4;
+      particles.push({
+        x: x, y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        r: Math.random() * 2.5 + 1,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 1,
+        decay: 0.015 + Math.random() * 0.01,
+        gravity: 0.06
+      });
+    }
+    let frame = 0;
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.vx *= 0.98;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) continue;
+        alive = true;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+        // glow
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha * 0.15;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      frame++;
+      if (alive && frame < 120) requestAnimationFrame(animate);
+      else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    }
+    animate();
+  }
+
+  // Enhance quiz click handler
+  document.querySelectorAll('.quiz-options li').forEach(li => {
+    const origClick = li.onclick;
+    li.addEventListener('click', function(e) {
+      setTimeout(() => {
+        if (li.classList.contains('correct')) {
+          const section = li.closest('.quiz-section');
+          if (section) {
+            const rect = li.getBoundingClientRect();
+            const sRect = section.getBoundingClientRect();
+            createBurst(section, rect.left - sRect.left + rect.width / 2, rect.top - sRect.top + rect.height / 2);
+          }
+        }
+      }, 50);
+    });
+  });
+
+  /* ─── 3. Scroll Compass Widget ─── */
+  if (!document.querySelector('.scroll-compass')) {
+    const compass = document.createElement('div');
+    compass.className = 'scroll-compass';
+    compass.innerHTML = `<svg viewBox="0 0 56 56">
+      <circle cx="28" cy="28" r="26" fill="rgba(13,11,8,0.9)" stroke="#D4A843" stroke-width="1.5"/>
+      <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(212,168,67,0.15)" stroke-width="1"/>
+      <!-- tick marks -->
+      <line x1="28" y1="4" x2="28" y2="8" stroke="#D4A843" stroke-width="1.5"/>
+      <line x1="28" y1="48" x2="28" y2="52" stroke="#8A8272" stroke-width="1"/>
+      <line x1="4" y1="28" x2="8" y2="28" stroke="#8A8272" stroke-width="1"/>
+      <line x1="48" y1="28" x2="52" y2="28" stroke="#8A8272" stroke-width="1"/>
+      <!-- needle (rotates via JS) -->
+      <g id="compassNeedle" style="transform-origin:28px 28px;">
+        <polygon points="28,8 25,28 28,26 31,28" fill="#D4A843"/>
+        <polygon points="28,48 25,28 28,30 31,28" fill="#C45A4A" opacity="0.6"/>
+      </g>
+      <!-- center -->
+      <circle cx="28" cy="28" r="3" fill="#D4A843"/>
+      <!-- progress arc -->
+      <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(212,168,67,0.1)" stroke-width="3"
+              stroke-dasharray="150.8" stroke-dashoffset="150.8"
+              id="compassProgress" transform="rotate(-90 28 28)"
+              stroke-linecap="round"/>
+      <!-- percentage text -->
+      <text x="28" y="43" text-anchor="middle" fill="#8A8272" font-family="JetBrains Mono,monospace" font-size="5.5" id="compassPct">0%</text>
+    </svg>`;
+    compass.title = 'Click to scroll to top';
+    compass.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+    document.body.appendChild(compass);
+
+    const needle = document.getElementById('compassNeedle');
+    const progressArc = document.getElementById('compassProgress');
+    const pctText = document.getElementById('compassPct');
+    const circumference = 150.8;
+
+    function updateCompass() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0;
+
+      // Show/hide
+      compass.classList.toggle('visible', scrollTop > 200);
+
+      // Rotate needle based on scroll (full rotation = full scroll)
+      const rotation = progress * 360;
+      if(needle) needle.style.transform = `rotate(${rotation}deg)`;
+
+      // Progress arc
+      if(progressArc) {
+        const offset = circumference - (progress * circumference);
+        progressArc.setAttribute('stroke-dashoffset', offset);
+        progressArc.setAttribute('stroke', progress > 0.8 ? '#4AAF6A' : '#D4A843');
+      }
+
+      // Percentage text
+      if(pctText) pctText.textContent = Math.round(progress * 100) + '%';
+    }
+
+    window.addEventListener('scroll', updateCompass, {passive: true});
+    updateCompass();
+  }
+
+  /* ─── 4. Section Reveal Gold Flash ─── */
+  document.querySelectorAll('.section').forEach(section => {
+    if(section.querySelector('.section-flash')) return;
+    section.style.position = 'relative';
+    const flash = document.createElement('div');
+    flash.className = 'section-flash';
+    section.prepend(flash);
+  });
+
+  const flashObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) {
+        entry.target.classList.add('flash-active');
+        setTimeout(() => entry.target.classList.remove('flash-active'), 800);
+        flashObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.2});
+
+  document.querySelectorAll('.section').forEach(s => flashObserver.observe(s));
+
+  /* ─── 5. Checklist Celebration ─── */
+  document.querySelectorAll('.checklist li').forEach(li => {
+    li.addEventListener('click', function() {
+      if(this.classList.contains('checked')) {
+        this.classList.add('just-checked');
+        setTimeout(() => this.classList.remove('just-checked'), 600);
+      }
+    });
+  });
+
+  /* ─── 6. Timer Button Active State ─── */
+  const timerBtn = document.getElementById('timerBtn');
+  if(timerBtn) {
+    const origToggle = window.toggleTimer;
+    if(origToggle) {
+      window.toggleTimer = function() {
+        origToggle();
+        timerBtn.classList.toggle('active');
+      };
+    }
+  }
+
+})();
+
+
+(function(){
+  /* ─── 1. Particle Performance Auto-Scaling ─── */
+  const canvas = document.getElementById('goldParticles');
+  if(canvas){
+    const isMobile = window.innerWidth < 768;
+    const isLowEnd = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if(prefersReduced){
+      canvas.style.display = 'none';
+    } else if(isMobile || isLowEnd){
+      // Reduce particle opacity and hide on very small screens
+      canvas.style.opacity = isMobile ? '0.3' : '0.4';
+      if(window.innerWidth < 400) canvas.style.display = 'none';
+    }
+
+    // Battery API: disable particles on low battery
+    if('getBattery' in navigator){
+      navigator.getBattery().then(batt => {
+        if(batt.level < 0.2 && !batt.charging){
+          canvas.style.display = 'none';
+        }
+        batt.addEventListener('levelchange', () => {
+          if(batt.level < 0.15 && !batt.charging) canvas.style.display = 'none';
+        });
+      }).catch(()=>{});
+    }
+
+    // Visibility: pause animation when tab is hidden
+    let rafId = null;
+    document.addEventListener('visibilitychange', () => {
+      if(document.hidden) {
+        canvas.style.display = 'none';
+      } else if(!prefersReduced && !(window.innerWidth < 400)){
+        canvas.style.display = '';
+      }
+    });
+  }
+
+  /* ─── 2. Illustration Lazy Load ─── */
+  const lazyObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const el = entry.target;
+        const svg = el.querySelector('svg');
+        if(svg) svg.style.opacity = '1';
+        el.classList.add('visible');
+        lazyObs.unobserve(el);
+      }
+    });
+  }, {rootMargin: '100px', threshold: 0.1});
+
+  document.querySelectorAll('.hero-illustration').forEach(ill => {
+    const svg = ill.querySelector('svg');
+    if(svg){
+      svg.style.opacity = '0';
+      svg.style.transition = 'opacity 0.8s ease-out';
+    }
+    lazyObs.observe(ill);
+  });
+
+  /* ─── 3. Touch Swipe Navigation ─── */
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+    touchStartTime = Date.now();
+  }, {passive: true});
+
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    const dy = e.changedTouches[0].screenY - touchStartY;
+    const dt = Date.now() - touchStartTime;
+
+    // Must be fast horizontal swipe (>80px, <300ms, mostly horizontal)
+    if(Math.abs(dx) > 80 && Math.abs(dx) > Math.abs(dy) * 2 && dt < 300){
+      const navBtns = document.querySelectorAll('.nav-btn:not(.disabled)');
+      if(dx > 0){
+        // Swipe right → prev
+        const prev = document.querySelector('.nav-btn[href*="day"]:first-of-type:not(.disabled)');
+        if(prev && prev.textContent.includes('Prev')) prev.click();
+      } else {
+        // Swipe left → next
+        const allBtns = Array.from(document.querySelectorAll('.nav-btn'));
+        const next = allBtns.find(b => b.textContent.includes('Next') && !b.classList.contains('disabled'));
+        if(next) next.click();
+      }
+    }
+  }, {passive: true});
+
+  /* ─── 4. Compass Touch Feedback ─── */
+  const compass = document.querySelector('.scroll-compass');
+  if(compass){
+    compass.addEventListener('touchstart', () => {
+      compass.style.transform = 'scale(0.9)';
+      compass.style.transition = 'transform 0.1s';
+    }, {passive: true});
+    compass.addEventListener('touchend', () => {
+      compass.style.transform = 'scale(1)';
+    }, {passive: true});
+  }
+
+  /* ─── 5. Viewport Height Fix for Mobile Browsers ─── */
+  function setVH(){
+    document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+  }
+  setVH();
+  window.addEventListener('resize', setVH);
+
+  /* ─── 6. Font Loading Optimization ─── */
+  if('fonts' in document){
+    document.fonts.ready.then(() => {
+      document.body.classList.add('fonts-loaded');
+    });
+  }
+
+  /* ─── 7. Smooth Scroll Polyfill for Older Safari ─── */
+  if(!('scrollBehavior' in document.documentElement.style)){
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if(target){
+          e.preventDefault();
+          target.scrollIntoView({behavior:'smooth',block:'start'});
+        }
+      });
+    });
+  }
+
+  /* ─── 8. Double-tap to top (mobile shortcut) ─── */
+  let lastTapTime = 0;
+  const header = document.querySelector('.sticky-header');
+  if(header){
+    header.addEventListener('touchend', () => {
+      const now = Date.now();
+      if(now - lastTapTime < 300){
+        window.scrollTo({top:0, behavior:'smooth'});
+      }
+      lastTapTime = now;
+    }, {passive: true});
+  }
+
+})();
+
+
+
+/* ═══ THEME TOGGLE LOGIC ═══ */
+(function(){
+  const toggle = document.getElementById('themeToggle');
+  if(!toggle) return;
+
+  // 1. Determine initial theme
+  function getPreferredTheme(){
+    const saved = localStorage.getItem('eldorado-theme');
+    if(saved) return saved;
+    // Respect system preference
+    if(window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
+    return 'dark';
+  }
+
+  function applyTheme(theme, animate){
+    const html = document.documentElement;
+    if(animate){
+      html.classList.add('theme-transitioning');
+      setTimeout(() => html.classList.remove('theme-transitioning'), 500);
+    }
+    if(theme === 'light'){
+      html.setAttribute('data-theme', 'light');
+      // Update meta theme-color
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.content = '#FAF6EE';
+    } else {
+      html.removeAttribute('data-theme');
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.content = '#0D0B08';
+    }
+    localStorage.setItem('eldorado-theme', theme);
+
+    // Update particle canvas colors if exists
+    updateParticleColors(theme);
+    // Update compass colors
+    updateCompassColors(theme);
+  }
+
+  function updateParticleColors(theme){
+    // Signal to particle system
+    window.__eldoradoTheme = theme;
+  }
+
+  function updateCompassColors(theme){
+    const compass = document.querySelector('.scroll-compass svg');
+    if(!compass) return;
+    const bgCircle = compass.querySelector('circle:first-of-type');
+    const texts = compass.querySelectorAll('text');
+    if(theme === 'light'){
+      if(bgCircle) bgCircle.setAttribute('fill', 'rgba(250,246,238,0.9)');
+      texts.forEach(t => {
+        if(t.getAttribute('fill') === '#8A8272' || t.getAttribute('fill') === 'var(--text-dim)')
+          t.setAttribute('fill', '#8A8070');
+      });
+    } else {
+      if(bgCircle) bgCircle.setAttribute('fill', 'rgba(13,11,8,0.85)');
+    }
+  }
+
+  // 2. Apply on load (no animation)
+  const initial = getPreferredTheme();
+  applyTheme(initial, false);
+
+  // 3. Toggle click
+  toggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    applyTheme(next, true);
+  });
+
+  // 4. Keyboard support
+  toggle.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      toggle.click();
+    }
+  });
+
+  // 5. Listen for system theme change
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+    if(!localStorage.getItem('eldorado-theme')){
+      applyTheme(e.matches ? 'light' : 'dark', true);
+    }
+  });
+})();
+/* ═══ END THEME TOGGLE ═══ */
+
+</script>
+</body>
+</html>

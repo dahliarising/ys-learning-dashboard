@@ -1,2040 +1,590 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Day 11 - 피드백 주고받기 | 인간 탐구 시리즈</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg: #F5F0EB;
-            --bg2: #EDE7DF;
-            --card: #FFFFFF;
-            --card-hover: #FAFAF7;
-            --text1: #2C2C2C;
-            --text2: #6B6B6B;
-            --text3: #999999;
-            --accent: #3D5A80;
-            --accent-light: #E8EEF4;
-            --warm: #D4A373;
-            --warm-light: #FFF3E6;
-            --sage: #7A9E7E;
-            --sage-light: #EDF5EE;
-            --coral: #C1666B;
-            --coral-light: #FBEAEB;
-            --border: rgba(0, 0, 0, 0.06);
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
-            --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.05);
-            
-            --font-display: 'Playfair Display', Georgia, serif;
-            --font-body: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-mono: 'IBM Plex Mono', 'Menlo', monospace;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        body {
-            background: var(--bg);
-            color: var(--text1);
-            font-family: var(--font-body);
-            font-size: 1rem;
-            line-height: 1.9;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        .container {
-            max-width: 720px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
-        
-        header {
-            padding: 3rem 0 2rem;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .day-label {
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--text3);
-            margin-bottom: 0.5rem;
-        }
-        
-        h1 {
-            font-family: var(--font-display);
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: var(--text1);
-            margin-bottom: 1rem;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: var(--bg2);
-            border-radius: 2px;
-            margin: 1.5rem 0 0;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: var(--accent);
-            width: 50%;
-            border-radius: 2px;
-        }
-        
-        .progress-text {
-            font-size: 0.85rem;
-            color: var(--text3);
-            margin-top: 0.5rem;
-        }
-        
-        section {
-            padding: 4rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        section:last-child {
-            border-bottom: none;
-            padding-bottom: 6rem;
-        }
-        
-        h2 {
-            font-family: var(--font-display);
-            font-size: 1.6rem;
-            font-weight: 600;
-            color: var(--text1);
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--accent-light);
-        }
-        
-        p {
-            margin-bottom: 1.5rem;
-            color: var(--text2);
-        }
-        
-        strong {
-            color: var(--text1);
-            font-weight: 600;
-        }
-        
-        .accent {
-            color: var(--accent);
-            font-weight: 600;
-        }
-        
-        .warm-text {
-            color: var(--warm);
-            font-weight: 600;
-        }
-        
-        .scenario-box {
-            background: var(--warm-light);
-            padding: 2.4rem;
-            border-radius: 16px;
-            margin-bottom: 2rem;
-            border-left: 4px solid var(--warm);
-        }
-        
-        .scenario-box h3 {
-            font-family: var(--font-display);
-            font-size: 1.2rem;
-            color: var(--warm);
-            margin-bottom: 1rem;
-        }
-        
-        .cards-container {
-            display: grid;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .concept-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2.4rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow);
-        }
-        
-        .concept-card:hover {
-            background: var(--card-hover);
-            box-shadow: var(--shadow-hover);
-            transform: translateY(-2px);
-        }
-        
-        .concept-card.expanded {
-            background: var(--accent-light);
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-        }
-        
-        .card-title {
-            font-family: var(--font-display);
-            font-size: 1.2rem;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-            flex: 1;
-        }
-        
-        .card-toggle {
-            color: var(--accent);
-            font-size: 1.5rem;
-            margin-left: 1rem;
-            flex-shrink: 0;
-        }
-        
-        .card-content {
-            display: none;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border);
-        }
-        
-        .card-content.visible {
-            display: block;
-        }
-        
-        .card-content p {
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
-        }
-        
-        .aha-point {
-            background: var(--accent-light);
-            padding: 1.2rem;
-            border-radius: 12px;
-            margin-top: 1rem;
-            border-left: 3px solid var(--accent);
-        }
-        
-        .aha-point strong {
-            color: var(--accent);
-        }
-        
-        svg {
-            width: 100%;
-            height: auto;
-            margin: 2rem 0;
-            background: var(--card);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-        }
-        
-        .diagram-caption {
-            font-size: 0.9rem;
-            color: var(--text3);
-            text-align: center;
-            margin-top: 1rem;
-            font-style: italic;
-        }
-        
-        .research-spotlight {
-            background: var(--accent-light);
-            padding: 2.4rem;
-            border-radius: 16px;
-            margin-bottom: 2rem;
-            border-left: 4px solid var(--accent);
-        }
-        
-        .research-spotlight h3 {
-            color: var(--accent);
-            font-family: var(--font-display);
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .research-spotlight p {
-            margin-bottom: 1rem;
-            font-size: 0.95rem;
-        }
-        
-        .mental-model {
-            background: var(--sage-light);
-            padding: 2.4rem;
-            border-radius: 16px;
-            margin-bottom: 2rem;
-            border-left: 4px solid var(--sage);
-        }
-        
-        .mental-model h3 {
-            color: var(--sage);
-            font-family: var(--font-display);
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .practice-section {
-            display: grid;
-            gap: 1.5rem;
-        }
-        
-        .practice-item {
-            background: var(--card);
-            padding: 1.8rem;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-        
-        .practice-time {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--warm);
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-        
-        .practice-title {
-            font-family: var(--font-display);
-            font-size: 1.1rem;
-            color: var(--text1);
-            margin-bottom: 0.5rem;
-        }
-        
-        .philosophy-box {
-            background: var(--coral-light);
-            padding: 2.4rem;
-            border-radius: 16px;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid var(--coral);
-        }
-        
-        .philosopher {
-            margin-bottom: 1.5rem;
-        }
-        
-        .philosopher-name {
-            color: var(--coral);
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .quote {
-            font-style: italic;
-            color: var(--text2);
-            padding-left: 1.5rem;
-            margin: 0.5rem 0;
-        }
-        
-        .quiz-section {
-            background: var(--accent-light);
-            padding: 2.4rem;
-            border-radius: 16px;
-            margin-bottom: 2rem;
-        }
-        
-        .quiz-item {
-            margin-bottom: 2rem;
-        }
-        
-        .quiz-question {
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--text1);
-        }
-        
-        .quiz-options {
-            display: grid;
-            gap: 0.8rem;
-        }
-        
-        .quiz-option {
-            background: var(--card);
-            padding: 1rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .quiz-option:hover {
-            background: var(--card-hover);
-        }
-        
-        .quiz-option input {
-            margin-right: 0.8rem;
-        }
-        
-        .quiz-feedback {
-            margin-top: 1rem;
-            padding: 1rem;
-            border-radius: 8px;
-            display: none;
-        }
-        
-        .quiz-feedback.correct {
-            background: var(--sage-light);
-            color: var(--sage);
-            display: block;
-        }
-        
-        .quiz-feedback.incorrect {
-            background: var(--coral-light);
-            color: var(--coral);
-            display: block;
-        }
-        
-        .connection-map {
-            background: var(--card);
-            padding: 2.4rem;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            text-align: center;
-        }
-        
-        .connection-map p {
-            margin-bottom: 1rem;
-            color: var(--text2);
-        }
-        
-        footer {
-            text-align: center;
-            padding: 2rem 0;
-            color: var(--text3);
-            font-size: 0.9rem;
-        }
-        
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            h2 {
-                font-size: 1.3rem;
-            }
-            
-            .container {
-                padding: 0 1rem;
-            }
-            
-            section {
-                padding: 2.5rem 0;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.5rem;
-            }
-            
-            section {
-                padding: 2rem 0;
-            }
-            
-            .scenario-box, .concept-card, .research-spotlight {
-                padding: 1.5rem;
-            }
-        }
-    
-        /* ===== INTERACTIVE COMPONENTS ===== */
-        
-        /* 1. Dynamic Scroll Progress Bar */
-        .progress-bar {
-            height: 3px;
-            background: var(--bg2);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent), var(--warm));
-            width: 0%;
-            transition: width 0.1s ease-out;
-        }
-        
-        /* 2. Box Breathing Guide */
-        .breathing-section {
-            background: linear-gradient(135deg, var(--sage-light) 0%, var(--accent-light) 100%);
-            border-radius: 16px;
-            padding: 2.4rem;
-            margin: 2rem 0;
-            text-align: center;
-        }
-        
-        .breathing-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-            margin: 2rem 0;
-        }
-        
-        .breathing-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--sage), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-align: center;
-            padding: 1rem;
-            box-shadow: 0 4px 16px rgba(122, 158, 126, 0.2);
-            animation: none;
-        }
-        
-        .breathing-circle.breathing {
-            animation: breathing 16s infinite;
-        }
-        
-        @keyframes breathing {
-            0% { transform: scale(0.8); background: linear-gradient(135deg, #7A9E7E, #3D5A80); }
-            25% { transform: scale(1.2); background: linear-gradient(135deg, #9EBFA0, #5A7FA8); }
-            50% { transform: scale(0.8); background: linear-gradient(135deg, #7A9E7E, #3D5A80); }
-            75% { transform: scale(1.1); background: linear-gradient(135deg, #8DAD8D, #4D6F96); }
-            100% { transform: scale(0.8); background: linear-gradient(135deg, #7A9E7E, #3D5A80); }
-        }
-        
-        .breathing-label {
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            color: var(--text2);
-            margin-top: 0.5rem;
-            letter-spacing: 0.05em;
-        }
-        
-        .breathing-controls {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 1.5rem;
-        }
-        
-        .breathing-btn {
-            padding: 0.8rem 1.5rem;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-family: var(--font-body);
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: var(--accent);
-            font-weight: 600;
-        }
-        
-        .breathing-btn:hover {
-            background: var(--accent-light);
-            border-color: var(--accent);
-        }
-        
-        /* 3. Flashcard System */
-        .flashcards-section {
-            margin: 2rem 0;
-        }
-        
-        .flashcard-container {
-            perspective: 1000px;
-            height: 280px;
-            margin: 2rem 0;
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .flashcard {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-        }
-        
-        .flashcard-container:hover .flashcard {
-            transform: rotateY(180deg);
-        }
-        
-        .flashcard-front, .flashcard-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            padding: 2rem;
-            font-size: 1.3rem;
-            font-weight: 600;
-            line-height: 1.6;
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .flashcard-front {
-            background: linear-gradient(135deg, var(--accent-light), var(--warm-light));
-            color: var(--accent);
-            border: 2px solid var(--accent);
-        }
-        
-        .flashcard-back {
-            background: linear-gradient(135deg, var(--sage-light), var(--accent-light));
-            color: var(--sage);
-            border: 2px solid var(--sage);
-            transform: rotateY(180deg);
-            font-size: 1.1rem;
-        }
-        
-        .flashcard-nav {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-        
-        .flashcard-btn {
-            padding: 0.8rem 1.5rem;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: var(--font-body);
-            font-size: 0.95rem;
-            transition: all 0.3s;
-            color: var(--text1);
-        }
-        
-        .flashcard-btn:hover {
-            background: var(--accent-light);
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-        
-        .flashcard-counter {
-            text-align: center;
-            color: var(--text2);
-            font-size: 0.9rem;
-            margin-top: 1rem;
-            font-family: var(--font-mono);
-        }
-        
-        /* 4. Scenario Choice Game */
-        .scenario-section {
-            background: var(--card);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 2.4rem;
-            margin: 2rem 0;
-        }
-        
-        .scenario-prompt {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--accent);
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        
-        .scenario-choices {
-            display: grid;
-            gap: 1rem;
-        }
-        
-        .scenario-choice {
-            padding: 1.5rem;
-            background: var(--accent-light);
-            border: 2px solid transparent;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: left;
-        }
-        
-        .scenario-choice:hover {
-            transform: translateX(8px);
-            border-color: var(--accent);
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .scenario-choice.selected {
-            border-color: var(--sage);
-            background: var(--sage-light);
-        }
-        
-        .scenario-choice-title {
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-        
-        .scenario-choice.selected .scenario-choice-title {
-            color: var(--sage);
-        }
-        
-        .scenario-choice-desc {
-            color: var(--text2);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-        
-        .scenario-result {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: var(--sage-light);
-            border-left: 4px solid var(--sage);
-            border-radius: 8px;
-            display: none;
-        }
-        
-        .scenario-result.show {
-            display: block;
-            animation: slideIn 0.4s ease-out;
-        }
-        
-        /* 5. Practice Timer */
-        .timer-section {
-            background: linear-gradient(135deg, var(--warm-light), var(--accent-light));
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-            text-align: center;
-        }
-        
-        .timer-display {
-            font-family: var(--font-mono);
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin: 1.5rem 0;
-            letter-spacing: 0.1em;
-        }
-        
-        .timer-circle {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: conic-gradient(var(--accent) 0deg, var(--accent) var(--timer-progress, 0deg), var(--accent-light) var(--timer-progress, 0deg), var(--accent-light) 360deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 1.5rem auto;
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .timer-controls {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 1.5rem;
-        }
-        
-        .timer-preset {
-            padding: 0.7rem 1.2rem;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-        
-        .timer-preset:hover, .timer-preset.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-        
-        .timer-action {
-            padding: 0.8rem 1.8rem;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: var(--font-body);
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .timer-action:hover {
-            background: var(--sage);
-            box-shadow: var(--shadow-hover);
-        }
-        
-        /* 6. Concept Matching */
-        .matching-section {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-        
-        .matching-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin: 1.5rem 0;
-        }
-        
-        .matching-column {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-        
-        .matching-column-title {
-            font-weight: 700;
-            color: var(--accent);
-            text-align: center;
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-family: var(--font-mono);
-        }
-        
-        .match-item {
-            padding: 1rem;
-            background: var(--accent-light);
-            border: 2px solid transparent;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-            user-select: none;
-        }
-        
-        .match-item:hover {
-            border-color: var(--accent);
-            box-shadow: var(--shadow-hover);
-            transform: translateY(-2px);
-        }
-        
-        .match-item.selected {
-            border-color: var(--accent);
-            background: var(--accent-light);
-            box-shadow: inset 0 0 0 2px var(--accent);
-        }
-        
-        .match-item.matched {
-            background: var(--sage-light);
-            border-color: var(--sage);
-            cursor: default;
-            color: var(--sage);
-            font-weight: 600;
-        }
-        
-        .match-item.incorrect {
-            background: var(--coral-light);
-            border-color: var(--coral);
-        }
-        
-        .matching-reset {
-            padding: 0.8rem 1.5rem;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: var(--font-body);
-            font-size: 0.95rem;
-            font-weight: 600;
-            margin-top: 1.5rem;
-            width: 100%;
-            transition: all 0.3s;
-        }
-        
-        .matching-reset:hover {
-            background: var(--sage);
-        }
-        
-        .matching-status {
-            text-align: center;
-            margin-top: 1rem;
-            font-size: 0.95rem;
-            color: var(--text2);
-            font-weight: 500;
-        }
-        
-        .matching-status.complete {
-            color: var(--sage);
-            font-weight: 700;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @media (max-width: 640px) {
-            .flashcard-container {
-                height: 220px;
-            }
-            
-            .flashcard-front, .flashcard-back {
-                font-size: 1rem;
-                padding: 1.5rem;
-            }
-            
-            .breathing-circle {
-                width: 100px;
-                height: 100px;
-                font-size: 0.8rem;
-            }
-            
-            .matching-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .timer-display {
-                font-size: 2.5rem;
-            }
-            
-            .timer-circle {
-                width: 150px;
-                height: 150px;
-            }
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 11 — 피드백 주고받기 | 인간 탐구 시리즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg:#F5F0EB;--bg2:#EDE7DF;--card:#FFFFFF;--card-hover:#FAFAF7;
+    --text1:#2C2C2C;--text2:#6B6B6B;--text3:#999;
+    --accent:#3D5A80;--accent-light:#E8EEF4;
+    --warm:#D4A373;--warm-light:#FFF3E6;
+    --sage:#7A9E7E;--sage-light:#EDF5EE;
+    --coral:#C1666B;--coral-light:#FBEAEB;
+    --border:rgba(0,0,0,0.06);
+    --shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.03);
+    --fd:'Playfair Display',Georgia,serif;
+    --fb:'Noto Sans KR',-apple-system,sans-serif;
+    --fm:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--fb);background:var(--bg);color:var(--text1);line-height:1.85;font-size:0.95rem;letter-spacing:-0.01em;}
+.wrap{max-width:680px;margin:0 auto;padding:0 1.5rem;}
+
+/* ── Slim Header ── */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(245,240,235,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
+.hdr-track{height:3px;background:var(--bg2);}
+.hdr-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--sage));transition:width .3s;}
+.hdr-inner{display:flex;justify-content:space-between;align-items:center;padding:0.4rem 1.5rem;max-width:680px;margin:0 auto;}
+.hdr-label{font-family:var(--fm);font-size:0.7rem;color:var(--text3);letter-spacing:0.06em;}
+.hdr-nav a{font-family:var(--fm);font-size:0.7rem;color:var(--text3);text-decoration:none;margin-left:1rem;}
+.hdr-nav a:hover{color:var(--accent);}
+
+/* ── Hero (compact) ── */
+.hero{padding:2.5rem 0 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
+.hero .day-num{font-family:var(--fm);font-size:0.7rem;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.4rem;}
+.hero h1{font-family:var(--fd);font-size:1.7rem;font-weight:700;color:var(--text1);line-height:1.25;margin-bottom:1rem;letter-spacing:-0.02em;}
+.hero .hook{font-size:1rem;color:var(--text2);line-height:1.75;font-style:italic;border-left:3px solid var(--warm);padding-left:1.2rem;}
+
+/* ── Section Spacing ── */
+section{margin-bottom:2.5rem;}
+.sec-label{font-family:var(--fm);font-size:0.65rem;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.3rem;}
+h2{font-family:var(--fd);font-size:1.25rem;font-weight:600;color:var(--accent);margin-bottom:1rem;line-height:1.3;}
+h3{font-size:1rem;font-weight:600;margin-bottom:0.6rem;color:var(--text1);}
+p{margin-bottom:1.2rem;color:var(--text2);}
+
+/* ── Insight Box ── */
+.insight{background:var(--accent-light);border-radius:10px;padding:1rem 1.3rem;margin:1.2rem 0;border-left:3px solid var(--accent);font-size:0.9rem;line-height:1.7;}
+.insight strong{color:var(--accent);}
+.insight.warm{background:var(--warm-light);border-color:var(--warm);}
+.insight.warm strong{color:var(--warm);}
+.insight.sage{background:var(--sage-light);border-color:var(--sage);}
+.insight.sage strong{color:var(--sage);}
+
+/* ── Pull Quote ── */
+.pq{font-size:1.05rem;font-style:italic;color:var(--text1);border-left:3px solid var(--warm);padding:0.6rem 0 0.6rem 1.3rem;margin:1.8rem 0;line-height:1.65;}
+.pq cite{display:block;font-size:0.75rem;font-style:normal;color:var(--text3);margin-top:0.4rem;font-family:var(--fm);}
+
+/* ── Stat Highlights ── */
+.stats{display:flex;gap:1rem;margin:1.5rem 0;flex-wrap:wrap;}
+.st{flex:1;min-width:120px;background:var(--card);border-radius:10px;padding:1rem;text-align:center;box-shadow:var(--shadow);}
+.st .n{font-family:var(--fd);font-size:1.6rem;font-weight:700;color:var(--accent);}
+.st .d{font-size:0.75rem;color:var(--text3);margin-top:0.2rem;}
+
+/* ── 2-Col Grid ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin:1.2rem 0;}
+.gi{background:var(--card);border-radius:10px;padding:1rem;box-shadow:var(--shadow);}
+.gi h4{font-size:0.85rem;font-weight:600;color:var(--accent);margin-bottom:0.3rem;}
+.gi p{font-size:0.82rem;color:var(--text2);margin:0;line-height:1.6;}
+
+/* ── Compare ── */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:1.5rem 0;border-radius:10px;overflow:hidden;box-shadow:var(--shadow);}
+.cmp-l{padding:1.2rem;background:var(--coral-light);}
+.cmp-r{padding:1.2rem;background:var(--sage-light);}
+.cmp h4{font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;}
+.cmp p{font-size:0.82rem;margin:0;line-height:1.6;}
+.cmp-l h4{color:var(--coral);}
+.cmp-r h4{color:var(--sage);}
+
+/* ── Card (accordion) ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);cursor:pointer;transition:all .25s;}
+.card:hover{box-shadow:var(--shadow),0 0 0 1px var(--accent-light);}
+.card-top{display:flex;justify-content:space-between;align-items:center;}
+.card-top h3{font-size:0.95rem;color:var(--accent);margin:0;}
+.card-arrow{font-size:0.8rem;color:var(--text3);transition:transform .3s;}
+.card-arrow.open{transform:rotate(180deg);}
+.card-body{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+.card-body.open{max-height:1500px;}
+.card-inner{padding-top:1rem;margin-top:1rem;border-top:1px solid var(--border);font-size:0.88rem;color:var(--text2);line-height:1.75;}
+.card-inner h4{font-size:0.88rem;font-weight:600;color:var(--text1);margin:1rem 0 0.4rem;}
+
+/* ── SVG Container ── */
+.svg-wrap{margin:1.5rem 0;text-align:center;}
+.svg-wrap svg{max-width:100%;height:auto;}
+.svg-cap{font-family:var(--fm);font-size:0.7rem;color:var(--text3);margin-top:0.5rem;text-align:center;}
+
+/* ── Practice ── */
+.practice{background:var(--card);border-radius:12px;padding:1.5rem;box-shadow:var(--shadow);margin:1.5rem 0;}
+.practice h3{color:var(--sage);font-size:0.95rem;}
+.practice-item{display:flex;gap:0.8rem;align-items:flex-start;margin-top:0.8rem;}
+.practice-badge{font-family:var(--fm);font-size:0.65rem;background:var(--sage-light);color:var(--sage);padding:0.2rem 0.6rem;border-radius:12px;white-space:nowrap;margin-top:0.1rem;}
+.practice-text{font-size:0.88rem;color:var(--text2);line-height:1.65;}
+
+/* ── Timer ── */
+.timer-box{background:var(--warm-light);border-radius:10px;padding:1rem;margin-top:1rem;text-align:center;}
+.timer-display{font-family:var(--fd);font-size:2rem;color:var(--warm);margin:0.5rem 0;}
+.timer-btns{display:flex;gap:0.5rem;justify-content:center;}
+.timer-btns button{font-family:var(--fb);font-size:0.8rem;padding:0.4rem 1rem;border:1px solid var(--warm);background:transparent;color:var(--warm);border-radius:20px;cursor:pointer;transition:all .2s;}
+.timer-btns button:hover{background:var(--warm);color:#fff;}
+.timer-btns button.active{background:var(--warm);color:#fff;}
+
+/* ── Breathing ── */
+.breath-box{text-align:center;margin:1rem 0;}
+#breathC{width:100px;height:100px;border-radius:50%;background:var(--sage-light);border:2px solid var(--sage);margin:0 auto 0.8rem;display:flex;align-items:center;justify-content:center;transition:all 1s ease;font-family:var(--fm);font-size:0.75rem;color:var(--sage);}
+#breathB{font-family:var(--fb);font-size:0.8rem;background:var(--sage);color:#fff;border:none;padding:0.4rem 1.5rem;border-radius:20px;cursor:pointer;}
+
+/* ── Flashcard ── */
+.fc-wrap{perspective:800px;max-width:400px;margin:0 auto;}
+.fc{position:relative;width:100%;height:200px;cursor:pointer;transform-style:preserve-3d;transition:transform .5s;}
+.fc.flip{transform:rotateY(180deg);}
+.fc-f,.fc-b{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;box-shadow:var(--shadow);}
+.fc-f{background:var(--card);border:1px solid var(--border);}
+.fc-b{background:var(--accent);color:#fff;transform:rotateY(180deg);}
+.fc-f .term{font-size:1.1rem;font-weight:600;color:var(--accent);text-align:center;}
+.fc-f .hint{font-size:0.7rem;color:var(--text3);margin-top:0.8rem;font-family:var(--fm);}
+.fc-b .def{font-size:0.9rem;text-align:center;line-height:1.6;}
+.fc-nav{display:flex;justify-content:center;gap:0.8rem;margin-top:1rem;}
+.fc-nav button{font-family:var(--fb);font-size:0.8rem;background:var(--bg2);border:1px solid var(--border);padding:0.35rem 1.2rem;border-radius:20px;cursor:pointer;}
+.fc-counter{font-family:var(--fm);font-size:0.75rem;color:var(--text3);display:flex;align-items:center;}
+
+/* ── Scenario ── */
+.sc-box{background:var(--card);border-radius:12px;padding:1.5rem;box-shadow:var(--shadow);}
+.sc-q{font-size:0.95rem;color:var(--text1);margin-bottom:1rem;line-height:1.7;}
+.sc-opt{padding:0.8rem 1rem;border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;cursor:pointer;font-size:0.88rem;color:var(--text2);transition:all .2s;line-height:1.6;}
+.sc-opt:hover{border-color:var(--accent);background:var(--accent-light);}
+.sc-opt.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
+.sc-result{display:none;margin-top:1rem;padding:1rem;border-radius:8px;font-size:0.85rem;line-height:1.7;}
+.sc-result.show{display:block;}
+.sc-result.good{background:var(--sage-light);color:var(--sage);}
+.sc-result.ok{background:var(--warm-light);color:var(--warm);}
+.sc-result.bad{background:var(--coral-light);color:var(--coral);}
+
+/* ── Quiz ── */
+.quiz-q{background:var(--card);border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);}
+.quiz-q p{font-size:0.9rem;font-weight:500;color:var(--text1);margin-bottom:0.8rem;}
+.quiz-opt{display:block;padding:0.6rem 1rem;border:1px solid var(--border);border-radius:8px;margin-bottom:0.4rem;cursor:pointer;font-size:0.85rem;color:var(--text2);transition:all .2s;}
+.quiz-opt:hover{border-color:var(--accent);}
+.quiz-opt.correct{background:var(--sage-light);border-color:var(--sage);color:var(--sage);}
+.quiz-opt.wrong{background:var(--coral-light);border-color:var(--coral);color:var(--coral);}
+.quiz-fb{display:none;font-size:0.82rem;padding:0.8rem;border-radius:8px;margin-top:0.5rem;line-height:1.6;}
+.quiz-fb.show{display:block;background:var(--accent-light);color:var(--accent);}
+
+/* ── Matching ── */
+.match-area{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin:1rem 0;}
+.match-item{padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.82rem;text-align:center;transition:all .2s;background:var(--card);}
+.match-item:hover{border-color:var(--accent);}
+.match-item.sel{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
+.match-item.done{border-color:var(--sage);background:var(--sage-light);color:var(--sage);cursor:default;}
+
+/* ── Connection ── */
+.conn{display:flex;justify-content:space-between;gap:0.5rem;margin:1rem 0;}
+.conn a{flex:1;text-align:center;padding:0.8rem;background:var(--card);border-radius:10px;text-decoration:none;box-shadow:var(--shadow);transition:all .2s;font-size:0.82rem;color:var(--text2);}
+.conn a:hover{box-shadow:var(--shadow),0 0 0 1px var(--accent);color:var(--accent);}
+.conn a .cn{font-family:var(--fm);font-size:0.65rem;color:var(--text3);display:block;margin-bottom:0.2rem;}
+
+/* ── Footer ── */
+.ftr{text-align:center;padding:2rem 0;border-top:1px solid var(--border);margin-top:2rem;font-size:0.75rem;color:var(--text3);}
+
+/* ── Responsive ── */
+@media(max-width:640px){
+    .hero h1{font-size:1.4rem;}
+    .g2,.cmp,.match-area{grid-template-columns:1fr;}
+    .stats{flex-direction:column;}
+    .conn{flex-direction:column;}
+}
+
+/* ── Fade In ── */
+.fi{opacity:0;transform:translateY(12px);transition:opacity .5s,transform .5s;}
+.fi.v{opacity:1;transform:none;}
 </style>
 </head>
 <body>
-    <header class="container">
-        <div class="day-label">Part 2: 인간관계 심리학</div>
-        <h1>Day 11 — 피드백 주고받기</h1>
-        <div class="progress-bar">
-            <div class="progress-fill"></div>
-        </div>
-        <div class="progress-text">진행률: 50% (11/22)</div>
-    </header>
 
-    <main class="container">
-        <!-- 섹션 1: 훅 -->
-        <section id="hook">
-            <h2>피드백은 오히려 성과를 떨어뜨린다 — 607개 연구의 진실</h2>
-            <p>당신의 상사가 당신의 프레젠테이션을 검토했습니다. 그는 "당신의 슬라이드 디자인이 너무 복잡하다"고 말했습니다. 당신은 그의 피드백을 받아들이고, 디자인을 단순화했습니다.</p>
-            <p>그런데 여기 문제가 있습니다: <span class="accent">Kluger & DeNisi(1996)가 607개의 피드백 연구를 분석한 결과, 무려 38%의 경우에서 피드백이 오히려 성과를 떨어뜨렸다는 것을 발견했습니다</span>.</p>
-            <p><strong>이것은 무엇을 의미할까요?</strong> 대부분의 피드백은 <strong>잘못된 방식</strong>으로 주어지고 있다는 뜻입니다. 피드백을 주는 방식과 받는 방식 모두에 신경과학이 있습니다.</p>
-        </section>
+<!-- Header -->
+<header class="hdr">
+    <div class="hdr-track"><div class="hdr-fill" id="progFill"></div></div>
+    <div class="hdr-inner">
+        <span class="hdr-label">Day 11 / 22</span>
+        <nav class="hdr-nav">
+            <a href="day10_갈등의_신경과학.html">← 이전</a>
+            <a href="day12_통합복습_Part1_2.html">다음 →</a>
+        </nav>
+    </div>
+</header>
 
-        <!-- 섹션 2: 시나리오 -->
-        <section id="scenarios">
-            <h2>피드백이 상처가 되는 순간들</h2>
-            
-            <div class="scenario-box">
-                <h3>시나리오 1: 설계 리뷰의 날카로운 피드백</h3>
-                <p>당신이 디자인한 제품 컨셉을 팀과 공유했습니다. 당신은 몇 주를 투자했고, 자부심을 가지고 있습니다. 그런데 경험 많은 동료가 말합니다: "이건 시장에서 절대 작동하지 않을 거야. 리서치가 부족하다."</p>
-                <p>당신의 신경계는 무엇을 감지했을까요?</p>
-                <ul style="margin-left: 1.5rem; color: var(--text2);">
-                    <li>당신의 아이디어(= 당신의 능력)가 거부되었다</li>
-                    <li>공개적으로 비판받았다 (사회적 위협)</li>
-                    <li>통제력을 잃었다 (자율성 위협)</li>
-                </ul>
-            </div>
+<main class="wrap">
 
-            <div class="scenario-box">
-                <h3>시나리오 2: 공허한 격려</h3>
-                <p>"잘하고 있어."</p>
-                <p>당신의 상사가 말합니다. 그런데 왜 이 말이 공허하게 들릴까요? 왜 당신은 자신이 정말로 뭘 잘못했는지 알고 싶은 강박을 느낄까요? 심리학자들은 이것을 "피드백 기아(feedback hunger)"라고 부릅니다. 무언가를 개선하려면 당신은 <strong>구체적인 정보</strong>가 필요합니다.</p>
-            </div>
-
-            <div class="scenario-box">
-                <h3>시나리오 3: 배우자의 육아 피드백</h3>
-                <p>당신이 아이를 재우고 있습니다. 당신의 배우자가 옆에서 말합니다: "그렇게 하지 말고, 이렇게 해. 더 부드럽게."</p>
-                <p>당신은 방어적으로 반응합니다: "나도 하고 있잖아. 왜 자꾸 간섭해?"</p>
-                <p>이것은 육아 방식의 차이가 아닙니다. 이것은 <strong>신경적 위협</strong>입니다. 당신의 신경계는 "당신의 능력이 의심받고 있다"는 신호를 받았습니다.</p>
-            </div>
-        </section>
-
-        <!-- 섹션 3: 개념 카드 -->
-        <section id="concepts">
-            <h2>발견: 피드백의 신경과학</h2>
-            
-            <div class="cards-container">
-                <div class="concept-card" onclick="toggleCard(this)">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">① SCARF 위협 모델</div>
-                            <p style="color: var(--text2); font-size: 0.9rem;">David Rock, 2008</p>
-                        </div>
-                        <div class="card-toggle">+</div>
-                    </div>
-                    <div class="card-content">
-                        <h4 style="color: var(--accent); margin-bottom: 1rem;">피드백이 신경을 자극하는 5가지 방식</h4>
-                        
-                        <p><strong>S — Status (지위)</strong></p>
-                        <p>피드백을 받을 때 당신은 "내 지위가 떨어지는 건 아닐까?"를 감지합니다. 특히 공개적으로 비판받으면, 당신의 뇌는 사회적 위계에서 당신을 하강시킵니다. 이것은 편도체를 활성화합니다.</p>
-                        
-                        <p><strong>C — Certainty (확실성)</strong></p>
-                        <p>피드백은 불확실성을 만듭니다. "내가 정말로 이 일을 잘할 수 있을까?" 당신의 신경계는 불확실성을 위협으로 감지합니다. 예측 불가능한 환경은 스트레스 호르몬(코르티솔)을 증가시킵니다.</p>
-                        
-                        <p><strong>A — Autonomy (자율성)</strong></p>
-                        <p>피드백은 종종 지시처럼 느껴집니다: "이렇게 해야 해." 당신의 신경계는 자율성의 제한을 위협으로 감지합니다. 통제감을 잃으면 뇌의 보상 시스템이 활성화되지 않습니다.</p>
-                        
-                        <p><strong>R — Relatedness (관계성)</strong></p>
-                        <p>피드백이 비판처럼 느껴지면, 당신은 "저 사람이 나를 거부하려고 하나?"를 감지합니다. 사회적 배제는 신체적 고통과 동일한 뇌 영역을 활성화합니다 (Day 10의 Cyberball 실험).</p>
-                        
-                        <p><strong>F — Fairness (공정성)</strong></p>
-                        <p>피드백이 일방적이거나 불공정하게 느껴지면, 당신의 신경계는 "이건 부당해"를 감지합니다. 불공정함은 감정 뇌를 활성화시켜서, 당신은 피드백의 내용이 아니라 감정으로 반응합니다.</p>
-                        
-                        <div class="aha-point">
-                            <strong>💡 아하 포인트:</strong> 좋은 피드백도 SCARF 중 하나라도 위협하면 신경계가 방어 상태로 전환됩니다. 그러면 학습은 불가능합니다.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="concept-card" onclick="toggleCard(this)">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">② SBI 모델: 피드백의 구조</div>
-                            <p style="color: var(--text2); font-size: 0.9rem;">Situation-Behavior-Impact</p>
-                        </div>
-                        <div class="card-toggle">+</div>
-                    </div>
-                    <div class="card-content">
-                        <h4 style="color: var(--accent); margin-bottom: 1rem;">신경과학적으로 효과적인 피드백 구조</h4>
-                        
-                        <p><strong>Situation (상황)</strong></p>
-                        <p>먼저 당신이 어느 상황을 언급하는지 명확히 합니다. "어제 회의에서..."라고 시간과 장소를 구체화합니다. 왜? 당신의 신경계가 "우리가 같은 사건에 대해 말하고 있다"를 확인해야 하기 때문입니다. 이것이 CERTAINTY를 회복시킵니다.</p>
-                        
-                        <p><strong>Behavior (행동)</strong></p>
-                        <p>그 상황에서 당신이 한 구체적인 행동을 설명합니다. "당신이 한 말은..." 또는 "당신이 한 행동은..." 중요한 것은 <strong>당신의 인격이 아니라 그 특정 행동</strong>입니다. 이것이 STATUS를 보호합니다. (당신은 "나쁜 사람"이 아니라, 그 상황에서 "다르게 할 수 있었던" 사람입니다.)</p>
-                        
-                        <p><strong>Impact (영향)</strong></p>
-                        <p>그 행동의 영향을 설명합니다. "그 결과는..." 이때 중요한 것은 <strong>객관적 결과</strong>를 설명하는 것입니다. 감정은 피합니다. "당신이 화나게 했어"보다는 "그 결과 팀의 의사결정이 지연되었어"가 낫습니다. 이것이 FAIRNESS를 회복시킵니다 (개인 공격이 아니라 상황 분석).</p>
-                        
-                        <p><strong>각 단계의 뇌과학:</strong></p>
-                        <ul style="margin-left: 1.5rem; color: var(--text2);">
-                            <li>Situation → 편도체 진정, dACC 활성화 (정보 처리)</li>
-                            <li>Behavior → dlPFC 활성화 (이성적 평가)</li>
-                            <li>Impact → OFC 활성화 (가치 평가, 학습)</li>
-                        </ul>
-                        
-                        <div class="aha-point">
-                            <strong>💡 아하 포인트:</strong> SBI 구조는 신경계를 "공격받고 있다"는 상태에서 "배우고 있다"는 상태로 전환시킵니다.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="concept-card" onclick="toggleCard(this)">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">③ 피드백 수용: 성격과 신경계</div>
-                            <p style="color: var(--text2); font-size: 0.9rem;">INFP 타입과 자기자비</p>
-                        </div>
-                        <div class="card-toggle">+</div>
-                    </div>
-                    <div class="card-content">
-                        <h4 style="color: var(--accent); margin-bottom: 1rem;">성격에 따른 피드백 반응과 뇌과학</h4>
-                        
-                        <p><strong>INFP의 도전: Fi (개인적 가치) vs 피드백</strong></p>
-                        <p>INFP는 당신의 행동을 당신의 정체성과 연결시킵니다. "내가 한 실수 = 내가 나쁜 사람"이라는 공식으로 작동합니다. 신경과학적으로, 그들의 뇌는 개인적 가치(anterior insula)와 행동 평가(dACC)를 강하게 연결시킵니다.</p>
-                        
-                        <p><strong>탈개인화 전략</strong></p>
-                        <p>피드백을 받을 때, 당신은 <strong>그것을 "나"에서 분리</strong>해야 합니다. 인지 재구성을 사용합니다:</p>
-                        <ul style="margin-left: 1.5rem; color: var(--text2);">
-                            <li>OLD: "나는 실수했다. 나는 능력이 없다." (자기 비판)</li>
-                            <li>NEW: "나는 이 상황에서 다르게 할 수 있었다. 이것은 배움의 기회다." (성장 마음가짐)</li>
-                        </ul>
-                        <p>이 전환은 단순한 생각 바꾸기가 아닙니다. 이것은 신경 회로를 재구성하는 것입니다. 반복하면 anterior insula의 반응이 약해집니다.</p>
-                        
-                        <p><strong>자기자비 (Self-Compassion) — Neff 2003</strong></p>
-                        <p>Kristin Neff의 연구에 따르면, 자기 비판은 신경계를 스트레스 상태에 유지합니다. 하지만 자기자비는 코르티솔(스트레스 호르몬)을 낮추고 옥시토신(안정 호르몬)을 증가시킵니다.</p>
-                        
-                        <p>자기자비의 3가지 구성요소:</p>
-                        <ul style="margin-left: 1.5rem; color: var(--text2);">
-                            <li><strong>자기친절:</strong> "이건 누구나 겪는 일이야. 나를 가혹하게 판단하지 말자."</li>
-                            <li><strong>공통 인간성:</strong> "실패는 인간이 되는 일의 일부다. 나만이 아니다."</li>
-                            <li><strong>마음챙김:</strong> "이 고통을 인식하되, 그것이 전부인 것처럼 확대하지 말자."</li>
-                        </ul>
-                        
-                        <div class="aha-point">
-                            <strong>💡 아하 포인트:</strong> 피드백을 수용하는 능력은 성격이 아니라, 신경계의 상태입니다. 자기자비를 연습하면, 신경계가 안전해지고 학습이 활성화됩니다.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 섹션 4: 시각화 -->
-        <section id="visualizations">
-            <h2>피드백의 신경 회로: SCARF 위협</h2>
-            
-            <svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
-                <!-- 배경 -->
-                <rect width="600" height="400" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1"/>
-                
-                <!-- 중심 뇌 -->
-                <circle cx="300" cy="200" r="40" fill="#E8EEF4" stroke="#3D5A80" stroke-width="2"/>
-                <text x="300" y="205" text-anchor="middle" font-size="12" font-weight="600" fill="#3D5A80">신경계</text>
-                
-                <!-- 5가지 위협 -->
-                <!-- Status -->
-                <rect x="50" y="80" width="100" height="60" rx="8" fill="#FFF3E6" stroke="#D4A373" stroke-width="2"/>
-                <text x="100" y="105" text-anchor="middle" font-size="12" font-weight="600" fill="#D4A373">Status</text>
-                <text x="100" y="125" text-anchor="middle" font-size="10" fill="#6B6B6B">지위 위협</text>
-                <path d="M 150 110 L 265 170" stroke="#D4A373" stroke-width="2" marker-end="url(#arrowhead)"/>
-                
-                <!-- Certainty -->
-                <rect x="450" y="80" width="100" height="60" rx="8" fill="#FBEAEB" stroke="#C1666B" stroke-width="2"/>
-                <text x="500" y="105" text-anchor="middle" font-size="12" font-weight="600" fill="#C1666B">Certainty</text>
-                <text x="500" y="125" text-anchor="middle" font-size="10" fill="#6B6B6B">불확실성</text>
-                <path d="M 450 110 L 335 170" stroke="#C1666B" stroke-width="2" marker-end="url(#arrowhead)"/>
-                
-                <!-- Autonomy -->
-                <rect x="450" y="310" width="100" height="60" rx="8" fill="#EDF5EE" stroke="#7A9E7E" stroke-width="2"/>
-                <text x="500" y="335" text-anchor="middle" font-size="12" font-weight="600" fill="#7A9E7E">Autonomy</text>
-                <text x="500" y="355" text-anchor="middle" font-size="10" fill="#6B6B6B">통제 제한</text>
-                <path d="M 450 330 L 335 230" stroke="#7A9E7E" stroke-width="2" marker-end="url(#arrowhead)"/>
-                
-                <!-- Relatedness -->
-                <rect x="50" y="310" width="100" height="60" rx="8" fill="#E8EEF4" stroke="#3D5A80" stroke-width="2"/>
-                <text x="100" y="335" text-anchor="middle" font-size="12" font-weight="600" fill="#3D5A80">Relatedness</text>
-                <text x="100" y="355" text-anchor="middle" font-size="10" fill="#6B6B6B">관계 거절</text>
-                <path d="M 150 330 L 265 230" stroke="#3D5A80" stroke-width="2" marker-end="url(#arrowhead)"/>
-                
-                <!-- Fairness (아래) -->
-                <rect x="240" y="320" width="120" height="60" rx="8" fill="none" stroke="#C1666B" stroke-width="2" stroke-dasharray="5,5"/>
-                <text x="300" y="345" text-anchor="middle" font-size="12" font-weight="600" fill="#C1666B">Fairness</text>
-                <text x="300" y="365" text-anchor="middle" font-size="10" fill="#6B6B6B">불공정함</text>
-                <path d="M 300 320 L 300 245" stroke="#C1666B" stroke-width="2" marker-end="url(#arrowhead)"/>
-                
-                <!-- 신경 반응 -->
-                <text x="300" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#C1666B">위협 감지 → 편도체 활성화 → 방어 반응</text>
-                
-                <defs>
-                    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                        <polygon points="0 0, 10 3, 0 6" fill="#3D5A80"/>
-                    </marker>
-                </defs>
-            </svg>
-            <p class="diagram-caption">SCARF 모델: 5가지 신경 위협이 신경계를 방어 상태로 전환</p>
-
-            <!-- 두 번째 다이어그램: SBI 흐름 -->
-            <svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" style="margin-top: 3rem;">
-                <!-- 배경 -->
-                <rect width="600" height="300" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1"/>
-                
-                <!-- SBI 흐름 -->
-                <g>
-                    <!-- Situation -->
-                    <rect x="30" y="120" width="140" height="80" rx="8" fill="#FFF3E6" stroke="#D4A373" stroke-width="2"/>
-                    <text x="100" y="145" text-anchor="middle" font-size="12" font-weight="600" fill="#D4A373">Situation</text>
-                    <text x="100" y="165" text-anchor="middle" font-size="9" fill="#6B6B6B">명확한 맥락</text>
-                    <text x="100" y="180" text-anchor="middle" font-size="9" fill="#6B6B6B">→ Certainty ↑</text>
-                    
-                    <!-- Behavior -->
-                    <rect x="230" y="120" width="140" height="80" rx="8" fill="#E8EEF4" stroke="#3D5A80" stroke-width="2"/>
-                    <text x="300" y="145" text-anchor="middle" font-size="12" font-weight="600" fill="#3D5A80">Behavior</text>
-                    <text x="300" y="165" text-anchor="middle" font-size="9" fill="#6B6B6B">구체적 행동</text>
-                    <text x="300" y="180" text-anchor="middle" font-size="9" fill="#6B6B6B">→ Status ↑</text>
-                    
-                    <!-- Impact -->
-                    <rect x="430" y="120" width="140" height="80" rx="8" fill="#EDF5EE" stroke="#7A9E7E" stroke-width="2"/>
-                    <text x="500" y="145" text-anchor="middle" font-size="12" font-weight="600" fill="#7A9E7E">Impact</text>
-                    <text x="500" y="165" text-anchor="middle" font-size="9" fill="#6B6B6B">객관적 결과</text>
-                    <text x="500" y="180" text-anchor="middle" font-size="9" fill="#6B6B6B">→ Fairness ↑</text>
-                </g>
-                
-                <!-- 화살표 -->
-                <path d="M 175 160 L 225 160" stroke="#D4A373" stroke-width="2" marker-end="url(#arrowhead)"/>
-                <path d="M 375 160 L 425 160" stroke="#3D5A80" stroke-width="2" marker-end="url(#arrowhead)"/>
-                
-                <!-- 뇌 활성화 -->
-                <text x="100" y="260" text-anchor="middle" font-size="10" fill="#6B6B6B" font-weight="600">편도체 진정</text>
-                <text x="300" y="260" text-anchor="middle" font-size="10" fill="#6B6B6B" font-weight="600">dlPFC 활성화</text>
-                <text x="500" y="260" text-anchor="middle" font-size="10" fill="#6B6B6B" font-weight="600">OFC 활성화</text>
-                
-                <text x="300" y="290" text-anchor="middle" font-size="11" fill="#3D5A80" font-weight="700">결과: 신경계 안정화 → 학습 가능</text>
-            </svg>
-            <p class="diagram-caption">SBI 모델: 구조화된 피드백이 신경계를 학습 상태로 전환</p>
-        </section>
-
-        <!-- 섹션 5: 연구 스포트라이트 -->
-        <section id="research">
-            <h2>연구: Kluger & DeNisi (1996) — 피드백 메타분석</h2>
-            
-            <div class="research-spotlight">
-                <h3>607개 피드백 연구의 결정적 발견</h3>
-                
-                <p><strong>문제 제기:</strong> 1960년부터 1996년까지 발표된 피드백 연구들을 모두 수집했습니다. 607개 연구. 거의 100,000명의 참여자.</p>
-                
-                <p><strong>기대:</strong> 피드백은 성과를 향상시킬 것이다. 당신이 틀린 것을 알려주면, 당신은 그것을 수정할 것이다. 간단하다.</p>
-                
-                <p><strong>결과: 충격적인 발견</strong></p>
-                <ul style="margin-left: 1.5rem; color: var(--text2);">
-                    <li>62%의 경우: 피드백이 성과를 향상시켰다</li>
-                    <li><strong>38%의 경우: 피드백이 오히려 성과를 떨어뜨렸다</strong></li>
-                </ul>
-                
-                <p><strong>심화 분석: 어떤 피드백이 역효과를 낼까?</strong></p>
-                <ol style="margin-left: 1.5rem; color: var(--text2);">
-                    <li><strong>일방적 비판:</strong> "당신의 아이디어는 나쁘다"는 형식의 피드백. 신경과학적으로는 SCARF의 모든 영역을 위협합니다.</li>
-                    <li><strong>개인적 공격:</strong> "당신은 능력이 없다"는 형식. 행동이 아니라 정체성을 공격합니다. 편도체 과활성화.</li>
-                    <li><strong>맥락 없는 피드백:</strong> "당신이 한 말은 부적절했어"인데, 언제 어디서인지 명시하지 않는 경우. 신경계가 불확실성을 감지합니다.</li>
-                    <li><strong>수동적 공격성:</strong> 피드백이라는 가장(假)으로 주어지지만, 실제로는 비난입니다. 신경계가 위협을 감지합니다.</li>
-                </ol>
-                
-                <p><strong>의미:</strong> 피드백이 효과적이려면, 신경계가 안전함을 느껴야 합니다. 신경계가 위협을 감지하면, 학습 뇌가 아니라 생존 뇌가 활성화됩니다.</p>
-                
-                <div class="aha-point">
-                    <strong>💡 인사이트:</strong> 피드백의 내용이 아니라 피드백을 받는 신경계의 상태가 결과를 결정합니다.
-                </div>
-            </div>
-        </section>
-
-        <!-- 섹션 6: 멘탈 모델 -->
-        <section id="mental-model">
-            <h2>멘탈 모델: 피드백은 거울이 아니라 렌즈</h2>
-            
-            <div class="mental-model">
-                <h3>🔍 광학 비유: 거울 vs 렌즈</h3>
-                
-                <p><strong>거울 (피드백의 오해):</strong></p>
-                <p>당신은 거울 앞에 섭니다. 거울이 당신의 얼굴을 있는 그대로 보여줍니다. "당신은 이렇습니다." 당신은 거울을 신뢰합니다. 왜냐하면 거울은 객관적이기 때문입니다.</p>
-                
-                <p>하지만 피드백은 거울이 아닙니다. 피드백을 주는 사람은 그들의 관점, 편견, 경험, 신경상태를 통해 당신을 봅니다.</p>
-                
-                <p><strong>렌즈 (피드백의 진실):</strong></p>
-                <p>렌즈는 빛을 굴절시킵니다. 당신을 다른 각도에서 보게 합니다. 렌즈는 객관적이지 않습니다. 하지만 그것이 가치입니다.</p>
-                
-                <p>좋은 피드백은 당신에게 <strong>새로운 관점</strong>을 제공합니다:</p>
-                <ul style="margin-left: 1.5rem; color: var(--text2);">
-                    <li>"당신의 프레젠테이션이 복잡해 보인다" = 그들의 렌즈에서 당신의 아이디어를 본 것입니다</li>
-                    <li>당신은 그 피드백을 동의할 수도, 거부할 수도 있습니다</li>
-                    <li>하지만 당신은 그것을 통해 <strong>다른 관점이 존재한다</strong>는 것을 알게 됩니다</li>
-                </ul>
-                
-                <p style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);"><strong>역설:</strong> 최고의 피드백을 받는 사람은 피드백을 거울로 보는 사람이 아니라, 렌즈로 보는 사람입니다.</p>
-            </div>
-
-            <!-- 시각화 -->
-            <svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
-                <!-- 배경 -->
-                <rect width="600" height="300" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1"/>
-                
-                <!-- 왼쪽: 거울 -->
-                <g>
-                    <!-- 거울 -->
-                    <circle cx="100" cy="150" r="60" fill="none" stroke="#D4A373" stroke-width="3"/>
-                    <text x="100" y="155" text-anchor="middle" font-size="12" font-weight="600" fill="#D4A373">거울</text>
-                    
-                    <!-- 사람과 반사 -->
-                    <circle cx="40" cy="150" r="20" fill="#E8EEF4" stroke="#999" stroke-width="1"/>
-                    <circle cx="160" cy="150" r="20" fill="#E8EEF4" stroke="#999" stroke-width="1" opacity="0.5"/>
-                    <text x="100" y="230" text-anchor="middle" font-size="11" fill="#6B6B6B">객관적 반사</text>
-                    <text x="100" y="250" text-anchor="middle" font-size="11" fill="#6B6B6B">(거짓 가정)</text>
-                </g>
-                
-                <!-- 오른쪽: 렌즈 -->
-                <g>
-                    <!-- 렌즈 -->
-                    <ellipse cx="500" cy="150" rx="40" ry="60" fill="none" stroke="#3D5A80" stroke-width="3"/>
-                    <path d="M 480 100 Q 500 130 480 150 Q 500 170 480 200" fill="none" stroke="#3D5A80" stroke-width="2"/>
-                    <text x="500" y="155" text-anchor="middle" font-size="12" font-weight="600" fill="#3D5A80">렌즈</text>
-                    
-                    <!-- 광선 굴절 -->
-                    <path d="M 420 120 L 480 130 L 540 110" stroke="#3D5A80" stroke-width="2" stroke-dasharray="5,5"/>
-                    <path d="M 420 150 L 480 150 L 540 150" stroke="#3D5A80" stroke-width="2" stroke-dasharray="5,5"/>
-                    <path d="M 420 180 L 480 170 L 540 190" stroke="#3D5A80" stroke-width="2" stroke-dasharray="5,5"/>
-                    
-                    <text x="500" y="230" text-anchor="middle" font-size="11" fill="#6B6B6B">다른 각도</text>
-                    <text x="500" y="250" text-anchor="middle" font-size="11" fill="#6B6B6B">(새로운 관점)</text>
-                </g>
-            </svg>
-            <p class="diagram-caption">거울 vs 렌즈: 피드백의 본질</p>
-        </section>
-
-        <!-- 섹션 7: 실천 가이드 -->
-        <section id="practice">
-            <h2>실천: 피드백 주고받기 3단계</h2>
-            
-            <div class="practice-section">
-                <div class="practice-item">
-                    <div class="practice-time">30초 — 감정 라벨링</div>
-                    <div class="practice-title">피드백 받을 때 신경계 진정</div>
-                    <p>피드백을 받으면 당신의 편도체가 활성화됩니다. 하지만 30초 동안 정지하면, 당신의 전전두피질이 통제를 회복할 수 있습니다:</p>
-                    <ol style="margin-left: 1.5rem; color: var(--text2);">
-                        <li><strong>감정 확인:</strong> "지금 나는 불편해 하고 있다. 이것은 자연스러운 반응이다."</li>
-                        <li><strong>신체 확인:</strong> "내 가슴이 조여온다. 내 호흡이 빨라지고 있다." (관찰, 비판 아님)</li>
-                        <li><strong>관점 전환:</strong> "이것은 공격이 아니라 정보다. 나는 이 정보를 사용할 수도, 무시할 수도 있다."</li>
-                        <li><strong>반응 연기:</strong> "지금 당장 대답하지 말자. 24시간 생각한 후 반응하자."</li>
-                    </ol>
-                </div>
-
-                <div class="practice-item">
-                    <div class="practice-time">5분 — SBI 피드백 작성</div>
-                    <div class="practice-title">효과적인 피드백 만들기</div>
-                    <p>당신이 누군가에게 피드백을 줄 때, SBI 구조를 사용합니다:</p>
-                    <p><strong>예시:</strong></p>
-                    <ul style="margin-left: 1.5rem; color: var(--text2);">
-                        <li>S: "어제 회의에서 당신이 제안한 마케팅 전략에 대해 말하고 싶어."</li>
-                        <li>B: "당신이 ROI 데이터를 제시하지 않고 직관에만 의존했어."</li>
-                        <li>I: "그 결과 팀이 당신의 제안이 얼마나 효과적일지 평가할 수 없었고, 의사결정이 지연되었어."</li>
-                    </ul>
-                    <p style="margin-top: 1rem;"><strong>달성:</strong> SCARF의 모든 영역이 안전합니다. Status (행동, 성격 아님), Certainty (명확함), Autonomy (제안, 명령 아님), Relatedness (관계 유지), Fairness (객관적 영향).</p>
-                </div>
-
-                <div class="practice-item">
-                    <div class="practice-time">하루 — 피드백 일지</div>
-                    <div class="practice-title">패턴 인식과 신경 재조정</div>
-                    <p>주 2-3회, 당신이 받은 피드백을 기록합니다:</p>
-                    <ol style="margin-left: 1.5rem; color: var(--text2);">
-                        <li><strong>피드백:</strong> "나의 프레젠테이션이 너무 길었다."</li>
-                        <li><strong>신경 반응:</strong> "편도체 활성화 (불편해함), 방어 충동 (설명하고 싶음)"</li>
-                        <li><strong>SCARF 위협:</strong> "Status (능력 의심) + Autonomy (지시받음)"</li>
-                        <li><strong>새로운 해석:</strong> "이것은 공격이 아니라 정보다. 다음에는 더 짧게 하면 된다."</li>
-                        <li><strong>학습:</strong> "내 강점: 내용의 깊이. 약점: 간결함. 개선 방향 명확함."</li>
-                    </ol>
-                    <p style="margin-top: 1rem;">시간이 지나면서 당신의 신경계는 피드백에 대한 '각성' 반응을 줄이고, '학습' 반응을 높입니다. 이것이 신경 가소성입니다.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- 섹션 8: 철학의 렌즈 -->
-        <section id="philosophy">
-            <h2>철학: 검토되지 않은 삶</h2>
-            
-            <div class="philosophy-box">
-                <div class="philosopher">
-                    <div class="philosopher-name">소크라테스 (기원전 5세기)</div>
-                    <p class="quote">"검토되지 않은 삶은 살아갈 가치가 없다."</p>
-                    <p>소크라테스는 아테네 사람들에게 끊임없이 질문을 던졌습니다. 그들의 가정을 검토하고, 그들이 생각했던 것들을 의심하게 했습니다. 이것이 철학입니다. 그리고 이것이 피드백입니다. 피드백은 당신의 가정을 검토하도록 요청하는 것입니다.</p>
-                </div>
-
-                <div class="philosopher">
-                    <div class="philosopher-name">칼 포퍼 (20세기)</div>
-                    <p class="quote">"이론은 반증 가능성에 의해 과학적이다."</p>
-                    <p>포퍼는 과학적 진보는 당신의 가설을 반박시킬 수 있는 증거를 찾는 것이라고 말했습니다. 당신의 이론이 틀릴 수 있다는 가능성을 열어둔다면, 당신은 계속 배울 수 있습니다. 피드백은 당신의 "이론" (당신이 옳다고 생각하는 것)에 대한 반증 시도입니다.</p>
-                </div>
-            </div>
-
-            <p><strong>현대 신경과학과의 연결:</strong> 두 철학자의 통찰은 신경과학적으로 정확합니다. 당신의 뇌가 확증 편향(confirmation bias)에 빠져 있을 때, 피드백은 당신의 신경회로를 새롭게 조정하도록 강요합니다. 이것이 성장입니다.</p>
-        </section>
-
-        <!-- 섹션 9: 연결 지도 -->
-        <section id="connections">
-            <h2>연결: 이전과 이후의 개념</h2>
-            
-            <div class="connection-map">
-                <p><strong>이 강의는 다른 Day들과 연결됩니다:</strong></p>
-                
-                <p style="margin-top: 2rem;">↑ <strong>Day 10: 갈등의 신경과학</strong></p>
-                <p style="font-size: 0.9rem; color: var(--text3);">피드백은 미니 갈등입니다. 갈등의 신경계 반응을 이해하면, 피드백 상황에서 신경계를 진정시킬 수 있습니다.</p>
-                
-                <p style="margin-top: 2rem;">↓ <strong>Day 12: 신뢰와 취약성</strong></p>
-                <p style="font-size: 0.9rem; color: var(--text3);">진정한 피드백은 신뢰 위에서만 가능합니다. 당신이 누군가를 신뢰하면, 그들의 피드백은 공격이 아니라 배려로 느껴집니다.</p>
-                
-                <p style="margin-top: 2rem;"><strong>일상의 적용:</strong></p>
-                <p style="font-size: 0.9rem; color: var(--text3);">직장 (코드 리뷰, 성과 평가) → 가정 (배우자의 의견) → 내면 (자신에게 주는 피드백)</p>
-            </div>
-        </section>
-
-        <!-- 섹션 10: 퀴즈 -->
-        <section id="quiz">
-            <h2>확인: 당신은 얼마나 이해했나요?</h2>
-            
-            <div class="quiz-section">
-                <div class="quiz-item">
-                    <div class="quiz-question">1. Kluger & DeNisi의 607개 피드백 연구에서 가장 중요한 발견은?</div>
-                    <div class="quiz-options">
-                        <label class="quiz-option">
-                            <input type="radio" name="q1"> 
-                            a) 모든 피드백이 성과를 향상시킨다
-                        </label>
-                        <label class="quiz-option">
-                            <input type="radio" name="q1">
-                            b) 피드백의 38%가 오히려 성과를 떨어뜨린다
-                        </label>
-                        <label class="quiz-option">
-                            <input type="radio" name="q1">
-                            c) 피드백은 성격에 따라 효과가 다르다
-                        </label>
-                    </div>
-                    <button onclick="checkAnswer('q1', 'b', this)" style="margin-top: 1rem; padding: 0.8rem 1.5rem; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">답 확인</button>
-                    <div class="quiz-feedback">
-                        <strong>정답!</strong> 피드백의 방식이 중요합니다. 신경계를 위협하는 피드백은 학습을 방해합니다.
-                    </div>
-                </div>
-
-                <div class="quiz-item">
-                    <div class="quiz-question">2. SBI 모델에서 S (Situation)를 명확히 하면 신경계에 무엇을 주나요?</div>
-                    <div class="quiz-options">
-                        <label class="quiz-option">
-                            <input type="radio" name="q2">
-                            a) 안정감 (Status 보호)
-                        </label>
-                        <label class="quiz-option">
-                            <input type="radio" name="q2">
-                            b) 확실성 (Certainty 회복)
-                        </label>
-                        <label class="quiz-option">
-                            <input type="radio" name="q2">
-                            c) 자율성 (Autonomy 유지)
-                        </label>
-                    </div>
-                    <button onclick="checkAnswer('q2', 'b', this)" style="margin-top: 1rem; padding: 0.8rem 1.5rem; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">답 확인</button>
-                    <div class="quiz-feedback">
-                        <strong>정답!</strong> 상황을 명확히 하면 신경계가 "무슨 일에 대해 이야기하는지 알겠다"는 확실성을 얻고, 불안감이 줄어듭니다.
-                    </div>
-                </div>
-
-                <div class="quiz-item">
-                    <div class="quiz-question">3. INFP가 피드백에 어렵게 반응하는 신경학적 이유는?</div>
-                    <div class="quiz-options">
-                        <label class="quiz-option">
-                            <input type="radio" name="q3">
-                            a) 당신의 감정이 너무 민감해서이다
-                        </label>
-                        <label class="quiz-option">
-                            <input type="radio" name="q3">
-                            b) 당신의 뇌가 행동과 정체성을 강하게 연결시켜서이다
-                        </label>
-                        <label class="quiz-option">
-                            <input type="radio" name="q3">
-                            c) 당신은 피드백을 받을 수 없는 사람이다
-                        </label>
-                    </div>
-                    <button onclick="checkAnswer('q3', 'b', this)" style="margin-top: 1rem; padding: 0.8rem 1.5rem; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">답 확인</button>
-                    <div class="quiz-feedback">
-                        <strong>정답!</strong> 이것은 성격이 아니라 신경 회로입니다. 탈개인화 연습으로 이 회로를 재조정할 수 있습니다.
-                    </div>
-                </div>
-            </div>
-        
-        <!-- 섹션 추가: 피드백과 성격 유형 -->
-        <section id="personality">
-            <h2>심화: 성격 유형별 피드백 수용 패턴</h2>
-            
-            <p>INFP만이 피드백에 어려움을 겪지 않습니다. 각 성격 유형은 고유한 신경학적 패턴을 가집니다.</p>
-            
-            <div class="cards-container" style="margin-top: 2rem;">
-                <div class="concept-card" style="cursor: default;">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">INTJ — 효율성 중심</div>
-                            <p style="color: var(--text2); font-size: 0.9rem;">피드백의 신경 반응</p>
-                        </div>
-                    </div>
-                    <div class="card-content visible">
-                        <p><strong>신경 특성:</strong> dlPFC (논리) 과활성화, 편도체 (감정) 저활성화</p>
-                        <p><strong>피드백 반응:</strong> "이것이 사실인가? 어떻게 확인할 수 있는가?" 피드백을 데이터로 처리합니다.</p>
-                        <p><strong>위험:</strong> 감정적 맥락을 무시합니다. "당신의 피드백은 도움이 된다"는 것만 중요합니다. 피드백을 준 사람의 의도는 무시할 수 있습니다.</p>
-                    </div>
-                </div>
-
-                <div class="concept-card" style="cursor: default;">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">ENFP — 가능성 중심</div>
-                            <p style="color: var(--text2); font-size: 0.9rem;">피드백의 신경 반응</p>
-                        </div>
-                    </div>
-                    <div class="card-content visible">
-                        <p><strong>신경 특성:</strong> 보상 시스템 민감, 빠른 신경 전환</p>
-                        <p><strong>피드백 반응:</strong> 피드백을 "새로운 관점" "새로운 가능성"으로 받아들입니다. 빠르게 적응합니다.</p>
-                        <p><strong>위험:</strong> 피드백에 너무 빠르게 반응해서, 깊이 있는 학습 없이 다음으로 넘어갈 수 있습니다.</p>
-                    </div>
-                </div>
-
-                <div class="concept-card" style="cursor: default;">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">ISTJ — 책임감 중심</div>
-                            <p style="color: var(--text2); font-size: 0.9rem;">피드백의 신경 반응</p>
-                        </div>
-                    </div>
-                    <div class="card-content visible">
-                        <p><strong>신경 특성:</strong> 규칙 중심 뇌 (dorsolateral prefrontal cortex), 일관성 추구</p>
-                        <p><strong>피드백 반응:</strong> 피드백을 "해야 할 일" "고쳐야 할 것"으로 받아들입니다. 즉시 행동합니다.</p>
-                        <p><strong>위험:</strong> 피드백이 완벽하지 않으면, 혼란스러워합니다. "어떻게 정확히 고쳐야 하는가?"를 알아야 합니다.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 섹션 추가: 디지털 시대의 피드백 -->
-        <section id="digital">
-            <h2>현대 도전: 디지털 피드백의 신경 위협</h2>
-            
-            <div class="scenario-box">
-                <h3>이메일 피드백의 문제</h3>
-                <p>당신이 이메일로 피드백을 받습니다: "당신의 제안은 현실적이지 않다."</p>
-                
-                <p><strong>신경 문제:</strong></p>
-                <ul style="margin-left: 1.5rem; color: var(--text2);">
-                    <li><strong>음성 신호 부재:</strong> 전음성(prosody), 표정, 신체 언어가 없습니다. 당신의 뇌는 최악을 상상합니다.</li>
-                    <li><strong>SCARF 극대화:</strong> 텍스트로만 피드백을 받으면, 당신의 신경계는 모든 SCARF 영역을 위협으로 감지합니다.</li>
-                    <li><strong>반응 지연:</strong> 이메일은 회신을 요구하지 않습니다. 당신은 하루 종일 그 피드백을 되새김합니다. 편도체가 계속 활성화됩니다.</li>
-                </ul>
-            </div>
-
-            <p><strong>해결책:</strong></p>
-            <ul style="margin-left: 1.5rem; color: var(--text2);">
-                <li>중요한 피드백은 항상 대면으로 전달하세요 (또는 화상 통화)</li>
-                <li>텍스트 피드백을 받으면, 24시간 기다린 후 반응하세요. 신경계가 진정될 시간을 갖으세요.</li>
-                <li>이메일로 피드백을 줄 때는, SBI 구조 + 명확한 의도를 포함하세요: "나는 당신이 성공하기를 원해서 이 피드백을 준다"</li>
-            </ul>
-        </section>
-
-        <!-- 섹션 추가: 피드백 생태계 -->
-        <section id="ecosystem">
-            <h2>구축하기: 피드백 건강한 조직 문화</h2>
-            
-            <p>개인적으로 피드백을 잘 받는 것도 중요하지만, 더 근본적인 변화는 <strong>조직 문화</strong>에서 옵니다.</p>
-            
-            <div class="mental-model">
-                <h3>신경 심리학적으로 건강한 피드백 문화의 특징</h3>
-                
-                <p><strong>1. 심리적 안전감 (Psychological Safety)</strong></p>
-                <p>Google의 Project Aristotle 연구에 따르면, 가장 생산적인 팀은 "피드백을 두려워하지 않는" 팀입니다. 신경과학적으로, 심리적 안전감이 높은 팀에서는 편도체가 덜 활성화되고, 전전두피질이 더 활성화됩니다. 결과: 더 많은 혁신, 더 적은 오류.</p>
-                
-                <p><strong>2. 정기적인 피드백 (Frequent Feedback)</strong></p>
-                <p>연간 1회 피드백보다는 주간 1회 피드백이 낫습니다. 왜? 작은 피드백은 신경계를 덜 위협합니다. 큰 피드백은 편도체 활성화가 커집니다. 그리고 정기적 피드백은 "예상 가능함"을 만들어서, 신경계가 확실성을 회복합니다 (Certainty ↑).</p>
-                
-                <p><strong>3. 양방향 피드백 (Bidirectional Feedback)</strong></p>
-                <p>상사→부사원 피드백만 있으면, 권력의 불균형이 SCARF의 모든 영역을 위협합니다. 부사원이 상사에게 피드백을 줄 수 있는 문화에서, 양쪽 모두 신경적으로 더 안전해집니다.</p>
-                
-                <p><strong>4. 피드백 후의 행동 (Action on Feedback)</strong></p>
-                <p>가장 나쁜 것은 피드백을 받고 아무것도 하지 않는 것입니다. 신경계는 "내 의견이 무시당했다"는 신호를 받습니다 (Relatedness 위협). 좋은 조직은 피드백을 받고, 그에 따라 <strong>눈에 띄는 변화</strong>를 만듭니다.</p>
-            </div>
-        </section>
-
-        <!-- 섹션 추가: 자체 평가 -->
-        <section id="self-assessment">
-            <h2>자체 평가: 당신의 피드백 신경 프로필</h2>
-            
-            <p>이 강의를 마무리하기 전에, 당신 자신의 피드백 신경 프로필을 평가해보세요:</p>
-            
-            <div class="practice-section">
-                <div class="practice-item">
-                    <div class="practice-title">Q1: 피드백을 받은 후, 당신은 주로 어떻게 반응하나요?</div>
-                    <p style="margin-top: 1rem;">a) 즉시 방어한다 (경쟁 모드) / b) 피한다 (회피 모드) / c) 수용한다 (수용 모드) / d) 당신의 관점도 설명한다 (타협 모드) / e) 피드백을 요청자와 함께 분석한다 (협력 모드)</p>
-                    <p style="color: var(--text3); font-size: 0.9rem; margin-top: 1rem;"><strong>해석:</strong> a-e 순서로 갈수록, 신경계가 더 안전한 상태입니다. e는 갈등 해결 능력이 뛰어난 상태입니다.</p>
-                </div>
-
-                <div class="practice-item">
-                    <div class="practice-title">Q2: 당신은 피드백을 어느 정도 자주 구하나요?</div>
-                    <p style="margin-top: 1rem;">a) 거의 구하지 않는다 / b) 반년에 한 번 / c) 분기에 한 번 / d) 월 1회 / e) 주 1회 이상</p>
-                    <p style="color: var(--text3); font-size: 0.9rem; margin-top: 1rem;"><strong>해석:</strong> 더 자주 피드백을 구하는 사람일수록, 신경계가 피드백을 덜 위협으로 감지합니다. 피드백은 스포츠 훈련과 같습니다. 규칙적으로 할수록, 신경계가 적응합니다.</p>
-                </div>
-
-                <div class="practice-item">
-                    <div class="practice-title">Q3: 당신이 주는 피드백은 주로 어떤 방식인가요?</div>
-                    <p style="margin-top: 1rem;">a) 비판적이고 직설적이다 / b) 애매하고 간접적이다 / c) SBI 구조를 따른다 / d) 상대방의 신경계 상태를 먼저 확인한 후 준다</p>
-                    <p style="color: var(--text3); font-size: 0.9rem; margin-top: 1rem;"><strong>해석:</strong> d가 가장 신경과학적으로 효과적입니다. "지금 피드백을 받을 준비가 되셨나요?"라는 질문부터 시작하세요.</p>
-                </div>
-            </div>
-        </section>
+<!-- Hero -->
+<section class="hero">
+    <div class="day-num">Day 11</div>
+    <h1>피드백 주고받기</h1>
+    <div class="hook">"피드백을 들을 때 뇌는 물리적 고통과 같은 영역이 활성화된다 — 그래서 피드백이 '아픈' 것이다."</div>
 </section>
-    
-        <!-- ===== INTERACTIVE COMPONENTS (Added) ===== -->
-        
-        <section>
-            <h2>인터랙티브 연습</h2>
-            
-            <!-- 1. 플래시카드 -->
-            <div class="flashcards-section">
-                <h3>핵심 개념 플래시카드</h3>
-                <p>카드를 클릭하여 뒤집어 정의를 확인하세요. 각 개념을 완전히 이해할 때까지 반복합니다.</p>
-                <div class="flashcards-container">
-            <div class="flashcard-container" style="display: block;">
-                <div class="flashcard">
-                    <div class="flashcard-front">성장 피드백</div>
-                    <div class="flashcard-back">현재의 실수나 부족함이 연습과 노력으로 개선될 수 있다는 메시지를 포함한 피드백</div>
-                </div>
-            </div>
-            <div class="flashcard-container" style="display: none;">
-                <div class="flashcard">
-                    <div class="flashcard-front">심리적 안전감</div>
-                    <div class="flashcard-back">팀 문화에서 실수를 해도 처벌받지 않을 것이라는 믿음, 창의성과 배움의 기초</div>
-                </div>
-            </div>
-            <div class="flashcard-container" style="display: none;">
-                <div class="flashcard">
-                    <div class="flashcard-front">Kluger-DeNisi 효과</div>
-                    <div class="flashcard-back">부정적 피드백이 오히려 성과를 떨어뜨리는 현상 (38% 역효과), 피드백 방식이 중요함</div>
-                </div>
-            </div>
-            <div class="flashcard-container" style="display: none;">
-                <div class="flashcard">
-                    <div class="flashcard-front">SBI 모델</div>
-                    <div class="flashcard-back">Situation(상황) → Behavior(행동) → Impact(영향)의 구체적 피드백 구조</div>
-                </div>
+
+<!-- Intro -->
+<section class="fi">
+    <p>비판적 피드백을 받을 때 실제로 신체 통증을 느끼나요? 최신 뇌과학 연구가 그것이 실제라는 것을 증명했습니다.</p>
+
+    <div class="insight">
+        <strong>발견:</strong> 사회적 거부는 배측 전전두피질(dACC)과 전방 뇌섬엽을 활성화시키는데, 이는 신체적 통증과 정확히 동일한 영역입니다. (Eisenberger et al., 2003)
+    </div>
+
+    <p>피드백이 왜 이렇게 아플까? 그리고 어떻게 그 통증을 학습의 기회로 변환할 수 있을까요?</p>
+</section>
+
+<!-- Core Concepts -->
+<section class="fi">
+    <div class="sec-label">Discover</div>
+    <h2>세 가지 핵심 발견</h2>
+
+    <!-- Card 1 -->
+    <div class="card" onclick="toggleC(this)">
+        <div class="card-top">
+            <h3>01 — 피드백과 위협 반응</h3>
+            <span class="card-arrow">▼</span>
+        </div>
+        <div class="card-body">
+            <div class="card-inner">
+                <p>Eisenberger et al.(2003)의 'Cyberball' 실험에서 온라인 공 주고받기 게임 중 배제당한 참가자들의 dACC와 전방뇌섬엽이 활성화되었습니다. 이 영역은 신체적 통증과 동일합니다.</p>
+                <h4>SCARF 모델 (David Rock, 2008)</h4>
+                <p>피드백이 다음 5가지를 위협하면 편도체 방어 반응이 유발됩니다:</p>
+                <ul style="font-size:0.88rem;color:var(--text2);margin:0.5rem 0 0 1.5rem;line-height:1.65;">
+                    <li><strong>Status</strong> — 사회적 지위 위협</li>
+                    <li><strong>Certainty</strong> — 예측 불가능성</li>
+                    <li><strong>Autonomy</strong> — 선택권 박탈</li>
+                    <li><strong>Relatedness</strong> — 관계 단절감</li>
+                    <li><strong>Fairness</strong> — 부공정성 인식</li>
+                </ul>
             </div>
         </div>
-                <div class="flashcard-nav">
-                    <button class="flashcard-btn" onclick="prevFlashcard()">← 이전</button>
-                    <button class="flashcard-btn" onclick="nextFlashcard()">다음 →</button>
-                </div>
-                <div class="flashcard-counter">1 / 4</div>
-            </div>
-            
-            <!-- 2. 호흡 안내 -->
-            <div class="breathing-section">
-                <h3>박스 브리딩 연습</h3>
-                <p>스트레스 상황에서 신경계를 안정화하는 과학적 호흡법</p>
-                <div class="breathing-container">
-                    <div class="breathing-circle">
-                        <span>들이쉬기</span>
-                    </div>
-                </div>
-                <div class="breathing-controls">
-                    <button class="breathing-btn" onclick="toggleBreathing(this)" data-breathing-start>시작</button>
-                    <button class="breathing-btn" onclick="stopBreathing(this)">멈추기</button>
-                </div>
-            </div>
-            
-            <!-- 3. 시나리오 선택 게임 -->
-            <div class="scenario-section">
-                <h3>상황 대응: 당신이라면?</h3>
-                <p class="scenario-prompt">후배의 보고서에서 심각한 오류를 발견했습니다</p>
-                <div class="scenario-choices">
-                    <div class="scenario-choice" onclick="selectScenarioChoice(this)">
-                        <div class="scenario-choice-title">직접 비판</div>
-                        <div class="scenario-choice-desc">'이 보고서는 엉망이야. 기본도 못 했네.'라고 지적합니다. 신경계: 후배의 편도체 활성화, 방어 모드, 배움 불가</div>
-                    </div>
-                    <div class="scenario-choice" onclick="selectScenarioChoice(this)">
-                        <div class="scenario-choice-title">칭찬 샌드위치</div>
-                        <div class="scenario-choice-desc">'좋은 시도야. 하지만 이 부분이 잘못됐어. 다음엔 더 잘할 수 있어!'라고 말합니다. 신경계: 표면적으로는 긍정이지만 본질은 비판, 신뢰 감소</div>
-                    </div>
-                    <div class="scenario-choice" onclick="selectScenarioChoice(this)">
-                        <div class="scenario-choice-title">SBI 피드백</div>
-                        <div class="scenario-choice-desc">'보고서를 검토했을 때, 이 부분에서 통계 오류가 있었어. 이것 때문에 의사결정이 잘못될 수 있으니 함께 수정해보자'라고 말합니다. 신경계: 전전두피질 활성화, 배움 모드, 관계 강화</div>
-                    </div>
-                </div>
-                <div class="scenario-result">
-                    <strong>신경과학적 분석:</strong> 선택한 옵션을 클릭하면 뇌과학적 설명이 나타납니다.
-                </div>
-            </div>
-            
-            <!-- 4. 연습 타이머 -->
-            <div class="timer-section">
-                <h3>자기 연습 타이머</h3>
-                <p>집중력 있는 연습을 위해 시간을 설정하세요.</p>
-                <div class="timer-controls">
-                    <button class="timer-preset" onclick="setTimerDuration(30)">30초</button>
-                    <button class="timer-preset" onclick="setTimerDuration(300)">5분</button>
-                </div>
-                <div class="timer-circle">
-                    <div class="timer-display">00:00</div>
-                </div>
-                <div class="timer-controls">
-                    <button class="timer-action" onclick="startTimer()">시작</button>
-                    <button class="timer-action" onclick="stopTimer()">일시정지</button>
-                    <button class="timer-action" onclick="resetTimer()">리셋</button>
-                </div>
-            </div>
-            
-            <!-- 5. 개념 매칭 게임 -->
-            <div class="matching-section">
-                <h3>개념 매칭 게임</h3>
-                <p>왼쪽의 개념과 오른쪽의 정의를 클릭하여 올바르게 연결하세요.</p>
-                        <div class="matching-container">
-            <div class="matching-column">
-                <div class="matching-column-title">개념</div>
-                <div class="match-item" onclick="selectMatchItem(this)">SBI</div>
-                <div class="match-item" onclick="selectMatchItem(this)">심리적안전</div>
-                <div class="match-item" onclick="selectMatchItem(this)">성장마인드셋</div>
-                <div class="match-item" onclick="selectMatchItem(this)">피드백</div>
-                <div class="match-item" onclick="selectMatchItem(this)">래포</div>
-            </div>
-            <div class="matching-column">
-                <div class="matching-column-title">정의</div>
-                <div class="match-item" onclick="selectMatchItem(this)">실수 허용</div>
-                <div class="match-item" onclick="selectMatchItem(this)">신뢰 관계</div>
-                <div class="match-item" onclick="selectMatchItem(this)">노력이 능력</div>
-                <div class="match-item" onclick="selectMatchItem(this)">38% 역효과</div>
-                <div class="match-item" onclick="selectMatchItem(this)">상황·행동·영향</div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="card" onclick="toggleC(this)">
+        <div class="card-top">
+            <h3>02 — SBI 피드백 모델</h3>
+            <span class="card-arrow">▼</span>
+        </div>
+        <div class="card-body">
+            <div class="card-inner">
+                <p>Center for Creative Leadership이 개발한 SBI 모델은 Situation(상황)-Behavior(행동)-Impact(영향)로 구성됩니다.</p>
+                <h4>뇌과학적 장점</h4>
+                <p><strong>S(상황)</strong>은 전전두피질을 활성화하여 논리적 분석을 돕고, <strong>B(행동)</strong은 정체성이 아닌 선택지에 초점을 맞춰 자존감 위협을 회피하며, <strong>I(영향)</strong을 공유하면 거울뉴런을 통해 공감을 유도합니다.</p>
+                <h4>비교 예시</h4>
+                <p><strong>❌ "너는 항상 늦어"</strong> — 정체성 공격 → 편도체 방어</p>
+                <p><strong>✓ "오늘 회의에 10분 늦었는데, 팀이 기다리느라 논의 시간이 줄었다"</strong> — 구체적이고 비인격적 → 전전두피질 활성</p>
             </div>
         </div>
-                <button class="matching-reset" onclick="resetMatching()">다시 시작</button>
-                <div class="matching-status"></div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="card" onclick="toggleC(this)">
+        <div class="card-top">
+            <h3>03 — 성장 마인드셋과 피드백 수용</h3>
+            <span class="card-arrow">▼</span>
+        </div>
+        <div class="card-body">
+            <div class="card-inner">
+                <p>Carol Dweck(2006)의 연구에 따르면 마인드셋이 피드백 처리 방식을 결정합니다.</p>
+                <h4>고정 마인드셋</h4>
+                <p>피드백을 "내 능력이 부족하다"는 판단으로 해석 → 편도체 방어 반응, 회피 행동</p>
+                <h4>성장 마인드셋</h4>
+                <p>피드백을 "배울 기회"로 해석 → 전전두피질 활성화, 분석 및 통합</p>
+                <p>Moser et al.(2011): 성장 마인드셋 그룹의 ERN(error-related negativity) 반응이 더 크고, 실수 후 수행 향상이 2배였습니다.</p>
             </div>
-        </section>
+        </div>
+    </div>
+</section>
+
+<!-- SVG Diagram -->
+<section class="fi">
+    <div class="svg-wrap">
+        <svg viewBox="0 0 520 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#3D5A80" stroke-width="1.5"/></marker>
+            </defs>
+            <rect x="0" y="0" width="520" height="240" fill="#FAFAF7" rx="12"/>
+            
+            <!-- Input -->
+            <rect x="10" y="100" width="60" height="40" rx="6" fill="#E8EEF4" stroke="#3D5A80" stroke-width="1.5"/>
+            <text x="40" y="125" text-anchor="middle" font-family="Noto Sans KR" font-size="10" fill="#3D5A80" font-weight="600">피드백</text>
+
+            <!-- SCARF Filter -->
+            <circle cx="120" cy="120" r="20" fill="#FFF3E6" stroke="#D4A373" stroke-width="1.5"/>
+            <text x="120" y="128" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#D4A373" font-weight="600">SCARF</text>
+
+            <!-- Branch: Threat -->
+            <circle cx="220" cy="60" r="35" fill="#FBEAEB" stroke="#C1666B" stroke-width="1.5"/>
+            <text x="220" y="55" text-anchor="middle" font-family="Noto Sans KR" font-size="10" fill="#C1666B" font-weight="600">위협 인식</text>
+            <text x="220" y="70" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#C1666B">편도체/dACC</text>
+
+            <!-- Branch: Learning -->
+            <circle cx="220" cy="180" r="35" fill="#EDF5EE" stroke="#7A9E7E" stroke-width="1.5"/>
+            <text x="220" y="175" text-anchor="middle" font-family="Noto Sans KR" font-size="10" fill="#7A9E7E" font-weight="600">학습 인식</text>
+            <text x="220" y="190" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#7A9E7E">전전두피질</text>
+
+            <!-- Outcomes -->
+            <rect x="340" y="35" width="75" height="50" rx="6" fill="#FBEAEB" stroke="#C1666B" stroke-width="1.5"/>
+            <text x="377.5" y="50" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#C1666B" font-weight="600">방어/회피</text>
+            <text x="377.5" y="65" text-anchor="middle" font-family="Noto Sans KR" font-size="8" fill="#C1666B">코르티솔 상승</text>
+
+            <rect x="340" y="155" width="75" height="50" rx="6" fill="#EDF5EE" stroke="#7A9E7E" stroke-width="1.5"/>
+            <text x="377.5" y="170" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#7A9E7E" font-weight="600">분석/통합</text>
+            <text x="377.5" y="185" text-anchor="middle" font-family="Noto Sans KR" font-size="8" fill="#7A9E7E">성장 가능</text>
+
+            <!-- Arrows -->
+            <line x1="70" y1="120" x2="100" y2="120" stroke="#3D5A80" stroke-width="1.2" marker-end="url(#ah)"/>
+            <line x1="140" y1="105" x2="185" y2="70" stroke="#D4A373" stroke-width="1.2" marker-end="url(#ah)"/>
+            <line x1="140" y1="135" x2="185" y2="170" stroke="#D4A373" stroke-width="1.2" marker-end="url(#ah)"/>
+            <line x1="255" y1="60" x2="340" y2="60" stroke="#C1666B" stroke-width="1.2" marker-end="url(#ah)"/>
+            <line x1="255" y1="180" x2="340" y2="180" stroke="#7A9E7E" stroke-width="1.2" marker-end="url(#ah)"/>
+        </svg>
+        <div class="svg-cap">피드백 수용의 뇌 경로: SCARF 필터가 위협 vs 학습 인식을 결정</div>
+    </div>
+</section>
+
+<!-- Research -->
+<section class="fi">
+    <div class="sec-label">Research</div>
+    <h2>연구 스포트라이트</h2>
+
+    <div class="pq">
+        "사회적 거부는 물리적 통증과 동일한 뇌 영역을 활성화시킨다."
+        <cite>— Eisenberger et al., UCLA, 2003</cite>
+    </div>
+
+    <p>Cyberball 실험에서 온라인 공 주고받기 게임 중 배제당한 참가자들은 실제 신체적 고통처럼 dACC(사회적 통증 영역)가 활성화되었습니다. 이 발견은 사회적 거부가 생물학적 통증임을 증명합니다.</p>
+
+    <div class="stats">
+        <div class="st">
+            <div class="n">동일</div>
+            <div class="d">사회적 거부와 물리적 통증 뇌영역</div>
+        </div>
+        <div class="st">
+            <div class="n">2배</div>
+            <div class="d">성장 마인드셋의 실수 후 향상</div>
+        </div>
+        <div class="st">
+            <div class="n">5가지</div>
+            <div class="d">SCARF 위협 요인</div>
+        </div>
+    </div>
+</section>
+
+<!-- Practice -->
+<section class="fi">
+    <div class="sec-label">Apply</div>
+    <h2>오늘의 실천</h2>
+
+    <div class="practice">
+        <h3>SBI 피드백 모델 연습</h3>
+        <div class="practice-item">
+            <span class="practice-badge">30초</span>
+            <span class="practice-text">최근 받은 피드백 하나를 떠올리고, 그것을 Situation-Behavior-Impact로 재구성하세요.</span>
+        </div>
+        <div class="practice-item">
+            <span class="practice-badge">5분</span>
+            <span class="practice-text">동료나 가족에게 줄 피드백 하나를 SBI 모델로 작성하세요. 정체성이 아닌 구체적 행동에 초점을 맞추세요.</span>
+        </div>
+
+        <!-- Timer -->
+        <div class="timer-box">
+            <div class="timer-display" id="tDisp">0:30</div>
+            <div class="timer-btns">
+                <button onclick="setT(30)" class="active">30초</button>
+                <button onclick="setT(300)">5분</button>
+                <button onclick="goT()" id="tBtn">시작</button>
+                <button onclick="rstT()">리셋</button>
+            </div>
+        </div>
+
+        <!-- Breathing -->
+        <div class="breath-box">
+            <p style="font-size:0.82rem;color:var(--text3);margin:1rem 0 0.5rem;">호흡 가이드</p>
+            <div id="breathC">시작</div>
+            <button id="breathB" onclick="toggleBreath()">시작</button>
+        </div>
+    </div>
+</section>
+
+<!-- Interactive: Flashcard -->
+<section class="fi">
+    <div class="sec-label">Interactive</div>
+    <h2>핵심 개념 플래시카드</h2>
+    <div class="fc-wrap">
+        <div class="fc" id="fc" onclick="flipFC()">
+            <div class="fc-f"><div class="term" id="fcF"></div><div class="hint">클릭하여 뒤집기</div></div>
+            <div class="fc-b"><div class="def" id="fcB"></div></div>
+        </div>
+    </div>
+    <div class="fc-nav">
+        <button onclick="prevFC()">← 이전</button>
+        <span class="fc-counter" id="fcN">1/4</span>
+        <button onclick="nextFC()">다음 →</button>
+    </div>
+</section>
+
+<!-- Interactive: Scenario -->
+<section class="fi">
+    <div class="sec-label">Simulation</div>
+    <h2>당신이라면?</h2>
+    <div class="sc-box">
+        <div class="sc-q">상사가 전체 팀 미팅에서 당신의 보고서 실수를 지적합니다. 얼굴이 달아오릅니다. 어떻게 하시겠습니까?</div>
+        <div class="sc-opt" onclick="pickSc(this,0)">A. "그건 제 잘못이 아니라 데이터 문제입니다"라고 즉시 방어</div>
+        <div class="sc-opt" onclick="pickSc(this,1)">B. "지적 감사합니다. 회의 후 더 이야기할 수 있을까요?"라고 응답</div>
+        <div class="sc-opt" onclick="pickSc(this,2)">C. 아무 말 없이 고개를 숙인다</div>
+        <div class="sc-result" id="scR"></div>
+    </div>
+</section>
+
+<!-- Quiz -->
+<section class="fi">
+    <div class="sec-label">Quiz</div>
+    <h2>오늘의 확인</h2>
+
+    <div class="quiz-q">
+        <p>Q1. 피드백 수용 시 물리적 통증과 같은 뇌 영역이 활성화되는 이유는?</p>
+        <div class="quiz-opt" onclick="chkQ(this,true)">dACC와 전방뇌섬엽이 사회적 거부에 반응</div>
+        <div class="quiz-opt" onclick="chkQ(this,false)">피드백이 실제로 신체 손상을 일으킴</div>
+        <div class="quiz-opt" onclick="chkQ(this,false)">편도체의 기본 특성</div>
+        <div class="quiz-fb">Eisenberger(2003): 사회적 거부는 신체적 통증과 동일한 뇌 영역을 활성화합니다.</div>
+    </div>
+
+    <div class="quiz-q">
+        <p>Q2. SBI 모델의 S는?</p>
+        <div class="quiz-opt" onclick="chkQ(this,true)">Situation(상황)</div>
+        <div class="quiz-opt" onclick="chkQ(this,false)">Status(지위)</div>
+        <div class="quiz-opt" onclick="chkQ(this,false)">System(시스템)</div>
+        <div class="quiz-fb">SBI: Situation(상황)-Behavior(행동)-Impact(영향). 구체적 상황부터 시작합니다.</div>
+    </div>
+
+    <div class="quiz-q">
+        <p>Q3. 성장 마인드셋이 피드백 수용에 미치는 효과는?</p>
+        <div class="quiz-opt" onclick="chkQ(this,false)">피드백 수용이 30% 증가</div>
+        <div class="quiz-opt" onclick="chkQ(this,true)">실수 후 수행 향상이 2배</div>
+        <div class="quiz-opt" onclick="chkQ(this,false)">편도체 활성 100% 감소</div>
+        <div class="quiz-fb">Moser et al.(2011): 성장 마인드셋은 실수를 학습 신호로 인식해 수행 향상이 2배입니다.</div>
+    </div>
+</section>
+
+<!-- Matching -->
+<section class="fi">
+    <div class="sec-label">Game</div>
+    <h2>개념 매칭</h2>
+    <p style="font-size:0.85rem;">왼쪽 용어와 오른쪽 설명을 순서대로 클릭하여 연결하세요.</p>
+    <div class="match-area" id="matchArea"></div>
+    <div id="matchMsg" style="text-align:center;font-size:0.85rem;color:var(--sage);margin-top:0.5rem;"></div>
+</section>
+
+<!-- Connection -->
+<section class="fi">
+    <div class="sec-label">다음 여정</div>
+    <h2>연결된 강의</h2>
+    <div class="conn">
+        <a href="day10_갈등의_신경과학.html">
+            <span class="cn">Day 10</span>
+            갈등의 신경과학
+        </a>
+        <a href="day12_통합복습_Part1_2.html">
+            <span class="cn">Day 12</span>
+            통합복습 Part 1
+        </a>
+        <a href="day06_감정조절_실전.html">
+            <span class="cn">Day 06</span>
+            감정조절 실전
+        </a>
+    </div>
+</section>
+
 </main>
 
-    <footer class="container">
-        <p>© 2026 인간 탐구 시리즈 | Day 11: 피드백 주고받기</p>
-        <p style="margin-top: 1rem; font-size: 0.85rem;">참고문헌: Kluger & DeNisi (1996), Rock (2008), Neff (2003)</p>
-    </footer>
+<footer class="ftr">
+    <div class="wrap">인간 탐구 시리즈 · Day 11/22 · v5.0</div>
+</footer>
 
-    <script>
-        function toggleCard(element) {
-            const content = element.querySelector('.card-content');
-            const toggle = element.querySelector('.card-toggle');
-            
-            if (content.classList.contains('visible')) {
-                content.classList.remove('visible');
-                toggle.textContent = '+';
-                element.classList.remove('expanded');
-            } else {
-                content.classList.add('visible');
-                toggle.textContent = '−';
-                element.classList.add('expanded');
-            }
-        }
+<script>
+// Scroll Progress
+window.addEventListener('scroll',()=>{
+    const p=Math.min(100,(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight))*100);
+    document.getElementById('progFill').style.width=p+'%';
+});
 
-        function checkAnswer(questionName, correctAnswer, button) {
-            const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
-            const feedback = button.nextElementSibling;
-            
-            if (!selectedOption) {
-                alert('답을 선택해주세요.');
-                return;
-            }
-            
-            if (selectedOption.parentElement.textContent.includes(correctAnswer)) {
-                feedback.classList.remove('incorrect');
-                feedback.classList.add('correct');
-            } else {
-                feedback.classList.remove('correct');
-                feedback.classList.add('incorrect');
-                feedback.innerHTML = '<strong>다시 생각해보세요.</strong> 강의 내용을 다시 읽어보고 다시 선택해보세요.';
-            }
-        }
+// Card Toggle
+function toggleC(el){
+    const b=el.querySelector('.card-body'),a=el.querySelector('.card-arrow');
+    b.classList.toggle('open');a.classList.toggle('open');
+}
 
-        // Smooth fade-in on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+// Timer
+let tSec=30,tInt=null,tRun=false;
+function fmtT(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function setT(s){tSec=s;tRun=false;clearInterval(tInt);document.getElementById('tDisp').textContent=fmtT(s);document.getElementById('tBtn').textContent='시작';document.querySelectorAll('.timer-btns button').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');}
+function goT(){
+    if(tRun){clearInterval(tInt);tRun=false;document.getElementById('tBtn').textContent='시작';return;}
+    tRun=true;document.getElementById('tBtn').textContent='정지';
+    tInt=setInterval(()=>{tSec--;document.getElementById('tDisp').textContent=fmtT(tSec);if(tSec<=0){clearInterval(tInt);tRun=false;document.getElementById('tBtn').textContent='완료!';}},1000);
+}
+function rstT(){clearInterval(tInt);tRun=false;tSec=30;document.getElementById('tDisp').textContent=fmtT(30);document.getElementById('tBtn').textContent='시작';}
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
+// Breathing
+let brInt=null,brRun=false;
+function toggleBreath(){
+    const c=document.getElementById('breathC'),b=document.getElementById('breathB');
+    if(brRun){clearInterval(brInt);brRun=false;b.textContent='시작';c.style.transform='scale(1)';c.textContent='시작';c.style.background='var(--sage-light)';c.style.borderColor='var(--sage)';return;}
+    brRun=true;b.textContent='정지';
+    const ph=[{t:'들이쉬기',s:'scale(1.35)',bg:'var(--accent-light)',bc:'var(--accent)'},{t:'멈추기',s:'scale(1.35)',bg:'var(--warm-light)',bc:'var(--warm)'},{t:'내쉬기',s:'scale(1)',bg:'var(--sage-light)',bc:'var(--sage)'},{t:'멈추기',s:'scale(1)',bg:'var(--coral-light)',bc:'var(--coral)'}];
+    let i=0;
+    function run(){c.textContent=ph[i%4].t;c.style.transform=ph[i%4].s;c.style.background=ph[i%4].bg;c.style.borderColor=ph[i%4].bc;i++;}
+    run();brInt=setInterval(run,4000);
+}
 
-        document.querySelectorAll('section').forEach(section => {
-            section.style.opacity = '0';
-            section.style.transform = 'translateY(20px)';
-            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(section);
-        });
-    
-        // ===== INTERACTIVE COMPONENTS JS =====
-        
-        // 1. Dynamic Scroll Progress Bar
-        function updateProgressBar() {
-            const scrollTop = window.scrollY;
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollPercent = scrollTop / docHeight;
-            const progressBar = document.querySelector('.progress-bar::after');
-            if (progressBar) {
-                document.querySelector('.progress-bar').style.setProperty('--width', (scrollPercent * 100) + '%');
-            }
-        }
-        
-        // Update progress bar on scroll
-        document.addEventListener('scroll', function() {
-            const scrollTop = window.scrollY;
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollPercent = scrollTop / docHeight;
-            const progressBar = document.querySelector('.progress-bar');
-            if (progressBar) {
-                const gradientPercent = (scrollPercent * 100).toFixed(1);
-                progressBar.style.background = 'linear-gradient(90deg, var(--accent) ' + gradientPercent + '%, var(--bg2) ' + gradientPercent + '%)';
-            }
-        }, false);
-        
-        // 2. Box Breathing Guide
-        function toggleBreathing(btn) {
-            const circle = document.querySelector('.breathing-circle');
-            if (circle) {
-                circle.classList.toggle('breathing');
-                btn.textContent = circle.classList.contains('breathing') ? '정지' : '시작';
-                btn.style.background = circle.classList.contains('breathing') ? 'var(--coral-light)' : 'white';
-                btn.style.color = circle.classList.contains('breathing') ? 'var(--coral)' : 'var(--accent)';
-            }
-        }
-        
-        function stopBreathing(btn) {
-            const circle = document.querySelector('.breathing-circle');
-            if (circle) {
-                circle.classList.remove('breathing');
-                const startBtn = document.querySelector('[data-breathing-start]');
-                if (startBtn) {
-                    startBtn.textContent = '시작';
-                    startBtn.style.background = 'white';
-                    startBtn.style.color = 'var(--accent)';
-                }
-            }
-        }
-        
-        // 3. Flashcard System
-        let currentCardIndex = 0;
-        const flashcardCount = document.querySelectorAll('.flashcard-container').length;
-        
-        function prevFlashcard() {
-            currentCardIndex = (currentCardIndex - 1 + flashcardCount) % flashcardCount;
-            updateFlashcardDisplay();
-        }
-        
-        function nextFlashcard() {
-            currentCardIndex = (currentCardIndex + 1) % flashcardCount;
-            updateFlashcardDisplay();
-        }
-        
-        function updateFlashcardDisplay() {
-            document.querySelectorAll('.flashcard-container').forEach((card, idx) => {
-                card.style.display = idx === currentCardIndex ? 'block' : 'none';
-            });
-            const counter = document.querySelector('.flashcard-counter');
-            if (counter) {
-                counter.textContent = (currentCardIndex + 1) + ' / ' + flashcardCount;
-            }
-        }
-        
-        // Initialize flashcards
-        document.addEventListener('DOMContentLoaded', function() {
-            if (flashcardCount > 0) {
-                updateFlashcardDisplay();
-            }
-        });
-        
-        // 4. Scenario Choice Game
-        function selectScenarioChoice(element) {
-            const parent = element.closest('.scenario-choices') || element.parentElement.parentElement;
-            if (parent) {
-                parent.querySelectorAll('.scenario-choice').forEach(choice => {
-                    choice.classList.remove('selected');
-                });
-                element.classList.add('selected');
-                
-                const resultDiv = element.closest('.scenario-section').querySelector('.scenario-result');
-                if (resultDiv) {
-                    resultDiv.classList.add('show');
-                }
-            }
-        }
-        
-        // 5. Practice Timer
-        let timerInterval = null;
-        let timerSeconds = 0;
-        
-        function setTimerDuration(seconds) {
-            if (timerInterval) clearInterval(timerInterval);
-            timerSeconds = seconds;
-            updateTimerDisplay();
-            document.querySelectorAll('.timer-preset').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-        }
-        
-        function startTimer() {
-            if (!timerInterval) {
-                const totalSeconds = timerSeconds;
-                timerInterval = setInterval(function() {
-                    timerSeconds--;
-                    updateTimerDisplay();
-                    if (timerSeconds <= 0) {
-                        clearInterval(timerInterval);
-                        timerInterval = null;
-                        timerSeconds = 0;
-                        playTimerSound();
-                    }
-                }, 1000);
-            }
-        }
-        
-        function stopTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
-        }
-        
-        function resetTimer() {
-            stopTimer();
-            timerSeconds = 0;
-            updateTimerDisplay();
-        }
-        
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timerSeconds / 60);
-            const seconds = timerSeconds % 60;
-            const display = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-            const timerDisplay = document.querySelector('.timer-display');
-            if (timerDisplay) {
-                timerDisplay.textContent = display;
-            }
-            
-            const progress = ((1 - (timerSeconds / (timerSeconds > 0 ? timerSeconds : 1))) * 360);
-            const circle = document.querySelector('.timer-circle');
-            if (circle) {
-                circle.style.setProperty('--timer-progress', progress + 'deg');
-            }
-        }
-        
-        function playTimerSound() {
-            // Simple beep using Web Audio API
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gain = audioContext.createGain();
-                oscillator.connect(gain);
-                gain.connect(audioContext.destination);
-                oscillator.frequency.value = 800;
-                gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.5);
-            } catch (e) {
-                // Fallback: simple alert
-                console.log('Timer complete!');
-            }
-        }
-        
-        // 6. Concept Matching Game
-        let selectedTerm = null;
-        let matches = {};
-        
-        function selectMatchItem(element) {
-            const isLeft = element.closest('.matching-column:first-child') !== null;
-            
-            if (matches[selectedTerm + '-' + element.textContent]) {
-                return;
-            }
-            
-            if (!selectedTerm) {
-                selectedTerm = element.textContent;
-                element.classList.add('selected');
-            } else {
-                const matchKey = selectedTerm + '-' + element.textContent;
-                matches[matchKey] = true;
-                
-                // Find and mark both items as matched
-                document.querySelectorAll('.match-item').forEach(item => {
-                    if (item.textContent === selectedTerm || item.textContent === element.textContent) {
-                        item.classList.add('matched');
-                        item.classList.remove('selected');
-                    }
-                });
-                
-                selectedTerm = null;
-                
-                // Check if all matched
-                const totalItems = document.querySelectorAll('.match-item').length;
-                const matchedItems = document.querySelectorAll('.match-item.matched').length;
-                if (matchedItems === totalItems) {
-                    const status = document.querySelector('.matching-status');
-                    if (status) {
-                        status.textContent = '완벽합니다! 🎉 모든 개념을 올바르게 매칭했습니다.';
-                        status.classList.add('complete');
-                    }
-                }
-            }
-        }
-        
-        function resetMatching() {
-            document.querySelectorAll('.match-item').forEach(item => {
-                item.classList.remove('matched', 'selected', 'incorrect');
-            });
-            selectedTerm = null;
-            matches = {};
-            const status = document.querySelector('.matching-status');
-            if (status) {
-                status.textContent = '';
-                status.classList.remove('complete');
-            }
-        }
-        
-        // Original functions
-        function toggleCard(element) {
-            element.classList.toggle('open');
-        }
-        
-        function checkAnswer(questionNum, element) {
-            const correctAnswers = {
-                1: 'd',
-                2: 'b',
-                3: 'b'
-            };
-            
-            const explanations = {
-                1: {
-                    'a': '틀렸습니다. 수동적 커뮤니케이션은 당신의 스트레스를 증가시킵니다.',
-                    'b': '틀렸습니다. 공격적 커뮤니케이션은 관계를 손상시킵니다.',
-                    'c': '틀렸습니다. 수동-공격적 커뮤니케이션은 가장 혼란스럽습니다.',
-                    'd': '맞습니다! 어서티브 커뮤니케이션은 당신과 상대 모두를 존중합니다. 신경계에 가장 적은 스트레스를 주고, 관계를 가장 깊게 만듭니다.'
-                }
-            };
-            
-            const explanationId = 'exp' + questionNum;
-            const explanation = document.getElementById(explanationId);
-            
-            const isCorrect = element.value === correctAnswers[questionNum];
-            const explanationText = explanations[questionNum] ? explanations[questionNum][element.value] : '';
-            
-            if (explanation) {
-                if (isCorrect) {
-                    explanation.classList.add('show');
-                    explanation.style.backgroundColor = '#EDF5EE';
-                    explanation.style.borderLeftColor = '#7A9E7E';
-                    explanation.innerHTML = '<strong style="color: #7A9E7E;">✓ 정답입니다!</strong> ' + explanationText;
-                } else {
-                    explanation.classList.add('show');
-                    explanation.style.backgroundColor = '#FBEAEB';
-                    explanation.style.borderLeftColor = '#C1666B';
-                    explanation.innerHTML = '<strong style="color: #C1666B;">✗ 다시 생각해보세요.</strong> ' + explanationText;
-                }
-            }
-        }
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.animation = 'fadeIn 0.6s ease-in-out';
-                    }
-                });
-            });
-            
-            document.querySelectorAll('section').forEach(section => {
-                observer.observe(section);
-            });
-        });
+// Flashcard
+const fcs=[
+    {f:'SCARF 모델',b:'Status, Certainty, Autonomy, Relatedness, Fairness. 피드백이 5가지를 위협하면 편도체 방어반응 유발.'},
+    {f:'SBI 모델',b:'Situation-Behavior-Impact. 구체적이고 비인격적인 피드백 구조. 전전두피질 활성화로 학습 용이.'},
+    {f:'성장 마인드셋',b:'피드백을 학습 기회로 해석. 실수 후 수행 향상이 2배. (Moser, 2011)'},
+    {f:'dACC',b:'배측 전방대상피질. 사회적 거부와 물리적 통증 모두에 반응하는 사회적 통증 영역.'}
+];
+let fcI=0,fcFlip=false;
+function showFC(){fcFlip=false;document.getElementById('fc').classList.remove('flip');document.getElementById('fcF').textContent=fcs[fcI].f;document.getElementById('fcB').textContent=fcs[fcI].b;document.getElementById('fcN').textContent=(fcI+1)+'/'+fcs.length;}
+function flipFC(){fcFlip=!fcFlip;document.getElementById('fc').classList.toggle('flip');}
+function nextFC(){fcI=(fcI+1)%fcs.length;showFC();}
+function prevFC(){fcI=(fcI-1+fcs.length)%fcs.length;showFC();}
+showFC();
 
-	</script>
+// Scenario
+const scRes=[
+    {cls:'bad',txt:'편도체 방어반응입니다. SCARF의 Status 위협에 반응한 즉각적 방어로, 상황을 악화시킵니다. 상사의 의도가 건설적이었더라도 적대적으로 변질됩니다.'},
+    {cls:'good',txt:'성장 마인드셋입니다. 6초 지연 + 개인 공간 확보 + 개선 의도 표시. 편도체를 진정시키고 전전두피질을 활성화하여 피드백을 학습의 기회로 변환합니다.'},
+    {cls:'ok',txt:'동결 반응입니다. 겉으로는 순순하지만, 내면의 수치심과 코르티솔이 상승합니다. 감정을 처리하지 못해 나중에 반추하거나 회피 행동으로 이어질 수 있습니다.'}
+];
+function pickSc(el,i){
+    document.querySelectorAll('.sc-opt').forEach(o=>o.classList.remove('selected'));
+    el.classList.add('selected');
+    const r=document.getElementById('scR');
+    r.className='sc-result show '+scRes[i].cls;r.textContent=scRes[i].txt;
+}
+
+// Quiz
+function chkQ(el,ok){
+    const q=el.parentElement,opts=q.querySelectorAll('.quiz-opt'),fb=q.querySelector('.quiz-fb');
+    if(fb.classList.contains('show'))return;
+    opts.forEach(o=>o.style.pointerEvents='none');
+    el.classList.add(ok?'correct':'wrong');
+    if(!ok) opts.forEach(o=>{if(o.getAttribute('onclick')&&o.getAttribute('onclick').includes('true'))o.classList.add('correct');});
+    fb.classList.add('show');
+}
+
+// Matching
+const mData=[
+    ['SCARF','5가지 사회적 위협 요인'],['SBI','상황 행동 영향'],['성장 마인드셋','학습 기회로 해석'],['dACC','사회적 통증 영역'],['고정 마인드셋','능력 판단 방어']
+];
+let mSel=null,mDone=0;
+function initMatch(){
+    const area=document.getElementById('matchArea');area.innerHTML='';
+    const left=mData.map((d,i)=>({t:d[0],i:i,side:'l'}));
+    const right=mData.map((d,i)=>({t:d[1],i:i,side:'r'})).sort(()=>Math.random()-0.5);
+    left.forEach(d=>{const e=document.createElement('div');e.className='match-item';e.textContent=d.t;e.dataset.i=d.i;e.dataset.s='l';e.onclick=function(){clickM(this);};area.appendChild(e);});
+    right.forEach(d=>{const e=document.createElement('div');e.className='match-item';e.textContent=d.t;e.dataset.i=d.i;e.dataset.s='r';e.onclick=function(){clickM(this);};area.appendChild(e);});
+}
+function clickM(el){
+    if(el.classList.contains('done'))return;
+    if(!mSel){mSel=el;el.classList.add('sel');return;}
+    if(mSel.dataset.s===el.dataset.s){mSel.classList.remove('sel');mSel=el;el.classList.add('sel');return;}
+    if(mSel.dataset.i===el.dataset.i){mSel.classList.remove('sel');mSel.classList.add('done');el.classList.add('done');mDone++;mSel=null;
+        if(mDone===mData.length)document.getElementById('matchMsg').textContent='모두 맞추셨습니다!';
+    } else {mSel.classList.remove('sel');el.style.background='var(--coral-light)';setTimeout(()=>el.style.background='',500);mSel=null;}
+}
+initMatch();
+
+// Fade In
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('v');}),{threshold:0.1});
+document.querySelectorAll('.fi').forEach(el=>obs.observe(el));
+</script>
 </body>
 </html>

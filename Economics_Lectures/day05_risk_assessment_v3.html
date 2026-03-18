@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 05 | 위험 수용도 진단 & 자산 배분 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #B5B3AB;
+  --text-dim: #8A8880;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 05 / 23</span>
+    <span class="header-title">위험 수용도 진단 & 자산 배분</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 1 · 부자 마인드셋 & 자산 기초</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 1 — 부자 마인드셋 & 자산 기초</div>
+  <h1 class="hero-day">Day 05</h1>
+  <h2 class="hero-subtitle">위험 수용도 진단 & 자산 배분</h2>
+  <p class="hero-quote">"위험은 나쁜 것이 아니다. 이해하지 못하는 위험이 나쁜 것이다." — Warren Buffett</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 1: 01~07</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:21.7%"></div></div>
+    <div class="progress-label"><span>Day 05</span><span>5 / 23 완료 (21.7%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 분산 학습 + 간격 반복</h3>
+    <p>오늘의 자산 배분 개념을 5일 뒤에 복습하면, 뇌의 장기기억 전환율이 85%에 달합니다. 따라서 오늘은 '깊게 이해'하고, D+1, D+3에서 '확인'하세요.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">09:00-09:05</td><td>복습 & 동기부여</td><td>지난 4일의 복합수익률 확인</td></tr>
+<tr><td class="time-col">09:05-09:15</td><td>개념 학습</td><td>위험 수용도 & 포트폴리오 이론</td></tr>
+<tr><td class="time-col">09:15-09:20</td><td>시각화 분석</td><td>3개 차트 분석 (열지도, 경계, 파이)</td></tr>
+<tr><td class="time-col">09:20-09:25</td><td>심화 이해</td><td>Deep Dive 1-2 읽기: 신경과학 + 실제사례</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">위험 수용도 진단 & 자산 배분</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">위험 수용도 (Risk Tolerance)</div>
+      <div class="card-body">
+        <p><strong>정의:</strong> 투자자가 포트폴리오 가치의 단기 변동성(손실)을 감당할 수 있는 심리적, 재무적 능력입니다.</p>
+        <p><strong>3가지 구성요소:</strong></p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>심리적 안정성: 주식이 -20% 떨어져도 끝까지 보유할 수 있는가?</li>
+          <li>재무적 여유: 긴급자금 충분한가? 5년 내 대출금이 필요한가?</li>
+          <li>시간 지평선: 몇 년 동안 투자할 수 있는가? (길수록 높은 리스크 가능)</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>당신의 62점:</strong> 중상 수준의 위험 수용도로, 60% 주식 배분에 적합합니다. 단기 변동성에 흔들리지 않으면서도 과도한 리스크는 피할 수 있는 수준입니다.</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">현대 포트폴리오 이론 (MPT)</div>
+      <div class="card-body">
+        <p><strong>핵심 원리:</strong> 여러 자산을 조합하면 전체 리스크를 줄일 수 있다는 1952년 마코위츠의 이론입니다.</p>
+        <p><strong>다각화의 마법:</strong> 부동산 91% + 주식 9% 상태는 "알을 한 바구니에 담은 것"입니다. 경제 침체 시 부동산과 주식이 함께 떨어질 수 있습니다. 하지만 60% 주식 + 40% 채권은 상관계수가 낮아(약 0.2), 주식이 하락할 때 채권이 상승할 가능성이 높아 전체 변동성을 12% → 10%로 감소시킵니다.</p>
+        <div class="data-table-wrap" style="margin-top:0.6rem;">
+          <table class="data-table" style="font-size:0.75rem;">
+            <thead>
+              <tr><th>자산조합</th><th>기대수익</th><th>변동성</th><th>Sharpe지표</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>100% 주식</td><td>9.5%</td><td>18.7%</td><td>0.38</td></tr>
+              <tr><td>60/40 (권장)</td><td>7.0%</td><td>10.1%</td><td>0.43</td></tr>
+              <tr><td>100% 채권</td><td>4.0%</td><td>6.2%</td><td>0.25</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:0.4rem;"><strong>결론:</strong> 60/40 포트폴리오가 수익 대비 효율성(Sharpe) 측면에서 최고입니다.</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">자산 배분 (Asset Allocation)</div>
+      <div class="card-body">
+        <p><strong>정의:</strong> 주식, 채권, 부동산 등 다양한 자산에 자본을 배치하는 전략입니다. 포트폴리오 수익률의 87-93%를 결정합니다.</p>
+        <p><strong>당신에게 맞는 배분:</strong></p>
+        <div class="data-table-wrap">
+          <table class="data-table" style="font-size:0.8rem;">
+            <thead>
+              <tr><th>자산 유형</th><th>현재 비율</th><th>권장 비율</th><th>변화액</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>부동산 (7억)</td><td>214%*</td><td>70-80%**</td><td>점진적 감소</td></tr>
+              <tr><td>주식 (2,800만)</td><td>9%</td><td>60%</td><td>+5,100만</td></tr>
+              <tr><td>채권/현금</td><td>-123%***</td><td>20-30%</td><td>+3,500만</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:0.75rem;margin-top:0.4rem;">*레버리지 상태 (담보대출 4억 때문) **절대 기준이 아니라 상대 기준의 합리적 목표 ***음수는 부채를 의미</p>
+        <p style="margin-top:0.6rem;"><strong>리밸런싱 타이밍:</strong> 연 1회 (연초), 또는 한 자산이 목표 ±5% 벗어날 때</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">상관계수 & 다각화 효과</div>
+      <div class="card-body">
+        <p><strong>상관계수란?</strong> 두 자산이 함께 움직이는 정도를 -1 ~ +1로 표현합니다.</p>
+        <div class="data-table-wrap">
+          <table class="data-table" style="font-size:0.8rem;">
+            <thead>
+              <tr><th>상관계수</th><th>의미</th><th>예시</th><th>다각화 효과</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>+1.0</td><td>완벽한 양의 상관</td><td>삼성 주식 + KOSPI</td><td>없음</td></tr>
+              <tr><td>+0.5</td><td>중간 양의 상관</td><td>국내 주식 + 채권</td><td>약함</td></tr>
+              <tr><td>+0.2</td><td>약한 양의 상관</td><td>국내 주식 + 미국주식</td><td>중간</td></tr>
+              <tr><td>0.0</td><td>상관 없음</td><td>주식 + 인플레이션</td><td>강함</td></tr>
+              <tr><td>-1.0</td><td>완벽한 음의 상관</td><td>주식 + 장기채권(위기 시)</td><td>최대</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:0.6rem;"><strong>당신의 60/40 포트폴리오:</strong> 한국 주식-채권 상관계수는 통상 +0.15 ~ +0.25로, 다각화 효과가 약 20% 정도 리스크를 감소시킵니다. 여기에 국제주식 10% 추가 시 상관계수가 낮아져 추가적 리스크 감소를 기대할 수 있습니다.</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">효율적 경계 (Efficient Frontier)</div>
+      <div class="card-body">
+        <p><strong>정의:</strong> 같은 수준의 리스크에서 최고 수익을 제공하는 포트폴리오들의 집합을 그래프로 나타낸 곡선입니다.</p>
+        <p><strong>특징:</strong></p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>Y축 (수익률) 위로 올라갈수록 더 높은 리스크를 감수해야 함</li>
+          <li>경계 아래의 포트폴리오는 "비효율적" (같은 리스크에서 더 낮은 수익)</li>
+          <li>자본배분선(CML): 무위험자산(채권)과 최적 위험자산(주식)을 연결한 직선</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>당신의 위치:</strong> 경계 위의 약 중간 지점에 위치합니다. 이는 당신의 62점 위험도와 38세 나이를 고려한 최적점입니다. 이 점 위쪽(더 높은 리스크)은 무리할 필요가 없고, 아래쪽(더 낮은 리스크)은 장기 자산 목표(은퇴 자산 형성) 측면에서 과도히 보수적입니다.</p>
+        <p style="margin-top:0.4rem;"><strong>5년마다 재조정:</strong> 나이가 늘어나면서 위험 수용도가 자연스럽게 감소합니다. 43세(5년 뒤)에는 55% 주식 + 45% 채본으로 조정하고, 48세(10년 뒤)에는 50/50으로 이동하는 것이 표준입니다.</p>
+        </div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  
+<div class="chart-container">
+  <div class="chart-title">CHART 1: RISK TOLERANCE PROFILE EVOLUTION</div>
+  <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1000" height="500" fill="#0A0C10"/>
+    
+    <!-- Grid -->
+    <g stroke="#2A2D36" stroke-width="1">
+      <line x1="100" y1="50" x2="100" y2="400"/>
+      <line x1="100" y1="400" x2="950" y2="400"/>
+      <line x1="100" y1="100" x2="950" y2="100"/>
+      <line x1="100" y1="150" x2="950" y2="150"/>
+      <line x1="100" y1="200" x2="950" y2="200"/>
+      <line x1="100" y1="250" x2="950" y2="250"/>
+      <line x1="100" y1="300" x2="950" y2="300"/>
+      <line x1="100" y1="350" x2="950" y2="350"/>
+      <line x1="150" y1="50" x2="150" y2="400"/>
+      <line x1="200" y1="50" x2="200" y2="400"/>
+      <line x1="250" y1="50" x2="250" y2="400"/>
+      <line x1="300" y1="50" x2="300" y2="400"/>
+      <line x1="350" y1="50" x2="350" y2="400"/>
+      <line x1="400" y1="50" x2="400" y2="400"/>
+      <line x1="450" y1="50" x2="450" y2="400"/>
+      <line x1="500" y1="50" x2="500" y2="400"/>
+      <line x1="550" y1="50" x2="550" y2="400"/>
+      <line x1="600" y1="50" x2="600" y2="400"/>
+      <line x1="650" y1="50" x2="650" y2="400"/>
+      <line x1="700" y1="50" x2="700" y2="400"/>
+      <line x1="750" y1="50" x2="750" y2="400"/>
+      <line x1="800" y1="50" x2="800" y2="400"/>
+      <line x1="850" y1="50" x2="850" y2="400"/>
+      <line x1="900" y1="50" x2="900" y2="400"/>
+      <line x1="950" y1="50" x2="950" y2="400"/>
+    </g>
+    
+    <!-- Heat map bars showing risk tolerance by age -->
+    <!-- Age 25: High risk tolerance (80% equity) -->
+    <rect x="120" y="80" width="20" height="320" fill="#4ABF7A" opacity="0.8"/>
+    <!-- Age 30: 77% equity -->
+    <rect x="155" y="92" width="20" height="308" fill="#4ABF7A" opacity="0.75"/>
+    <!-- Age 35: 75% equity -->
+    <rect x="190" y="100" width="20" height="300" fill="#4ABF7A" opacity="0.7"/>
+    <!-- Age 38: 72% equity (학습자) -->
+    <rect x="225" y="112" width="20" height="288" fill="#C9A84C" opacity="0.9"/>
+    <!-- Age 40: 70% equity -->
+    <rect x="260" y="120" width="20" height="280" fill="#4A9EBF" opacity="0.7"/>
+    <!-- Age 45: 65% equity -->
+    <rect x="295" y="140" width="20" height="260" fill="#4A9EBF" opacity="0.65"/>
+    <!-- Age 50: 60% equity -->
+    <rect x="330" y="160" width="20" height="240" fill="#4A9EBF" opacity="0.6"/>
+    <!-- Age 55: 55% equity -->
+    <rect x="365" y="180" width="20" height="220" fill="#4A9EBF" opacity="0.55"/>
+    <!-- Age 60: 40% equity -->
+    <rect x="400" y="240" width="20" height="160" fill="#BF4A4A" opacity="0.6"/>
+    <!-- Age 65: 30% equity -->
+    <rect x="435" y="280" width="20" height="120" fill="#BF4A4A" opacity="0.5"/>
+    
+    <!-- Curve line: Risk tolerance decline -->
+    <polyline points="130,80 160,92 195,100 230,112 265,120 300,140 335,160 370,180 405,240 440,280" 
+              stroke="#C9A84C" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+    
+    <!-- Labels -->
+    <text x="50" y="420" font-family="JetBrains Mono" font-size="12" fill="#8A8880">25</text>
+    <text x="145" y="420" font-family="JetBrains Mono" font-size="12" fill="#8A8880">30</text>
+    <text x="185" y="420" font-family="JetBrains Mono" font-size="12" fill="#8A8880">35</text>
+    <text x="220" y="420" font-family="JetBrains Mono" font-size="12" fill="#C9A84C">38*</text>
+    <text x="255" y="420" font-family="JetBrains Mono" font-size="12" fill="#8A8880">40</text>
+    <text x="295" y="420" font-family="JetBrains Mono" font-size="12" fill="#8A8880">45</text>
+    <text x="330" y="420" font-family="JetBrains Mono" font-size="12" fill="#8A8880">50</text>
+    <text x="365" y="420" font-family="JetBrains Mono" font-size="12" fill="#8A8880">55</text>
+    <text x="400" y="420" font-family="JetBrains Mono" font-size="12" fill="#8A8880">60</text>
+    <text x="435" y="420" font-family="JetBrains Mono" font-size="12" fill="#8A8880">65</text>
+    
+    <!-- Y-axis label -->
+    <text x="20" y="75" font-family="JetBrains Mono" font-size="12" fill="#B5B3AB">100%</text>
+    <text x="25" y="225" font-family="JetBrains Mono" font-size="12" fill="#B5B3AB">50%</text>
+    <text x="35" y="405" font-family="JetBrains Mono" font-size="12" fill="#B5B3AB">0%</text>
+    
+    <!-- Axis labels -->
+    <text x="480" y="450" font-family="JetBrains Mono" font-size="12" fill="#B5B3AB" text-anchor="middle">나이 (Age)</text>
+    <text x="30" y="200" font-family="JetBrains Mono" font-size="12" fill="#B5B3AB" text-anchor="middle" transform="rotate(-90 30 200)">주식 비율 (%)</text>
+    
+    <!-- Legend -->
+    <rect x="650" y="60" width="15" height="15" fill="#4ABF7A" opacity="0.8"/>
+    <text x="675" y="72" font-family="Noto Sans KR" font-size="11" fill="#E8E6E1">공격적 (75%+ 주식)</text>
+    
+    <rect x="650" y="90" width="15" height="15" fill="#C9A84C" opacity="0.9"/>
+    <text x="675" y="102" font-family="Noto Sans KR" font-size="11" fill="#E8E6E1">균형적 (60-75%)</text>
+    
+    <rect x="650" y="120" width="15" height="15" fill="#4A9EBF" opacity="0.65"/>
+    <text x="675" y="132" font-family="Noto Sans KR" font-size="11" fill="#E8E6E1">보수적 (40-60%)</text>
+    
+    <rect x="650" y="150" width="15" height="15" fill="#BF4A4A" opacity="0.6"/>
+    <text x="675" y="162" font-family="Noto Sans KR" font-size="11" fill="#E8E6E1">매우 보수적 (&lt;40%)</text>
+  </svg>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">CHART 2: EFFICIENT FRONTIER & OPTIMAL PORTFOLIO</div>
+  <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1000" height="500" fill="#0A0C10"/>
+    
+    <!-- Grid -->
+    <g stroke="#2A2D36" stroke-width="1">
+      <line x1="100" y1="50" x2="100" y2="400"/>
+      <line x1="100" y1="400" x2="950" y2="400"/>
+    </g>
+    
+    <!-- Axis lines (thicker) -->
+    <line x1="100" y1="400" x2="950" y2="400" stroke="#4A9EBF" stroke-width="2"/>
+    <line x1="100" y1="50" x2="100" y2="400" stroke="#4A9EBF" stroke-width="2"/>
+    
+    <!-- Grid lines -->
+    <g stroke="#2A2D36" stroke-width="0.5">
+      <line x1="150" y1="50" x2="150" y2="400"/>
+      <line x1="200" y1="50" x2="200" y2="400"/>
+      <line x1="250" y1="50" x2="250" y2="400"/>
+      <line x1="300" y1="50" x2="300" y2="400"/>
+      <line x1="350" y1="50" x2="350" y2="400"/>
+      <line x1="400" y1="50" x2="400" y2="400"/>
+      <line x1="450" y1="50" x2="450" y2="400"/>
+      <line x1="500" y1="50" x2="500" y2="400"/>
+      <line x1="550" y1="50" x2="550" y2="400"/>
+      <line x1="600" y1="50" x2="600" y2="400"/>
+      <line x1="650" y1="50" x2="650" y2="400"/>
+      <line x1="700" y1="50" x2="700" y2="400"/>
+      <line x1="750" y1="50" x2="750" y2="400"/>
+      <line x1="800" y1="50" x2="800" y2="400"/>
+      <line x1="850" y1="50" x2="850" y2="400"/>
+      <line x1="900" y1="50" x2="900" y2="400"/>
+      <line x1="100" y1="100" x2="950" y2="100"/>
+      <line x1="100" y1="150" x2="950" y2="150"/>
+      <line x1="100" y1="200" x2="950" y2="200"/>
+      <line x1="100" y1="250" x2="950" y2="250"/>
+      <line x1="100" y1="300" x2="950" y2="300"/>
+      <line x1="100" y1="350" x2="950" y2="350"/>
+    </g>
+    
+    <!-- Inefficient portfolios (scattered points) -->
+    <circle cx="150" cy="280" r="5" fill="#BF4A4A" opacity="0.4"/>
+    <circle cx="170" cy="270" r="5" fill="#BF4A4A" opacity="0.4"/>
+    <circle cx="190" cy="250" r="5" fill="#BF4A4A" opacity="0.4"/>
+    <circle cx="210" cy="240" r="5" fill="#BF4A4A" opacity="0.4"/>
+    <circle cx="180" cy="200" r="5" fill="#BF4A4A" opacity="0.4"/>
+    <circle cx="220" cy="220" r="5" fill="#BF4A4A" opacity="0.4"/>
+    <circle cx="250" cy="180" r="5" fill="#BF4A4A" opacity="0.4"/>
+    <circle cx="270" cy="160" r="5" fill="#BF4A4A" opacity="0.4"/>
+    
+    <!-- Efficient Frontier (curved line) -->
+    <path d="M 150,320 Q 300,200 500,90 T 850,60" stroke="#4ABF7A" stroke-width="3" fill="none"/>
+    
+    <!-- Risk-free asset (Bonds, 100% bonds) -->
+    <circle cx="150" cy="340" r="7" fill="#4A9EBF"/>
+    <text x="145" y="365" font-family="JetBrains Mono" font-size="11" fill="#4A9EBF">100% Bond</text>
+    
+    <!-- Optimal portfolio (60/40) at learner's age -->
+    <circle cx="380" cy="155" r="10" fill="#C9A84C"/>
+    <text x="385" y="145" font-family="JetBrains Mono" font-size="11" fill="#C9A84C" font-weight="bold">학습자</text>
+    <text x="370" y="175" font-family="JetBrains Mono" font-size="10" fill="#C9A84C">(60% 주식)</text>
+    
+    <!-- 100% equity portfolio -->
+    <circle cx="850" cy="70" r="8" fill="#4ABF7A"/>
+    <text x="840" y="50" font-family="JetBrains Mono" font-size="11" fill="#4ABF7A">100% Stock</text>
+    
+    <!-- Capital Market Line (CML) -->
+    <line x1="150" y1="340" x2="850" y2="70" stroke="#C9A84C" stroke-width="2" stroke-dasharray="5,5"/>
+    <text x="500" y="210" font-family="JetBrains Mono" font-size="10" fill="#C9A84C" opacity="0.7">Capital Market Line</text>
+    
+    <!-- X-axis label (Risk/Volatility) -->
+    <text x="520" y="440" font-family="JetBrains Mono" font-size="12" fill="#B5B3AB" text-anchor="middle">위험 (리스크/변동성 σ)</text>
+    
+    <!-- Y-axis label (Return) -->
+    <text x="40" y="220" font-family="JetBrains Mono" font-size="12" fill="#B5B3AB" text-anchor="middle" transform="rotate(-90 40 220)">기대수익률 (%)</text>
+    
+    <!-- Y-axis ticks -->
+    <text x="85" y="405" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB">0%</text>
+    <text x="75" y="205" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB">10%</text>
+    <text x="75" y="105" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB">20%</text>
+    
+    <!-- X-axis ticks -->
+    <text x="150" y="420" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB">5%</text>
+    <text x="450" y="420" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB">15%</text>
+    <text x="850" y="420" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB">25%</text>
+  </svg>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">CHART 3: OPTIMAL ASSET ALLOCATION COMPARISON</div>
+  <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1000" height="500" fill="#0A0C10"/>
+    
+    <!-- Pie 1: Current Allocation (91% Real Estate, 9% Stock) -->
+    <g transform="translate(200, 200)">
+      <!-- Real Estate slice (91% = 327.6 degrees) -->
+      <path d="M 0,0 L 0,-150 A 150,150 0 1,1 -132.3,-69.6 Z" fill="#4A9EBF" opacity="0.8"/>
+      <!-- Stock slice (9% = 32.4 degrees) -->
+      <path d="M 0,0 L -132.3,-69.6 A 150,150 0 0,1 -117.5,97.5 Z" fill="#4ABF7A" opacity="0.8"/>
+      
+      <!-- Labels -->
+      <text x="0" y="-80" font-family="JetBrains Mono" font-size="14" fill="#E8E6E1" text-anchor="middle" font-weight="bold">91%</text>
+      <text x="0" y="-60" font-family="Noto Sans KR" font-size="11" fill="#B5B3AB" text-anchor="middle">부동산</text>
+      
+      <text x="-60" y="30" font-family="JetBrains Mono" font-size="12" fill="#E8E6E1" font-weight="bold">9%</text>
+      <text x="-60" y="45" font-family="Noto Sans KR" font-size="10" fill="#B5B3AB">주식</text>
+    </g>
+    
+    <!-- Label: Current -->
+    <text x="200" y="390" font-family="Noto Sans KR" font-size="13" fill="#E8E6E1" text-anchor="middle" font-weight="bold">현재 포트폴리오</text>
+    <text x="200" y="410" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB" text-anchor="middle">고위험 (변동성 높음)</text>
+    
+    <!-- Pie 2: Recommended Allocation (60% Stock, 40% Bond) -->
+    <g transform="translate(700, 200)">
+      <!-- Stock slice (60% = 216 degrees) -->
+      <path d="M 0,0 L 0,-150 A 150,150 0 0,1 144.1,46.4 Z" fill="#4ABF7A" opacity="0.8"/>
+      <!-- Bond slice (40% = 144 degrees) -->
+      <path d="M 0,0 L 144.1,46.4 A 150,150 0 0,1 -97.5,-113.1 Z" fill="#C9A84C" opacity="0.8"/>
+      
+      <!-- Labels -->
+      <text x="30" y="-40" font-family="JetBrains Mono" font-size="14" fill="#E8E6E1" font-weight="bold">60%</text>
+      <text x="30" y="-25" font-family="Noto Sans KR" font-size="11" fill="#B5B3AB">주식</text>
+      
+      <text x="-70" y="30" font-family="JetBrains Mono" font-size="14" fill="#E8E6E1" font-weight="bold">40%</text>
+      <text x="-70" y="45" font-family="Noto Sans KR" font-size="11" fill="#B5B3AB">채권</text>
+    </g>
+    
+    <!-- Label: Recommended -->
+    <text x="700" y="390" font-family="Noto Sans KR" font-size="13" fill="#E8E6E1" text-anchor="middle" font-weight="bold">권장 포트폴리오</text>
+    <text x="700" y="410" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB" text-anchor="middle">(60/40 균형 배분)</text>
+    
+    <!-- Arrow -->
+    <path d="M 400,200 L 600,200" stroke="#C9A84C" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="500" y="190" font-family="Noto Sans KR" font-size="11" fill="#C9A84C" text-anchor="middle">리밸런싱</text>
+    
+    <!-- Arrow marker definition -->
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+        <polygon points="0 0, 10 3, 0 6" fill="#C9A84C"/>
+      </marker>
+    </defs>
+  </svg>
+</div>
+
+</section>
+
+
+
+
+<!-- Deep Dive Sections -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  
+  <details class="deep-dive">
+    <summary><strong>DD1. 현대 포트폴리오 이론 (Modern Portfolio Theory, MPT) 실전 이해</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>해리 마코위츠(Harry Markowitz)의 혁명적 발견:</strong> 1950년대 마코위츠는 포트폴리오의 기대수익률과 리스크(표준편차)만으로 최적 포트폴리오를 구성할 수 있음을 증명했습니다. 이는 "저기(correlation)"라는 개념을 통해, 서로 다른 자산을 혼합하면 전체 리스크를 줄일 수 있다는 획기적 아이디어였습니다.</p>
+      
+      <p><strong>효율적 경계(Efficient Frontier)의 의미:</strong> 같은 수준의 리스크 하에서 가장 높은 수익을 제공하는 포트폴리오들의 집합입니다. 예를 들어 변동성 12%를 감수하려면, 가능한 많은 포트폴리오 중에서 기대수익이 최대인 포트폴리오를 선택해야 합니다. 이것이 바로 당신의 "효율적 경계 위의 최적점"입니다.</p>
+      
+      <p><strong>자본배치선(Capital Allocation Line)과 위험자산 포트폴리오:</strong> 무위험자산(예: 국채 3% 수익)과 위험자산 포트폴리오를 조합한 직선이 CAL입니다. 당신의 나이(38세)와 위험회피도(62점)에서 최적점은 약 60% 주식 + 40% 채권인데, 이는 CAL 위에 위치하며 당신의 특성과 목표수익을 함께 만족합니다.</p>
+      
+      <p><strong>한국 투자자를 위한 적용 팁:</strong> 한국은 부동산에 순자산의 90%가 집중된 특수한 구조입니다. 이는 리스크 포인트로 작용합니다. 지역(서울/지방), 경제주기 변화에 따라 부동산 수익률이 크게 변동하기 때문입니다. 따라서 주식과 해외 자산을 추가하는 것이 전체 포트폴리오의 변동성(σ)을 오히려 감소시킬 수 있습니다.</p>
+    </div>
+  </details>
+  
+  <details class="deep-dive">
+    <summary><strong>DD2. 위험 수용도(Risk Tolerance) 측정의 신경생물학적 기반</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>편도체(Amygdala)와 공포 반응:</strong> 당신의 62점(중간-높음) 위험 수용도는 편도체의 활성화 수준과 관련이 있습니다. 주식이 하루에 -5% 떨어지면, 먼저 편도체가 반응하여 "위험!" 신호를 보냅니다. 위험 수용도가 높을수록, 전전두피질(prefrontal cortex)이 빠르게 이 신호를 "장기 목표 관점에서는 정상 변동"으로 재해석합니다.</p>
+      
+      <p><strong>보상 회로(Dopamine System)와 수익 추구:</strong> 주식으로 +3% 수익을 얻으면 도파민이 분비되어 기분이 좋아집니다. 하지만 같은 크기의 손실(-3%)은 도파민 감소보다 훨씬 큰 고통(약 2배)을 유발합니다. 이것이 "손실회피(loss aversion)"입니다. 당신의 62점 수용도에서는 이 손실회피가 중간 수준이므로, 단기 변동성에 흔들리지 않으면서도 과도한 리스크는 피할 수 있습니다.</p>
+      
+      <p><strong>신경적응(Neural Adaptation)과 시간 지평선:</strong> 처음 6개월간 -20% 손실을 경험하면 매우 고통스럽지만(신경계 활성화), 3년 뒤 그것이 전체 수익의 일부로 보이면 고통이 줄어듭니다. 이것이 "시간 지평선이 길수록 더 높은 리스크를 감당할 수 있다"는 원칙의 신경과학적 근거입니다.</p>
+      
+      <p><strong>엔지니어 특화 편향:</strong> 엔지니어들은 데이터 기반 의사결정을 선호합니다. 하지만 "확실한 데이터"를 기다리다가 투자 타이밍을 놓치는 경향이 있습니다. 주식 시장의 30% 이상은 예측 불가능한 뉴스와 심리에 의해 움직입니다. 따라서 엔지니어의 장점(분석력)과 약점(완벽함 추구)을 인식하고, "충분히 좋은 포트폴리오"를 만드는 것이 더 나은 결과를 냅니다.</p>
+    </div>
+  </details>
+  
+  <details class="deep-dive">
+    <summary><strong>DD3. 한국 가정의 자산 배분 현실과 리스크 재평가</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>부동산 집중의 숨은 위험:</strong> 당신의 순자산 3억 2,800만 중 부동산이 7억(약 214%)이라는 것은 담보대출 4억을 통한 높은 레버리지 상태입니다. 이는 포트폴리오 이론에서 볼 때 "과도하게 집중된 위험"입니다. 부동산의 특성상 (1) 단기 현금화 불가, (2) 지역/경제 주기에 따른 큰 변동성, (3) 유동성 부족을 가진 자산입니다. 금리 인상 시 담보대출 금리도 올라가 실제 현금 흐름 악화로 이어집니다.</p>
+      
+      <p><strong>글로벌 비교: 주요 국가의 가정 자산 배분:</strong> OECD 자료에 따르면, 미국 가정의 부동산 비율은 약 35% (주식 40%), 일본은 43%, 독일은 50%입니다. 한국의 평균 가정 부동산 비율이 70-80%인 이유는 (1) 강한 자산 인플레이션 기대, (2) 전세 제도의 특수성, (3) 저금리 환경에서 부채의 실질 비용 감소 때문입니다. 하지만 이제 금리가 정상화되고 있으므로, 선제적 리밸런싱이 필요합니다.</p>
+      
+      <p><strong>리밸런싱 전략: 3년 로드맵:</strong> 한 번에 급격한 변화는 시장 타이밍 실패와 세금 부담을 초래합니다. 권장 방법은 (1) Year 1: 매월 100만원씩 주식에 추가 매수 → 2,800만 → 3,800만, (2) Year 2-3: 부동산 수익(임대료 혹은 양도차익)의 50%를 주식 배분으로 전환. 이렇게 하면 부동산은 유지하면서도 포트폴리오 변동성을 20%p 감소시킬 수 있습니다.</p>
+    </div>
+  </details>
+  
+  <details class="deep-dive">
+    <summary><strong>DD4. 자산 배분과 세금 최적화 통합 전략</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>양도세와 종부세 고려한 리밸런싱:</strong> 부동산 매각 시 양도세(약 6-15%)가 발생합니다. 따라서 "부동산 매각 후 주식 매수"는 비효율적입니다. 대신 (1) 전세 보증금 회수 → 주식 투자, (2) 부동산 임대 수익 → 주식 투자, (3) 추가 수입 → 주식 투자 경로가 낫습니다. 종부세 기준(9억 초과)을 염두에 두되, 현재 당신의 7억 부동산은 미래 인상 가능성이 높으므로 조기 대응이 중요합니다.</p>
+      
+      <p><strong>주식 투자의 세제 혜택 극대화:</strong> (1) ISA(개인종합자산관리계좌): 연 400만원까지 비과세 수익 (2) 국내 주식 배당금: 15.4% 세금, 해외 주식 배당금: 15.4% 세금이지만, 환율 헤징 가능 (3) 손실 이월: 주식 손실을 다음 연도 수익과 상쇄 (5년 가능). 장기 투자자 입장에서 ISA가 최우선 수단입니다.</p>
+      
+      <p><strong>부동산 인상률 vs 주식 기대수익 시뮬레이션:</strong> 가정: 부동산 연 3%, 주식 연 7% 수익률. 5년 후, 현재 부동산 7억은 8.1억, 주식 2,800만은 3,900만이 됩니다. 전체 순자산은 3.28억 → 4.3억으로 증가하지만, 주식 비중은 9.2% → 8.3%로 오히려 감소합니다(부동산 인상 때문). 따라서 매년 균형 유지를 위해 추가 자금 투입이 필수적입니다.</p>
+    </div>
+  </details>
+</section>
+
+<!-- Data Table: 위험 수용도별 자산 배분 -->
+<section class="section fade-up">
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>위험 수용도 점수</th>
+          <th>분류</th>
+          <th>권장 주식 비율</th>
+          <th>권장 채권 비율</th>
+          <th>기대수익률</th>
+          <th>연 표준편차</th>
+          <th>최악 1년 손실</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>20-30점</td>
+          <td>매우 보수적</td>
+          <td>20%</td>
+          <td>80%</td>
+          <td>4.2%</td>
+          <td>6.5%</td>
+          <td>-5% 이상</td>
+        </tr>
+        <tr>
+          <td>31-45점</td>
+          <td>보수적</td>
+          <td>40%</td>
+          <td>60%</td>
+          <td>5.8%</td>
+          <td>9.2%</td>
+          <td>-12% 이상</td>
+        </tr>
+        <tr>
+          <td>46-60점</td>
+          <td>균형적</td>
+          <td>60%</td>
+          <td>40%</td>
+          <td>7.0%</td>
+          <td>11.8%</td>
+          <td>-18% 이상</td>
+        </tr>
+        <tr class="highlight-row">
+          <td>61-75점</td>
+          <td>공격적</td>
+          <td>80%</td>
+          <td>20%</td>
+          <td>8.2%</td>
+          <td>15.1%</td>
+          <td>-28% 이상</td>
+        </tr>
+        <tr>
+          <td>76-100점</td>
+          <td>매우 공격적</td>
+          <td>100%</td>
+          <td>0%</td>
+          <td>9.5%</td>
+          <td>18.7%</td>
+          <td>-35% 이상</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-dim);margin-top:0.5rem;"><strong>주:</strong> 기대수익률은 1980-2024년 한국/미국/해외 자산의 연복합수익률 기반. 표준편차는 일반적 경제 주기의 변동성. 최악 1년 손실은 금융위기 수준의 악재 발생 시 통계적 손실(68% 신뢰도).</p>
+</section>
+
+<!-- Formula Block: 포트폴리오 리스크 계산 -->
+<section class="section fade-up">
+  <div class="formula-block">
+    <div class="formula-line"><span class="formula-highlight">포트폴리오 표준편차 (σ_p) 계산:</span></div>
+    <div class="formula-line" style="margin-top:0.8rem;"><span class="formula-blue">σ_p = √ [ w₁² · σ₁² + w₂² · σ₂² + 2 · w₁ · w₂ · ρ₁₂ · σ₁ · σ₂ ]</span></div>
+    <div class="formula-line" style="margin-top:0.8rem;"><span class="formula-comment">여기서:</span></div>
+    <div class="formula-line"><span class="formula-comment">  w₁, w₂ = 자산1, 자산2의 비중 (합계 = 100%)</span></div>
+    <div class="formula-line"><span class="formula-comment">  σ₁, σ₂ = 각 자산의 표준편차 (변동성)</span></div>
+    <div class="formula-line"><span class="formula-comment">  ρ₁₂ = 두 자산 간 상관계수 (-1 ~ +1)</span></div>
+    <div class="formula-line" style="margin-top:0.8rem;"><span class="formula-highlight">예제 (당신의 포트폴리오):</span></div>
+    <div class="formula-line"><span class="formula-comment">  주식 60% (σ=16%), 채권 40% (σ=6%), 상관계수 ρ = 0.2</span></div>
+    <div class="formula-line"><span class="formula-comment">  σ_p = √ [ 0.6² · 16² + 0.4² · 6² + 2 · 0.6 · 0.4 · 0.2 · 16 · 6 ]</span></div>
+    <div class="formula-line"><span class="formula-comment">  σ_p = √ [ 92.16 + 5.76 + 4.608 ]</span></div>
+    <div class="formula-line"><span class="formula-blue">  σ_p = √ 102.528 = 10.13%</span></div>
+    <div class="formula-line" style="margin-top:0.8rem;"><span class="formula-highlight">결론:</span> 단순 평균 변동성 (60% · 16% + 40% · 6% = 12%)보다 낮은 10.13%</div>
+    <div class="formula-line"><span class="formula-comment">  → 이것이 다각화(Diversification)의 효과! 상관계수가 낮을수록 리스크 감소</span></div>
+  </div>
+</section>
+
+<!-- Simulation Box: 당신의 자산에 직접 적용 -->
+<section class="section fade-up">
+  <div class="sim-box">
+    <h3>💰 당신의 포트폴리오 리밸런싱 시뮬레이션</h3>
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1.2rem;">
+      현재: 순자산 3.28억 | 부동산 7억 | 부채 4억 | 주식 2,800만<br>
+      위험 수용도: 62점 (공격적 범위) → 권장 자산 배분: 60% 주식, 40% 채권
+    </p>
+    <ul class="checklist">
+      <li><strong>Step 1:</strong> 현재 주식 2,800만 → 목표 1.97억 (순자산 3.28억의 60%)</li>
+      <li><strong>Step 2:</strong> 필요 추가 자금 = 1.97억 - 0.28억 = 1.69억</li>
+      <li><strong>Step 3:</strong> 3년 계획: 매월 470만원씩 주식 매수 (36개월 × 470만 ≈ 1.69억)</li>
+      <li><strong>Step 4:</strong> 월급 또는 보너스로 투자하기 (정기적 매수 = 시장 타이밍 위험 제거)</li>
+      <li><strong>Step 5:</strong> 1년마다 검토: 주식 수익 발생 시 채권으로 리밸런싱</li>
+      <li><strong>선택:</strong> ISA 계좌 활용 (연 400만원 비과세 수익, 우선순위 1순위)</li>
+      <li><strong>선택:</strong> 전세보증금 회수 시 즉시 투자 (새 자금 충전 기회)</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  
+    <div class="sim-box">
+      <h3>💰 당신의 포트폴리오 리밸런싱 시뮬레이션</h3>
+      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1.2rem;">
+        현재: 순자산 3.28억 | 부동산 7억 | 부채 4억 | 주식 2,800만<br>
+        위험 수용도: 62점 (공격적 범위) → 권장 자산 배분: 60% 주식, 40% 채권
+      </p>
+      <ul class="checklist">
+        <li><strong>Step 1:</strong> 현재 주식 2,800만 → 목표 1.97억 (순자산 3.28억의 60%)</li>
+        <li><strong>Step 2:</strong> 필요 추가 자금 = 1.97억 - 0.28억 = 1.69억</li>
+        <li><strong>Step 3:</strong> 3년 계획: 매월 470만원씩 주식 매수 (36개월 × 470만 ≈ 1.69억)</li>
+        <li><strong>Step 4:</strong> 월급 또는 보너스로 투자하기 (정기적 매수 = 시장 타이밍 위험 제거)</li>
+        <li><strong>Step 5:</strong> 1년마다 검토: 주식 수익 발생 시 채권으로 리밸런싱</li>
+        <li><strong>선택:</strong> ISA 계좌 활용 (연 400만원 비과세 수익, 우선순위 1순위)</li>
+        <li><strong>선택:</strong> 전세보증금 회수 시 즉시 투자 (새 자금 충전 기회)</li>
+      </ul>
+    </div>
+    
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    
+<div class="bias-name">과잉 확신 편향 (Overconfidence Bias)</div>
+<p>
+  현재 당신은 부동산 91% 보유로 "나는 부동산을 잘 안다"고 느낄 수 있습니다. 
+  특히 과거 10년간 부동산이 인상되었다면, 이것이 강화됩니다. 
+  하지만 신경과학적으로, 이는 <span class="neuro-tag">안와전전두피질(orbitofrontal cortex)</span>의 
+  과활성화로 인한 것입니다. 우리 뇌는 "이미 일어난 일"을 실력이라고 착각합니다.
+</p>
+<p style="margin-top:0.6rem;">
+  <strong>엔지니어 특화 형태:</strong> 엔지니어들은 <span class="engineer-tag">데이터 기반 의사결정</span>을 자랑스러워합니다. 
+  하지만 부동산 데이터는 거래량이 적어 통계적 신뢰도가 낮습니다. 
+  반면 주식은 분당 수천 건 거래되어 데이터 품질이 훨씬 높습니다. 
+  따라서 엔지니어의 강점을 살리려면 주식, ETF, 펀드 같은 
+  "거래량이 높고 데이터가 풍부한 자산"에 더 투자하는 것이 논리적입니다.
+</p>
+<p style="margin-top:0.6rem;">
+  <strong>대응책:</strong> "위험 수용도 62점 = 균형적 배분 60/40"이라는 원칙을 의사결정 규칙으로 정하고, 
+  감정적 판단을 배제하세요. 1년마다 검토하되, 중간에는 건드리지 않기.
+</p>
+
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 현대 포트폴리오 이론(MPT)에서 '효율적 경계(Efficient Frontier)'의 정의로 가장 맞는 것은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 가장 높은 수익을 제공하는 단일 자산을 선택하는 것</li>
+<li onclick="checkAnswer(this,'q1',true)">② 같은 수준의 리스크에서 최고 수익을 제공하는 포트폴리오들의 집합</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 모든 투자자가 동일하게 선택해야 하는 최적 포트폴리오</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 리스크가 0%인 포트폴리오</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          효율적 경계는 수익-리스크 그래프에서 곡선 형태를 가지며, 
+          이 곡선 '위'의 포트폴리오들은 모두 "같은 리스크에서 최고 수익" 또는 "같은 수익에서 최저 리스크"를 제공합니다. 
+          당신의 위치는 경계 위에서 약 중간 지점으로, 당신의 위험도와 목표에 맞는 최적점입니다.
+        </div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 자산 배분 결정 시 가장 중요한 요소는 무엇인가?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 어제의 주식 수익률 추세</li>
+<li onclick="checkAnswer(this,'q2',false)">② 친구의 추천 투자 상품</li>
+<li onclick="checkAnswer(this,'q2',true)">③ 개인의 위험 수용도, 시간 지평선, 재무 상황</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 가장 높은 기대 수익률을 제공하는 자산</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ③</strong><br>
+          정답: ③ <br/>
+          자산 배분은 포트폴리오 수익의 87-93%를 결정하는 전략적 의사결정입니다. 
+          단기 주가 추세나 타인의 추천보다는, 당신의 개인적 특성이 훨씬 중요합니다. 
+          위험 수용도 62점, 나이 38세, 부채 4억 상황을 고려한 60% 주식 배분이 당신에게 최적입니다.
+        </div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. 다각화(Diversification)가 리스크를 감소시키는 이유는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 여러 자산에 투자하면 자동으로 모든 자산이 함께 상승한다</li>
+<li onclick="checkAnswer(this,'q3',true)">② 서로 상관계수가 낮은 자산들을 조합하면, 한 자산의 손실을 다른 자산의 이익이 상쇄할 수 있다</li>
+<li onclick="checkAnswer(this,'q3',false)">③ 더 많은 자산에 투자할수록 비례해서 리스크가 감소한다</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 다각화 자체가 수익을 보장한다</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          다각화의 핵심은 상관계수입니다. 예를 들어 부동산 91%는 "알을 한 바구니에 담은 것"이므로, 
+          경기 침체 시 부동산이 함께 떨어질 수 있습니다. 반면 60% 주식 + 40% 채권은 
+          상관계수가 +0.2로 낮아, 주식이 하락할 때 채권이 상승하는 경향이 있어 전체 변동성을 감소시킵니다. 
+          이것이 MPT의 핵심입니다.
+        </div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. 110-나이 공식에 따르면, 38세 투자자의 권장 주식 비율은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① 38% (110-38 = 72는 채권)</li>
+<li onclick="checkAnswer(this,'q4',true)">② 72% (110-38 = 72)</li>
+<li onclick="checkAnswer(this,'q4',false)">③ 62% (위험 수용도 점수와 동일)</li>
+<li onclick="checkAnswer(this,'q4',false)">④ 80% (젊으니까 최대한 공격적으로)</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          110-나이 공식은 간단한 규칙으로, 38세는 110-38=72%, 즉 72% 주식 비중을 권장합니다. 
+          하지만 당신의 위험 수용도(62점)를 반영하면 60% 주식으로 조정하는 것이 더 정확합니다. 
+          나이와 위험도 두 요소를 모두 고려해야 합니다.
+        </div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. 부동산 7억 + 부채 4억 상황에서 자산 배분 조정 시 첫 번째 우선순위는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',false)">① 부동산을 모두 매각하고 주식으로 전환한다</li>
+<li onclick="checkAnswer(this,'q5',true)">② 매월 정기적으로 주식에 추가 투자하고, 부동산 임대 수익/양도차익을 주식으로 재투자한다</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 주식은 위험하니 현금을 늘린다</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 이미 충분히 투자했으니 투자를 멈춘다</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          부동산 매각은 양도세(약 6-15%) 부담이 크고, 시장 타이밍 실패 위험이 있습니다. 
+          대신 (1) 매월 고정액으로 주식에 투자 (시장 타이밍 위험 제거), 
+          (2) 부동산 임대 수익 → 주식 투자, (3) 향후 양도 시 세금을 고려한 점진적 전환이 효율적입니다. 
+          3년에 걸쳐 매월 470만원씩 투자하면 목표 배분을 달성할 수 있습니다.
+        </div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 05</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 12일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 14일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 18일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">03월 25일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 10일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day04_mortgage_optimization.html">← Day 04</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 05 / 23</span>
+  <a class="nav-btn" href="day06_behavioral_finance.html">Day 06 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

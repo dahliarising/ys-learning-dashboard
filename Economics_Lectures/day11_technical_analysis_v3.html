@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 11 | 기술적 분석 기초 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #B5B3AB;
+  --text-dim: #8A8880;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 11 / 23</span>
+    <span class="header-title">기술적 분석 기초</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 2 · 주식 투자 심화</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 2 — 주식 투자 심화</div>
+  <h1 class="hero-day">Day 11</h1>
+  <h2 class="hero-subtitle">기술적 분석 기초</h2>
+  <p class="hero-quote">"차트 패턴은 집단 심리의 결정화다." — 기술적 분석가</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 2: 08~14</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:47.8%"></div></div>
+    <div class="progress-label"><span>Day 11</span><span>11 / 23 완료 (47.8%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 가격 움직임의 패턴에서 미래를 읽을 수 있을까?</h3>
+    <p>기술적 분석은 투자자 심리의 합의에 기반합니다. 패턴 인식 능력이 중요하지만, 과도한 패턴 강박에 빠지지 않아야 합니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">0–5분</td><td>차트 패턴의 심리학적 의미 이해</td><td>개념도</td></tr>
+<tr><td class="time-col">5–12분</td><td>지지선/저항선 찾기: 기술적 근거</td><td>차트 분석</td></tr>
+<tr><td class="time-col">12–18분</td><td>이동평균선 해석: 트렌드 판단</td><td>수식 및 시각화</td></tr>
+<tr><td class="time-col">18–22분</td><td>거래량 분석: 패턴의 신뢰도</td><td>수치 비교</td></tr>
+<tr><td class="time-col">22–25분</td><td>기술적 신호 vs 기본 분석 비교</td><td>능동적 회상</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">기술적 분석 기초</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">기술적 분석의 세 가지 기본 가정</div>
+      <div class="card-body"><p>기술적 분석은 세 가지 가정 위에 성립합니다. 이 가정들이 맞지 않으면 차트 분석이 무의미합니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">기술적 분석의 삼대 가정:</div>
+<div class="formula-line">① 시장은 모든 정보를 반영한다</div>
+<div class="formula-line">   = 차트에 이미 모든 뉴스가 포함됨</div>
+<div class="formula-line">   ⚠️ 그래서 뉴스 먼저 확인이 불필요</div>
+<div class="formula-line"></div>
+<div class="formula-line">② 가격은 추세를 따른다 (Trend)</div>
+<div class="formula-line">   = 상승하던 주식은 계속 올라갈 가능성</div>
+<div class="formula-line">   = 하락하던 주식은 계속 내려갈 가능성</div>
+<div class="formula-line">   = 보통 3~6개월 추세 유지</div>
+<div class="formula-line"></div>
+<div class="formula-line">③ 역사는 반복된다</div>
+<div class="formula-line">   = 같은 패턴은 같은 결과</div>
+<div class="formula-line">   = 따라서 과거 차트 공부가 미래 예측을 돕는다</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">지지선과 저항선 — 심리의 경계선</div>
+      <div class="card-body"><p>주식 차트의 지지선/저항선은 '정신적 전투선'입니다. 심리학적 의미를 이해해야 합니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">지지선 (Support) — 심리학:</div>
+<div class="formula-line">  투자자들이 '이 가격에서는 무조건 사자'고 느끼는 선</div>
+<div class="formula-line">  원인: 이전 저점에서 반등 경험 → 심리적 안심</div>
+<div class="formula-line">  강도: 지지선이 깨진 후 3년 뒤 새 지지선</div>
+<div class="formula-line"></div>
+<div class="formula-highlight">저항선 (Resistance) — 심리학:</div>
+<div class="formula-line">  투자자들이 '이 가격에서는 무조건 판다'고 느끼는 선</div>
+<div class="formula-line">  원인: 이전 고점에서 손실 → 손절 심리</div>
+<div class="formula-line">  강도: 저항선 돌파 = 심리적 버리어 제거 → 급등</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">이동평균선 — 추세의 관성</div>
+      <div class="card-body"><p>이동평균선(MA)은 가격의 '관성'을 보여줍니다. 추세 방향을 판단하는 가장 간단한 도구입니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>선</th><th>기간</th><th>용도</th><th>해석</th></tr></thead>
+<tbody>
+<tr><td><strong>단기</strong></td><td>5일 / 20일</td><td>최근 추세</td><td>5MA 위 = 단기 강세</td></tr>
+<tr><td><strong>중기</strong></td><td>60일 / 100일</td><td>중기 추세</td><td>60MA > 100MA = 상승세</td></tr>
+<tr><td><strong>장기</strong></td><td>200일</td><td>장기 방향</td><td>200MA 위 = 약세장</td></tr>
+</tbody>
+</table>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">거래량 분석 — 패턴의 신뢰도</div>
+      <div class="card-body"><p>차트 패턴만으로는 신뢰도가 낮습니다. 거래량과 함께 봐야 신호의 진위를 판단할 수 있습니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">거래량과 신호의 관계:</div>
+<div class="formula-line">① 상승추세 + 거래량 증가 = 신뢰성 높음 ✓</div>
+<div class="formula-line">② 상승추세 + 거래량 감소 = 힘이 빠짐 ⚠️</div>
+<div class="formula-line">③ 저항선 돌파 + 거래량 폭증 = 진정한 돌파</div>
+<div class="formula-line">④ 저항선 돌파 + 거래량 적음 = 함정 가능성</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">기술적 vs 기본 분석 — 어떤 것을 믿을까</div>
+      <div class="card-body"><p>두 분석법의 역할이 다릅니다. 둘 다 필요하지만 우선순위가 있습니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>항목</th><th>기술적 분석</th><th>기본 분석</th></tr></thead>
+<tbody>
+<tr><td><strong>판단 기준</strong></td><td>차트, 거래량, 패턴</td><td>실적, PER, 성장률</td></tr>
+<tr><td><strong>단기 효율</strong></td><td>매우 높음 (1주~3개월)</td><td>낮음</td></tr>
+<tr><td><strong>장기 효율</strong></td><td>낮음</td><td>매우 높음 (1년+)</td></tr>
+<tr><td><strong>리스크</strong></td><td>심리 의존 → 오판 많음</td><td>더 객관적</td></tr>
+<tr><td><strong>추천 사용</strong></td><td>월물 매매</td><td>배당주, 성장주</td></tr>
+</tbody>
+</table>
+</div></div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  <div class="chart-container"><svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="400" fill="#12151C" />
+  <text x="450" y="30" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" text-anchor="middle" font-weight="600">지지선/저항선 — 심리의 경계선</text>
+  <!-- Grid -->
+  <line x1="100" y1="60" x2="100" y2="350" stroke="#C9A84C" stroke-width="2" />
+  <line x1="100" y1="350" x2="850" y2="350" stroke="#C9A84C" stroke-width="2" />
+  <!-- Price line -->
+  <polyline points="100,280 150,250 200,220 250,190 300,210 350,180 400,160 450,140 500,170 550,150 600,120 650,150 700,130 750,160 800,140 850,170" fill="none" stroke="#4A9EBF" stroke-width="2" />
+  <!-- Resistance line -->
+  <line x1="100" y1="130" x2="850" y2="130" stroke="#BF4A4A" stroke-width="2" stroke-dasharray="5,5" />
+  <text x="860" y="135" font-family="var(--font-mono)" font-size="11" fill="#BF4A4A">저항선</text>
+  <!-- Support line -->
+  <line x1="100" y1="290" x2="850" y2="290" stroke="#4ABF7A" stroke-width="2" stroke-dasharray="5,5" />
+  <text x="860" y="295" font-family="var(--font-mono)" font-size="11" fill="#4ABF7A">지지선</text>
+  <!-- Labels -->
+  <text x="45" y="355" font-family="var(--font-mono)" font-size="11" fill="#B5B3AB" text-anchor="end">시간</text>
+  <text x="45" y="70" font-family="var(--font-mono)" font-size="11" fill="#B5B3AB" text-anchor="end">가격</text>
+</svg></div><div class="chart-container"><svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="ma_grad" x1="0%" y1="100%" x2="0%" y2="0%"><stop offset="0%" style="stop-color:#4A9EBF;stop-opacity:0.3" /><stop offset="100%" style="stop-color:#4A9EBF;stop-opacity:0.8" /></linearGradient></defs>
+  <rect width="900" height="400" fill="#12151C" />
+  <text x="450" y="30" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" text-anchor="middle" font-weight="600">이동평균선 — 추세의 관성</text>
+  <line x1="100" y1="60" x2="100" y2="350" stroke="#C9A84C" stroke-width="2" />
+  <line x1="100" y1="350" x2="850" y2="350" stroke="#C9A84C" stroke-width="2" />
+  <!-- 가격 -->
+  <polyline points="100,280 150,270 200,250 250,220 300,200 350,170 400,140 450,120 500,100 550,110 600,90 650,100 700,80 750,90 800,70" fill="none" stroke="#4A9EBF" stroke-width="2" />
+  <!-- 200MA (느림) -->
+  <polyline points="100,290 150,280 200,270 250,260 300,250 350,230 400,210 450,190 500,180 550,170 600,160 650,150 700,140 750,130 800,120" fill="none" stroke="#C9A84C" stroke-width="2" />
+  <text x="810" y="125" font-family="var(--font-mono)" font-size="10" fill="#C9A84C">200MA</text>
+  <!-- 20MA (빠름) -->
+  <polyline points="100,290 150,275 200,245 250,215 300,185 350,165 400,135 450,115 500,105 550,110 600,95 650,105 700,80 750,90 800,70" fill="none" stroke="#4ABF7A" stroke-width="2" />
+  <text x="810" y="75" font-family="var(--font-mono)" font-size="10" fill="#4ABF7A">20MA</text>
+</svg></div><div class="chart-container"><svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="400" fill="#12151C" />
+  <text x="450" y="30" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" text-anchor="middle" font-weight="600">거래량 분석 — 패턴의 신뢰도</text>
+  <line x1="100" y1="80" x2="100" y2="320" stroke="#C9A84C" stroke-width="2" />
+  <line x1="100" y1="320" x2="850" y2="320" stroke="#C9A84C" stroke-width="2" />
+  <!-- 가격 -->
+  <polyline points="100,300 150,280 200,250 250,220 300,200 350,180 400,160" fill="none" stroke="#4A9EBF" stroke-width="2" />
+  <!-- 거래량 막대 1 (증가) -->
+  <rect x="110" y="250" width="20" height="70" fill="#4ABF7A" opacity="0.6" />
+  <text x="120" y="335" font-family="var(--font-mono)" font-size="9" fill="#B5B3AB" text-anchor="middle">많음</text>
+  <!-- 거래량 막대 2 (적음) -->
+  <rect x="190" y="290" width="20" height="30" fill="#BF4A4A" opacity="0.6" />
+  <text x="200" y="335" font-family="var(--font-mono)" font-size="9" fill="#B5B3AB" text-anchor="middle">적음</text>
+  <!-- 거래량 막대 3 (증가) -->
+  <rect x="270" y="240" width="20" height="80" fill="#4ABF7A" opacity="0.6" />
+  <text x="280" y="335" font-family="var(--font-mono)" font-size="9" fill="#B5B3AB" text-anchor="middle">증가</text>
+</svg></div>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 1: 차트 패턴의 자기 충족적 예언</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p>기술적 분석이 작동하는 이유는 '수학적 법칙'이 아니라 '심리적 합의'입니다. 투자자들이 같은 패턴을 보면 같은 행동을 하기 때문입니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>원리:</strong> "더블 바닥 패턴은 반등한다"는 차트북이 100만 권 팔렸습니다. 투자자들이 그것을 읽고 더블 바닥에서 매수를 시도합니다. 그러면 실제로 반등합니다. 차트가 예측한 것이 아니라, 차트 통신자들의 구매 행동이 가격을 올린 것입니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>위험:</strong> 이런 패턴은 "모두가 알고 있을 때" 작동합니다. 너무 유명해지면 작동하지 않습니다. 또한 기관투자가들이 개미를 속이기 위해 의도적으로 차트를 깨뜨립니다.</p>
+  </div>
+</details>
+
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 2: 후행 지표의 함정</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p>이동평균선, MACD, RSI 등 대부분의 기술적 지표는 '후행(Lagging)' 지표입니다. 즉, 이미 일어난 일을 확인해 줄 뿐 미래를 예측하지 못합니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>문제:</strong> 200일 이동평균이 올라가면 상승세를 확인합니다. 하지만 이미 주가는 200일 전부터 올랐습니다. 지표가 신호를 주고 매수하면 이미 반은 올랐을 때 타기하는 것입니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>해결:</strong> 차트와 기본 분석을 함께 봅니다. 기본이 좋은데 차트가 올라가면 타기. 기본이 나쁜데 차트만 올라가면 위험.</p>
+  </div>
+</details>
+
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 3: 타이밍의 불가능성</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p>단기 차트 매매는 매우 어렵습니다. 가장 뛰어난 펀드 매니저도 시장 타이밍에 실패합니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>통계:</strong> 2000년~2020년 20년간 S&P500 지수 수익률은 9.7%/년입니다. 하지만 최고 성장 10일을 빠트린 투자자는 4%/년만 얻었습니다. 10일 = 20년의 40%를 잃는 것입니다.</p>
+  </div>
+</details>
+
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 4: 엔지니어의 차트 강박 — 패턴 인식 과잉</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p><strong>뇌과학:</strong> 인간의 뇌는 패턴을 찾는 데 진화했습니다. 구름 속에서 얼굴을 본다거나, 무의미한 소음에서 의미를 찾습니다. 이를 '패리도리아(Pareidolia)'라고 합니다.</p>
+    <p style="margin-top: 0.8rem;">엔지니어는 이런 경향이 더 강합니다. 수학과 패턴을 찾는 것이 직업이기 때문입니다. 따라서 차트에서 '의미 있는 패턴'을 찾으려는 강박이 생깁니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>예방:</strong> 차트 분석은 보조 도구일 뿐입니다. 기본 분석을 먼저 하고, 차트는 타이밍 확인 용도로만 사용합니다.</p>
+  </div>
+</details>
+
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  <div style="background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06)); border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;"><h3 style="font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem;">📊 차트 패턴 분석기</h3><p style="font-size:0.9rem; color:var(--text-secondary);">실제 차트의 지지선/저항선을 찾아보세요. 이동평균선 교차점에서 신호를 발생시키는 연습을 해봅시다.</p></div>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    **패턴 인식 과잉 (Pareidolia)**:인간 뇌는 의미 없는 데서도 패턴을 찾습니다. 구름 속 얼굴, 무의미한 소음에서 의미를 찾습니다. 엔지니어는 이 경향이 더 강합니다. 차트에서 '의미 있는 패턴'을 찾으려는 강박이 생기기 쉽습니다.
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 기술적 분석이 작동하는 근본 이유는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 물리학적 법칙을 따르기 때문</li>
+<li onclick="checkAnswer(this,'q1',true)">② 투자자들의 합의와 심리</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 컴퓨터 프로그램 때문</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 이경, 기관이 정한 규칙</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>차트 패턴은 '수학적 법칙'이 아닌 '심리적 합의'입니다. 투자자들이 같은 패턴을 보면 같은 행동을 하기 때문입니다. 따라서 너무 많이 알려진 패턴은 작동하지 않습니다.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 저항선 돌파 시 가장 신뢰할 수 있는 신호는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 가격만 올라가면 신뢰</li>
+<li onclick="checkAnswer(this,'q2',true)">② 저항선 돌파 + 거래량 폭증</li>
+<li onclick="checkAnswer(this,'q2',false)">③ 저항선 돌파 + 거래량 적음</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 차트 모양만으로 판단</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ②</strong><br>저항선 돌파 + 거래량 폭증 = 진정한 돌파입니다. 거래량 없는 돌파는 함정일 가능성이 높습니다.</div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. 이동평균선이 후행 지표인 이유는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 계산이 복잡해서</li>
+<li onclick="checkAnswer(this,'q3',true)">② 이미 일어난 일을 확인할 뿐 미래를 예측하지 못함</li>
+<li onclick="checkAnswer(this,'q3',false)">③ 컴퓨터 오류</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 기관이 의도적으로 지연</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ②</strong><br>200일 이동평균이 올라간다는 것은 이미 200일 전부터 주가가 올랐다는 뜻입니다. 지표가 신호를 주면 이미 반은 움직였을 때 타기하는 것입니다.</div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. 단기 매매와 장기 투자 중 기술적 분석이 더 효과적인 쪽은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① 장기 투자</li>
+<li onclick="checkAnswer(this,'q4',true)">② 단기 매매 (1주~3개월)</li>
+<li onclick="checkAnswer(this,'q4',false)">③ 둘 다 동등</li>
+<li onclick="checkAnswer(this,'q4',false)">④ 기술적 분석은 무의미</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ②</strong><br>기술적 분석의 효율은 단기(1주~3개월)에서 매우 높습니다. 하지만 장기 투자에서는 기본 분석이 훨씬 효과적입니다.</div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. 차트 매매와 장기 매매에서 가장 큰 차이는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',false)">① 수수료 차이</li>
+<li onclick="checkAnswer(this,'q5',true)">② 리스크가 훨씬 높음</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 투자금액 차이</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 세금 차이</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ②</strong><br>차트 매매는 심리의존도가 높고, 오판 여지가 많으며, 리스크가 훨씬 높습니다. 또한 시간과 정서적 스트레스도 큽니다.</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 11</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 18일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 20일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 24일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">03월 31일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 16일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day10_financial_statements.html">← Day 10</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 11 / 23</span>
+  <a class="nav-btn" href="day12_timing_principles.html">Day 12 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

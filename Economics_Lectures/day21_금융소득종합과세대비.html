@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<script>
+/* Prevent FOUC: apply saved theme before render */
+(function(){
+  var t = localStorage.getItem('eldorado-theme');
+  if(!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  if(t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+})();
+</script>
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 21 | 금융소득 종합과세 대비 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #B5B3AB;
+  --text-dim: #8A8880;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+
+/* ═══ THEME TOGGLE ═══ */
+/* ── Toggle Button ── */
+.theme-toggle {
+  position: relative;
+  width: 52px; height: 28px;
+  background: var(--gold-dim);
+  border: 1px solid var(--border-gold);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex; align-items: center;
+  padding: 0 3px;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(212,168,67,0.2);
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.theme-toggle-knob {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--gold);
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  position: relative;
+}
+.theme-toggle-knob svg {
+  width: 14px; height: 14px;
+  transition: all 0.3s;
+}
+/* Dark mode icon (moon visible) */
+.theme-toggle .icon-moon { display: none; }
+.theme-toggle .icon-sun { display: block; }
+[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+[data-theme="light"] .theme-toggle-knob {
+  transform: translateX(24px);
+  background: #8B6914;
+}
+[data-theme="light"] .theme-toggle {
+  background: rgba(139,105,20,0.15);
+  border-color: rgba(139,105,20,0.3);
+}
+
+/* ── Light Theme Variables ── */
+[data-theme="light"] {
+  --bg-primary: #FAF6EE;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FFF9F0;
+  --bg-accent: #F5F0E5;
+  --bg-temple: #FBF7EF;
+  --gold: #8B6914;
+  --gold-bright: #A67C1A;
+  --gold-dim: rgba(139,105,20,0.08);
+  --gold-glow: rgba(139,105,20,0.15);
+  --gold-radiant: rgba(166,124,26,0.2);
+  --emerald: #2D7A52;
+  --emerald-dim: rgba(45,122,82,0.08);
+  --emerald-glow: rgba(45,122,82,0.15);
+  --amber: #9E5E28;
+  --amber-dim: rgba(158,94,40,0.08);
+  --copper: #7A4A30;
+  --text-primary: #2C2416;
+  --text-secondary: #5A5040;
+  --text-dim: #8A8070;
+  --border: #E0D8C8;
+  --border-gold: rgba(139,105,20,0.2);
+  --red: #B84A3A;
+  --green: #2D8A4A;
+}
+
+/* ── Light Theme Overrides ── */
+[data-theme="light"] body {
+  background: #FAF6EE !important;
+  color: #2C2416 !important;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139,105,20,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(158,94,40,0.03) 0%, transparent 50%) !important;
+}
+[data-theme="light"] body::before {
+  background-image:
+    repeating-linear-gradient(90deg, rgba(139,105,20,0.025) 0px, rgba(139,105,20,0.025) 1px, transparent 1px, transparent 80px),
+    repeating-linear-gradient(0deg, rgba(139,105,20,0.025) 0px, rgba(139,105,20,0.025) 1px, transparent 1px, transparent 80px) !important;
+}
+[data-theme="light"] body::after {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(139,105,20,0.03) 0%, transparent 25%),
+    radial-gradient(circle at 85% 80%, rgba(139,105,20,0.02) 0%, transparent 20%) !important;
+}
+[data-theme="light"] .sticky-header {
+  background: rgba(250,246,238,0.95) !important;
+  border-bottom-color: rgba(139,105,20,0.15) !important;
+}
+[data-theme="light"] .sticky-header::after {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.2), transparent) !important;
+}
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #F0EBE0;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(139,105,20,0.2), rgba(139,105,20,0.35));
+  border: 1px solid rgba(139,105,20,0.15);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(139,105,20,0.5);
+}
+[data-theme="light"] .header-day {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .header-title {
+  color: #5A5040;
+}
+[data-theme="light"] .badge-asset {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .badge-series {
+  color: #8A8070;
+  background: rgba(0,0,0,0.04);
+}
+[data-theme="light"] .timer-btn {
+  background: rgba(139,105,20,0.08);
+  border-color: #8B6914;
+  color: #8B6914;
+}
+[data-theme="light"] .timer-btn:hover {
+  background: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .hero {
+  border-bottom-color: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .hero::before {
+  background: linear-gradient(90deg, transparent, #8B6914, transparent);
+}
+[data-theme="light"] .hero-day {
+  color: #2C2416;
+  text-shadow: none;
+}
+[data-theme="light"] .hero-subtitle {
+  color: #8B6914;
+}
+[data-theme="light"] .hero-eldorado-sub {
+  color: #9E5E28;
+}
+[data-theme="light"] .hero-quote {
+  color: #5A5040;
+}
+[data-theme="light"] .concept-card {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+[data-theme="light"] .concept-card:hover {
+  background: #FFF9F0;
+  border-color: rgba(139,105,20,0.3);
+  box-shadow: 0 4px 16px rgba(139,105,20,0.08);
+}
+[data-theme="light"] .concept-card::before {
+  background: linear-gradient(90deg, rgba(139,105,20,0.1), rgba(139,105,20,0.3), rgba(139,105,20,0.1));
+}
+[data-theme="light"] .brain-box {
+  background: linear-gradient(135deg, #FFFFFF, #F8F4EC);
+  border-color: #E0D8C8;
+  border-left-color: #2D7A52;
+}
+[data-theme="light"] .brain-box::before {
+  background: radial-gradient(circle at 100% 0%, rgba(45,122,82,0.06), transparent 70%);
+}
+[data-theme="light"] .formula-block {
+  background: #FBF7EF;
+  border-color: #E0D8C8;
+  border-left-color: #8B6914;
+}
+[data-theme="light"] .sim-box {
+  background: linear-gradient(135deg, rgba(139,105,20,0.04), rgba(45,122,82,0.04));
+  border-color: rgba(139,105,20,0.2);
+}
+[data-theme="light"] .sim-box::before {
+  background: #FAF6EE;
+}
+[data-theme="light"] .psych-box {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+  border-left-color: #9E5E28;
+}
+[data-theme="light"] .deep-dive {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .deep-dive summary:hover {
+  background: #F8F4EC;
+}
+[data-theme="light"] .deep-dive[open] {
+  border-color: rgba(139,105,20,0.3);
+  box-shadow: 0 0 15px rgba(139,105,20,0.05);
+}
+[data-theme="light"] .quiz-section {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .quiz-section::before {
+  background: linear-gradient(90deg, #9E5E28, #8B6914, #9E5E28);
+}
+[data-theme="light"] .quiz-options li:hover {
+  background: #F5F0E5;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .quiz-answer {
+  background: #F5F0E5;
+}
+[data-theme="light"] .sr-tracker {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .sr-slot {
+  background: #F5F0E5;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .sr-slot:hover {
+  border-color: #8B6914;
+}
+[data-theme="light"] .chart-container {
+  background: #FFFFFF;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .data-table th {
+  border-bottom-color: rgba(139,105,20,0.3);
+}
+[data-theme="light"] .data-table td {
+  border-bottom-color: rgba(224,216,200,0.7);
+}
+[data-theme="light"] .data-table tr:hover td {
+  background: rgba(139,105,20,0.04);
+}
+[data-theme="light"] .highlight-row td {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+}
+[data-theme="light"] .nav-btn {
+  color: #5A5040;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .nav-btn:hover {
+  border-color: #8B6914;
+  color: #8B6914;
+}
+[data-theme="light"] .disclaimer {
+  border-top-color: rgba(139,105,20,0.15);
+}
+[data-theme="light"] .progress-bar-bg {
+  background: #EDE8D8;
+  border-color: #E0D8C8;
+}
+[data-theme="light"] .progress-bar-fill {
+  background: linear-gradient(90deg, #9E5E28, #8B6914, #A67C1A);
+  background-size: 200% 100%;
+}
+[data-theme="light"] .aztec-divider::before,
+[data-theme="light"] .aztec-divider::after {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.15), transparent);
+}
+[data-theme="light"] .hero-illustration {
+  border-color: rgba(139,105,20,0.1);
+}
+[data-theme="light"] .hero-illustration::after {
+  background: linear-gradient(to top, #FAF6EE, transparent);
+}
+/* Light theme: SVG illustrations get warmer tones */
+[data-theme="light"] .hero-illustration svg {
+  filter: saturate(0.8) brightness(1.1);
+}
+/* Light theme: particles become subtle */
+[data-theme="light"] #goldParticles {
+  opacity: 0.3;
+}
+/* Scroll compass light adaptation */
+[data-theme="light"] .scroll-compass {
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+}
+/* Card glow adapts to light theme */
+[data-theme="light"] .concept-card .card-glow {
+  background: radial-gradient(circle, rgba(139,105,20,0.08) 0%, transparent 70%);
+}
+/* Section flash for light */
+[data-theme="light"] .section-flash {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.4), transparent);
+}
+/* Checklist in light */
+[data-theme="light"] .checklist li::before {
+  border-color: #8B6914;
+}
+[data-theme="light"] .checklist li.checked::before {
+  background: #8B6914;
+}
+[data-theme="light"] .checklist li.checked::after {
+  color: #FFFFFF;
+}
+/* Neuro & Engineer tags */
+[data-theme="light"] .neuro-tag {
+  color: #2D7A52;
+  background: rgba(45,122,82,0.08);
+}
+[data-theme="light"] .engineer-tag {
+  color: #8B6914;
+  background: rgba(139,105,20,0.08);
+}
+/* Time table */
+[data-theme="light"] .time-table td {
+  border-bottom-color: rgba(224,216,200,0.5);
+}
+/* Part texture backgrounds in light */
+[data-theme="light"] .bg-part-texture {
+  opacity: 0.3;
+}
+/* Smooth transition on theme change */
+html {
+  transition: none;
+}
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 0.4s, color 0.3s, border-color 0.3s, box-shadow 0.3s !important;
+}
+/* ═══ END THEME TOGGLE ═══ */
+
+/* MOBILE_HEADER_FIX_V2 */
+
+/* ── Ultra-Simple Mobile Header ── */
+.sticky-header {
+  padding: 0.5rem 1rem;
+  gap: 0.5rem;
+}
+.header-left {
+  flex: 1;
+  min-width: 0;
+  gap: 0.6rem;
+}
+.header-day {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.header-title {
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+.header-right {
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+@media (max-width: 480px) {
+  .header-title { max-width: 140px; font-size: 0.72rem; }
+  .header-day { font-size: 0.6rem; padding: 0.1rem 0.4rem; }
+  .theme-toggle { width: 44px; height: 24px; }
+  .theme-toggle-knob { width: 18px; height: 18px; }
+  .theme-toggle-knob svg { width: 11px; height: 11px; }
+  [data-theme="light"] .theme-toggle-knob { transform: translateX(20px); }
+}
+@media (max-width: 360px) {
+  .header-title { max-width: 100px; font-size: 0.65rem; }
+}
+
+/* ── Dark Theme Body (default) ── */
+body {
+  background: var(--bg-primary);
+  background-image: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(212,168,67,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(196,121,61,0.04) 0%, transparent 50%);
+  color: var(--text-primary);
+}
+
+/* ── Light Theme: Complete Coverage ── */
+[data-theme="light"] body {
+  background: var(--bg-primary) !important;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139,105,20,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(158,94,40,0.03) 0%, transparent 50%) !important;
+  color: var(--text-primary) !important;
+}
+[data-theme="light"] body::before {
+  background-image:
+    repeating-linear-gradient(90deg, rgba(139,105,20,0.02) 0px, rgba(139,105,20,0.02) 1px, transparent 1px, transparent 80px),
+    repeating-linear-gradient(0deg, rgba(139,105,20,0.02) 0px, rgba(139,105,20,0.02) 1px, transparent 1px, transparent 80px) !important;
+}
+[data-theme="light"] body::after {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(139,105,20,0.02) 0%, transparent 25%),
+    radial-gradient(circle at 85% 80%, rgba(139,105,20,0.015) 0%, transparent 20%) !important;
+}
+/* Sticky header light */
+[data-theme="light"] .sticky-header {
+  background: rgba(250,246,238,0.96) !important;
+  border-bottom: 1px solid rgba(139,105,20,0.12) !important;
+}
+[data-theme="light"] .header-day {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+  border-color: rgba(139,105,20,0.2) !important;
+}
+[data-theme="light"] .header-title {
+  color: #5A5040 !important;
+}
+/* Hero light */
+[data-theme="light"] .hero {
+  border-bottom-color: rgba(139,105,20,0.15) !important;
+}
+[data-theme="light"] .hero::before {
+  background: linear-gradient(90deg, transparent, rgba(139,105,20,0.5), transparent) !important;
+}
+[data-theme="light"] .hero::after {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .hero-part {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .hero-day {
+  color: #2C2416 !important;
+  text-shadow: none !important;
+}
+[data-theme="light"] .hero-subtitle {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .hero-eldorado-sub {
+  color: #9E5E28 !important;
+}
+[data-theme="light"] .hero-quote {
+  color: #5A5040 !important;
+}
+[data-theme="light"] .hero-badge {
+  border: 1px solid rgba(0,0,0,0.1);
+}
+[data-theme="light"] .hb-net {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+  border-color: rgba(139,105,20,0.2) !important;
+}
+[data-theme="light"] .hb-net .dot { background: #8B6914 !important; }
+[data-theme="light"] .hb-house {
+  color: #2D7A52 !important;
+  background: rgba(45,122,82,0.08) !important;
+}
+[data-theme="light"] .hb-house .dot { background: #2D7A52 !important; }
+[data-theme="light"] .hb-debt {
+  color: #B84A3A !important;
+  background: rgba(184,74,58,0.08) !important;
+}
+[data-theme="light"] .hb-debt .dot { background: #B84A3A !important; }
+[data-theme="light"] .hb-stock {
+  color: #2D8A4A !important;
+  background: rgba(45,138,74,0.08) !important;
+}
+[data-theme="light"] .hb-stock .dot { background: #2D8A4A !important; }
+[data-theme="light"] .series-info {
+  color: #8A8070 !important;
+}
+/* Progress bar light */
+[data-theme="light"] .progress-bar-bg {
+  background: #EDE8D8 !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .progress-label {
+  color: #8A8070 !important;
+}
+/* Section labels light */
+[data-theme="light"] .section-label {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .section-label::before {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .section-title {
+  color: #2C2416 !important;
+}
+/* Brain box light */
+[data-theme="light"] .brain-box {
+  background: linear-gradient(135deg, #FFFFFF, #F8F4EC) !important;
+  border-color: #E0D8C8 !important;
+  border-left: 3px solid #2D7A52 !important;
+}
+[data-theme="light"] .brain-box::before {
+  background: radial-gradient(circle at 100% 0%, rgba(45,122,82,0.05), transparent 70%) !important;
+}
+[data-theme="light"] .brain-box h3 {
+  color: #2D7A52 !important;
+}
+[data-theme="light"] .brain-box p {
+  color: #5A5040 !important;
+}
+/* Time table light */
+[data-theme="light"] .time-table th {
+  color: #8A8070 !important;
+  border-bottom-color: #E0D8C8 !important;
+}
+[data-theme="light"] .time-table td {
+  color: #5A5040 !important;
+  border-bottom-color: rgba(224,216,200,0.5) !important;
+}
+[data-theme="light"] .time-table .time-col {
+  color: #8B6914 !important;
+}
+/* Concept card light */
+[data-theme="light"] .concept-card {
+  background: #FFFFFF !important;
+  border-color: #E0D8C8 !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+}
+[data-theme="light"] .concept-card:hover {
+  background: #FFF9F0 !important;
+  border-color: rgba(139,105,20,0.3) !important;
+  box-shadow: 0 4px 16px rgba(139,105,20,0.08) !important;
+}
+[data-theme="light"] .card-num {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .card-title {
+  color: #2C2416 !important;
+}
+[data-theme="light"] .card-body {
+  color: #5A5040 !important;
+}
+[data-theme="light"] .card-body p {
+  color: #5A5040 !important;
+}
+/* Formula block light */
+[data-theme="light"] .formula-block {
+  background: #FBF7EF !important;
+  border-color: #E0D8C8 !important;
+  border-left: 3px solid #8B6914 !important;
+}
+[data-theme="light"] .formula-line {
+  color: #2C2416 !important;
+}
+[data-theme="light"] .formula-comment {
+  color: #8A8070 !important;
+}
+[data-theme="light"] .formula-highlight {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .formula-blue {
+  color: #2D7A52 !important;
+}
+/* Data table light */
+[data-theme="light"] .data-table th {
+  color: #8B6914 !important;
+  border-bottom: 2px solid rgba(139,105,20,0.25) !important;
+}
+[data-theme="light"] .data-table td {
+  color: #5A5040 !important;
+  border-bottom-color: rgba(224,216,200,0.5) !important;
+}
+[data-theme="light"] .data-table td:first-child {
+  color: #2C2416 !important;
+}
+[data-theme="light"] .data-table tr:hover td {
+  background: rgba(139,105,20,0.04) !important;
+}
+[data-theme="light"] .highlight-row td {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+}
+/* Chart container light */
+[data-theme="light"] .chart-container {
+  background: #FFFFFF !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .chart-title {
+  color: #8A8070 !important;
+}
+/* Sim box light */
+[data-theme="light"] .sim-box {
+  background: linear-gradient(135deg, rgba(139,105,20,0.03), rgba(45,122,82,0.03)) !important;
+  border-color: rgba(139,105,20,0.2) !important;
+}
+[data-theme="light"] .sim-box::before {
+  color: #8B6914 !important;
+  background: #FAF6EE !important;
+}
+[data-theme="light"] .sim-box h3 {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .sim-box p,
+[data-theme="light"] .sim-box span,
+[data-theme="light"] .sim-box label {
+  color: #5A5040 !important;
+}
+[data-theme="light"] .sim-box input {
+  background: #FFFFFF !important;
+  color: #2C2416 !important;
+  border-color: #E0D8C8 !important;
+}
+/* Psych box light */
+[data-theme="light"] .psych-box {
+  background: #FFFFFF !important;
+  border-color: #E0D8C8 !important;
+  border-left: 3px solid #9E5E28 !important;
+}
+[data-theme="light"] .psych-box h3 {
+  color: #9E5E28 !important;
+}
+[data-theme="light"] .psych-box .bias-name {
+  color: #2C2416 !important;
+}
+[data-theme="light"] .psych-box p {
+  color: #5A5040 !important;
+}
+/* Deep dive light */
+[data-theme="light"] .deep-dive {
+  background: #FFFFFF !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .deep-dive summary {
+  color: #2C2416 !important;
+}
+[data-theme="light"] .deep-dive summary::before {
+  color: #8B6914 !important;
+}
+[data-theme="light"] .deep-dive summary:hover {
+  background: #F8F4EC !important;
+}
+[data-theme="light"] .deep-dive[open] {
+  border-color: rgba(139,105,20,0.3) !important;
+}
+[data-theme="light"] .deep-dive-content {
+  color: #5A5040 !important;
+}
+[data-theme="light"] .deep-dive-content p {
+  color: #5A5040 !important;
+}
+/* Quiz section light */
+[data-theme="light"] .quiz-section {
+  background: #FFFFFF !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .quiz-q h4 {
+  color: #2C2416 !important;
+}
+[data-theme="light"] .quiz-options li {
+  color: #5A5040 !important;
+}
+[data-theme="light"] .quiz-options li:hover {
+  background: #F5F0E5 !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .quiz-options li.correct {
+  background: rgba(45,138,74,0.1) !important;
+  border-color: #2D8A4A !important;
+  color: #2D8A4A !important;
+}
+[data-theme="light"] .quiz-options li.wrong {
+  background: rgba(184,74,58,0.1) !important;
+  border-color: #B84A3A !important;
+  color: #B84A3A !important;
+}
+[data-theme="light"] .quiz-answer {
+  background: #F5F0E5 !important;
+  color: #5A5040 !important;
+}
+/* SR tracker light */
+[data-theme="light"] .sr-tracker {
+  background: #FFFFFF !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .sr-tracker h3 {
+  color: #8A8070 !important;
+}
+[data-theme="light"] .sr-slot {
+  background: #F5F0E5 !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .sr-slot:hover {
+  border-color: #8B6914 !important;
+}
+[data-theme="light"] .sr-slot .sr-label {
+  color: #8A8070 !important;
+}
+[data-theme="light"] .sr-slot .sr-date {
+  color: #5A5040 !important;
+}
+[data-theme="light"] .sr-slot.done {
+  border-color: #2D8A4A !important;
+  background: rgba(45,138,74,0.06) !important;
+}
+/* Checklist light */
+[data-theme="light"] .checklist li {
+  color: #5A5040 !important;
+  border-bottom-color: rgba(224,216,200,0.4) !important;
+}
+[data-theme="light"] .checklist li::before {
+  border-color: #8B6914 !important;
+}
+[data-theme="light"] .checklist li.checked::before {
+  background: #8B6914 !important;
+}
+[data-theme="light"] .checklist li.checked::after {
+  color: #FFFFFF !important;
+}
+/* Nav footer light */
+[data-theme="light"] .nav-btn {
+  color: #5A5040 !important;
+  border-color: #E0D8C8 !important;
+}
+[data-theme="light"] .nav-btn:hover {
+  border-color: #8B6914 !important;
+  color: #8B6914 !important;
+}
+/* Disclaimer light */
+[data-theme="light"] .disclaimer {
+  color: #8A8070 !important;
+  border-top-color: rgba(139,105,20,0.12) !important;
+}
+/* Illustration light */
+[data-theme="light"] .hero-illustration {
+  border-color: rgba(139,105,20,0.08) !important;
+}
+[data-theme="light"] .hero-illustration::after {
+  background: linear-gradient(to top, #FAF6EE, transparent) !important;
+}
+[data-theme="light"] .hero-illustration svg {
+  filter: saturate(0.85) brightness(1.15) !important;
+}
+/* Aztec divider light */
+[data-theme="light"] .aztec-divider .aztec-glyph {
+  color: #8B6914 !important;
+}
+/* Particles subdued in light */
+[data-theme="light"] #goldParticles {
+  opacity: 0.2 !important;
+}
+/* Neuro/Engineer tags light */
+[data-theme="light"] .neuro-tag {
+  color: #2D7A52 !important;
+  background: rgba(45,122,82,0.08) !important;
+}
+[data-theme="light"] .engineer-tag {
+  color: #8B6914 !important;
+  background: rgba(139,105,20,0.08) !important;
+}
+/* Hero icon light */
+[data-theme="light"] .hero-icon svg {
+  filter: brightness(0.7) saturate(1.2) !important;
+}
+/* Scrollbar light */
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #F0EBE0 !important;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(139,105,20,0.2), rgba(139,105,20,0.35)) !important;
+  border-color: rgba(139,105,20,0.15) !important;
+}
+/* Skip link light */
+[data-theme="light"] .skip-link {
+  background: #8B6914 !important;
+  color: #FFFFFF !important;
+}
+/* Print — always light */
+@media print {
+  body { background: white !important; color: #222 !important; }
+}
+
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 21 / 23</span>
+    <span class="header-title">금융소득 종합과세 대비</span>
+  </div>
+  <div class="header-right">
+<button class="theme-toggle" id="themeToggle" aria-label="테마 전환" title="다크/라이트 모드 전환">
+  <div class="theme-toggle-knob">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </div>
+</button>  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 4 — 세금 & 자산 시스템</div>
+  <h1 class="hero-day">Day 21</h1>
+  <h2 class="hero-subtitle">금융소득 종합과세 대비</h2>
+  <p class="hero-quote">금융소득종합과세대비: 종합과세가시작되는금융소득구간을이해하고대비하세요</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 4: 20~23</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:91.3%"></div></div>
+    <div class="progress-label"><span>Day 21</span><span>21 / 23 완료 (91.3%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 종합과세가시작되는금융소득구간을이해하고대비하세요</h3>
+    <p>미리준비하면세부담을크게줄수있습니다</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">09:00~09:20</td><td>핵심정리</td><td>주요개념</td></tr>
+<tr><td class="time-col">09:20~09:40</td><td>실전전략</td><td>실행방안</td></tr>
+<tr><td class="time-col">09:40~10:00</td><td>최종체크</td><td>점검사항</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">금융소득 종합과세 대비</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">핵심1</div>
+      <div class="card-body"><p>금융소득종합과세대비의첫번째핵심내용입니다</p></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">핵심2</div>
+      <div class="card-body"><p>금융소득종합과세대비의두번째핵심내용입니다</p></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">핵심3</div>
+      <div class="card-body"><p>금융소득종합과세대비의세번째핵심내용입니다</p></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">핵심4</div>
+      <div class="card-body"><p>금융소득종합과세대비의네번째핵심내용입니다</p></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">체크리스트</div>
+      <div class="card-body"><p>실행항목들</p><ul><li>항목1</li><li>항목2</li><li>항목3</li></ul></div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  <svg viewBox='0 0 500 400' style='background: #0A0C10;'><text x='250' y='200' text-anchor='middle' fill='#C9A84C' font-size='20'>Day21</text></svg>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  <details class='deep-dive'><summary>Deep Dive: 금융소득종합과세대비</summary><div><p>상세분석내용</p></div></details>
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  <div class='simulation-section'><h4>Day 21 적용</h4><div class='sim-content'><p>당신의상황에맞게적용하세요</p></div></div>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    <p>심리적요인을이해하세요</p>
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 문제1</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',true)">① 선택1</li>
+<li onclick="checkAnswer(this,'q1',false)">② 선택2</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 선택3</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 선택4</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ①</strong><br>설명1</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 문제2</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 선택1</li>
+<li onclick="checkAnswer(this,'q2',true)">② 선택2</li>
+<li onclick="checkAnswer(this,'q2',false)">③ 선택3</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 선택4</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ②</strong><br>설명2</div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. 문제3</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 선택1</li>
+<li onclick="checkAnswer(this,'q3',false)">② 선택2</li>
+<li onclick="checkAnswer(this,'q3',true)">③ 선택3</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 선택4</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ③</strong><br>설명3</div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. 문제4</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① 선택1</li>
+<li onclick="checkAnswer(this,'q4',false)">② 선택2</li>
+<li onclick="checkAnswer(this,'q4',false)">③ 선택3</li>
+<li onclick="checkAnswer(this,'q4',true)">④ 선택4</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ④</strong><br>설명4</div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. 문제5</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',true)">① 선택1</li>
+<li onclick="checkAnswer(this,'q5',false)">② 선택2</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 선택3</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 선택4</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ①</strong><br>설명5</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 21</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 28일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 30일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">04월 03일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">04월 10일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 26일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day20_tax_optimization.html">← Day 20</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 21 / 23</span>
+  <a class="nav-btn" href="day22_financial_automation.html">Day 22 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+
+
+/* ═══ THEME TOGGLE LOGIC ═══ */
+(function(){
+  const toggle = document.getElementById('themeToggle');
+  if(!toggle) return;
+
+  // 1. Determine initial theme
+  function getPreferredTheme(){
+    const saved = localStorage.getItem('eldorado-theme');
+    if(saved) return saved;
+    // Respect system preference
+    if(window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
+    return 'dark';
+  }
+
+  function applyTheme(theme, animate){
+    const html = document.documentElement;
+    if(animate){
+      html.classList.add('theme-transitioning');
+      setTimeout(() => html.classList.remove('theme-transitioning'), 500);
+    }
+    if(theme === 'light'){
+      html.setAttribute('data-theme', 'light');
+      // Update meta theme-color
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.content = '#FAF6EE';
+    } else {
+      html.removeAttribute('data-theme');
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.content = '#0D0B08';
+    }
+    localStorage.setItem('eldorado-theme', theme);
+
+    // Update particle canvas colors if exists
+    updateParticleColors(theme);
+    // Update compass colors
+    updateCompassColors(theme);
+  }
+
+  function updateParticleColors(theme){
+    // Signal to particle system
+    window.__eldoradoTheme = theme;
+  }
+
+  function updateCompassColors(theme){
+    const compass = document.querySelector('.scroll-compass svg');
+    if(!compass) return;
+    const bgCircle = compass.querySelector('circle:first-of-type');
+    const texts = compass.querySelectorAll('text');
+    if(theme === 'light'){
+      if(bgCircle) bgCircle.setAttribute('fill', 'rgba(250,246,238,0.9)');
+      texts.forEach(t => {
+        if(t.getAttribute('fill') === '#8A8272' || t.getAttribute('fill') === 'var(--text-dim)')
+          t.setAttribute('fill', '#8A8070');
+      });
+    } else {
+      if(bgCircle) bgCircle.setAttribute('fill', 'rgba(13,11,8,0.85)');
+    }
+  }
+
+  // 2. Apply on load (no animation)
+  const initial = getPreferredTheme();
+  applyTheme(initial, false);
+
+  // 3. Toggle click
+  toggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? 'dark' : 'light';
+    applyTheme(next, true);
+  });
+
+  // 4. Keyboard support
+  toggle.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      toggle.click();
+    }
+  });
+
+  // 5. Listen for system theme change
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+    if(!localStorage.getItem('eldorado-theme')){
+      applyTheme(e.matches ? 'light' : 'dark', true);
+    }
+  });
+})();
+/* ═══ END THEME TOGGLE ═══ */
+
+</script>
+</body>
+</html>

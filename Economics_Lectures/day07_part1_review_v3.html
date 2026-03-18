@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 07 | Part 1 복습 & 통합 점검 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #B5B3AB;
+  --text-dim: #8A8880;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 07 / 23</span>
+    <span class="header-title">Part 1 복습 & 통합 점검</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 1 · 부자 마인드셋 & 자산 기초</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 1 — 부자 마인드셋 & 자산 기초</div>
+  <h1 class="hero-day">Day 07</h1>
+  <h2 class="hero-subtitle">Part 1 복습 & 통합 점검</h2>
+  <p class="hero-quote">"훌륭한 계획을 오늘 실행하는 것이, 내일의 완벽한 계획보다 낫다." — Sheryl Sandberg</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 1: 01~07</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:30.4%"></div></div>
+    <div class="progress-label"><span>Day 07</span><span>7 / 23 완료 (30.4%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 통합 이해 + 실행 의지</h3>
+    <p>Part 1의 6개 개념이 하나의 시스템을 이루는 이유를 이해하는 것이 중요합니다. 이해는 학습이고, 실행은 변화입니다. 당신은 이미 이해했습니다. 이제는 첫 발걸음입니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">09:00-09:05</td><td>전체 6일 회고</td><td>Day 1-6 핵심 개념 1분 요약</td></tr>
+<tr><td class="time-col">09:05-09:12</td><td>통합 이해</td><td>6가지 개념이 하나의 시스템을 이루는 방식</td></tr>
+<tr><td class="time-col">09:12-09:20</td><td>차트 분석</td><td>여정맵, 망각곡선, 개념 네트워크</td></tr>
+<tr><td class="time-col">09:20-09:25</td><td>실행 계획</td><td>다음 3년의 액션 아이템 정의</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">Part 1 복습 & 통합 점검</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">Part 1의 철학: 시스템적 접근</div>
+      <div class="card-body">
+        <p><strong>왜 6개의 독립적인 주제가 아니라 "Part 1"인가?</strong></p>
+        <p>Part 1은 당신의 현재 자산(3.28억)을 중심으로 설계된 통합 시스템입니다. 각 Day는:</p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>Day 1: "무엇을 위해?" (목표)</li>
+          <li>Day 2-3: "어떻게 하면?" (경로)</li>
+          <li>Day 4-5: "어떤 구조로?" (배분과 최적화)</li>
+          <li>Day 6: "어떻게 지킬까?" (심리 관리)</li>
+          <li>Day 7: "맞는가?" (통합 검증)</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>선형적 학습과의 차이:</strong> 보통의 강의는 "주식 기초 → 기업 분석 → 매수 타이밍"처럼 순서대로 진행합니다. 하지만 실제 투자는 "목표 → 자산 배분 → 실행 → 심리 관리 → 재검토"라는 사이클입니다. Part 1은 이 사이클의 한 바퀴를 완성합니다.</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">6일의 누적 학습 효과</div>
+      <div class="card-body">
+        <p><strong>각 Day의 '혼자'는 약하지만, '함께'는 강합니다.</strong></p>
+        <p>Day 별 학습 효과 (독립적):</p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>Day 1 (목표): 동기 부여 +++, 실제 변화 +</li>
+          <li>Day 2-3 (자산 형성): 이해 +++, 실행 가능성 ++</li>
+          <li>Day 4 (부채 관리): 절약 +++, 위험 감소 +++</li>
+          <li>Day 5 (자산 배분): 구체적 계획 +++, 심리적 저항 +</li>
+          <li>Day 6 (심리 관리): 자각 +++, 실행 통제 +++</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>통합 효과 (Part 1 전체):</strong> Day 5만으로는 "60/40 배분이 맞다"는 지식. 하지만 Day 6을 더하면 "내가 실제로 이 배분을 지킬 수 있는가?"라는 실행력이 생깁니다. 이것이 "통합 학습"의 힘입니다.</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">Part 2 (주식 투자)로의 브릿지</div>
+      <div class="card-body">
+        <p><strong>Part 1이 없었다면, Part 2는 위험합니다.</strong></p>
+        <p>Part 2에서 배울 것들 (예상):</p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>PER, PBR 같은 기업 분석 지표</li>
+          <li>재무제표 읽는 방법</li>
+          <li>기술적 분석 (차트 패턴)</li>
+          <li>매수/매도 타이밍</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>하지만 Part 1 없이 Part 2를 배우면:</strong></p>
+        <ul style="margin-left:1.2rem;">
+          <li>"이 주식이 좋으니까 사야 한다" ← 과신의 함정</li>
+          <li>"이 기업의 PER이 낮으니까 기회다" ← 앵커링의 함정</li>
+          <li>"지금 사는 것이 최적이다" ← 타이밍 환상</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>Part 1의 안전장치:</strong> 당신은 이미 "60/40 자산 배분", "월 470만원 정기 매수", "심리 편향에 대한 자각"을 갖추고 있습니다. 이것이 Part 2에서 무리한 투자를 하지 않도록 보호합니다.</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">간격 반복의 실질적 효과</div>
+      <div class="card-body">
+        <p><strong>학습의 70%는 복습에서 나온다.</strong></p>
+        <p>뇌과학 데이터:</p>
+        <div class="data-table-wrap" style="margin-top:0.6rem;">
+          <table class="data-table" style="font-size:0.8rem;">
+            <thead>
+              <tr><th>복습 방식</th><th>1주 후</th><th>1개월 후</th><th>3개월 후</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>복습 없음</td><td>30%</td><td>10%</td><td>5%</td></tr>
+              <tr><td>1회 복습</td><td>60%</td><td>40%</td><td>20%</td></tr>
+              <tr><td>간격 반복(D+1,3,7)</td><td>90%</td><td>85%</td><td>80%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:0.6rem;"><strong>당신의 계획:</strong> "이번 주: 전체 재정독 (D+1) → 3일 뒤: 퀴즈 풀이 (D+3) → 7일 뒤: 자신의 자산에 적용 (D+7)". 이 세 번의 복습이 Part 1의 장기 기억 전환율을 30%에서 85%로 상승시킵니다.</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">다음 Part (2-4)와의 연속성</div>
+      <div class="card-body">
+        <p><strong>Part 1은 기초, Part 2-4는 세부입니다.</strong></p>
+        <p>Part 구성:</p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>Part 1 (Days 1-7): 목표 & 자산 구조 설계</li>
+          <li>Part 2 (Days 8-14): 주식 투자 실전 (Part 1의 "주식 부분" 심화)</li>
+          <li>Part 3 (Days 15-19): 부동산 & 자산 배분 (Part 1의 "부동산 부분" 심화)</li>
+          <li>Part 4 (Days 20-23): 세금 & 자동화 (Part 1의 "수익 극대화" 응용)</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>흐름:</strong> Part 1에서 "60/40 배분"을 정했다면, Part 2에서는 "주식 60%를 어떻게 선택하는가?"를 배웁니다. Part 3에서는 "부동산 70-80%를 어떻게 관리하는가?"를 배웁니다. Part 4에서는 "전체 수익에 세금을 어떻게 최소화하는가?"를 배웁니다.</p>
+        <p style="margin-top:0.4rem;"><strong>일관성:</strong> Part 1의 기초가 단단하면, 다음 3개 Part는 자연스럽게 연결됩니다. 하지만 Part 1을 건너뛰고 Part 2부터 시작하면, "왜 이것을 배워야 하는가?"라는 혼란이 생깁니다.</p>
+        </div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  
+<div class="chart-container">
+  <div class="chart-title">CHART 1: PART 1 LEARNING JOURNEY — 6일간의 통합 체계</div>
+  <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1000" height="500" fill="#0A0C10"/>
+    
+    <!-- Background grid -->
+    <g stroke="#2A2D36" stroke-width="0.5" opacity="0.3">
+      <line x1="100" y1="50" x2="100" y2="400"/>
+      <line x1="100" y1="400" x2="950" y2="400"/>
+      <line x1="150" y1="50" x2="150" y2="400"/><line x1="200" y1="50" x2="200" y2="400"/><line x1="250" y1="50" x2="250" y2="400"/>
+      <line x1="300" y1="50" x2="300" y2="400"/><line x1="350" y1="50" x2="350" y2="400"/><line x1="400" y1="50" x2="400" y2="400"/>
+      <line x1="450" y1="50" x2="450" y2="400"/><line x1="500" y1="50" x2="500" y2="400"/><line x1="550" y1="50" x2="550" y2="400"/>
+      <line x1="600" y1="50" x2="600" y2="400"/><line x1="650" y1="50" x2="650" y2="400"/><line x1="700" y1="50" x2="700" y2="400"/>
+      <line x1="750" y1="50" x2="750" y2="400"/><line x1="800" y1="50" x2="800" y2="400"/><line x1="850" y1="50" x2="850" y2="400"/>
+      <line x1="900" y1="50" x2="900" y2="400"/><line x1="950" y1="50" x2="950" y2="400"/>
+    </g>
+    
+    <!-- Axis -->
+    <line x1="100" y1="400" x2="950" y2="400" stroke="#4A9EBF" stroke-width="2"/>
+    <line x1="100" y1="50" x2="100" y2="400" stroke="#4A9EBF" stroke-width="2"/>
+    
+    <!-- Day 1: Goal Setting -->
+    <circle cx="150" cy="280" r="20" fill="#4A9EBF" opacity="0.7"/>
+    <text x="150" y="288" font-family="JetBrains Mono" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="bold">Day1</text>
+    <text x="150" y="330" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">목표 설정</text>
+    <text x="150" y="345" font-family="Noto Sans KR" font-size="8" fill="#8A8880" text-anchor="middle">(3.28억)</text>
+    
+    <!-- Day 2: Compound Interest -->
+    <circle cx="250" cy="200" r="20" fill="#4ABF7A" opacity="0.7"/>
+    <text x="250" y="208" font-family="JetBrains Mono" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="bold">Day2</text>
+    <text x="250" y="330" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">복리의 수식</text>
+    <text x="250" y="345" font-family="Noto Sans KR" font-size="8" fill="#8A8880" text-anchor="middle">(시간의 힘)</text>
+    
+    <!-- Day 3: Asset Pipeline -->
+    <circle cx="350" cy="150" r="20" fill="#C9A84C" opacity="0.7"/>
+    <text x="350" y="158" font-family="JetBrains Mono" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="bold">Day3</text>
+    <text x="350" y="330" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">자산 형성 경로</text>
+    <text x="350" y="345" font-family="Noto Sans KR" font-size="8" fill="#8A8880" text-anchor="middle">(한국 현실)</text>
+    
+    <!-- Day 4: Mortgage Optimization -->
+    <circle cx="450" cy="120" r="20" fill="#BF4A4A" opacity="0.7"/>
+    <text x="450" y="128" font-family="JetBrains Mono" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="bold">Day4</text>
+    <text x="450" y="330" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">담보대출 최적화</text>
+    <text x="450" y="345" font-family="Noto Sans KR" font-size="8" fill="#8A8880" text-anchor="middle">(4억 관리)</text>
+    
+    <!-- Day 5: Risk Assessment & Allocation -->
+    <circle cx="550" cy="140" r="20" fill="#4A9EBF" opacity="0.7"/>
+    <text x="550" y="148" font-family="JetBrains Mono" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="bold">Day5</text>
+    <text x="550" y="330" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">위험 & 자산배분</text>
+    <text x="550" y="345" font-family="Noto Sans KR" font-size="8" fill="#8A8880" text-anchor="middle">(60/40 목표)</text>
+    
+    <!-- Day 6: Behavioral Finance -->
+    <circle cx="650" cy="180" r="20" fill="#4ABF7A" opacity="0.7"/>
+    <text x="650" y="188" font-family="JetBrains Mono" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="bold">Day6</text>
+    <text x="650" y="330" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">행동재무학</text>
+    <text x="650" y="345" font-family="Noto Sans KR" font-size="8" fill="#8A8880" text-anchor="middle">(심리 제어)</text>
+    
+    <!-- Connecting path -->
+    <polyline points="150,280 250,200 350,150 450,120 550,140 650,180" 
+              stroke="#C9A84C" stroke-width="2" fill="none" opacity="0.6" stroke-dasharray="5,5"/>
+    
+    <!-- Integration node (Day 7) -->
+    <circle cx="750" cy="200" r="25" fill="#C9A84C" opacity="0.8"/>
+    <text x="750" y="205" font-family="JetBrains Mono" font-size="13" fill="#E8E6E1" text-anchor="middle" font-weight="bold">Day7</text>
+    <text x="750" y="330" font-family="Noto Sans KR" font-size="10" fill="#E8E6E1" text-anchor="middle" font-weight="bold">통합점검</text>
+    <text x="750" y="347" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">(전체 시스템)</text>
+    
+    <!-- X-axis labels -->
+    <text x="150" y="430" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB" text-anchor="middle">Day 01</text>
+    <text x="250" y="430" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB" text-anchor="middle">Day 02</text>
+    <text x="350" y="430" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB" text-anchor="middle">Day 03</text>
+    <text x="450" y="430" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB" text-anchor="middle">Day 04</text>
+    <text x="550" y="430" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB" text-anchor="middle">Day 05</text>
+    <text x="650" y="430" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB" text-anchor="middle">Day 06</text>
+    <text x="750" y="430" font-family="JetBrains Mono" font-size="10" fill="#C9A84C" text-anchor="middle" font-weight="bold">TODAY</text>
+    
+    <!-- Y-axis label -->
+    <text x="30" y="220" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB" text-anchor="middle" transform="rotate(-90 30 220)">개념적 복잡도</text>
+  </svg>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">CHART 2: 에빙하우스 망각곡선 — 최적 복습 일정</div>
+  <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1000" height="500" fill="#0A0C10"/>
+    
+    <!-- Grid -->
+    <g stroke="#2A2D36" stroke-width="0.5" opacity="0.5">
+      <line x1="100" y1="50" x2="100" y2="400"/><line x1="100" y1="400" x2="950" y2="400"/>
+      <line x1="150" y1="50" x2="150" y2="400"/><line x1="200" y1="50" x2="200" y2="400"/><line x1="250" y1="50" x2="250" y2="400"/>
+      <line x1="300" y1="50" x2="300" y2="400"/><line x1="350" y1="50" x2="350" y2="400"/><line x1="400" y1="50" x2="400" y2="400"/>
+      <line x1="450" y1="50" x2="450" y2="400"/><line x1="500" y1="50" x2="500" y2="400"/><line x1="550" y1="50" x2="550" y2="400"/>
+      <line x1="600" y1="50" x2="600" y2="400"/><line x1="650" y1="50" x2="650" y2="400"/><line x1="700" y1="50" x2="700" y2="400"/>
+      <line x1="750" y1="50" x2="750" y2="400"/><line x1="800" y1="50" x2="800" y2="400"/><line x1="850" y1="50" x2="850" y2="400"/>
+      <line x1="100" y1="100" x2="950" y2="100"/><line x1="100" y1="150" x2="950" y2="150"/><line x1="100" y1="200" x2="950" y2="200"/>
+      <line x1="100" y1="250" x2="950" y2="250"/><line x1="100" y1="300" x2="950" y2="300"/><line x1="100" y1="350" x2="950" y2="350"/>
+    </g>
+    
+    <!-- Axis -->
+    <line x1="100" y1="400" x2="950" y2="400" stroke="#4A9EBF" stroke-width="2"/>
+    <line x1="100" y1="50" x2="100" y2="400" stroke="#4A9EBF" stroke-width="2"/>
+    
+    <!-- Forgetting curve (without review) -->
+    <path d="M 100,80 Q 200,120 300,180 Q 400,240 500,280 Q 600,310 700,330 Q 800,345 900,355" 
+          stroke="#BF4A4A" stroke-width="2" fill="none"/>
+    <text x="920" y="360" font-family="Noto Sans KR" font-size="9" fill="#BF4A4A">복습 없음</text>
+    
+    <!-- With 1st review (D+1) -->
+    <path d="M 100,80 Q 150,85 200,100 L 200,120 Q 250,125 300,140 Q 400,180 500,240 Q 600,280 700,310 Q 800,330 900,345" 
+          stroke="#C9A84C" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+    <circle cx="200" cy="120" r="6" fill="#C9A84C"/>
+    <text x="200" y="145" font-family="JetBrains Mono" font-size="8" fill="#C9A84C" text-anchor="middle">D+1 복습</text>
+    
+    <!-- With D+1, D+3 review -->
+    <path d="M 100,80 Q 150,85 200,100 L 200,120 Q 250,123 300,135 L 300,160 Q 350,165 400,180 Q 500,220 600,260 Q 700,290 800,310 Q 850,320 900,330" 
+          stroke="#4ABF7A" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+    <circle cx="200" cy="120" r="6" fill="#C9A84C"/>
+    <circle cx="300" cy="160" r="6" fill="#4ABF7A"/>
+    <text x="300" y="185" font-family="JetBrains Mono" font-size="8" fill="#4ABF7A" text-anchor="middle">D+3 복습</text>
+    
+    <!-- With D+1, D+3, D+7 review (optimal) -->
+    <path d="M 100,80 Q 150,83 200,98 L 200,120 Q 250,122 300,133 L 300,160 Q 350,162 400,175 L 400,195 Q 450,197 500,210 Q 600,240 700,270 Q 800,290 900,310" 
+          stroke="#4A9EBF" stroke-width="2" fill="none"/>
+    <circle cx="200" cy="120" r="6" fill="#C9A84C"/>
+    <circle cx="300" cy="160" r="6" fill="#4ABF7A"/>
+    <circle cx="400" cy="195" r="6" fill="#4A9EBF"/>
+    <text x="400" y="220" font-family="JetBrains Mono" font-size="8" fill="#4A9EBF" text-anchor="middle">D+7 복습</text>
+    
+    <!-- X-axis labels -->
+    <text x="100" y="430" font-family="JetBrains Mono" font-size="9" fill="#B5B3AB">Day 0</text>
+    <text x="200" y="430" font-family="JetBrains Mono" font-size="9" fill="#B5B3AB">D+1</text>
+    <text x="300" y="430" font-family="JetBrains Mono" font-size="9" fill="#B5B3AB">D+3</text>
+    <text x="400" y="430" font-family="JetBrains Mono" font-size="9" fill="#B5B3AB">D+7</text>
+    <text x="500" y="430" font-family="JetBrains Mono" font-size="9" fill="#B5B3AB">D+14</text>
+    <text x="650" y="430" font-family="JetBrains Mono" font-size="9" fill="#B5B3AB">D+30</text>
+    <text x="850" y="430" font-family="JetBrains Mono" font-size="9" fill="#B5B3AB">D+60</text>
+    
+    <!-- Y-axis labels -->
+    <text x="85" y="405" font-family="JetBrains Mono" font-size="9" fill="#B5B3AB">0%</text>
+    <text x="75" y="205" font-family="JetBrains Mono" font-size="9" fill="#B5B3AB">50%</text>
+    <text x="75" y="105" font-family="JetBrains Mono" font-size="9" fill="#B5B3AB">100%</text>
+    
+    <!-- Y-axis label -->
+    <text x="25" y="220" font-family="JetBrains Mono" font-size="9" fill="#B5B3AB" text-anchor="middle" transform="rotate(-90 25 220)">기억 지속율 (%)</text>
+    
+    <!-- Legend box -->
+    <rect x="600" y="60" width="320" height="130" fill="rgba(0,0,0,0.3)" stroke="#C9A84C" stroke-width="1" rx="4"/>
+    <text x="615" y="80" font-family="Noto Sans KR" font-size="10" fill="#C9A84C" font-weight="bold">최적 복습 일정:</text>
+    <text x="615" y="100" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB">✓ D+1 (내일)</text>
+    <text x="615" y="118" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB">✓ D+3 (3일 뒤)</text>
+    <text x="615" y="136" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB">✓ D+7 (7일 뒤)</text>
+    <text x="615" y="154" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB">✓ D+14 (14일 뒤)</text>
+    <text x="615" y="172" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB">✓ D+30 (30일 뒤)</text>
+  </svg>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">CHART 3: PART 1 개념 통합 네트워크</div>
+  <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1000" height="500" fill="#0A0C10"/>
+    
+    <!-- Central hub: Your Assets -->
+    <circle cx="500" cy="250" r="40" fill="#C9A84C" opacity="0.8"/>
+    <text x="500" y="245" font-family="Noto Sans KR" font-size="11" fill="#E8E6E1" text-anchor="middle" font-weight="bold">당신의</text>
+    <text x="500" y="260" font-family="Noto Sans KR" font-size="11" fill="#E8E6E1" text-anchor="middle" font-weight="bold">자산</text>
+    <text x="500" y="275" font-family="JetBrains Mono" font-size="9" fill="#B5B3AB" text-anchor="middle">3.28억</text>
+    
+    <!-- Connection nodes -->
+    <!-- Day 1: Goal Setting -->
+    <circle cx="150" cy="100" r="28" fill="#4A9EBF" opacity="0.6"/>
+    <text x="150" y="103" font-family="Noto Sans KR" font-size="9" fill="#E8E6E1" text-anchor="middle" font-weight="bold">목표</text>
+    <text x="150" y="120" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">(Day 1)</text>
+    <line x1="180" y1="120" x2="470" y2="230" stroke="#C9A84C" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Day 2: Compound -->
+    <circle cx="150" cy="250" r="28" fill="#4ABF7A" opacity="0.6"/>
+    <text x="150" y="253" font-family="Noto Sans KR" font-size="9" fill="#E8E6E1" text-anchor="middle" font-weight="bold">복리</text>
+    <text x="150" y="270" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">(Day 2)</text>
+    <line x1="180" y1="250" x2="470" y2="250" stroke="#4ABF7A" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Day 3: Pipeline -->
+    <circle cx="150" cy="400" r="28" fill="#BF4A4A" opacity="0.6"/>
+    <text x="150" y="403" font-family="Noto Sans KR" font-size="9" fill="#E8E6E1" text-anchor="middle" font-weight="bold">자산</text>
+    <text x="150" y="418" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">형성</text>
+    <text x="150" y="433" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">(Day 3)</text>
+    <line x1="180" y1="380" x2="470" y2="270" stroke="#BF4A4A" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Day 4: Mortgage -->
+    <circle cx="850" cy="100" r="28" fill="#4A9EBF" opacity="0.6"/>
+    <text x="850" y="103" font-family="Noto Sans KR" font-size="9" fill="#E8E6E1" text-anchor="middle" font-weight="bold">부채</text>
+    <text x="850" y="118" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">관리</text>
+    <text x="850" y="133" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">(Day 4)</text>
+    <line x1="820" y1="120" x2="540" y2="230" stroke="#4A9EBF" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Day 5: Risk -->
+    <circle cx="850" cy="250" r="28" fill="#4ABF7A" opacity="0.6"/>
+    <text x="850" y="253" font-family="Noto Sans KR" font-size="9" fill="#E8E6E1" text-anchor="middle" font-weight="bold">위험</text>
+    <text x="850" y="268" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">배분</text>
+    <text x="850" y="283" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">(Day 5)</text>
+    <line x1="820" y1="250" x2="540" y2="250" stroke="#4ABF7A" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Day 6: Behavior -->
+    <circle cx="850" cy="400" r="28" fill="#BF4A4A" opacity="0.6"/>
+    <text x="850" y="403" font-family="Noto Sans KR" font-size="9" fill="#E8E6E1" text-anchor="middle" font-weight="bold">심리</text>
+    <text x="850" y="418" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">관리</text>
+    <text x="850" y="433" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">(Day 6)</text>
+    <line x1="820" y1="380" x2="540" y2="270" stroke="#BF4A4A" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Insight box -->
+    <rect x="200" y="70" width="600" height="50" fill="rgba(201,168,76,0.1)" stroke="#C9A84C" stroke-width="1" rx="4"/>
+    <text x="500" y="92" font-family="Noto Sans KR" font-size="10" fill="#C9A84C" text-anchor="middle" font-weight="bold">Part 1은 "당신의 자산"을 중심으로 6가지 차원에서 접근하는 통합 시스템</text>
+    <text x="500" y="112" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">각 차원은 독립적이지만, 실제로는 모두 연결되어 있습니다.</text>
+  </svg>
+</div>
+
+</section>
+
+
+
+
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  
+  <details class="deep-dive">
+    <summary><strong>DD1. Part 1의 6일 과정이 하나의 통합 시스템인 이유</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>선형적 학습 vs 시스템적 학습:</strong> 대부분의 투자 강의는 "주식은 이렇게, 부동산은 이렇게"라는 선형적 시리즈를 따릅니다. 하지만 Part 1은 다릅니다. 모든 날이 당신의 현재 자산(3.28억)을 중심으로 설계되었습니다. Day 1의 "목표"는 Day 2의 "복리"를 통해 구체화되고, Day 3의 "자산 형성 경로"는 Day 4의 "부채 관리"와 결합되고, Day 5의 "위험 배분"은 Day 6의 "심리 관리"가 없으면 실행 불가능합니다.</p>
+      
+      <p><strong>반복문(Loop)의 중요성:</strong> 대부분의 학습은 "선형 진행"입니다. A → B → C → 완료. 하지만 투자는 다릅니다. "목표 설정 → 자산 배분 → 투자 → 변화된 자산 → 새로운 목표 설정"이라는 반복 사이클입니다. Part 1의 6일은 이 사이클의 한 바퀴(iteration)를 완성합니다. Day 7(오늘)은 다음 바퀴를 시작하기 전의 "점검" 역할입니다.</p>
+      
+      <p><strong>순환적 구조의 신경과학적 이점:</strong> 뇌는 순환 구조를 더 잘 기억합니다. "네트워크"의 형태로 정보가 저장되면, 한 개념에서 다른 개념으로의 연결이 강해져 장기 기억으로의 전환율이 높아집니다. 따라서 Part 1의 각 날이 "독립적인 강의"가 아니라 "하나의 전체의 일부"로 느껴질 때, 기억 지속율이 훨씬 높습니다.</p>
+      
+      <p><strong>당신에게 적용:</strong> 이제부터는 "Day X를 완료했다"가 아니라 "당신의 자산 구조가 이렇게 변해야 한다"는 액션 아이템으로 Part 1을 회고하세요. 예: "Day 7 점검 후, 3년 계획에 따라 매월 470만원 주식 매수"라는 구체적 행동으로.</p>
+    </div>
+  </details>
+  
+  <details class="deep-dive">
+    <summary><strong>DD2. 망각곡선과 당신의 학습 계획</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>에빙하우스 망각 곡선의 신경과학적 근거:</strong> 1885년 헤르만 에빙하우스가 발견한 "망각 곡선"은 최신 뇌과학으로 설명됩니다. 뇌의 해마(hippocampus)에서 단기 기억이 만들어지지만, 반복 자극이 없으면 24시간 내에 50-70%가 사라집니다. 반면 반복 자극이 있으면, 장기 기억(대뇌피질)으로의 전환이 일어나 지속율이 급상승합니다.</p>
+      
+      <p><strong>당신의 Part 1 복습 일정:</strong> 지금이 "Day 7 (학습 완료)"이라면, 최적 복습은 (1) 내일(D+1): 전체 요약 정독, (2) 3일 뒤(D+3): 퀴즈 재풀이, (3) 7일 뒤(D+7): 실제 자산에 적용. 이렇게 하면 Part 1의 기억이 60% → 90%로 상승합니다.</p>
+      
+      <p><strong>간격 반복의 수학적 효과:</strong> 단순 암기(1회만): 50% 지속율. 간격 반복 (D+1, D+3, D+7): 90% 이상 지속율. 약 80%의 학습 효율 향상입니다. 이것이 왜 SR(Spaced Repetition) 트래커가 필수적인지의 이유입니다.</p>
+      
+      <p><strong>당신의 실행 계획:</strong> 이 파일의 하단 "간격 반복 트래커"에서 (1) D+1 칸을 클릭하면 "내일 D+1 복습" 기억이 생깁니다. 모바일 달력에도 알람을 설정하세요. "완벽한 학습"보다 "꾸준한 복습"이 중요합니다.</p>
+    </div>
+  </details>
+  
+  <details class="deep-dive">
+    <summary><strong>DD3. Part 1 개념 간의 인과관계와 피드백 루프</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>Day 1 → Day 2 → Day 3의 선형 진행:</strong> (1) Day 1의 목표(10년 후 10억)가 없으면, (2) Day 2의 복리 계산이 추상적입니다. (3) Day 2의 "복리의 힘(연 7% 수익)"을 알아야 (4) Day 3의 "자산 형성 경로(월 500만 자산 구축)"가 현실적입니다.</p>
+      
+      <p><strong>Day 4 → Day 5로의 흐름:</strong> (1) Day 4에서 담보대출 4억을 최적화했다면, (2) Day 5의 자산 배분이 더 유연해집니다. 예를 들어 부채 비용이 연 4.5%에서 4.0%로 내려가면, 이는 추가 수익으로 작용하여 주식 투자 여력이 증가합니다.</p>
+      
+      <p><strong>Day 5 ← → Day 6의 상호관계(피드백):</strong> (1) Day 5에서 "60/40 자산 배분"을 정했다면, (2) Day 6에서 배우는 "행동재무학 편향"이 그 결정을 얼마나 잘 지킬 수 있는지를 결정합니다. 역으로 (3) 당신의 "손실 회피 편향이 약하다면", 좀 더 공격적인 70/30도 고려할 수 있습니다.</p>
+      
+      <p><strong>피드백 루프 (Feedback Loop):</strong> "자산 배분 결정 → 실제 투자 → 시장 변동 → 심리적 반응 → 행동 선택 → 결과"의 사이클이 반복됩니다. Part 1에서 배운 모든 것이 이 사이클 내에서 영역을 담당합니다. 따라서 Part 1 전체를 "하나의 시스템"으로 이해하면, Part 2(주식 투자)와 Part 3(자산 배분)에서도 더 빠르게 적응할 수 있습니다.</p>
+    </div>
+  </details>
+  
+  <details class="deep-dive">
+    <summary><strong>DD4. Part 1 복습 시 점검해야 할 10가지 체크리스트</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>개념 이해 레벨:</strong></p>
+      <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+        <li>□ 복리 수식을 손으로 계산할 수 있는가? (Day 2)</li>
+        <li>□ 당신의 자산 형성 경로(직업, 부동산, 부채)를 설명할 수 있는가? (Day 3)</li>
+        <li>□ 담보대출 최적화의 3가지 변수(금리, 기간, 금액)를 이해하는가? (Day 4)</li>
+        <li>□ 위험 수용도 62점이 60/40 배분을 의미하는 이유를 설명할 수 있는가? (Day 5)</li>
+        <li>□ 손실 회피, 확증편향, 앵커링 3가지 편향이 당신에게 어떻게 나타나는가? (Day 6)</li>
+      </ul>
+      
+      <p style="margin-top:0.8rem;"><strong>실행 의지 레벨:</strong></p>
+      <ul style="margin-left:1.2rem;">
+        <li>□ 3년 매월 470만원 주식 매수 계획을 달력에 입력했는가?</li>
+        <li>□ ISA 계좌를 개설했거나, 개설 계획을 세웠는가?</li>
+        <li>□ 현재 포트폴리오의 정확한 자산 배분(부동산 %, 주식 %, 현금 %)을 계산했는가?</li>
+        <li>□ "손절 기준"(예: 연 기대수익률 -5% 이하)을 정했는가?</li>
+        <li>□ 매월 자산 상황을 기록할 "자산 트래킹 시스템"을 구축했는가?</li>
+      </ul>
+      
+      <p style="margin-top:0.8rem;"><strong>해석:</strong> 개념 레벨에서 4개 이상 체크: 중상. Part 2로 진행 가능. 실행 의지에서 3개 이상: 실제 변화 예상. 5개 모두 체크: 탁월한 준비.</p>
+    </div>
+  </details>
+</section>
+
+<!-- Data Table: Part 1 6일 개념 요약 -->
+<section class="section fade-up">
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>핵심 개념</th>
+          <th>당신의 상황</th>
+          <th>다음 액션</th>
+          <th>Part 2 연결</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Day 1</td>
+          <td>재정 목표</td>
+          <td>10년 후 10억</td>
+          <td>목표 문서화</td>
+          <td>월 투자액 결정</td>
+        </tr>
+        <tr>
+          <td>Day 2</td>
+          <td>복리의 수식</td>
+          <td>연 7% × 10년 = 2배</td>
+          <td>수익률 가정 검증</td>
+          <td>주식 기대수익 추정</td>
+        </tr>
+        <tr>
+          <td>Day 3</td>
+          <td>자산 형성 경로</td>
+          <td>부동산→추가 부채→주식</td>
+          <td>경로 최적화</td>
+          <td>주식 투자 비중 조정</td>
+        </tr>
+        <tr>
+          <td>Day 4</td>
+          <td>부채 최적화</td>
+          <td>4억 대출 재구성</td>
+          <td>금리 재협상</td>
+          <td>금리 변화 민감도</td>
+        </tr>
+        <tr>
+          <td>Day 5</td>
+          <td>위험 수용도 & 자산배분</td>
+          <td>62점 → 60/40</td>
+          <td>3년 리밸런싱 계획</td>
+          <td>주식 투자 시작</td>
+        </tr>
+        <tr class="highlight-row">
+          <td>Day 6</td>
+          <td>행동재무학</td>
+          <td>편향 자각 & 규칙화</td>
+          <td>의사결정 시스템 구축</td>
+          <td>감정적 매도 방지</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Integration Formula Block -->
+<section class="section fade-up">
+  <div class="formula-block">
+    <div class="formula-line"><span class="formula-highlight">Part 1 통합 공식 — 당신의 10년 자산 계획</span></div>
+    <div class="formula-line" style="margin-top:0.8rem;"><span class="formula-blue">최종 자산 = 현재 자산 × (1+수익률)^년수 + 월 저축액 × [(1+수익률)^년수 - 1] / 수익률</span></div>
+    <div class="formula-line" style="margin-top:0.8rem;"><span class="formula-comment">실제 계산 (당신의 상황):</span></div>
+    <div class="formula-line"><span class="formula-comment">  현재 자산 = 3.28억</span></div>
+    <div class="formula-line"><span class="formula-comment">  월 저축액 = 470만원 (주식) + α (보너스, 임대수익)</span></div>
+    <div class="formula-line"><span class="formula-comment">  기대 수익률 = 7% (혼합: 부동산 3% + 주식 10% 가중평균)</span></div>
+    <div class="formula-line"><span class="formula-comment">  기간 = 10년</span></div>
+    <div class="formula-line" style="margin-top:0.6rem;"><span class="formula-blue">최종 = 3.28억 × 1.96 + (470만 × 12) × [(1.07^10 - 1) / 0.07]</span></div>
+    <div class="formula-line"><span class="formula-blue">최종 = 6.43억 + 5.65억 = 12.08억 ≈ 12억</span></div>
+    <div class="formula-line" style="margin-top:0.6rem;"><span class="formula-highlight">결론:</span> Day 1의 "10년 후 10억" 목표는 현실적이며, 약간의 추가 노력(보너스 투자 등)으로 12억 달성 가능</div>
+    <div class="formula-line"><span class="formula-comment">※ 이 계산은 세금, 인플레이션을 미포함한 순 자산 기준입니다</span></div>
+  </div>
+</section>
+
+<!-- Simulation Box: Part 1 정리 -->
+<section class="section fade-up">
+  <div class="sim-box">
+    <h3>📋 Part 1 최종 액션 아이템</h3>
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1.2rem;">
+      Part 1을 완료한 당신이 즉시 실행해야 할 6가지입니다. 체크리스트로 관리하세요.
+    </p>
+    <ul class="checklist">
+      <li><strong>우선 1순위 (이번 주):</strong> ISA 계좌 개설 또는 기존 계좌 확인</li>
+      <li><strong>우선 2순위 (1-2주):</strong> 현재 자산 상황 정리 (부동산 평가액, 부채 이자율, 주식 현황)</li>
+      <li><strong>우선 3순위 (2-4주):</strong> 자동 주식 매매 설정 (월 1회, 고정액 470만원)</li>
+      <li><strong>우선 4순위 (1개월):</strong> 담보대출 금리 재협상 요청 (은행 컨설턴트 면담)</li>
+      <li><strong>우선 5순위 (3개월):</strong> 첫 번째 D+30 복습 (Part 1 전체 재정독)</li>
+      <li><strong>선택 사항:</strong> 가족과 함께 "10년 자산 계획" 공유 및 합의 (부부 맞벌이 가정의 경우)</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  
+    <div class="sim-box">
+      <h3>🎯 Part 1 완수 체크리스트</h3>
+      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1.2rem;">
+        당신은 이미 학습했습니다. 이제는 실행만 남았습니다.
+      </p>
+      <ul class="checklist">
+        <li><strong>이번 주:</strong> 현재 자산 정확히 계산 (부동산 평가액, 주식 평가액, 현금, 부채)</li>
+        <li><strong>이번 주:</strong> ISA 계좌 개설 및 정기 매수 설정 (월 470만원, 자동)</li>
+        <li><strong>2주 내:</strong> 담보대출 금리 재협상 (은행 상담 1회)</li>
+        <li><strong>1개월 내:</strong> 투자 기록 시스템 구축 (매달 자산 추적)</li>
+        <li><strong>매달:</strong> 첫 번째 자동 주식 매수 확인</li>
+        <li><strong>3개월 뒤:</strong> Part 1 전체 재정독 (D+30 복습)</li>
+        <li><strong>지금 바로:</strong> Part 2 Day 08 시작 (주식 투자 기초)</li>
+      </ul>
+    </div>
+    
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    
+<div class="bias-name">완벽주의 편향 (Perfectionism Bias)</div>
+<p>
+  Part 1을 완료한 당신은 이제 "완벽한 계획을 세워야 한다"는 
+  <span class="neuro-tag">전전두피질의 과활성화</span>를 
+  느낄 수 있습니다. 엔지니어들의 특성상 "100% 완벽한 실행"을 추구합니다.
+</p>
+<p style="margin-top:0.6rem;">
+  하지만 투자의 현실은 다릅니다. 
+  "충분히 좋은 계획 (60/40 배분)"을 "계속 실행"하는 것이 
+  "완벽한 타이밍"을 기다리는 것보다 훨씬 더 큰 수익을 만듭니다.
+</p>
+<p style="margin-top:0.6rem;">
+  <strong>엔지니어 특화 해결책:</strong> 
+  <span class="engineer-tag">"완벽함 vs 꾸준함"의 트레이드오프를 인식하고</span>, 
+  "매월 470만원 자동 투자"처럼 
+  "구현 난이도 낮은" 규칙을 설정하세요. 
+  완벽한 선택 1개보다 
+  80점짜리 선택 10개가 더 좋습니다.
+</p>
+
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. Part 1 (Day 1-7)이 '통합 시스템'인 이유는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 모두 같은 교사가 강의했기 때문에</li>
+<li onclick="checkAnswer(this,'q1',true)">② 모두 당신의 현재 자산(3.28억)을 중심으로 설계되었고, 각 Day가 다음 Day를 위한 기초 역할</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 순서대로 진행하면 자동으로 이해된다</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 투자의 모든 주제를 다루었다</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          Part 1은 선형적 강의가 아니라 순환적 시스템입니다. 
+          Day 1의 목표가 Day 2의 복리 계산을 의미 있게 만들고, 
+          Day 5의 자산 배분이 Day 6의 심리 관리 없이는 실행 불가능합니다. 
+          따라서 Day 1-6은 독립적이 아니라 상호 연결되어 있으며, 
+          Day 7은 이 전체 시스템의 "점검"입니다.
+        </div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 망각곡선에서 3회 복습(D+1, D+3, D+7)의 효과는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 기억 지속율 30% (복습 없음과 동일)</li>
+<li onclick="checkAnswer(this,'q2',false)">② 기억 지속율 60% (1회 복습과 동일)</li>
+<li onclick="checkAnswer(this,'q2',true)">③ 기억 지속율 90% 이상 (3배 향상)</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 기억 지속율은 복습 횟수와 무관하다</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ③</strong><br>
+          정답: ③ <br/>
+          에빙하우스 망각 곡선의 신경과학적 근거는 
+          반복 자극이 뇌의 해마 → 대뇌피질로의 
+          장기 기억 전환을 촉진한다는 것입니다. 
+          간격 반복(D+1, D+3, D+7)은 기억 지속율을 
+          30%에서 90% 이상으로 상승시킵니다. 
+          이것이 SR 트래커를 매우 중요하게 다루는 이유입니다.
+        </div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. Part 1 후 당신의 자산 상태에서 가장 중요한 '다음 액션'은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 주식 종목 연구를 시작한다 (Part 2 준비)</li>
+<li onclick="checkAnswer(this,'q3',true)">② ISA 계좌를 개설하고 매월 470만원 자동 매수를 설정한다</li>
+<li onclick="checkAnswer(this,'q3',false)">③ 담보대출 전액을 상환한다</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 부동산을 즉시 매각한다</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          Part 1을 통해 당신이 결정한 것: 
+          (1) 10년 후 10억 목표, 
+          (2) 60/40 자산 배분, 
+          (3) 월 470만원 추가 투자. 
+          이를 실행하려면 ISA 계좌(비과세) 개설이 우선입니다. 
+          종목 연구(Part 2)는 그 다음입니다. 
+          "완벽한 선택"을 기다리지 말고 
+          "현실적 첫 발걸음"을 내딛으세요.
+        </div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. Part 2-4와 Part 1의 관계를 가장 잘 설명하는 것은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① Part 1은 완료했으니 다시 볼 필요 없다</li>
+<li onclick="checkAnswer(this,'q4',true)">② Part 1은 기초이고, Part 2-4는 세부 영역을 깊이 있게 다루면서 Part 1의 원칙을 계속 적용</li>
+<li onclick="checkAnswer(this,'q4',false)">③ Part 1-4는 모두 같은 난이도의 독립적 강의</li>
+<li onclick="checkAnswer(this,'q4',false)">④ Part 2-4가 더 중요하니 빠르게 진행한다</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          Part 1에서 "60/40 배분"을 정했다면, 
+          Part 2에서는 "주식 60%를 어떻게 선택하는가?" 
+          (종목 분석, 타이밍), 
+          Part 3에서는 "부동산 배분을 어떻게 관리할까?" 
+          (리밸런싱, 매매)를 배웁니다. 
+          Part 1의 원칙("60/40") 없이 Part 2를 배우면 
+          "이 종목이 좋으니까 100% 투자"라는 과신에 빠질 수 있습니다.
+        </div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. '충분히 좋은 계획을 꾸준히 실행'이 '완벽한 타이밍을 기다리기'보다 나은 이유는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',false)">① 시간이 덜 걸리기 때문에</li>
+<li onclick="checkAnswer(this,'q5',true)">② 복리의 시간 가치 + 심리적 일관성 + 시장 타이밍 위험 제거</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 계획이 간단해서</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 투자 수익이 보장되기 때문에</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          투자에서 "타이밍 예측"은 불가능에 가깝습니다 (약 30%). 
+          대신 (1) 복리의 힘(10년 × 월 470만 × 7% 수익), 
+          (2) 정기 매수의 심리적 안정성(변동성에 덜 흔들림), 
+          (3) 시장 타이밍 위험 제거(평균 단가 낮춤)가 
+          장기 수익의 핵심입니다. 
+          엔지니어의 완벽주의는 도움이 되지 않습니다.
+        </div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 07</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 14일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 16일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 20일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">03월 27일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 12일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day06_behavioral_finance.html">← Day 06</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 07 / 23</span>
+  <a class="nav-btn" href="day08_valuation_basics.html">Day 08 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

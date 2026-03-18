@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 12 | 매수·매도 타이밍 원칙 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #B5B3AB;
+  --text-dim: #8A8880;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 12 / 23</span>
+    <span class="header-title">매수·매도 타이밍 원칙</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 2 · 주식 투자 심화</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 2 — 주식 투자 심화</div>
+  <h1 class="hero-day">Day 12</h1>
+  <h2 class="hero-subtitle">매수·매도 타이밍 원칙</h2>
+  <p class="hero-quote">"타이밍이 아니라 시간이 시장을 이긴다." — 파마, 노벨 경제학상</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 2: 08~14</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:52.2%"></div></div>
+    <div class="progress-label"><span>Day 12</span><span>12 / 23 완료 (52.2%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 완벽한 매매 타이밍은 존재하는가?</h3>
+    <p>타이밍 예측은 거의 불가능하고, 시장에 계속 있는 것이 최선입니다. 달러 코스트 평균법으로 감정을 제어하고 규칙에 따릅니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">0–5분</td><td>단기 매매 vs 장기 투자: 통계적 진실</td><td>확률 분석</td></tr>
+<tr><td class="time-col">5–12분</td><td>평균 회귀 원칙: 극단적 가격은 돌아온다</td><td>수식 및 사례</td></tr>
+<tr><td class="time-col">12–18분</td><td>달러 코스트 평균법: 타이밍 우려 해소</td><td>시뮬레이션</td></tr>
+<tr><td class="time-col">18–22분</td><td>시장 사이클 이해: 강세장 vs 약세장</td><td>차트 분석</td></tr>
+<tr><td class="time-col">22–25분</td><td>실전 규칙: 매매 기록 & 감정 관리</td><td>행동 계획</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">매수·매도 타이밍 원칙</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">통계학적 진실: 타이밍은 거의 불가능</div>
+      <div class="card-body"><p>가장 뛰어난 펀드 매니저도 시장 타이밍에 실패합니다. 이는 통계적 사실입니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">유명한 연구 (Vanguard, 2000~2020):</div>
+<div class="formula-line">  S&P500 연평균 수익률: 9.7%</div>
+<div class="formula-line">  최고 수익 10일을 빠뜨린 경우: 4.0% (←60% 손실!)</div>
+<div class="formula-line">  = 단 10일 = 20년의 40% 손실</div>
+<div class="formula-line"></div>
+<div class="formula-highlight">최고 수익 날짜의 분포:</div>
+<div class="formula-line">  - 최고 수익 날짜들은 '무작위'에 가까움</div>
+<div class="formula-line">  - 예측 불가능 (평균적으로 약세장 시작 후 1주일)</div>
+<div class="formula-line">  - 따라서 '시장을 피했다가 복귀'하면 90% 실패</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">평균 회귀 원칙: 극단값은 언젠가 돌아온다</div>
+      <div class="card-body"><p>주가가 극도로 높거나 낮으면 평균으로 돌아오려 하는 경향이 있습니다. 이를 '평균 회귀(Mean Reversion)'라고 합니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>극단 상황</th><th>평균가(예)</th><th>실제 가격</th><th>회귀 시기</th></tr></thead>
+<tbody>
+<tr><td>극도로 낮음</td><td>50,000원</td><td>20,000원</td><td>6개월~2년</td></tr>
+<tr><td>극도로 높음</td><td>50,000원</td><td>100,000원</td><td>3개월~1년</td></tr>
+<tr><td>정상 범위</td><td>50,000원</td><td>48,000~52,000원</td><td>지속 (안정)</td></tr>
+</tbody>
+</table>
+</div>
+<p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.8rem;"><strong>주의:</strong> 평균 회귀까지의 기간이 예측 불가능합니다. 3개월일 수도, 3년일 수도 있습니다.</p></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">달러 코스트 평균법: 타이밍 우려 해소</div>
+      <div class="card-body"><p>고민하지 말고, 정해진 액수를 정해진 시간에 계속 매수하세요. 이것이 '최적'은 아니지만 '충분히 좋은' 방법입니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">달러 코스트 평균법 (DCA) 사례:</div>
+<div class="formula-line">  매달 100만원씩 투자 (12개월)</div>
+<div class="formula-line">  1월: 50,000원 × 20주 = 100만</div>
+<div class="formula-line">  2월: 40,000원 × 25주 = 100만</div>
+<div class="formula-line">  ...12월: 55,000원 × 18주 = 100만</div>
+<div class="formula-line"></div>
+<div class="formula-line">  평균 구매가 = 1,200만 ÷ (20+25+...+18)주</div>
+<div class="formula-line">  = 약 47,000원</div>
+<div class="formula-line">  ✓ 최저가(40,000원) 근처에서 구매</div>
+<div class="formula-line">  = 자동으로 '저가에서 많이, 고가에서 적게'</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">시장 사이클 이해: 강세장 vs 약세장</div>
+      <div class="card-body"><p>모든 시장은 사이클을 반복합니다. 지금 어느 단계인지 아는 것이 중요합니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>단계</th><th>투자심리</th><th>기간</th><th>조치</th></tr></thead>
+<tbody>
+<tr><td><strong>1. 약세 심화</strong></td><td>절망 (공포)</td><td>3~6개월</td><td>매수 시작</td></tr>
+<tr><td><strong>2. 강세 초기</strong></td><td>희망</td><td>6~12개월</td><td>계속 매수</td></tr>
+<tr><td><strong>3. 강세 중기</strong></td><td>낙관</td><td>6~18개월</td><td>정상 매수</td></tr>
+<tr><td><strong>4. 강세 극후기</strong></td><td>욕심 (탐욕)</td><td>1~3개월</td><td>매도 시작</td></tr>
+</tbody>
+</table>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">감정 관리: 투자 성공의 핵심</div>
+      <div class="card-body"><p>투자의 80%는 심리 게임입니다. 분석과 통계는 20%에 불과합니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">감정 관리 체크리스트:</div>
+<div class="formula-line">① 매매 규칙을 문서화하고 서명하세요</div>
+<div class="formula-line">② 손실이 나도 규칙대로 행동하세요 (규율)</div>
+<div class="formula-line">③ 매매 일지를 작성하세요 (감정 추적)</div>
+<div class="formula-line">④ 과거 실수를 매번 검토하세요</div>
+<div class="formula-line">⑤ 지인의 조언을 무시하세요 (중요!)</div>
+<div class="formula-line">⑥ 뉴스 시청을 줄이세요 (감정 자극)</div>
+</div></div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  <div class="chart-container"><svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="400" fill="#12151C" />
+  <text x="450" y="30" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" text-anchor="middle" font-weight="600">평균 회귀 원칙 — 극단값은 평균으로 돌아온다</text>
+  <line x1="100" y1="350" x2="850" y2="350" stroke="#C9A84C" stroke-width="2" />
+  <line x1="100" y1="60" x2="100" y2="350" stroke="#C9A84C" stroke-width="2" />
+  <!-- 평균선 -->
+  <line x1="100" y1="200" x2="850" y2="200" stroke="#C9A84C" stroke-width="2" stroke-dasharray="5,5" />
+  <text x="860" y="205" font-family="var(--font-mono)" font-size="11" fill="#C9A84C">평균가</text>
+  <!-- 가격 변동 -->
+  <polyline points="100,350 150,200 200,120 250,140 300,160 350,170 400,190 450,200 500,210 550,190 600,170 650,160 700,180 750,200 800,250 850,350" fill="none" stroke="#4A9EBF" stroke-width="2" />
+  <!-- 극단 영역 표시 -->
+  <rect x="200" y="60" width="100" height="140" fill="#4ABF7A" opacity="0.1" />
+  <text x="250" y="45" font-family="var(--font-mono)" font-size="10" fill="#4ABF7A">과도히 저가</text>
+  <rect x="700" y="60" width="100" height="130" fill="#BF4A4A" opacity="0.1" />
+  <text x="750" y="45" font-family="var(--font-mono)" font-size="10" fill="#BF4A4A">과도히 고가</text>
+</svg></div><div class="chart-container"><svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="400" fill="#12151C" />
+  <text x="450" y="30" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" text-anchor="middle" font-weight="600">달러 코스트 평균법 (DCA) — 자동 저가 매수</text>
+  <!-- Grid -->
+  <line x1="100" y1="60" x2="100" y2="350" stroke="#C9A84C" stroke-width="2" />
+  <line x1="100" y1="350" x2="850" y2="350" stroke="#C9A84C" stroke-width="2" />
+  <!-- 가격 -->
+  <polyline points="100,200 150,280 200,150 250,200 300,180 350,220 400,240 450,180 500,160 550,200 600,280 650,220 700,200 750,240 800,180 850,200" fill="none" stroke="#4A9EBF" stroke-width="2" />
+  <!-- 매수 신호 -->
+  <circle cx="100" cy="200" r="5" fill="#4ABF7A" />
+  <text x="105" y="365" font-family="var(--font-mono)" font-size="9" fill="#4ABF7A">1월</text>
+  <circle cx="200" cy="150" r="8" fill="#4ABF7A" />
+  <text x="195" y="365" font-family="var(--font-mono)" font-size="9" fill="#4ABF7A">많음</text>
+  <circle cx="300" cy="180" r="6" fill="#4ABF7A" />
+  <circle cx="500" cy="160" r="8" fill="#4ABF7A" />
+  <text x="495" y="365" font-family="var(--font-mono)" font-size="9" fill="#4ABF7A">많음</text>
+  <!-- 설명 -->
+  <rect x="600" y="80" width="250" height="120" fill="#1A1E2A" stroke="#4ABF7A" stroke-width="2" rx="4" />
+  <text x="615" y="105" font-family="var(--font-body)" font-size="11" fill="#4ABF7A" font-weight="600">DCA의 이점</text>
+  <text x="615" y="130" font-family="var(--font-body)" font-size="10" fill="#B5B3AB">✓ 저가에서 자동으로 많이 매수</text>
+  <text x="615" y="150" font-family="var(--font-body)" font-size="10" fill="#B5B3AB">✓ 고가에서는 적게 매수</text>
+  <text x="615" y="170" font-family="var(--font-body)" font-size="10" fill="#B5B3AB">✓ 타이밍 우려 제거</text>
+</svg></div><div class="chart-container"><svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="400" fill="#12151C" />
+  <text x="450" y="30" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" text-anchor="middle" font-weight="600">시장 사이클 — 4단계 반복</text>
+  <!-- 사이클 -->
+  <circle cx="450" cy="200" r="150" fill="none" stroke="#C9A84C" stroke-width="2" />
+  <!-- 1단계: 절망 -->
+  <circle cx="300" cy="200" r="30" fill="#BF4A4A" opacity="0.6" />
+  <text x="300" y="205" font-family="var(--font-mono)" font-size="10" fill="#E8E6E1" text-anchor="middle" font-weight="600">1</text>
+  <text x="300" y="240" font-family="var(--font-body)" font-size="10" fill="#BF4A4A" text-anchor="middle">절망</text>
+  <!-- 2단계: 희망 -->
+  <circle cx="450" cy="80" r="30" fill="#4ABF7A" opacity="0.6" />
+  <text x="450" y="85" font-family="var(--font-mono)" font-size="10" fill="#E8E6E1" text-anchor="middle" font-weight="600">2</text>
+  <text x="450" y="40" font-family="var(--font-body)" font-size="10" fill="#4ABF7A" text-anchor="middle">희망</text>
+  <!-- 3단계: 낙관 -->
+  <circle cx="600" cy="200" r="30" fill="#4A9EBF" opacity="0.6" />
+  <text x="600" y="205" font-family="var(--font-mono)" font-size="10" fill="#E8E6E1" text-anchor="middle" font-weight="600">3</text>
+  <text x="600" y="240" font-family="var(--font-body)" font-size="10" fill="#4A9EBF" text-anchor="middle">낙관</text>
+  <!-- 4단계: 욕심 -->
+  <circle cx="450" cy="320" r="30" fill="#C9A84C" opacity="0.6" />
+  <text x="450" y="325" font-family="var(--font-mono)" font-size="10" fill="#E8E6E1" text-anchor="middle" font-weight="600">4</text>
+  <text x="450" y="360" font-family="var(--font-body)" font-size="10" fill="#C9A84C" text-anchor="middle">욕심</text>
+</svg></div>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 1: 타이밍 실패의 통계적 증거</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p>2000~2020년 Vanguard 연구에 따르면 최고 수익 10일을 빠뜨렸을 때 20년 수익이 60% 감소했습니다. 최고 수익 날짜들은 무작위에 가까우므로 예측이 거의 불가능합니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>결론:</strong> 시장을 피했다가 복귀하려는 전략은 대부분 실패합니다. '계속 시장에 있는 것'이 '완벽한 타이밍을 기다리는 것'보다 훨씬 좋습니다.</p>
+  </div>
+</details>
+
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 2: 평균 회귀의 시간 문제</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p>주가가 극도로 낮으면 결국 평균으로 돌아옵니다. 하지만 '언제'는 예측 불가능합니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>위험:</strong> 극도로 낮은 가격에서 매수했는데 3년 동안 계속 떨어질 수 있습니다. 평균 회귀까지 자본을 인내할 수 있어야 합니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>해결:</strong> 평균 회귀를 믿되, 시간을 예측하지 마세요. DCA(달러 코스트 평균법)로 천천히 쌓아가세요.</p>
+  </div>
+</details>
+
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 3: 감정 제어 기법</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p>투자 실패의 80%는 분석 오류가 아니라 감정 조절 실패입니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>매매 규칙 문서화:</strong> 사전에 정확한 매수/매도 기준을 문서화하고 서명하세요. 시장이 움직일 때 이 문서를 보고 행동합니다. 감정적 판단을 억제합니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>매매 일지:</strong> 매번 매매 후 왜 했는지, 결과는 어땠는지 기록하세요. 3개월마다 검토합니다.</p>
+  </div>
+</details>
+
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 4: 엔지니어의 최적화 강박</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p><strong>뇌과학:</strong> 엔지니어들은 '최적'을 추구합니다. '최저가에 매수, 최고가에 매도'하려고 합니다. 하지만 이것은 불가능합니다.</p>
+    <p style="margin-top: 0.8rem;">투자는 '최적'이 아니라 '충분히 좋은' 것으로 만족해야 합니다. DCA는 '최적'은 아니지만 '충분히 좋은' 방법입니다. 이를 받아들이기가 엔지니어에게 어렵습니다.</p>
+  </div>
+</details>
+
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  <div style="background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06)); border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;"><h3 style="font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem;">📊 DCA 매매 일지 템플릿</h3><p style="font-size:0.9rem; color:var(--text-secondary);">매달 동일 금액으로 계속 매수합니다. 감정을 배제하고 규칙에 따릅니다.</p></div>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    **최적화 강박 (Optimization Bias)**: 엔지니어는 '최적'을 추구합니다. 하지만 투자는 '최적'이 불가능합니다. 완벽함을 추구하다가 아무것도 못 하는 함정에 빠집니다. DCA는 '최적'은 아니지만 '충분히 좋은' 방법입니다.
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. S&P500에서 최고 수익 10일을 빠뜨렸을 때 20년 수익은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 9.7%에서 8.5%로 감소</li>
+<li onclick="checkAnswer(this,'q1',true)">② 9.7%에서 4.0%로 감소 (60% 손실)</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 9.7%에서 6.0%로 감소</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 영향 없음</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>단 10일 = 20년의 40% 손실입니다. 최고 수익 날짜는 무작위에 가까우므로 예측 불가능합니다. 따라서 '시장을 피했다가 복귀'하려는 전략은 대부분 실패합니다.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 달러 코스트 평균법(DCA)의 장점은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 최고의 수익을 보장</li>
+<li onclick="checkAnswer(this,'q2',true)">② 저가에서 자동으로 많이, 고가에서 적게 매수</li>
+<li onclick="checkAnswer(this,'q2',false)">③ 타이밍을 완벽하게 맞춤</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 손실을 완전히 피함</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ②</strong><br>DCA는 '최적'은 아니지만 '충분히 좋은' 방법입니다. 가격이 낮으면 더 많은 주를 구매하고, 높으면 적게 구매합니다.</div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. 평균 회귀 원칙의 문제점은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 평균으로 돌아오지 않음</li>
+<li onclick="checkAnswer(this,'q3',true)">② 언제 돌아올지 예측 불가능</li>
+<li onclick="checkAnswer(this,'q3',false)">③ 모든 주식에 적용 불가</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 신뢰도가 0%</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ②</strong><br>주가는 결국 평균으로 돌아옵니다. 하지만 3개월일 수도, 3년일 수도 있습니다. 시간을 예측할 수 없습니다.</div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. 투자 성공의 몇 %가 심리/감정인가?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① 20%</li>
+<li onclick="checkAnswer(this,'q4',false)">② 50%</li>
+<li onclick="checkAnswer(this,'q4',true)">③ 80%</li>
+<li onclick="checkAnswer(this,'q4',false)">④ 100%</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ③</strong><br>투자의 80%는 심리 게임입니다. 분석과 통계는 20%에 불과합니다. 감정 제어가 가장 중요합니다.</div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. 시장 사이클의 첫 번째 단계는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',false)">① 희망</li>
+<li onclick="checkAnswer(this,'q5',true)">② 절망 (공포)</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 낙관</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 욕심</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ②</strong><br>약세장 심화 단계입니다. 이 때 매수를 시작하는 것이 최고 수익을 얻는 방법입니다.</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 12</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 19일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 21일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 25일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">04월 01일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 17일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day11_technical_analysis.html">← Day 11</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 12 / 23</span>
+  <a class="nav-btn" href="day13_kospi_discount.html">Day 13 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 16 | 내 집 전략 — 갈아타기 시뮬레이션 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #B5B3AB;
+  --text-dim: #8A8880;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 16 / 23</span>
+    <span class="header-title">내 집 전략 — 갈아타기 시뮬레이션</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 3 · 부동산 & 자산 배분</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 3 — 부동산 & 자산 배분</div>
+  <h1 class="hero-day">Day 16</h1>
+  <h2 class="hero-subtitle">내 집 전략 — 갈아타기 시뮬레이션</h2>
+  <p class="hero-quote">"내 집을 파는 것은 단순히 "집 가격"의 문제가 아니다. 모든 변수를 계산할 때만 수십억 원의 기회 비용을 피할 수 있다."</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 3: 15~19</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:69.6%"></div></div>
+    <div class="progress-label"><span>Day 16</span><span>16 / 23 완료 (69.6%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 주택 교환이 정말 이득일까?</h3>
+    <p>주택 거래비용은 총 매매가의 11% 이상입니다. 기회비용까지 포함하면 위치/환경 개선이 매우 커야만 정당화됩니다. 감정적 결정이 아닌 재무적 분석이 필수입니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">0–5분</td><td>주택 거래의 숨겨진 비용 이해</td><td>비용 분석</td></tr>
+<tr><td class="time-col">5–12분</td><td>기존 주택 매도 vs 신규 주택 매수 전략</td><td>수식</td></tr>
+<tr><td class="time-col">12–18분</td><td>4억 구성원리금 vs 신규 주택담보대출 비교</td><td>시뮬레이션</td></tr>
+<tr><td class="time-col">18–22분</td><td>양도소득세/중개수수료/이사비 계산</td><td>전수 분석</td></tr>
+<tr><td class="time-col">22–25분</td><td>최종 의사결정: 현주택 유지 vs 교환</td><td>행동 계획</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">내 집 전략 — 갈아타기 시뮬레이션</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">주택 거래비용의 숨겨진 항목들</div>
+      <div class="card-body"><p>주택 가격만 생각하면 안 됩니다. 거래비용, 세금, 이사비 등이 깊숨게 손실을 만듭니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">7억 주택 매도 시 소요 비용:</div>
+<div class="formula-line">  양도소득세 (누진): ~0.3억 (4.3%)</div>
+<div class="formula-line">  중개수수료: ~0.21억 (3%)</div>
+<div class="formula-line">  이사비: ~0.5백만</div>
+<div class="formula-line">  가정처분비: ~0.5백만</div>
+<div class="formula-line">  인장등록: ~0.05백만</div>
+<div class="formula-line">  ─────────────</div>
+<div class="formula-line">  총 비용: ~0.55억 (7.9%!)</div>
+<div class="formula-line"></div>
+<div class="formula-line">신규 주택 5억 매수 시:</div>
+<div class="formula-line">  취득세: ~0.075억 (1.5%)</div>
+<div class="formula-line">  중개수수료: ~0.1억 (2%)</div>
+<div class="formula-line">  ─────────────</div>
+<div class="formula-line">  총 비용: ~0.175억 (3.5%)</div>
+<div class="formula-line"></div>
+<div class="formula-highlight">교환 총 비용:</div>
+<div class="formula-line">  0.55 + 0.175 = <span class="formula-highlight">약 0.725억 (11.4%!)</span></div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">기존 주택 매도 가능액 계산</div>
+      <div class="card-body"><p>주택 가격 7억이라고 해서 7억을 받을 수 없습니다. 거래비용과 세금을 먼저 빼야 합니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">실제 수령액 계산:</div>
+<div class="formula-line">  주택 매도가: 7억</div>
+<div class="formula-line">  - 양도소득세: -0.3억</div>
+<div class="formula-line">  - 중개수수료 3%: -0.21억</div>
+<div class="formula-line">  - 이사비 등: -0.05억</div>
+<div class="formula-line">  ─────────────</div>
+<div class="formula-line">  실제 현금: <span class="formula-highlight">약 6.44억</span></div>
+<div class="formula-line"></div>
+<div class="formula-line">⚠️ 7억 주택은 실제로 6.44억만 가치</div>
+<div class="formula-line">   (약 8% 손실)</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">신규 주택 구매 자금 흐름</div>
+      <div class="card-body"><p>5억 신규 주택 구매 시 어떤 자금이 필요한가를 정확히 계산해야 합니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>항목</th><th>5억 주택</th><th>6억 주택</th></tr></thead>
+<tbody>
+<tr><td><strong>매매가</strong></td><td>5억</td><td>6억</td></tr>
+<tr><td>취득세 (1.5%)</td><td>0.075억</td><td>0.09억</td></tr>
+<tr><td>중개수수료 (2%)</td><td>0.1억</td><td>0.12억</td></tr>
+<tr><td>기타 비용</td><td>0.05억</td><td>0.06억</td></tr>
+<tr><td>소계</td><td>5.225억</td><td>6.27억</td></tr>
+<tr><td><strong>대출 필요액</strong></td><td>기존 4억 + 신규</td><td>기존 4억 + 신규</td></tr>
+</tbody>
+</table>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">양도소득세 계산의 함정</div>
+      <div class="card-body"><p>취득가와 현재가의 차이에만 세금이 붙습니다. 취득가를 제대로 알아야 합니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">양도소득세 계산:</div>
+<div class="formula-line">  매도가: 7억</div>
+<div class="formula-line">  - 취득가: 4.5억 (10년 전)</div>
+<div class="formula-line">  = 양도소득: 2.5억</div>
+<div class="formula-line"></div>
+<div class="formula-line">  누진세율 (종합소득 포함):</div>
+<div class="formula-line">  기본세율: 6% (장기보유 감면 후)</div>
+<div class="formula-line">  누진층 추가: 10%</div>
+<div class="formula-line">  ─────────────</div>
+<div class="formula-line">  예상 세금: 2.5억 × 12% = 0.3억</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">최종 의사결정: DSR과 기회비용 종합 분석</div>
+      <div class="card-body"><p>단순히 '더 좋은 집'이 아니라 재무적 영향을 종합 분석해야 합니다.</p>
+<div class="formula-block">
+<div class="formula-highlight">시나리오 비교:</div>
+<div class="formula-line">① 현주택 유지 (7억)</div>
+<div class="formula-line">   매월: 원리금 150만원</div>
+<div class="formula-line">   2년 후 순자산: 3.5억 + (7억 - 0.4억) = 10.1억</div>
+<div class="formula-line"></div>
+<div class="formula-line">② 신규 주택 교환 (5억 → 신규)</div>
+<div class="formula-line">   비용 손실: -0.725억</div>
+<div class="formula-line">   매월: 원리금 150~200만원 (새 대출)</div>
+<div class="formula-line">   2년 후 순자산: 3.5억 + 0.725억손실 = 2.775억</div>
+<div class="formula-line">   ⚠️ 교환 비용 때문에 손실 발생!</div>
+<div class="formula-line"></div>
+<div class="formula-highlight">결론:</div>
+<div class="formula-line">위치/환경 개선값이 0.725억 이상이 아니면</div>
+<div class="formula-line">현주택 유지가 재무적으로 유리합니다.</div>
+</div></div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  <div class="chart-container"><svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="400" fill="#12151C" />
+  <text x="450" y="30" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" text-anchor="middle" font-weight="600">주택 교환 비용 분석 — 숨겨진 7억 손실</text>
+  <!-- 기존 주택 매도 -->
+  <rect x="80" y="80" width="150" height="50" fill="#4A9EBF" opacity="0.6" />
+  <text x="155" y="105" font-family="var(--font-body)" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="600">매도가</text>
+  <text x="155" y="125" font-family="var(--font-mono)" font-size="12" fill="#4A9EBF" text-anchor="middle">7억</text>
+  <!-- 비용들 -->
+  <g>
+    <rect x="250" y="80" width="130" height="30" fill="#BF4A4A" opacity="0.5" />
+    <text x="315" y="100" font-family="var(--font-mono)" font-size="10" fill="#E8E6E1" text-anchor="middle">양도소득세</text>
+    <text x="315" y="115" font-family="var(--font-mono)" font-size="9" fill="#BF4A4A" text-anchor="middle">-0.3억</text>
+  </g>
+  <g>
+    <rect x="250" y="120" width="130" height="30" fill="#BF4A4A" opacity="0.5" />
+    <text x="315" y="140" font-family="var(--font-mono)" font-size="10" fill="#E8E6E1" text-anchor="middle">중개수수료</text>
+    <text x="315" y="155" font-family="var(--font-mono)" font-size="9" fill="#BF4A4A" text-anchor="middle">-0.21억</text>
+  </g>
+  <g>
+    <rect x="250" y="160" width="130" height="30" fill="#BF4A4A" opacity="0.5" />
+    <text x="315" y="180" font-family="var(--font-mono)" font-size="10" fill="#E8E6E1" text-anchor="middle">이사비 등</text>
+    <text x="315" y="195" font-family="var(--font-mono)" font-size="9" fill="#BF4A4A" text-anchor="middle">-0.05억</text>
+  </g>
+  <!-- 실제 수령액 -->
+  <rect x="420" y="100" width="140" height="80" fill="#4ABF7A" opacity="0.6" />
+  <text x="490" y="130" font-family="var(--font-body)" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="600">실제</text>
+  <text x="490" y="150" font-family="var(--font-body)" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="600">수령액</text>
+  <text x="490" y="170" font-family="var(--font-mono)" font-size="14" fill="#4ABF7A" text-anchor="middle" font-weight="600">6.44억</text>
+  <!-- 신규 주택 매수비용 -->
+  <rect x="600" y="80" width="120" height="50" fill="#4A9EBF" opacity="0.6" />
+  <text x="660" y="105" font-family="var(--font-body)" font-size="12" fill="#E8E6E1" text-anchor="middle">신규 매수</text>
+  <text x="660" y="125" font-family="var(--font-mono)" font-size="12" fill="#4A9EBF" text-anchor="middle">-0.175억</text>
+  <!-- 손실액 -->
+  <rect x="300" y="280" width="300" height="80" fill="#BF4A4A" opacity="0.3" stroke="#BF4A4A" stroke-width="2" rx="4" />
+  <text x="450" y="310" font-family="var(--font-body)" font-size="13" fill="#BF4A4A" text-anchor="middle" font-weight="600">총 거래 비용</text>
+  <text x="450" y="330" font-family="var(--font-mono)" font-size="14" fill="#BF4A4A" text-anchor="middle" font-weight="600">약 0.725억</text>
+  <text x="450" y="350" font-family="var(--font-mono)" font-size="11" fill="#BF4A4A" text-anchor="middle">(매매가의 11.4%!)</text>
+</svg></div><div class="chart-container"><svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="400" fill="#12151C" />
+  <text x="450" y="30" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" text-anchor="middle" font-weight="600">2년 후 순자산 비교</text>
+  <!-- 바 1: 현주택 유지 -->
+  <rect x="100" y="100" width="120" height="200" fill="#4ABF7A" opacity="0.6" />
+  <text x="160" y="150" font-family="var(--font-body)" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="600">현주택</text>
+  <text x="160" y="170" font-family="var(--font-body)" font-size="12" fill="#E8E6E1" text-anchor="middle">유지</text>
+  <text x="160" y="300" font-family="var(--font-mono)" font-size="13" fill="#4ABF7A" text-anchor="middle" font-weight="600">10.1억</text>
+  <!-- 바 2: 주택 교환 -->
+  <rect x="250" y="240" width="120" height="60" fill="#BF4A4A" opacity="0.6" />
+  <text x="310" y="265" font-family="var(--font-body)" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="600">교환</text>
+  <text x="310" y="300" font-family="var(--font-mono)" font-size="13" fill="#BF4A4A" text-anchor="middle" font-weight="600">2.8억</text>
+  <!-- 차이 -->
+  <line x1="400" y1="300" x2="550" y2="300" stroke="#C9A84C" stroke-width="2" stroke-dasharray="5,5" />
+  <text x="475" y="320" font-family="var(--font-mono)" font-size="11" fill="#C9A84C" text-anchor="middle" font-weight="600">-7.3억 손실</text>
+  <!-- 설명 -->
+  <rect x="600" y="100" width="280" height="220" fill="#1A1E2A" stroke="#C9A84C" stroke-width="2" rx="4" />
+  <text x="615" y="130" font-family="var(--font-body)" font-size="12" fill="#C9A84C" font-weight="600">의사결정 기준</text>
+  
+  <text x="615" y="160" font-family="var(--font-body)" font-size="11" fill="#4ABF7A" font-weight="600">✓ 현주택 유지</text>
+  <text x="625" y="180" font-family="var(--font-body)" font-size="10" fill="#B5B3AB">- 거래비용 없음</text>
+  <text x="625" y="195" font-family="var(--font-body)" font-size="10" fill="#B5B3AB">- 대출금 감소</text>
+  
+  <text x="615" y="225" font-family="var(--font-body)" font-size="11" fill="#BF4A4A" font-weight="600">✗ 주택 교환</text>
+  <text x="625" y="245" font-family="var(--font-body)" font-size="10" fill="#B5B3AB">위치 개선 > 0.725억</text>
+  <text x="625" y="260" font-family="var(--font-body)" font-size="10" fill="#B5B3AB">아니면 재무적 손실</text>
+</svg></div><div class="chart-container"><svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="400" fill="#12151C" />
+  <text x="450" y="30" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" text-anchor="middle" font-weight="600">DSR 변화 — 신규 대출의 영향</text>
+  <!-- 현재 DSR -->
+  <rect x="100" y="150" width="150" height="100" fill="#4ABF7A" opacity="0.6" />
+  <text x="175" y="180" font-family="var(--font-body)" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="600">현재</text>
+  <text x="175" y="200" font-family="var(--font-mono)" font-size="13" fill="#4ABF7A" text-anchor="middle" font-weight="600">DSR</text>
+  <text x="175" y="225" font-family="var(--font-mono)" font-size="14" fill="#4ABF7A" text-anchor="middle" font-weight="600">15%</text>
+  <!-- 신규 대출 -->
+  <rect x="280" y="150" width="150" height="150" fill="#BF4A4A" opacity="0.6" />
+  <text x="355" y="180" font-family="var(--font-body)" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="600">신규</text>
+  <text x="355" y="200" font-family="var(--font-body)" font-size="12" fill="#E8E6E1" text-anchor="middle">대출</text>
+  <text x="355" y="230" font-family="var(--font-mono)" font-size="13" fill="#BF4A4A" text-anchor="middle" font-weight="600">DSR</text>
+  <text x="355" y="255" font-family="var(--font-mono)" font-size="14" fill="#BF4A4A" text-anchor="middle" font-weight="600">28%</text>
+  <!-- 추가 금융상품 -->
+  <rect x="460" y="150" width="150" height="180" fill="#C9A84C" opacity="0.6" />
+  <text x="535" y="180" font-family="var(--font-body)" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="600">신용</text>
+  <text x="535" y="200" font-family="var(--font-body)" font-size="12" fill="#E8E6E1" text-anchor="middle">대출</text>
+  <text x="535" y="230" font-family="var(--font-mono)" font-size="13" fill="#C9A84C" text-anchor="middle" font-weight="600">DSR</text>
+  <text x="535" y="255" font-family="var(--font-mono)" font-size="14" fill="#C9A84C" text-anchor="middle" font-weight="600">38%</text>
+  <!-- 제약선 -->
+  <line x1="650" y1="130" x2="850" y2="130" stroke="#BF4A4A" stroke-width="2" stroke-dasharray="3,3" />
+  <text x="750" y="120" font-family="var(--font-mono)" font-size="10" fill="#BF4A4A" text-anchor="middle">금융당국 한계 (40%)</text>
+  <!-- 정보박스 -->
+  <rect x="600" y="250" width="270" height="120" fill="#1A1E2A" stroke="#C9A84C" stroke-width="2" rx="4" />
+  <text x="615" y="275" font-family="var(--font-body)" font-size="11" fill="#C9A84C" font-weight="600">DSR 영향</text>
+  <text x="615" y="300" font-family="var(--font-body)" font-size="10" fill="#B5B3AB">신규 대출 시 DSR 상승</text>
+  <text x="615" y="318" font-family="var(--font-body)" font-size="10" fill="#B5B3AB">→ 향후 추가 대출 불가</text>
+  <text x="615" y="336" font-family="var(--font-body)" font-size="10" fill="#B5B3AB">→ 재무 유연성 감소</text>
+</svg></div>
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 1: 기회비용 계산의 함정</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p>주택 교환의 의사결정은 단순히 '더 좋은 집'의 문제가 아닙니다. 0.725억의 거래비용 자체가 기회비용이 됩니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>예시:</strong> 0.725억을 주식 투자했다면 연 8% 수익으로 10년 후 1.56억이 됩니다. 하지만 주택 교환으로 사용하면 그 기회는 영구히 상실됩니다.</p>
+  </div>
+</details>
+
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 2: 양도소득세의 누진성</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p>양도소득이 크면 누진세로 인해 세금이 가파르게 올라갑니다. 또한 종합소득에 포함되어 다른 소득과의 누진층이 결정됩니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>중요:</strong> 양도소득세 계산 전에 취득가를 정확히 알아야 합니다. 취득가 증명 서류(계약서, 이전등기부 등)가 필요합니다.</p>
+  </div>
+</details>
+
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 3: DSR의 미래 제약</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p>신규 대출로 DSR이 28%가 되면, 앞으로 추가 대출이 거의 불가능해집니다. 신용카드, 자동차 할부, 전세금까지 모두 DSR에 포함됩니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>문제:</strong> 현재 15% DSR은 매우 건전합니다. 이를 28%로 올리는 것은 미래 재무 유연성을 크게 제약합니다. 긴급자금이 필요할 때 대출받을 수 없습니다.</p>
+  </div>
+</details>
+
+<details>
+  <summary style="cursor: pointer; font-weight: 600; color: var(--gold); padding: 1rem; background: var(--bg-card); border-radius: 6px; margin-bottom: 1rem;">🧠 Deep Dive 4: 엔지니어의 '위치' 강박</summary>
+  <div style="padding: 1rem; background: var(--bg-accent); border-left: 3px solid var(--blue); margin-top: 0.5rem; border-radius: 4px;">
+    <p><strong>뇌과학:</strong> 엔지니어들은 '최적화'를 추구합니다. 자신의 집도 '최적의 위치'여야 한다고 생각합니다. 하지만 0.725억의 비용이 '위치 개선'으로 돌아와야 정당성이 있습니다.</p>
+    <p style="margin-top: 0.8rem;"><strong>예방:</strong> 현주택의 '충분함'을 인정하고, 재무적 손실이 없을 때만 교환합니다. 감정적 '원함'과 재무적 '필요'를 분리합니다.</p>
+  </div>
+</details>
+
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  <div style="background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06)); border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;"><h3 style="font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem;">📊 주택 교환 계산기</h3><p style="font-size:0.9rem; color:var(--text-secondary);">현주택 가격, 신규 주택 가격, 취득가를 입력하여 실제 수령액과 비용을 계산해봅시다.</p></div>
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    **위치 강박 (Location Obsession)**: 엔지니어들은 '최적'을 추구합니다. 집의 위치도 '최적'이어야 한다고 생각합니다. 하지만 현재 위치의 '충분함'을 인정해야 합니다. 0.725억의 거래비용이 위치 개선으로 돌아오지 않으면 재무적 손실입니다.
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 7억 주택 매도 시 실제 수령액은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 7억원</li>
+<li onclick="checkAnswer(this,'q1',false)">② 6.7억원</li>
+<li onclick="checkAnswer(this,'q1',true)">③ 6.44억원</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 6억원</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ③</strong><br>양도소득세 0.3억 + 중개수수료 0.21억 + 기타비용 0.05억 = 0.56억 손실. 따라서 약 6.44억만 실제 수령합니다.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 주택 교환의 총 거래비용은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 0.3억 (양도소득세만)</li>
+<li onclick="checkAnswer(this,'q2',false)">② 0.375억 (기존+신규)</li>
+<li onclick="checkAnswer(this,'q2',true)">③ 0.725억 (총합)</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 1억 이상</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ③</strong><br>매도비용 0.55억 + 매수비용 0.175억 = 총 0.725억. 이는 거래하는 7억 + 5억의 약 11.4%에 해당합니다.</div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. 2년 후 순자산 비교에서 손실액은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 약 2억</li>
+<li onclick="checkAnswer(this,'q3',false)">② 약 5억</li>
+<li onclick="checkAnswer(this,'q3',true)">③ 약 7.3억</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 거래비용만 손실</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ③</strong><br>현주택 유지 시 10.1억 vs 교환 시 2.8억. 차이는 약 7.3억으로, 거래비용만이 아니라 향후 자산 증대 기회도 상실합니다.</div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. 신규 대출로 DSR이 28%가 되면?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① 문제없음</li>
+<li onclick="checkAnswer(this,'q4',true)">② 추가 대출 거의 불가능</li>
+<li onclick="checkAnswer(this,'q4',false)">③ 세금 감면</li>
+<li onclick="checkAnswer(this,'q4',false)">④ 대출금리 인하</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ②</strong><br>금융당국 한계는 40%입니다. 28%면 신용카드, 자동차 할부 등으로 쉽게 40%를 넘게 됩니다. 재무 유연성이 크게 제약됩니다.</div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. 주택 교환의 가장 큰 숨겨진 비용은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',false)">① 양도소득세</li>
+<li onclick="checkAnswer(this,'q5',true)">② 기회비용 (투자 기회 상실)</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 이사비</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 중개수수료</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ②</strong><br>0.725억을 매도/매수에 쓰지 않고 투자했다면 10년 후 1.56억 이상이 될 수 있습니다. 이 영구적 기회 상실이 가장 큰 비용입니다.</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 16</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 23일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 25일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 29일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">04월 05일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 21일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day15_real_estate_cycle.html">← Day 15</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 16 / 23</span>
+  <a class="nav-btn" href="day17_rebalancing.html">Day 17 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

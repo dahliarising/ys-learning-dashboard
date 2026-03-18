@@ -1,1784 +1,587 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Day 13 - 스토아 철학: 통제의 이분법 | 인간 탐구 시리즈</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg: #F5F0EB;
-            --bg2: #EDE7DF;
-            --card: #FFFFFF;
-            --card-hover: #FAFAF7;
-            --text1: #2C2C2C;
-            --text2: #6B6B6B;
-            --text3: #999999;
-            --accent: #3D5A80;
-            --accent-light: #E8EEF4;
-            --warm: #D4A373;
-            --warm-light: #FFF3E6;
-            --sage: #7A9E7E;
-            --sage-light: #EDF5EE;
-            --coral: #C1666B;
-            --coral-light: #FBEAEB;
-            --border: rgba(0, 0, 0, 0.06);
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
-            --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.05);
-            --font-display: 'Playfair Display', Georgia, serif;
-            --font-body: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-mono: 'IBM Plex Mono', 'Menlo', monospace;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: var(--font-body);
-            background-color: var(--bg);
-            color: var(--text1);
-            line-height: 1.9;
-            font-size: 1rem;
-            letter-spacing: -0.01em;
-        }
-        .container {
-            max-width: 720px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
-        .header {
-            position: sticky;
-            top: 0;
-            background: rgba(245, 240, 235, 0.95);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid var(--border);
-            z-index: 100;
-            padding: 1rem 0;
-        }
-        .progress-bar {
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent) 59.1%, var(--bg2) 59.1%);
-            margin-bottom: 1rem;
-        }
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-            color: var(--text2);
-            font-family: var(--font-mono);
-            letter-spacing: 0.08em;
-        }
-        .header-nav {
-            display: flex;
-            gap: 1.5rem;
-        }
-        .header-nav a {
-            color: var(--text2);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        .header-nav a:hover { color: var(--accent); }
-        h1 {
-            font-family: var(--font-display);
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin: 3rem 0 1rem 0;
-            color: var(--text1);
-        }
-        h2 {
-            font-family: var(--font-display);
-            font-size: 1.6rem;
-            font-weight: 600;
-            margin: 2.5rem 0 1rem 0;
-            color: var(--text1);
-        }
-        h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin: 1.5rem 0 0.8rem 0;
-            color: var(--text1);
-        }
-        p {
-            margin-bottom: 1.5rem;
-            text-align: justify;
-        }
-        .label {
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--text3);
-            margin-bottom: 0.5rem;
-        }
-        .hook-section {
-            background: linear-gradient(135deg, var(--accent-light) 0%, var(--warm-light) 100%);
-            border-radius: 16px;
-            padding: 3rem 2.4rem;
-            margin: 3rem 0;
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-        .hook-section h2 {
-            margin-top: 0;
-            color: var(--accent);
-            font-size: 1.8rem;
-        }
-        .hook-section p {
-            font-size: 1.1rem;
-            color: var(--text1);
-            font-weight: 500;
-        }
-        .card {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 2.4rem;
-            margin: 2rem 0;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-        .card:hover {
-            background: var(--card-hover);
-            box-shadow: var(--shadow-hover);
-        }
-        .insight {
-            background: var(--sage-light);
-            border-left: 4px solid var(--sage);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 8px;
-        }
-        .insight-label {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--sage);
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-        .insight p {
-            margin: 0;
-            color: var(--text1);
-            font-weight: 500;
-        }
-        .concept-cards {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        .concept-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.8rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .concept-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-        }
-        .concept-card-front {
-            font-weight: 600;
-            color: var(--accent);
-            font-size: 1.05rem;
-            margin-bottom: 0.8rem;
-        }
-        .concept-card-back {
-            display: none;
-            color: var(--text2);
-            line-height: 1.8;
-        }
-        .concept-card.expanded .concept-card-front {
-            display: none;
-        }
-        .concept-card.expanded .concept-card-back {
-            display: block;
-        }
-        .diagram-container {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid var(--border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .diagram-caption {
-            font-size: 0.9rem;
-            color: var(--text2);
-            margin-top: 1rem;
-            text-align: center;
-            font-style: italic;
-        }
-        svg { max-width: 100%; height: auto; }
-        .scenario-box {
-            background: var(--warm-light);
-            border-left: 4px solid var(--warm);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 8px;
-        }
-        .scenario-box h4 {
-            color: var(--warm);
-            font-weight: 600;
-            margin-bottom: 0.8rem;
-        }
-        .scenario-box p {
-            margin: 0.6rem 0;
-            color: var(--text2);
-        }
-        .quiz-section {
-            background: var(--accent-light);
-            border-radius: 16px;
-            padding: 2.4rem;
-            margin: 3rem 0;
-            border: 1px solid var(--border);
-        }
-        .quiz-question {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border: 1px solid var(--border);
-        }
-        .quiz-question h4 {
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--text1);
-        }
-        .quiz-options {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-        .quiz-option {
-            background: var(--bg2);
-            padding: 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-        .quiz-option:hover {
-            background: var(--accent-light);
-            border-color: var(--accent);
-        }
-        .quiz-option input[type="radio"] {
-            margin-right: 0.5rem;
-        }
-        .practice-section {
-            background: var(--sage-light);
-            border-radius: 16px;
-            padding: 2.4rem;
-            margin: 3rem 0;
-            border: 1px solid var(--border);
-        }
-        .practice-item {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin: 1rem 0;
-            border-left: 4px solid var(--sage);
-        }
-        .practice-item h4 {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--sage);
-        }
-        .practice-item p {
-            margin: 0;
-            font-size: 0.95rem;
-            color: var(--text2);
-        }
-        .philosophy-section {
-            background: linear-gradient(135deg, var(--warm-light) 0%, var(--accent-light) 100%);
-            border-radius: 16px;
-            padding: 2.4rem;
-            margin: 3rem 0;
-            border: 1px solid var(--border);
-        }
-        .philosophy-quote {
-            font-size: 1.15rem;
-            font-style: italic;
-            color: var(--text1);
-            margin: 1.5rem 0;
-            padding-left: 1.5rem;
-            border-left: 4px solid var(--warm);
-        }
-        .philosopher-name {
-            font-weight: 600;
-            color: var(--text1);
-            margin-top: 1rem;
-        }
-        .matrix-table {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border: 1px solid var(--border);
-        }
-        .matrix-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .matrix-table th,
-        .matrix-table td {
-            padding: 1rem;
-            text-align: left;
-            border: 1px solid var(--border);
-        }
-        .matrix-table th {
-            background: var(--bg2);
-            font-weight: 600;
-            color: var(--accent);
-        }
-        .matrix-table td {
-            color: var(--text2);
-        }
-        .locus-control {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin: 1.5rem 0;
-        }
-        .locus-item {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 2px solid var(--border);
-        }
-        .locus-item.internal {
-            border-color: var(--sage);
-        }
-        .locus-item.external {
-            border-color: var(--coral);
-        }
-        .locus-item h4 {
-            font-weight: 600;
-            margin-bottom: 0.8rem;
-        }
-        .locus-item.internal h4 {
-            color: var(--sage);
-        }
-        .locus-item.external h4 {
-            color: var(--coral);
-        }
-        .connection-map {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid var(--border);
-        }
-        .connection-item {
-            margin: 1rem 0;
-            padding: 0.8rem;
-            background: var(--bg2);
-            border-radius: 8px;
-            border-left: 3px solid var(--accent);
-        }
-        footer {
-            background: var(--bg2);
-            border-top: 1px solid var(--border);
-            padding: 3rem 0;
-            margin-top: 4rem;
-            text-align: center;
-            font-size: 0.9rem;
-            color: var(--text2);
-        }
-        .footer-content {
-            max-width: 720px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
-        @media (max-width: 768px) {
-            h1 { font-size: 1.8rem; }
-            h2 { font-size: 1.4rem; }
-            .hook-section { padding: 2rem 1.5rem; }
-            .card { padding: 1.5rem; }
-            .header-nav { gap: 1rem; }
-            .locus-control { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 480px) {
-            .container { padding: 0 1rem; }
-            h1 { font-size: 1.5rem; margin: 2rem 0 0.8rem 0; }
-            .hook-section { margin: 2rem 0; padding: 1.5rem; }
-            .card { margin: 1.5rem 0; padding: 1.2rem; }
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 13 — 스토아 철학: 통제의 이분법 | 인간 탐구 시리즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg:#F5F0EB;--bg2:#EDE7DF;--card:#FFFFFF;--card-hover:#FAFAF7;
+    --text1:#2C2C2C;--text2:#6B6B6B;--text3:#999;
+    --accent:#3D5A80;--accent-light:#E8EEF4;
+    --warm:#D4A373;--warm-light:#FFF3E6;
+    --sage:#7A9E7E;--sage-light:#EDF5EE;
+    --coral:#C1666B;--coral-light:#FBEAEB;
+    --border:rgba(0,0,0,0.06);
+    --shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.03);
+    --fd:'Playfair Display',Georgia,serif;
+    --fb:'Noto Sans KR',-apple-system,sans-serif;
+    --fm:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--fb);background:var(--bg);color:var(--text1);line-height:1.85;font-size:0.95rem;letter-spacing:-0.01em;}
+.wrap{max-width:680px;margin:0 auto;padding:0 1.5rem;}
 
-        /* ========== INTERACTIVE COMPONENTS CSS ========== */
-        
-        /* 1. Scroll Progress Bar */
-        .scroll-progress {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--sage) 0%, var(--accent) 100%);
-            width: 0%;
-            z-index: 1000;
-            transition: width 0.1s linear;
-        }
-        
-        /* 2. Box Breathing Guide */
-        .breathing-container {
-            background: var(--sage-light);
-            border-radius: 16px;
-            padding: 2.4rem;
-            margin: 2rem 0;
-            text-align: center;
-            border: 1px solid var(--sage);
-        }
-        .breathing-controls {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin: 1.5rem 0;
-        }
-        .breathing-btn {
-            background: var(--sage);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        .breathing-btn:hover {
-            opacity: 0.9;
-            transform: scale(1.05);
-        }
-        .breathing-btn.active {
-            background: var(--accent);
-        }
-        .breathing-circle {
-            width: 120px;
-            height: 120px;
-            margin: 2rem auto;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--sage) 0%, var(--accent) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            animation: breathing 16s infinite;
-        }
-        @keyframes breathing {
-            0% { transform: scale(1); opacity: 1; }
-            25% { transform: scale(1.3); opacity: 0.8; }
-            50% { transform: scale(1.3); opacity: 0.8; }
-            75% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .breathing-circle.paused {
-            animation: none;
-        }
-        .breathing-text {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--sage);
-            margin-top: 1rem;
-            min-height: 1.5rem;
-        }
-        
-        /* 3. Flashcards */
-        .flashcard-section {
-            margin: 2rem 0;
-        }
-        .flashcard-container {
-            perspective: 1000px;
-            height: 300px;
-            margin: 2rem 0;
-        }
-        .flashcard {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-            cursor: pointer;
-        }
-        .flashcard.flipped {
-            transform: rotateY(180deg);
-        }
-        .flashcard-front, .flashcard-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 16px;
-            padding: 2rem;
-            text-align: center;
-            font-weight: 600;
-        }
-        .flashcard-front {
-            background: var(--accent-light);
-            border: 2px solid var(--accent);
-            color: var(--accent);
-            font-size: 1.4rem;
-        }
-        .flashcard-back {
-            background: var(--warm-light);
-            border: 2px solid var(--warm);
-            color: var(--warm);
-            font-size: 1rem;
-            transform: rotateY(180deg);
-            flex-direction: column;
-            gap: 1rem;
-        }
-        .flashcard-nav {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin: 1.5rem 0;
-        }
-        .flashcard-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        .flashcard-btn:hover {
-            opacity: 0.9;
-            transform: scale(1.05);
-        }
-        .flashcard-counter {
-            text-align: center;
-            color: var(--text2);
-            font-size: 0.95rem;
-            margin: 1rem 0;
-        }
-        
-        /* 4. Scenario Choice Game */
-        .scenario-container {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 2.4rem;
-            margin: 2rem 0;
-            border: 1px solid var(--border);
-        }
-        .scenario-question {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text1);
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        .scenario-choices {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        .scenario-choice {
-            padding: 1.5rem;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: var(--card);
-        }
-        .scenario-choice:hover {
-            transform: scale(1.02);
-            box-shadow: var(--shadow-hover);
-        }
-        .scenario-choice-title {
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-            font-size: 1.05rem;
-        }
-        .scenario-choice-desc {
-            color: var(--text2);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-        .scenario-result {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            border-radius: 12px;
-            background: var(--accent-light);
-            border-left: 4px solid var(--accent);
-            display: none;
-        }
-        .scenario-result.show {
-            display: block;
-        }
-        
-        /* 5. Timer */
-        .timer-container {
-            background: var(--sage-light);
-            border-radius: 16px;
-            padding: 2rem;
-            margin: 2rem 0;
-            text-align: center;
-            border: 1px solid var(--sage);
-        }
-        .timer-display {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--sage);
-            font-family: var(--font-mono);
-            margin: 1.5rem 0;
-            min-height: 4rem;
-        }
-        .timer-choices {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin: 1.5rem 0;
-            flex-wrap: wrap;
-        }
-        .timer-btn {
-            background: var(--sage);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        .timer-btn:hover {
-            opacity: 0.9;
-            transform: scale(1.05);
-        }
-        .timer-btn.active {
-            background: var(--accent);
-        }
-        .timer-progress {
-            width: 100%;
-            height: 6px;
-            background: rgba(122, 158, 126, 0.2);
-            border-radius: 3px;
-            margin-top: 1.5rem;
-            overflow: hidden;
-        }
-        .timer-progress-fill {
-            height: 100%;
-            background: var(--sage);
-            width: 100%;
-            transition: width 0.1s linear;
-        }
-        
-        /* 6. Matching Game */
-        .matching-container {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 2.4rem;
-            margin: 2rem 0;
-            border: 1px solid var(--border);
-        }
-        .matching-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            margin: 2rem 0;
-        }
-        .matching-column {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        .matching-label {
-            font-weight: 700;
-            color: var(--accent);
-            font-size: 0.9rem;
-            text-align: center;
-            margin-bottom: 0.5rem;
-        }
-        .match-item {
-            padding: 1.2rem;
-            background: var(--accent-light);
-            border: 2px solid var(--accent);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            user-select: none;
-            text-align: center;
-            font-weight: 600;
-            color: var(--text1);
-        }
-        .match-item:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-hover);
-        }
-        .match-item.selected {
-            background: var(--warm-light);
-            border-color: var(--warm);
-            transform: scale(1.05);
-        }
-        .match-item.correct {
-            background: var(--sage-light);
-            border-color: var(--sage);
-        }
-        .match-item.incorrect {
-            background: var(--coral-light);
-            border-color: var(--coral);
-        }
-        .matching-result {
-            text-align: center;
-            margin-top: 1.5rem;
-            padding: 1rem;
-            border-radius: 8px;
-            display: none;
-            font-weight: 600;
-        }
-        .matching-result.show {
-            display: block;
-        }
-        .matching-result.success {
-            background: var(--sage-light);
-            color: var(--sage);
-        }
-        .matching-result.error {
-            background: var(--coral-light);
-            color: var(--coral);
-        }
+/* ── Slim Header ── */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(245,240,235,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
+.hdr-track{height:3px;background:var(--bg2);}
+.hdr-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--sage));transition:width .3s;}
+.hdr-inner{display:flex;justify-content:space-between;align-items:center;padding:0.4rem 1.5rem;max-width:680px;margin:0 auto;}
+.hdr-label{font-family:var(--fm);font-size:0.7rem;color:var(--text3);letter-spacing:0.06em;}
+.hdr-nav a{font-family:var(--fm);font-size:0.7rem;color:var(--text3);text-decoration:none;margin-left:1rem;}
+.hdr-nav a:hover{color:var(--accent);}
 
-            </style>
+/* ── Hero (compact) ── */
+.hero{padding:2.5rem 0 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
+.hero .day-num{font-family:var(--fm);font-size:0.7rem;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.4rem;}
+.hero h1{font-family:var(--fd);font-size:1.7rem;font-weight:700;color:var(--text1);line-height:1.25;margin-bottom:1rem;letter-spacing:-0.02em;}
+.hero .hook{font-size:1rem;color:var(--text2);line-height:1.75;font-style:italic;border-left:3px solid var(--warm);padding-left:1.2rem;}
+
+/* ── Section Spacing ── */
+section{margin-bottom:2.5rem;}
+.sec-label{font-family:var(--fm);font-size:0.65rem;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.3rem;}
+h2{font-family:var(--fd);font-size:1.25rem;font-weight:600;color:var(--accent);margin-bottom:1rem;line-height:1.3;}
+h3{font-size:1rem;font-weight:600;margin-bottom:0.6rem;color:var(--text1);}
+p{margin-bottom:1.2rem;color:var(--text2);}
+
+/* ── Insight Box ── */
+.insight{background:var(--accent-light);border-radius:10px;padding:1rem 1.3rem;margin:1.2rem 0;border-left:3px solid var(--accent);font-size:0.9rem;line-height:1.7;}
+.insight strong{color:var(--accent);}
+.insight.warm{background:var(--warm-light);border-color:var(--warm);}
+.insight.warm strong{color:var(--warm);}
+.insight.sage{background:var(--sage-light);border-color:var(--sage);}
+.insight.sage strong{color:var(--sage);}
+
+/* ── Pull Quote ── */
+.pq{font-size:1.05rem;font-style:italic;color:var(--text1);border-left:3px solid var(--warm);padding:0.6rem 0 0.6rem 1.3rem;margin:1.8rem 0;line-height:1.65;}
+.pq cite{display:block;font-size:0.75rem;font-style:normal;color:var(--text3);margin-top:0.4rem;font-family:var(--fm);}
+
+/* ── Stat Highlights ── */
+.stats{display:flex;gap:1rem;margin:1.5rem 0;flex-wrap:wrap;}
+.st{flex:1;min-width:120px;background:var(--card);border-radius:10px;padding:1rem;text-align:center;box-shadow:var(--shadow);}
+.st .n{font-family:var(--fd);font-size:1.6rem;font-weight:700;color:var(--accent);}
+.st .d{font-size:0.75rem;color:var(--text3);margin-top:0.2rem;}
+
+/* ── 2-Col Grid ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin:1.2rem 0;}
+.gi{background:var(--card);border-radius:10px;padding:1rem;box-shadow:var(--shadow);}
+.gi h4{font-size:0.85rem;font-weight:600;color:var(--accent);margin-bottom:0.3rem;}
+.gi p{font-size:0.82rem;color:var(--text2);margin:0;line-height:1.6;}
+
+/* ── Compare ── */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:1.5rem 0;border-radius:10px;overflow:hidden;box-shadow:var(--shadow);}
+.cmp-l{padding:1.2rem;background:var(--coral-light);}
+.cmp-r{padding:1.2rem;background:var(--sage-light);}
+.cmp h4{font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;}
+.cmp p{font-size:0.82rem;margin:0;line-height:1.6;}
+.cmp-l h4{color:var(--coral);}
+.cmp-r h4{color:var(--sage);}
+
+/* ── Card (accordion) ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);cursor:pointer;transition:all .25s;}
+.card:hover{box-shadow:var(--shadow),0 0 0 1px var(--accent-light);}
+.card-top{display:flex;justify-content:space-between;align-items:center;}
+.card-top h3{font-size:0.95rem;color:var(--accent);margin:0;}
+.card-arrow{font-size:0.8rem;color:var(--text3);transition:transform .3s;}
+.card-arrow.open{transform:rotate(180deg);}
+.card-body{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+.card-body.open{max-height:1500px;}
+.card-inner{padding-top:1rem;margin-top:1rem;border-top:1px solid var(--border);font-size:0.88rem;color:var(--text2);line-height:1.75;}
+.card-inner h4{font-size:0.88rem;font-weight:600;color:var(--text1);margin:1rem 0 0.4rem;}
+
+/* ── SVG Container ── */
+.svg-wrap{margin:1.5rem 0;text-align:center;}
+.svg-wrap svg{max-width:100%;height:auto;}
+.svg-cap{font-family:var(--fm);font-size:0.7rem;color:var(--text3);margin-top:0.5rem;text-align:center;}
+
+/* ── Practice ── */
+.practice{background:var(--card);border-radius:12px;padding:1.5rem;box-shadow:var(--shadow);margin:1.5rem 0;}
+.practice h3{color:var(--sage);font-size:0.95rem;}
+.practice-item{display:flex;gap:0.8rem;align-items:flex-start;margin-top:0.8rem;}
+.practice-badge{font-family:var(--fm);font-size:0.65rem;background:var(--sage-light);color:var(--sage);padding:0.2rem 0.6rem;border-radius:12px;white-space:nowrap;margin-top:0.1rem;}
+.practice-text{font-size:0.88rem;color:var(--text2);line-height:1.65;}
+
+/* ── Timer ── */
+.timer-box{background:var(--warm-light);border-radius:10px;padding:1rem;margin-top:1rem;text-align:center;}
+.timer-display{font-family:var(--fd);font-size:2rem;color:var(--warm);margin:0.5rem 0;}
+.timer-btns{display:flex;gap:0.5rem;justify-content:center;}
+.timer-btns button{font-family:var(--fb);font-size:0.8rem;padding:0.4rem 1rem;border:1px solid var(--warm);background:transparent;color:var(--warm);border-radius:20px;cursor:pointer;transition:all .2s;}
+.timer-btns button:hover{background:var(--warm);color:#fff;}
+.timer-btns button.active{background:var(--warm);color:#fff;}
+
+/* ── Breathing ── */
+.breath-box{text-align:center;margin:1rem 0;}
+#breathC{width:100px;height:100px;border-radius:50%;background:var(--sage-light);border:2px solid var(--sage);margin:0 auto 0.8rem;display:flex;align-items:center;justify-content:center;transition:all 1s ease;font-family:var(--fm);font-size:0.75rem;color:var(--sage);}
+#breathB{font-family:var(--fb);font-size:0.8rem;background:var(--sage);color:#fff;border:none;padding:0.4rem 1.5rem;border-radius:20px;cursor:pointer;}
+
+/* ── Flashcard ── */
+.fc-wrap{perspective:800px;max-width:400px;margin:0 auto;}
+.fc{position:relative;width:100%;height:200px;cursor:pointer;transform-style:preserve-3d;transition:transform .5s;}
+.fc.flip{transform:rotateY(180deg);}
+.fc-f,.fc-b{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;box-shadow:var(--shadow);}
+.fc-f{background:var(--card);border:1px solid var(--border);}
+.fc-b{background:var(--accent);color:#fff;transform:rotateY(180deg);}
+.fc-f .term{font-size:1.1rem;font-weight:600;color:var(--accent);text-align:center;}
+.fc-f .hint{font-size:0.7rem;color:var(--text3);margin-top:0.8rem;font-family:var(--fm);}
+.fc-b .def{font-size:0.9rem;text-align:center;line-height:1.6;}
+.fc-nav{display:flex;justify-content:center;gap:0.8rem;margin-top:1rem;}
+.fc-nav button{font-family:var(--fb);font-size:0.8rem;background:var(--bg2);border:1px solid var(--border);padding:0.35rem 1.2rem;border-radius:20px;cursor:pointer;}
+.fc-counter{font-family:var(--fm);font-size:0.75rem;color:var(--text3);display:flex;align-items:center;}
+
+/* ── Scenario ── */
+.sc-box{background:var(--card);border-radius:12px;padding:1.5rem;box-shadow:var(--shadow);}
+.sc-q{font-size:0.95rem;color:var(--text1);margin-bottom:1rem;line-height:1.7;}
+.sc-opt{padding:0.8rem 1rem;border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;cursor:pointer;font-size:0.88rem;color:var(--text2);transition:all .2s;line-height:1.6;}
+.sc-opt:hover{border-color:var(--accent);background:var(--accent-light);}
+.sc-opt.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
+.sc-result{display:none;margin-top:1rem;padding:1rem;border-radius:8px;font-size:0.85rem;line-height:1.7;}
+.sc-result.show{display:block;}
+.sc-result.good{background:var(--sage-light);color:var(--sage);}
+.sc-result.ok{background:var(--warm-light);color:var(--warm);}
+.sc-result.bad{background:var(--coral-light);color:var(--coral);}
+
+/* ── Quiz ── */
+.quiz-q{background:var(--card);border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);}
+.quiz-q p{font-size:0.9rem;font-weight:500;color:var(--text1);margin-bottom:0.8rem;}
+.quiz-opt{display:block;padding:0.6rem 1rem;border:1px solid var(--border);border-radius:8px;margin-bottom:0.4rem;cursor:pointer;font-size:0.85rem;color:var(--text2);transition:all .2s;}
+.quiz-opt:hover{border-color:var(--accent);}
+.quiz-opt.correct{background:var(--sage-light);border-color:var(--sage);color:var(--sage);}
+.quiz-opt.wrong{background:var(--coral-light);border-color:var(--coral);color:var(--coral);}
+.quiz-fb{display:none;font-size:0.82rem;padding:0.8rem;border-radius:8px;margin-top:0.5rem;line-height:1.6;}
+.quiz-fb.show{display:block;background:var(--accent-light);color:var(--accent);}
+
+/* ── Matching ── */
+.match-area{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin:1rem 0;}
+.match-item{padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.82rem;text-align:center;transition:all .2s;background:var(--card);}
+.match-item:hover{border-color:var(--accent);}
+.match-item.sel{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
+.match-item.done{border-color:var(--sage);background:var(--sage-light);color:var(--sage);cursor:default;}
+
+/* ── Connection ── */
+.conn{display:flex;justify-content:space-between;gap:0.5rem;margin:1rem 0;}
+.conn a{flex:1;text-align:center;padding:0.8rem;background:var(--card);border-radius:10px;text-decoration:none;box-shadow:var(--shadow);transition:all .2s;font-size:0.82rem;color:var(--text2);}
+.conn a:hover{box-shadow:var(--shadow),0 0 0 1px var(--accent);color:var(--accent);}
+.conn a .cn{font-family:var(--fm);font-size:0.65rem;color:var(--text3);display:block;margin-bottom:0.2rem;}
+
+/* ── Footer ── */
+.ftr{text-align:center;padding:2rem 0;border-top:1px solid var(--border);margin-top:2rem;font-size:0.75rem;color:var(--text3);}
+
+/* ── Responsive ── */
+@media(max-width:640px){
+    .hero h1{font-size:1.4rem;}
+    .g2,.cmp,.match-area{grid-template-columns:1fr;}
+    .stats{flex-direction:column;}
+    .conn{flex-direction:column;}
+}
+
+/* ── Fade In ── */
+.fi{opacity:0;transform:translateY(12px);transition:opacity .5s,transform .5s;}
+.fi.v{opacity:1;transform:none;}
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="container">
-            <div class="progress-bar"></div>
-            <div class="header-content">
-                <span>DAY 13 — 스토아 철학: 통제의 이분법</span>
-                <div class="header-nav">
-                    <a href="#concepts">개념</a>
-                    <a href="#scenarios">시나리오</a>
-                    <a href="#quiz">퀴즈</a>
+
+<!-- Header -->
+<header class="hdr">
+    <div class="hdr-track"><div class="hdr-fill" id="progFill"></div></div>
+    <div class="hdr-inner">
+        <span class="hdr-label">Day 13 / 22</span>
+        <nav class="hdr-nav">
+            <a href="day12_통합복습_Part1_2.html">← 이전</a>
+            <a href="day14_마르쿠스_아우렐리우스.html">다음 →</a>
+        </nav>
+    </div>
+</header>
+
+<main class="wrap">
+
+<!-- Hero -->
+<section class="hero">
+    <div class="day-num">Day 13</div>
+    <h1>스토아 철학: 통제의 이분법</h1>
+    <div class="hook">"2,000년 전 로마 노예가 발견한 원리가 현대 인지행동치료(CBT)의 핵심이 되었다."</div>
+</section>
+
+<!-- Intro -->
+<section class="fi">
+    <p>우리 인생의 고통 대부분은 '사건'에서 오지 않습니다. 대신 그 사건에 대한 우리의 '판단'에서 비롯됩니다.</p>
+
+    <div class="insight">
+        <strong>핵심 원리:</strong> 통제 불가능한 것에 집착할수록 편도체는 과활성화되고, 통제 가능한 것에 집중할수록 전전두피질이 깨어납니다.
+    </div>
+
+    <p>이것이 에픽테토스의 통제 이분법(Dichotomy of Control)입니다. 이 2,000년 된 스토아 원리는 오늘날의 인지행동치료(CBT)와 심리학의 기초가 되었습니다.</p>
+</section>
+
+<!-- 핵심 개념 -->
+<section class="fi">
+    <div class="sec-label">Discover</div>
+    <h2>세 가지 핵심 발견</h2>
+
+    <!-- Card 1 -->
+    <div class="card" onclick="toggleC(this)">
+        <div class="card-top">
+            <h3>01 — 에픽테토스의 통제 이분법</h3>
+            <span class="card-arrow">▼</span>
+        </div>
+        <div class="card-body">
+            <div class="card-inner">
+                <p>에픽테토스(55-135 AD)는 로마의 노예였습니다. 그의 주인이 그의 다리를 꺾었을 때, 그는 이렇게 말했습니다: "당신이 그것을 부러뜨렸다면, 그것이 부러질 것입니다." 곧, 그는 자신이 통제할 수 없는 사건과 통제할 수 있는 판단을 구분했습니다.</p>
+                <h4>통제 가능 영역</h4>
+                <p>생각, 판단, 반응, 노력, 태도, 욕망, 회피. 뇌과학: 이들에 집중 → 전전두피질 활성 + 코르티솔 감소.</p>
+                <h4>통제 불가 영역</h4>
+                <p>타인의 행동, 날씨, 과거 사건, 결과, 타인의 평가. 뇌과학: 이들에 집착 → 편도체 과활성 + 학습된 무력감 발생.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="card" onclick="toggleC(this)">
+        <div class="card-top">
+            <h3>02 — 스토아와 CBT의 연결</h3>
+            <span class="card-arrow">▼</span>
+        </div>
+        <div class="card-body">
+            <div class="card-inner">
+                <p>Aaron Beck(1960s)이 개발한 인지행동치료는 스토아 철학에서 직접 영감을 받았습니다. Ellis(1955)의 REBT도 에픽테토스를 명시적으로 인용합니다.</p>
+                <div class="cmp">
+                    <div class="cmp-l">
+                        <h4>스토아 철학</h4>
+                        <p>사건 → 판단 → 감정</p>
+                    </div>
+                    <div class="cmp-r">
+                        <h4>CBT - ABC 모델</h4>
+                        <p>Activating event → Belief → Consequence</p>
+                    </div>
+                </div>
+                <p>핵심은 동일: 중간의 '판단(B)'을 바꾸면 '결과(C)'가 바뀐다는 것. 뇌과학: 인지 재구조화 시 전전두피질→편도체의 하향 조절 경로가 강화됩니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="card" onclick="toggleC(this)">
+        <div class="card-top">
+            <h3>03 — 부정적 시각화: 불안의 역설적 치료</h3>
+            <span class="card-arrow">▼</span>
+        </div>
+        <div class="card-body">
+            <div class="card-inner">
+                <p>세네카(4-65 AD)는 '부정적 시각화(Premeditatio Malorum)'를 추천했습니다. 최악의 시나리오를 미리 상상하는 기법입니다.</p>
+                <h4>역설적 효과</h4>
+                <p>불안감이 없어지지 않지만, 불확실성으로 인한 편도체 반응이 줄어듭니다. Kross et al.(2014): 자기 거리두기(심리적 거리) 기법을 사용한 참가자들은 부정적 감정 강도가 40% 감소했습니다.</p>
+                <div class="stats">
+                    <div class="st"><div class="n">2000</div><div class="d">년 스토아 역사</div></div>
+                    <div class="st"><div class="n">40%</div><div class="d">자기 거리두기 효과</div></div>
+                    <div class="st"><div class="n">ABC</div><div class="d">인지 모델</div></div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <main class="container">
-        <h1>스토아 철학: 통제의 이분법과 자유의 재발견</h1>
-        
-        <div class="label">학습 진행률 — 59.1% (13/22) | Part 3 시작</div>
-        <p style="color: var(--text2); margin-bottom: 2rem;">
-            2,000년 전, 로마의 한 노예가 감옥에서 발견한 원리가 현대 심리학의 기초가 되었습니다. "사건 자체가 문제가 아니라, 그 사건에 대한 당신의 해석이 문제다." 이 한 문장이 에픽테토스에서 시작하여, 현대의 인지행동치료(CBT)로 진화했습니다. 오늘 우리는 통제 가능한 것과 불가능한 것을 분별하는 지혜를 배웁니다.
-        </p>
-        
-        <div class="hook-section">
-            <h2>"2000년 전 한 노예가 발견한 원리가 현대 CBT의 핵심과 정확히 일치한다"</h2>
-            <p>에픽테토스(Epictetus, 50-135 AD)는 로마의 기원전 노예였습니다. 주인이 그의 다리를 부러뜨렸을 때, 그는 말했습니다: "그대가 부러뜨릴 수 있는 것은 나의 몸뿐이지만, 나의 마음은 그대의 지배를 벗어난다." 이것이 스토아 철학의 핵심입니다. 당신이 통제할 수 없는 것에 집착할 때 고통이 생깁니다. 당신이 통제할 수 있는 것에 집중할 때 자유가 생깁니다.</p>
-        </div>
-        
-        <section id="concepts">
-            <h2>에픽테토스의 이분법(Dichotomy of Control)</h2>
-            
-            <div class="card">
-                <h3>통제 가능한 것 vs 통제 불가능한 것</h3>
-                <p>
-                    에픽테토스는 우리 삶의 모든 것을 두 가지 범주로 나눴습니다. 이 단순한 이분법은 2,000년 후 심리학자들을 경탄하게 했습니다.
-                </p>
-                
-                <div class="matrix-table">
-                    <table>
-                        <tr>
-                            <th style="color: var(--sage); border-color: var(--sage);">통제 가능한 것</th>
-                            <th style="color: var(--coral); border-color: var(--coral);">통제 불가능한 것</th>
-                        </tr>
-                        <tr>
-                            <td style="border-color: var(--sage);">내 생각</td>
-                            <td style="border-color: var(--coral);">타인의 생각</td>
-                        </tr>
-                        <tr>
-                            <td style="border-color: var(--sage);">내 행동</td>
-                            <td style="border-color: var(--coral);">타인의 행동</td>
-                        </tr>
-                        <tr>
-                            <td style="border-color: var(--sage);">내 의도</td>
-                            <td style="border-color: var(--coral);">외부 사건의 결과</td>
-                        </tr>
-                        <tr>
-                            <td style="border-color: var(--sage);">내 노력</td>
-                            <td style="border-color: var(--coral);">내 몸</td>
-                        </tr>
-                        <tr>
-                            <td style="border-color: var(--sage);">내 가치판단</td>
-                            <td style="border-color: var(--coral);">재산</td>
-                        </tr>
-                        <tr>
-                            <td style="border-color: var(--sage);">내 욕망/혐오</td>
-                            <td style="border-color: var(--coral);">명성</td>
-                        </tr>
-                    </table>
-                </div>
-                
-                <p style="margin-top: 1.5rem; color: var(--text2);">
-                    이 표는 간단해 보이지만, 깊이가 있습니다. 에픽테토스는 우리의 건강, 재산, 명성까지도 "통제 불가능한 것"으로 분류했습니다. 왜? 이 모든 것들은 외부 요인에 의존하기 때문입니다. 당신은 건강하려고 노력할 수 있지만, 질병이 올 수 있습니다. 부자가 되려고 노력할 수 있지만, 경제 위기가 올 수 있습니다. 존경받으려고 노력할 수 있지만, 타인은 당신을 비판할 수 있습니다.
-                </p>
-            </div>
-            
-            <div class="insight">
-                <div class="insight-label">스토아 철학의 핵심</div>
-                <p>"당신의 자유는 당신이 통제할 수 있는 것에 집중하는 정도에 비례한다." 통제 불가능한 것에 집착할수록 불안해집니다. 통제 가능한 것에 집중할수록 자유로워집니다.</p>
-            </div>
-        </section>
-        
-        <h2>신경과학의 관점: 통제 소재(Locus of Control)</h2>
-        
-        <div class="locus-control">
-            <div class="locus-item internal">
-                <h4>내적 통제(Internal Locus of Control)</h4>
-                <p>
-                    <strong>신념:</strong> 내 삶의 결과는 주로 내 행동과 노력에 달려 있다.
-                </p>
-                <p style="margin-top: 1rem;">
-                    <strong>신경활동:</strong> 높은 내적 통제는 dlPFC(배외측 전전두피질)의 강한 활성화와 연관됩니다. 이 영역은 의사결정, 목표 설정, 행동 계획을 담당합니다. 내적 통제가 높은 사람들은 더 나은 스트레스 대응 능력을 보입니다.
-                </p>
-                <p style="margin-top: 1rem;">
-                    <strong>결과:</strong> 주도적(proactive), 책임감 있는, 동기 부여된, 심리적으로 안정적
-                </p>
-            </div>
-            
-            <div class="locus-item external">
-                <h4>외적 통제(External Locus of Control)</h4>
-                <p>
-                    <strong>신념:</strong> 내 삶의 결과는 운, 타인, 운명에 의해 결정된다.
-                </p>
-                <p style="margin-top: 1rem;">
-                    <strong>신경활동:</strong> 높은 외적 통제는 편도체(amygdala)의 과활성화와 연관됩니다. 이 영역은 위협 감지와 불안을 담당합니다. 외적 통제가 높은 사람들은 만성적 스트레스와 불안 수준이 높습니다.
-                </p>
-                <p style="margin-top: 1rem;">
-                    <strong>결과:</strong> 수동적(passive), 무력감, 동기 부여 부족, 심리적 불안정
-                </p>
-            </div>
-        </div>
-        
-        <div class="insight">
-            <div class="insight-label">신경과학 인사이트</div>
-            <p>흥미롭게도, Rotter(1966)의 심리학 연구와 현대 신경영상 연구가 일치합니다. 내적 통제를 가진 사람들은 dlPFC가 더 강하고, 외적 통제를 가진 사람들은 편도체가 더 활성화됩니다. 통제감(sense of agency)은 신경적으로 측정 가능합니다.</p>
-        </div>
-        
-        <h2>스토아 철학과 CBT의 신경과학적 연결</h2>
-        
-        <div class="diagram-container">
-            <svg viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg">
-                <rect width="600" height="500" fill="#FFFFFF" stroke="none"/>
-                
-                <!-- Stoicism column -->
-                <rect x="20" y="30" width="260" height="420" fill="#FFF3E6" stroke="#D4A373" stroke-width="2" rx="8" opacity="0.3"/>
-                <text x="40" y="60" font-family="Noto Sans KR" font-size="14" font-weight="600" fill="#D4A373">스토아 철학 (2000년 전)</text>
-                
-                <rect x="30" y="80" width="240" height="60" fill="#FFFFFF" stroke="#D4A373" stroke-width="1" rx="6"/>
-                <text x="50" y="105" font-family="Noto Sans KR" font-size="12" font-weight="600" fill="#D4A373">에픽테토스</text>
-                <text x="50" y="125" font-family="Noto Sans KR" font-size="11" fill="#999999">"사건이 아니라 해석이 문제다"</text>
-                
-                <circle cx="75" cy="180" r="20" fill="#D4A373" stroke="none"/>
-                <text x="75" y="185" font-family="Noto Sans KR" font-size="10" fill="#FFF" text-anchor="middle" font-weight="600">사건</text>
-                
-                <line x1="95" y1="180" x2="135" y2="180" stroke="#D4A373" stroke-width="2" marker-end="url(#arroworange)"/>
-                
-                <circle cx="165" cy="180" r="20" fill="#D4A373" stroke="none"/>
-                <text x="165" y="185" font-family="Noto Sans KR" font-size="10" fill="#FFF" text-anchor="middle" font-weight="600">해석</text>
-                
-                <line x1="165" y1="200" x2="165" y2="240" stroke="#D4A373" stroke-width="2" marker-end="url(#arroworange)"/>
-                
-                <circle cx="165" cy="270" r="20" fill="#D4A373" stroke="none"/>
-                <text x="165" y="275" font-family="Noto Sans KR" font-size="10" fill="#FFF" text-anchor="middle" font-weight="600">반응</text>
-                
-                <!-- CBT column -->
-                <rect x="320" y="30" width="260" height="420" fill="#E8EEF4" stroke="#3D5A80" stroke-width="2" rx="8" opacity="0.3"/>
-                <text x="340" y="60" font-family="Noto Sans KR" font-size="14" font-weight="600" fill="#3D5A80">현대 CBT (1960년대 ~ )</text>
-                
-                <rect x="330" y="80" width="240" height="60" fill="#FFFFFF" stroke="#3D5A80" stroke-width="1" rx="6"/>
-                <text x="350" y="105" font-family="Noto Sans KR" font-size="12" font-weight="600" fill="#3D5A80">Aaron Beck & Albert Ellis</text>
-                <text x="350" y="125" font-family="Noto Sans KR" font-size="11" fill="#999999">"인지 → 정서 → 행동"</text>
-                
-                <circle cx="375" cy="180" r="20" fill="#3D5A80" stroke="none"/>
-                <text x="375" y="185" font-family="Noto Sans KR" font-size="10" fill="#FFF" text-anchor="middle" font-weight="600">사건</text>
-                
-                <line x1="395" y1="180" x2="435" y2="180" stroke="#3D5A80" stroke-width="2" marker-end="url(#arrowblue)"/>
-                
-                <circle cx="465" cy="180" r="20" fill="#3D5A80" stroke="none"/>
-                <text x="465" y="185" font-family="Noto Sans KR" font-size="10" fill="#FFF" text-anchor="middle" font-weight="600">인지</text>
-                
-                <line x1="465" y1="200" x2="465" y2="240" stroke="#3D5A80" stroke-width="2" marker-end="url(#arrowblue)"/>
-                
-                <circle cx="465" cy="270" r="20" fill="#3D5A80" stroke="none"/>
-                <text x="465" y="275" font-family="Noto Sans KR" font-size="10" fill="#FFF" text-anchor="middle" font-weight="600">정서</text>
-                
-                <!-- 연결선 -->
-                <line x1="100" y1="330" x2="500" y2="330" stroke="#C1666B" stroke-width="2" stroke-dasharray="5,5"/>
-                <text x="300" y="325" font-family="Noto Sans KR" font-size="12" font-weight="600" fill="#C1666B" text-anchor="middle">2000년의 지혜 연결</text>
-                
-                <!-- 신경과학 -->
-                <rect x="60" y="380" width="180" height="50" fill="#EDF5EE" stroke="#7A9E7E" stroke-width="1" rx="6"/>
-                <text x="80" y="400" font-family="Noto Sans KR" font-size="11" font-weight="600" fill="#7A9E7E">dlPFC(통제감)</text>
-                <text x="80" y="420" font-family="Noto Sans KR" font-size="10" fill="#999999">↑ 내적 통제</text>
-                
-                <rect x="360" y="380" width="180" height="50" fill="#EDF5EE" stroke="#7A9E7E" stroke-width="1" rx="6"/>
-                <text x="380" y="400" font-family="Noto Sans KR" font-size="11" font-weight="600" fill="#7A9E7E">Amygdala(위협감지)</text>
-                <text x="380" y="420" font-family="Noto Sans KR" font-size="10" fill="#999999">↓ 불안 감소</text>
-                
-                <!-- 마커 정의 -->
-                <defs>
-                    <marker id="arroworange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#D4A373"/>
-                    </marker>
-                    <marker id="arrowblue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#3D5A80"/>
-                    </marker>
-                </defs>
-            </svg>
-        </div>
-        
-        <div class="diagram-caption">
-            2000년이 지났지만, 인간의 심리학적 원리는 변하지 않았습니다. 에픽테토스의 "해석"이 현대 CBT의 "인지"가 되었을 뿐입니다.
-        </div>
-        
-        <h2>실생활 시나리오: 통제의 이분법 적용</h2>
-        
-        <div class="scenario-box">
-            <h4>시나리오 1: 이직 불안</h4>
-            <p><strong>상황:</strong> 회사가 구조조정 계획을 발표했습니다. 당신은 해고될 수 있습니다.</p>
-            <p><strong>통제 불가능한 것:</strong> 회사의 경제 상황, 경영진의 결정, 시장 변화, 타인의 의견</p>
-            <p><strong>통제 가능한 것:</strong> 당신의 스킬 개발, 이력서 준비, 네트워크 확대, 긍정적 마음가짐, 당신의 노력</p>
-            <p><strong>스토아 지혜:</strong> 불확실한 미래에 불안해하는 것보다, 지금 당신이 할 수 있는 행동에 집중하세요. 이력서를 업데이트하고, 스킬을 연마하고, 네트워크를 만드세요. 이것들은 당신의 통제 범위 내입니다.</p>
-        </div>
-        
-        <div class="scenario-box">
-            <h4>시나리오 2: 타인의 평가 불안</h4>
-            <p><strong>상황:</strong> 당신의 보스가 당신을 좋아하지 않는 것 같습니다. 계속 비판합니다.</p>
-            <p><strong>통제 불가능한 것:</strong> 보스의 성격, 보스의 의견, 보스의 감정, 보스의 선택</p>
-            <p><strong>통제 가능한 것:</strong> 당신의 행동, 당신의 노력의 질, 당신의 태도, 당신의 반응, 피드백에 대한 배움</p>
-            <p><strong>스토아 지혜:</strong> 에픽테토스는 "타인을 바꾸려고 하지 마라. 그 대신 당신의 해석을 바꾸어라"라고 말했습니다. 보스의 비판을 "개인적 공격"이 아니라 "성장의 기회"로 재해석하세요. 당신이 할 수 있는 것은 최선을 다하는 것뿐입니다.</p>
-        </div>
-        
-        <div class="scenario-box">
-            <h4>시나리오 3: 자녀의 성격 불안</h4>
-            <p><strong>상황:</strong> 당신의 아이가 내성적이고 사회성이 떨어집니다. 당신은 아이가 친구를 사귀기를 원합니다.</p>
-            <p><strong>통제 불가능한 것:</strong> 아이의 기질, 아이의 친구 관계, 또래의 태도, 아이의 성격</p>
-            <p><strong>통제 가능한 것:</strong> 당신이 아이에게 제공하는 환경, 당신의 태도, 아이와의 소통, 역할 모델링</p>
-            <p><strong>스토아 지혜:</strong> 아이를 바꾸려고 하기보다, 당신이 할 수 있는 것에 집중하세요. 아이가 안전감을 느끼는 가정을 만드세요. 아이 자신의 방식으로 성장할 수 있도록 허용하세요. 이것이 진정한 부모의 역할입니다.</p>
-        </div>
-        
-        <h2>개념카드 3장</h2>
-        
-        <div class="concept-cards">
-            <div class="concept-card" onclick="this.classList.toggle('expanded')">
-                <div class="concept-card-front">① 에픽테토스의 통제 이분법 심화</div>
-                <div class="concept-card-back">
-                    <p><strong>에픽테토스의 엔키리디온(Enchiridion, "손에 들려야 할 것들") 제1장:</strong></p>
-                    <p style="margin-top: 0.8rem; margin-bottom: 0;">
-                    "우리의 감지되는 인상(impressions) 중 일부는 우리의 통제 아래에 있고, 일부는 그렇지 않습니다. 우리의 통제 아래에 있는 것들: 의견, 욕망, 혐오, 그리고 요약하면 우리의 행동(actions)입니다. 우리의 통제 아래에 있지 않은 것들: 몸, 재산, 명성, 지위, 그리고 요약하면 우리의 행동이 아닌 것(non-actions)입니다."
-                    </p>
-                    <p style="margin-top: 1rem;">
-                    여기서 중요한 것은 "감지되는 인상"입니다. 우리가 "사건"이라고 부르는 것은 사실 우리의 "감지된 인상"입니다. 같은 사건이라도 다르게 감지될 수 있습니다. 당신이 거절당했을 때, 이것을 "패배"로 감지할 수도 있고, "다음 기회"로 감지할 수도 있습니다. 에픽테토스는 "당신의 감지 방식을 통제하라"고 말합니다. 이것이 현대 CBT의 "인지 재구조화"와 정확히 일치합니다.
-                    </p>
-                </div>
-            </div>
-            
-            <div class="concept-card" onclick="this.classList.toggle('expanded')">
-                <div class="concept-card-front">② 통제 소재(Locus of Control)의 신경과학</div>
-                <div class="concept-card-back">
-                    <p><strong>내적 통제의 신경생물학:</strong> Rodin과 Langer(1977)의 실험. 양로원 거주자들을 두 그룹으로 나눴습니다. 한 그룹은 "당신의 선택"을 강조받았고, 다른 그룹은 "우리가 당신을 돌보겠습니다"라는 메시지를 받았습니다. 18개월 후, 첫 번째 그룹의 거주자들은 두 배 이상 더 오래 살았습니다. 신경과학적으로, 내적 통제감은 스트레스 호르몬(코르티솔)을 감소시킵니다.</p>
-                    
-                    <p style="margin-top: 1rem;"><strong>외적 통제의 신경생물학:</strong> Seligman과 Maier(1967)의 "학습된 무력감(learned helplessness)" 실험. 개들을 전기 충격을 받는 두 가지 상황에 노출시켰습니다. 한 그룹은 레버를 눌러 충격을 피할 수 있었고, 다른 그룹은 할 수 없었습니다. 나중에 둘 다 쉽게 피할 수 있는 상황에 놓였을 때, "피할 수 없다고 배운" 개들은 도망치지 않았습니다. 그들의 뇌는 무력감을 "학습"했습니다. 신경과학적으로, 이것은 편도체와 HPA축의 과활성화입니다.</p>
-                    
-                    <p style="margin-top: 1rem;"><strong>좋은 소식:</strong> 신경가소성. Seligman은 나중에 "학습된 낙관주의(learned optimism)"가 가능함을 증명했습니다. 외적 통제감이 높더라도, 훈련을 통해 내적 통제감을 높일 수 있습니다. 당신의 뇌는 재학습할 수 있습니다.</p>
-                </div>
-            </div>
-            
-            <div class="concept-card" onclick="this.classList.toggle('expanded')">
-                <div class="concept-card-front">③ 스토아와 CBT의 실전 연결</div>
-                <div class="concept-card-back">
-                    <p><strong>에픽테토스 → Beck의 CBT 모델:</strong></p>
-                    <p style="margin-top: 0.8rem;">
-                    1. <strong>사건(Event):</strong> 객관적 상황. 통제 불가능.
-                    </p>
-                    <p style="margin: 0.4rem 0;">
-                    2. <strong>자동적 사고(Automatic Thought):</strong> 사건에 대한 즉각적 해석. 이것은 당신의 기존 신념에 근거합니다. "나는 실패할 거야", "타인은 나를 판단할 거야"
-                    </p>
-                    <p style="margin: 0.4rem 0;">
-                    3. <strong>정서(Emotion):</strong> 해석의 결과. "불안", "우울", "분노". 당신이 느끼는 감정은 사건 자체가 아니라, 그 사건에 대한 해석입니다.
-                    </p>
-                    <p style="margin: 0.4rem 0;">
-                    4. <strong>인지 왜곡(Cognitive Distortion):</strong> "절대화" ("난 절대 성공할 수 없어"), "일반화" ("이것은 항상 나에게 일어나"), "재앙화" ("이것은 최악이야")
-                    </p>
-                    <p style="margin: 0.4rem 0;">
-                    5. <strong>인지 재구조화(Cognitive Restructuring):</strong> 에픽테토스의 "해석의 변화". 더 합리적이고 적응적인 생각으로 재해석합니다. "이것은 학습 기회다", "이것도 지나갈 거야", "나는 이것을 통해 성장할 수 있어"
-                    </p>
-                    <p style="margin: 0.4rem 0;">
-                    6. <strong>행동(Behavior):</strong> 새로운 정서에 기반한 행동. 불안에 기반한 회피 대신, 성장 마음가짐에 기반한 도전.
-                    </p>
-                </div>
-            </div>
-        </div>
-        
-        
-        <!-- ========== INTERACTIVE COMPONENTS ========== -->
-        
-        <!-- 1. Scroll Progress Bar -->
-        <div class="scroll-progress" id="scrollProgress"></div>
-        
-        <!-- 2. Box Breathing Guide -->
-        <section class="breathing-container">
-            <h3>호흡 명상 가이드</h3>
-            <p>4-4-4-4 박스 호흡법으로 마음을 정하세요</p>
-            <div class="breathing-circle" id="breathingCircle">준비 중</div>
-            <div class="breathing-text" id="breathingText"></div>
-            <div class="breathing-controls">
-                <button class="breathing-btn" id="breathingStart">시작</button>
-                <button class="breathing-btn" id="breathingStop">정지</button>
-            </div>
-        </section>
-        
-        <!-- 3. Flashcards -->
-        <section class="flashcard-section">
-            <h3>핵심 개념 플래시카드</h3>
-            <div class="flashcard-container" id="flashcardContainer">
-                <div class="flashcard" id="flashcard">
-                    <div class="flashcard-front" id="flashcardFront"></div>
-                    <div class="flashcard-back" id="flashcardBack"></div>
-                </div>
-            </div>
-            <div class="flashcard-counter" id="flashcardCounter"></div>
-            <div class="flashcard-nav">
-                <button class="flashcard-btn" id="flashcardPrev">← 이전</button>
-                <button class="flashcard-btn" id="flashcardFlip">반대쪽 보기</button>
-                <button class="flashcard-btn" id="flashcardNext">다음 →</button>
-            </div>
-        </section>
-        
-        <!-- 4. Scenario Choice Game -->
-        <section class="scenario-container" id="scenarioContainer">
-            <h3>시나리오: 어떻게 선택하시겠어요?</h3>
-            <div class="scenario-question" id="scenarioQuestion"></div>
-            <div class="scenario-choices" id="scenarioChoices"></div>
-            <div class="scenario-result" id="scenarioResult">
-                <h4>뇌과학적 결과:</h4>
-                <p id="scenarioExplanation"></p>
-            </div>
-        </section>
-        
-        <!-- 5. Timer -->
-        <section class="timer-container">
-            <h3>명상 타이머</h3>
-            <div class="timer-choices">
-                <button class="timer-btn" data-seconds="30">30초</button>
-                <button class="timer-btn" data-seconds="300">5분</button>
-            </div>
-            <div class="timer-display" id="timerDisplay">00:00</div>
-            <div class="timer-progress">
-                <div class="timer-progress-fill" id="timerProgress"></div>
-            </div>
-            <div class="timer-controls" style="margin-top: 1rem; display: flex; gap: 1rem; justify-content: center;">
-                <button class="breathing-btn" id="timerStartPause">시작</button>
-                <button class="breathing-btn" id="timerReset">리셋</button>
-            </div>
-        </section>
-        
-        <!-- 6. Matching Game -->
-        <section class="matching-container" id="matchingContainer">
-            <h3>개념 매칭 게임</h3>
-            <p style="text-align: center; color: var(--text2); margin-bottom: 1.5rem;">왼쪽의 개념을 오른쪽의 설명과 연결하세요</p>
-            <div class="matching-grid" id="matchingGrid"></div>
-            <div class="matching-result" id="matchingResult"></div>
-        </section>
+</section>
 
-        <section id="quiz" class="quiz-section">
-            <h2>퀴즈: 통제의 이분법 이해</h2>
-            <p style="color: var(--text2); margin-bottom: 2rem;">스토아 철학의 핵심을 이해했는지 확인하세요.</p>
+<!-- SVG Diagram -->
+<section class="fi">
+    <div class="svg-wrap">
+        <svg viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#3D5A80" stroke-width="1.5"/></marker>
+            </defs>
+            <rect x="0" y="0" width="500" height="320" fill="#FAFAF7" rx="12"/>
             
-            <div class="quiz-question">
-                <h4>Q1. 에픽테토스는 다음 중 무엇을 "통제 불가능한 것"으로 분류했는가?</h4>
-                <div class="quiz-options">
-                    <label class="quiz-option">
-                        <input type="radio" name="q1" value="a"> A. 내 행동과 노력
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q1" value="b"> B. 내 몸과 건강
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q1" value="c"> C. 내 욕망과 혐오
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q1" value="d"> D. 내 생각과 판단
-                    </label>
-                </div>
-                <div style="margin-top: 1rem; padding: 1rem; background: var(--sage-light); border-radius: 8px; display: none;">
-                    <strong>정답: B</strong><br/>
-                    에픽테토스는 심지어 우리의 몸도 "통제 불가능한 것"으로 분류했습니다. 왜? 건강하려고 노력할 수 있지만, 질병은 올 수 있기 때문입니다. 우리가 통제할 수 있는 것은 "노력"이지, "결과"가 아닙니다.
-                </div>
-            </div>
+            <!-- Title -->
+            <text x="250" y="25" text-anchor="middle" font-family="Noto Sans KR" font-size="13" fill="#2C2C2C" font-weight="600">통제의 이분법: 통제 가능 vs 통제 불가</text>
             
-            <div class="quiz-question">
-                <h4>Q2. "학습된 무력감(learned helplessness)"은 신경과학적으로 어떤 변화를 의미하는가?</h4>
-                <div class="quiz-options">
-                    <label class="quiz-option">
-                        <input type="radio" name="q2" value="a"> A. PFC 활성화 증가
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q2" value="b"> B. 편도체와 HPA축의 과활성화
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q2" value="c"> C. 미러뉴런 활성화
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q2" value="d"> D. 옥시토신 분비 증가
-                    </label>
-                </div>
-                <div style="margin-top: 1rem; padding: 1rem; background: var(--sage-light); border-radius: 8px; display: none;">
-                    <strong>정답: B</strong><br/>
-                    Seligman의 연구. 무력감을 배운 뇌는 편도체(위협 감지)와 HPA축(스트레스 반응)이 과활성화됩니다. 만성적인 스트레스 상태입니다. 하지만 좋은 소식은 신경가소성을 통해 이를 역전시킬 수 있다는 것입니다.
-                </div>
-            </div>
+            <!-- Center Self -->
+            <circle cx="250" cy="160" r="25" fill="#E8EEF4" stroke="#3D5A80" stroke-width="2"/>
+            <text x="250" y="165" text-anchor="middle" font-family="Noto Sans KR" font-size="12" fill="#3D5A80" font-weight="600">나</text>
             
-            <div class="quiz-question">
-                <h4>Q3. 내적 통제(internal locus of control)와 관련된 뇌 영역은?</h4>
-                <div class="quiz-options">
-                    <label class="quiz-option">
-                        <input type="radio" name="q3" value="a"> A. 편도체
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q3" value="b"> B. 해마
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q3" value="c"> C. 배외측 전전두피질(dlPFC)
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q3" value="d"> D. 소뇌
-                    </label>
-                </div>
-                <div style="margin-top: 1rem; padding: 1rem; background: var(--sage-light); border-radius: 8px; display: none;">
-                    <strong>정답: C</strong><br/>
-                    dlPFC는 의사결정, 목표 설정, 행동 계획, 실행 기능을 담당합니다. 내적 통제감이 높은 사람들은 dlPFC가 더 강하고 활성화됩니다. 이것은 "나는 내 삶의 주인이다"라는 신경학적 기반입니다.
-                </div>
-            </div>
+            <!-- Inner Circle - Controllable (Sage) -->
+            <circle cx="250" cy="160" r="95" fill="none" stroke="#7A9E7E" stroke-width="2" stroke-dasharray="4,4"/>
             
-            <div class="quiz-question">
-                <h4>Q4. CBT의 "인지 왜곡" 중 "절대화"의 예는?</h4>
-                <div class="quiz-options">
-                    <label class="quiz-option">
-                        <input type="radio" name="q4" value="a"> A. "이번 실패는 나를 더 강하게 할 거야"
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q4" value="b"> B. "난 절대 성공할 수 없어"
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q4" value="c"> C. "이건 최악이야, 모든 게 끝났어"
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q4" value="d"> D. "이건 어제도 일어났고 내일도 일어날 거야"
-                    </label>
-                </div>
-                <div style="margin-top: 1rem; padding: 1rem; background: var(--sage-light); border-radius: 8px; display: none;">
-                    <strong>정답: B</strong><br/>
-                    "절대화"는 한 가지 상황을 절대적이고 변할 수 없는 것으로 보는 인지 왜곡입니다. "난 절대"라는 표현이 핵심입니다. 스토아 철학에서 말하는 "부정적인 판단"입니다.
-                </div>
-            </div>
+            <!-- Controllable items -->
+            <text x="180" y="95" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#7A9E7E" font-weight="600">판단</text>
+            <text x="320" y="95" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#7A9E7E" font-weight="600">반응</text>
+            <text x="250" y="75" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#7A9E7E" font-weight="600">노력</text>
+            <text x="135" y="160" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#7A9E7E" font-weight="600">태도</text>
+            <text x="365" y="160" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#7A9E7E" font-weight="600">욕망</text>
             
-            <div class="quiz-question">
-                <h4>Q5. 다음 중 당신이 통제할 수 있는 것은?</h4>
-                <div class="quiz-options">
-                    <label class="quiz-option">
-                        <input type="radio" name="q5" value="a"> A. 타인이 당신을 어떻게 평가하는지
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q5" value="b"> B. 경제 위기가 올 확률
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q5" value="c"> C. 사건에 대한 당신의 해석
-                    </label>
-                    <label class="quiz-option">
-                        <input type="radio" name="q5" value="d"> D. 타인의 성격
-                    </label>
-                </div>
-                <div style="margin-top: 1rem; padding: 1rem; background: var(--sage-light); border-radius: 8px; display: none;">
-                    <strong>정답: C</strong><br/>
-                    에픽테토스의 핵심: "사건 자체는 통제 불가능하지만, 그 사건에 대한 당신의 해석은 통제 가능하다." 당신이 통제할 수 있는 것은 당신의 생각, 판단, 행동, 노력입니다.
-                </div>
-            </div>
-        </section>
-        
-        <section id="practice" class="practice-section">
-            <h2>실천 가이드: 통제의 이분법 일상 적용</h2>
+            <text x="200" y="230" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#7A9E7E" font-weight="600">→ 전전두피질</text>
+            <text x="300" y="230" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#7A9E7E" font-weight="600">→ 코르티솔 ↓</text>
             
-            <div class="practice-item">
-                <h4>30초 실천: 통제 목록</h4>
-                <p>지금 당신을 불안하게 하는 1가지 상황을 떠올리세요. 그것을 "통제 가능한 것"과 "통제 불가능한 것"으로 나누어 적으세요. 예: 이직 불안 → 불가능(회사 결정), 가능(스킬 개발). 이것만으로도 당신의 불안은 50% 감소할 것입니다.</p>
-            </div>
+            <!-- Outer Circle - Uncontrollable (Coral) -->
+            <circle cx="250" cy="160" r="145" fill="none" stroke="#C1666B" stroke-width="2"/>
             
-            <div class="practice-item">
-                <h4>5분 실천: 통제 동심원 그리기</h4>
-                <p>동심원 3개를 그으세요. 중심원(내 생각/행동) → 중간원(나의 영향력) → 바깥원(나의 관심사 but 통제 불가). 당신의 시간과 에너지를 중심원에 집중하세요. 바깥원에서 벗어나세요. 이것이 당신의 "전략적 통제"입니다.</p>
-            </div>
+            <!-- Uncontrollable items -->
+            <text x="110" y="140" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#C1666B" font-weight="600">타인의</text>
+            <text x="110" y="155" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#C1666B" font-weight="600">행동</text>
             
-            <div class="practice-item">
-                <h4>하루 실천: 스토아 저널</h4>
-                <p>매일 저녁, 3가지를 기록하세요: (1) 오늘 나를 불안하게 한 것 (2) 그것에서 통제 가능한 부분 (3) 내일 내가 할 것. 이것이 에픽테토스의 방식입니다. 당신은 사건을 통제할 수 없지만, 당신의 반응과 행동은 통제할 수 있습니다.</p>
-            </div>
-        </section>
-        
-        <section class="philosophy-section">
-            <h2>철학적 깊이: 에픽테토스와 현대 심리학</h2>
+            <text x="390" y="140" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#C1666B" font-weight="600">결과</text>
+            <text x="390" y="155" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#C1666B" font-weight="600">평가</text>
             
-            <div class="philosopher-name">에픽테토스 (50-135 AD), 로마 시대 노예 철학자</div>
-            <div class="philosophy-quote">
-                "사람을 괴롭히는 것은 사물 그 자체가 아니라, 그 사물에 대한 그들의 판단이다."<br/>
-                — Epictetus, Enchiridion
-            </div>
+            <text x="250" y="310" text-anchor="middle" font-family="Noto Sans KR" font-size="9" fill="#C1666B" font-weight="600">과거 / 날씨 / 환경</text>
             
-            <p style="margin-top: 1.5rem;">
-                에픽테토스는 로마의 노예였습니다. 그의 주인이 그의 다리를 부러뜨렸을 때, 그는 말했습니다: "당신이 부러뜨릴 수 있는 것은 나의 몸뿐입니다. 하지만 나의 마음은 당신의 지배 아래에 있지 않습니다." 2,000년 후, 이 말은 현대 심리학의 기초가 되었습니다.
-            </p>
-            
-            <p style="margin-top: 1rem;">
-                에픽테토스가 이해한 것은 우리 뇌의 근본적인 구조입니다. 외부 사건(amygdala 자극)에서 우리의 고통(cortisol 분비)까지는 직접적인 연결이 아니라, "판단의 중간 단계"가 있습니다. 이 중간 단계는 PFC에 의해 제어됩니다. 우리의 자유는 이 중간 단계에 있습니다.
-            </p>
-            
-            <div class="philosopher-name" style="margin-top: 2rem;">Aaron T. Beck (1921 - ), 현대 인지행동치료(CBT)의 창시자</div>
-            <div class="philosophy-quote">
-                "가장 인간다운 특성은 우리의 생각을 관찰하고 수정할 수 있는 능력이다."<br/>
-                — Aaron Beck
-            </div>
-            
-            <p style="margin-top: 1rem;">
-                Beck은 1960년대 우울한 환자들을 관찰하다가 발견했습니다. 그들의 문제는 사건 자체가 아니라, 사건에 대한 자동적인 부정적 생각이었습니다. 그는 이것을 "자동적 사고(automatic thoughts)"라고 불렀고, 이 생각들을 변화시키는 기법을 개발했습니다. 이것이 바로 현대 CBT의 시작입니다.
-            </p>
-            
-            <p style="margin-top: 1rem;">
-                흥미롭게도, Beck은 에픽테토스를 읽지 않고 자신의 임상 관찰에서 같은 결론에 도달했습니다. 이것이 바로 진리의 힘입니다. 2,000년 전의 진리가 2,000년 후에도 여전히 참입니다. 왜냐하면 우리의 뇌 구조는 변하지 않았기 때문입니다.
-            </p>
-        </section>
-        
-        <section style="background: var(--accent-light); border-radius: 16px; padding: 2.4rem; margin: 3rem 0; border: 1px solid var(--border);">
-            <h2 style="color: var(--accent); margin-top: 0;">다음 여정: 더 깊은 철학의 세계 (Days 14-18)</h2>
-            <p>
-                Day 13에서 우리는 통제의 이분법을 배웠습니다. 다음 5일간(Day 14-18)에서는 이 기초 위에서 더욱 정교한 삶의 철학을 탐구합니다. 에픽테토스가 "무엇을 통제할 수 없는지" 물었다면, 다음 철학자들은 "그렇다면 우리는 어떻게 살아야 하는가?"라는 더 깊은 질문을 던집니다.
-            </p>
-        </section>
-    </main>
-    
-    <footer>
-        <div class="footer-content">
-            <p>인간 탐구 시리즈 · Day 13 스토아 철학: 통제의 이분법 · 59.1% 완료 (13/22 Days)</p>
-            <p style="margin-top: 1rem; font-size: 0.8rem;">철학과 신경과학의 만남 | 2000년의 지혜가 현대 뇌과학으로 증명되다</p>
+            <text x="180" y="300" text-anchor="middle" font-family="Noto Sans KR" font-size="8" fill="#C1666B" font-weight="600">→ 편도체과활 →</text>
+            <text x="320" y="300" text-anchor="middle" font-family="Noto Sans KR" font-size="8" fill="#C1666B" font-weight="600">무력감 ↑</text>
+        </svg>
+        <div class="svg-cap">통제 가능 영역(내부)에 집중 ↔ 통제 불가 영역(외부) 내려놓기</div>
+    </div>
+</section>
+
+<!-- Research -->
+<section class="fi">
+    <div class="sec-label">Research</div>
+    <h2>연구 스포트라이트</h2>
+
+    <div class="pq">
+        "자기 거리두기 기법을 사용한 참가자들은 부정적 감정 강도가 40% 감소했다."
+        <cite>— Kross et al., University of Michigan, 2014</cite>
+    </div>
+
+    <p>연구원들은 참가자들에게 개인적 고민에 대해 말하도록 했습니다. 한 그룹은 자신의 이름을 사용해 1인칭으로 ("나는..."), 다른 그룹은 3인칭으로 ("그/그녀는...") 말했습니다. 3인칭으로 거리를 둔 그룹이 감정 강도와 코르티솔 수준이 모두 낮았습니다.</p>
+
+    <div class="insight sage">
+        <strong>실천 포인트:</strong> 스트레스 상황에서 "나는 불안하다"가 아니라 "그 상황은 불안을 유발할 수 있겠지"라고 객관화하세요.
+    </div>
+</section>
+
+<!-- Practice -->
+<section class="fi">
+    <div class="sec-label">Apply</div>
+    <h2>오늘의 실천</h2>
+
+    <div class="practice">
+        <h3>통제 이분법 연습</h3>
+        <div class="practice-item">
+            <span class="practice-badge">30초</span>
+            <span class="practice-text">지금 걱정되는 것 하나를 생각하고, 통제 가능/불가로 분류해보세요.</span>
         </div>
-    </footer>
-    
-    <script>
-        document.querySelectorAll('.quiz-option').forEach(option => {
-            option.addEventListener('click', function() {
-                const container = this.closest('.quiz-question');
-                const feedback = container.querySelector('div[style*="display: none"]');
-                if (feedback) {
-                    feedback.style.display = 'block';
-                }
-            });
-        });
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, { threshold: 0.1 });
-        
-        document.querySelectorAll('.card, .concept-cards, .quiz-question, .scenario-box').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(10px)';
-            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(el);
-        });
+        <div class="practice-item">
+            <span class="practice-badge">5분</span>
+            <span class="practice-text">이번 주 스트레스 3가지를 적고, 각각 통제 가능 영역과 통제 불가 영역을 구분하세요.</span>
+        </div>
+        <div class="practice-item">
+            <span class="practice-badge">하루</span>
+            <span class="practice-text">스트레스가 올라올 때마다 "이건 내 통제 안에 있는가?"라고 자문하는 습관을 연습하세요.</span>
+        </div>
 
-        // ========== INTERACTIVE COMPONENTS JAVASCRIPT ==========
-        
-        // 1. Scroll Progress Bar
-        function initScrollProgress() {
-            const progressBar = document.getElementById('scrollProgress');
-            window.addEventListener('scroll', () => {
-                const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-                const scrolled = (window.scrollY / totalHeight) * 100;
-                progressBar.style.width = scrolled + '%';
-            });
-        }
-        
-        // 2. Box Breathing
-        let breathingActive = false;
-        let breathingInterval = null;
-        const breathingPhases = ['들이쉬기', '멈추기', '내쉬기', '멈추기'];
-        let currentPhase = 0;
-        
-        function initBreathing() {
-            const startBtn = document.getElementById('breathingStart');
-            const stopBtn = document.getElementById('breathingStop');
-            const circle = document.getElementById('breathingCircle');
-            const text = document.getElementById('breathingText');
-            
-            startBtn.addEventListener('click', () => {
-                breathingActive = true;
-                circle.classList.remove('paused');
-                startBtn.classList.add('active');
-                stopBtn.classList.remove('active');
-                currentPhase = 0;
-                updateBreathingPhase();
-            });
-            
-            stopBtn.addEventListener('click', () => {
-                breathingActive = false;
-                circle.classList.add('paused');
-                stopBtn.classList.add('active');
-                startBtn.classList.remove('active');
-                if (breathingInterval) clearInterval(breathingInterval);
-                text.textContent = '';
-                circle.textContent = '준비 중';
-            });
-        }
-        
-        function updateBreathingPhase() {
-            const text = document.getElementById('breathingText');
-            text.textContent = breathingPhases[currentPhase];
-            currentPhase = (currentPhase + 1) % 4;
-            if (breathingActive) {
-                breathingInterval = setTimeout(updateBreathingPhase, 4000);
-            }
-        }
-        
-        // 3. Flashcards
-        let currentCardIndex = 0;
-        let flashcards = [];
-        
-        function initFlashcards(cards) {
-            flashcards = cards;
-            if (flashcards.length === 0) return;
-            
-            const container = document.getElementById('flashcard');
-            const prevBtn = document.getElementById('flashcardPrev');
-            const nextBtn = document.getElementById('flashcardNext');
-            const flipBtn = document.getElementById('flashcardFlip');
-            
-            container.addEventListener('click', () => {
-                container.classList.toggle('flipped');
-            });
-            
-            flipBtn.addEventListener('click', () => {
-                container.classList.toggle('flipped');
-            });
-            
-            prevBtn.addEventListener('click', () => {
-                if (currentCardIndex > 0) {
-                    currentCardIndex--;
-                    container.classList.remove('flipped');
-                    updateFlashcard();
-                }
-            });
-            
-            nextBtn.addEventListener('click', () => {
-                if (currentCardIndex < flashcards.length - 1) {
-                    currentCardIndex++;
-                    container.classList.remove('flipped');
-                    updateFlashcard();
-                }
-            });
-            
-            updateFlashcard();
-        }
-        
-        function updateFlashcard() {
-            if (flashcards.length === 0) return;
-            const card = flashcards[currentCardIndex];
-            document.getElementById('flashcardFront').textContent = card.front;
-            document.getElementById('flashcardBack').innerHTML = '<div>' + card.back + '</div>';
-            document.getElementById('flashcardCounter').textContent = (currentCardIndex + 1) + ' / ' + flashcards.length;
-        }
-        
-        // 4. Scenario Game
-        function initScenario(scenario) {
-            const container = document.getElementById('scenarioContainer');
-            const questionEl = document.getElementById('scenarioQuestion');
-            const choicesEl = document.getElementById('scenarioChoices');
-            const resultEl = document.getElementById('scenarioResult');
-            const explanationEl = document.getElementById('scenarioExplanation');
-            
-            questionEl.textContent = scenario.question;
-            choicesEl.innerHTML = '';
-            
-            scenario.choices.forEach((choice, idx) => {
-                const choiceDiv = document.createElement('div');
-                choiceDiv.className = 'scenario-choice';
-                choiceDiv.innerHTML = '<div class="scenario-choice-title">' + choice.title + '</div><div class="scenario-choice-desc">' + choice.desc + '</div>';
-                choiceDiv.addEventListener('click', () => {
-                    resultEl.classList.add('show');
-                    explanationEl.textContent = choice.explanation;
-                });
-                choicesEl.appendChild(choiceDiv);
-            });
-        }
-        
-        // 5. Timer
-        let timerSeconds = 0;
-        let timerInterval = null;
-        let timerStartTime = 0;
-        let timerPaused = false;
-        
-        function initTimer() {
-            const buttons = document.querySelectorAll('.timer-btn');
-            const startPauseBtn = document.getElementById('timerStartPause');
-            const resetBtn = document.getElementById('timerReset');
-            const display = document.getElementById('timerDisplay');
-            const progress = document.getElementById('timerProgress');
-            
-            buttons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    timerSeconds = parseInt(btn.dataset.seconds);
-                    timerStartTime = timerSeconds;
-                    display.textContent = formatTime(timerSeconds);
-                    progress.style.width = '100%';
-                    clearInterval(timerInterval);
-                    timerPaused = false;
-                    startPauseBtn.textContent = '시작';
-                });
-            });
-            
-            startPauseBtn.addEventListener('click', () => {
-                if (timerSeconds === 0) return;
-                
-                if (timerPaused) {
-                    timerPaused = false;
-                    startPauseBtn.textContent = '일시정지';
-                    resumeTimer();
-                } else {
-                    timerPaused = true;
-                    startPauseBtn.textContent = '재개';
-                    clearInterval(timerInterval);
-                }
-            });
-            
-            resetBtn.addEventListener('click', () => {
-                clearInterval(timerInterval);
-                timerSeconds = 0;
-                timerPaused = false;
-                display.textContent = '00:00';
-                progress.style.width = '100%';
-                startPauseBtn.textContent = '시작';
-            });
-        }
-        
-        function resumeTimer() {
-            if (timerSeconds <= 0) return;
-            timerInterval = setInterval(() => {
-                timerSeconds--;
-                document.getElementById('timerDisplay').textContent = formatTime(timerSeconds);
-                const progressPercent = (timerSeconds / timerStartTime) * 100;
-                document.getElementById('timerProgress').style.width = progressPercent + '%';
-                
-                if (timerSeconds === 0) {
-                    clearInterval(timerInterval);
-                    playSound();
-                }
-            }, 1000);
-        }
-        
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
-        }
-        
-        function playSound() {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            oscillator.frequency.value = 800;
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.5);
-        }
-        
-        // 6. Matching Game
-        function initMatching(pairs) {
-            const container = document.getElementById('matchingGrid');
-            const result = document.getElementById('matchingResult');
-            
-            // Shuffle right column
-            const leftItems = pairs.map(p => p[0]);
-            const rightItems = pairs.map(p => p[1]);
-            rightItems.sort(() => Math.random() - 0.5);
-            
-            container.innerHTML = '<div class="matching-column"><div class="matching-label">개념</div>' + 
-                leftItems.map((item, idx) => '<div class="match-item" data-left="' + idx + '">' + item + '</div>').join('') +
-                '</div><div class="matching-column"><div class="matching-label">정의</div>' +
-                rightItems.map((item, idx) => '<div class="match-item" data-right="' + idx + '">' + item + '</div>').join('') +
-                '</div>';
-            
-            const leftMatches = {};
-            let selectedLeft = null;
-            
-            document.querySelectorAll('[data-left]').forEach(item => {
-                item.addEventListener('click', () => {
-                    document.querySelectorAll('[data-left]').forEach(i => i.classList.remove('selected'));
-                    item.classList.add('selected');
-                    selectedLeft = item.dataset.left;
-                });
-            });
-            
-            document.querySelectorAll('[data-right]').forEach((item, rightIdx) => {
-                item.addEventListener('click', () => {
-                    if (selectedLeft === null) return;
-                    
-                    const correctLeft = leftItems.indexOf(pairs[rightItems.indexOf(item.textContent)][0]);
-                    if (parseInt(selectedLeft) === correctLeft) {
-                        item.classList.add('correct');
-                        document.querySelector('[data-left="' + selectedLeft + '"]').classList.add('correct');
-                        leftMatches[selectedLeft] = true;
-                        
-                        if (Object.keys(leftMatches).length === pairs.length) {
-                            result.classList.add('show', 'success');
-                            result.textContent = '🎉 모두 맞췄습니다!';
-                        }
-                    } else {
-                        item.classList.add('incorrect');
-                        setTimeout(() => item.classList.remove('incorrect'), 500);
-                    }
-                    selectedLeft = null;
-                    document.querySelectorAll('[data-left]').forEach(i => i.classList.remove('selected'));
-                });
-            });
-        }
-        
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', () => {
-            initScrollProgress();
-            initBreathing();
-            initTimer();
-        });
+        <!-- Timer -->
+        <div class="timer-box">
+            <div class="timer-display" id="tDisp">0:30</div>
+            <div class="timer-btns">
+                <button onclick="setT(30)" class="active">30초</button>
+                <button onclick="setT(300)">5분</button>
+                <button onclick="goT()" id="tBtn">시작</button>
+                <button onclick="rstT()">리셋</button>
+            </div>
+        </div>
 
-        // Day 13 - 스토아 통제의 이분법
-        const day13Flashcards = [
-            { front: "통제의 이분법", back: "내가 통제할 수 있는 것(생각, 행동, 판단)과 할 수 없는 것(결과, 타인의 생각, 외부 사건)을 구분" },
-            { front: "프로하이레시스 (Prohairesis)", back: "도덕적 선택능력. 스토아 철학에서 진정한 선의 근원이며 인간의 본질적 자유" },
-            { front: "인상(Phantasia)의 검토", back: "외부에서 들어오는 인상(자극)을 판단하기 전에 검토하여 올바른 판단(dogma)을 형성하는 과정" },
-            { front: "스토아적 부정 시각화", back: "어려움에 직면했을 때, 그것을 받아들이고 그 속에서 덕을 실천할 기회로 보는 관점" }
-        ];
-        
-        const day13Scenario = {
-            question: "프로젝트가 갑자기 취소되었습니다. 당신의 반응은?",
-            choices: [
-                {
-                    title: "분노 (통제 불가에 집착)",
-                    desc: "왜 이럴 수가! 불공평해! 나의 노력이 낭비되었다",
-                    explanation: "편도체가 활성화되고 코르티솔이 증가합니다. 외부 통제불가 사건에 집착하면 스트레스만 증가합니다."
-                },
-                {
-                    title: "수용 (통제 가능에 집중)",
-                    desc: "이제 다음 단계를 생각해봅시다. 내 노력은 여전히 가치 있습니다",
-                    explanation: "전전두피질이 활성화되어 합리적 판단이 가능합니다. 내가 통제할 수 있는 것(반응, 다음 행동)에 집중하면 회복력이 생깁니다."
-                },
-                {
-                    title: "무관심 (포기)",
-                    desc: "뭐... 어차피 내 책임이 아니니까 상관없지",
-                    explanation: "무관심은 스토아 철학이 아닙니다. 덕을 실천할 기회를 놓칠 수 있습니다."
-                }
-            ]
-        };
-        
-        const day13Pairs = [
-            ["에픽테토스", "노예 철학자"],
-            ["통제 이분법", "내 안/밖 구분"],
-            ["CBT", "인지행동치료"],
-            ["프로하이레시스", "도덕적 선택"],
-            ["스토아", "덕의 철학"]
-        ];
-        
-        initFlashcards(day13Flashcards);
-        initScenario(day13Scenario);
-        initMatching(day13Pairs);
+        <!-- Breathing -->
+        <div class="breath-box">
+            <p style="font-size:0.82rem;color:var(--text3);margin:1rem 0 0.5rem;">호흡 가이드</p>
+            <div id="breathC">시작</div>
+            <button id="breathB" onclick="toggleBreath()">시작</button>
+        </div>
+    </div>
+</section>
 
-    </script>
+<!-- Interactive: Flashcard -->
+<section class="fi">
+    <div class="sec-label">Interactive</div>
+    <h2>핵심 개념 플래시카드</h2>
+    <div class="fc-wrap">
+        <div class="fc" id="fc" onclick="flipFC()">
+            <div class="fc-f"><div class="term" id="fcF"></div><div class="hint">클릭하여 뒤집기</div></div>
+            <div class="fc-b"><div class="def" id="fcB"></div></div>
+        </div>
+    </div>
+    <div class="fc-nav">
+        <button onclick="prevFC()">← 이전</button>
+        <span class="fc-counter" id="fcN">1/4</span>
+        <button onclick="nextFC()">다음 →</button>
+    </div>
+</section>
+
+<!-- Interactive: Scenario -->
+<section class="fi">
+    <div class="sec-label">Simulation</div>
+    <h2>당신이라면?</h2>
+    <div class="sc-box">
+        <div class="sc-q">프로젝트 발표 전날, 결과에 대한 불안이 밀려옵니다. 어떻게 하시겠습니까?</div>
+        <div class="sc-opt" onclick="pickSc(this,0)">A. 밤새 모든 가능한 질문에 답변을 준비한다</div>
+        <div class="sc-opt" onclick="pickSc(this,1)">B. "준비는 내 영역, 결과는 아니다"라고 구분하고 충분히 자고 간다</div>
+        <div class="sc-opt" onclick="pickSc(this,2)">C. "어차피 될 대로 되겠지"라고 포기한다</div>
+        <div class="sc-result" id="scR"></div>
+    </div>
+</section>
+
+<!-- Quiz -->
+<section class="fi">
+    <div class="sec-label">Quiz</div>
+    <h2>오늘의 확인</h2>
+
+    <div class="quiz-q">
+        <p>Q1. 에픽테토스의 핵심 가르침은?</p>
+        <div class="quiz-opt" onclick="chkQ(this,false)">모든 것을 통제해야 한다</div>
+        <div class="quiz-opt" onclick="chkQ(this,true)">사건이 아니라 판단이 감정을 결정한다</div>
+        <div class="quiz-opt" onclick="chkQ(this,false)">감정은 통제할 수 없다</div>
+        <div class="quiz-fb">에픽테토스: "우리를 괴롭히는 것은 사건 자체가 아니라, 사건에 대한 판단이다."</div>
+    </div>
+
+    <div class="quiz-q">
+        <p>Q2. CBT의 ABC 모델에서 B는?</p>
+        <div class="quiz-opt" onclick="chkQ(this,false)">Behavior(행동)</div>
+        <div class="quiz-opt" onclick="chkQ(this,true)">Belief(신념/판단)</div>
+        <div class="quiz-opt" onclick="chkQ(this,false)">Background(배경)</div>
+        <div class="quiz-fb">ABC 모델: Activating event → Belief → Consequence. B의 '신념'을 바꾸면 C의 '결과'가 바뀝니다.</div>
+    </div>
+
+    <div class="quiz-q">
+        <p>Q3. 부정적 시각화의 뇌과학적 효과는?</p>
+        <div class="quiz-opt" onclick="chkQ(this,false)">편도체 활성 증가</div>
+        <div class="quiz-opt" onclick="chkQ(this,true)">예측 오류 최소화로 편도체 반응 감소</div>
+        <div class="quiz-opt" onclick="chkQ(this,false)">전전두피질 비활성화</div>
+        <div class="quiz-fb">Kross 연구: 자기 거리두기로 불확실성 감소 → 편도체의 '예상 외' 반응 줄어듦 → 불안 감소.</div>
+    </div>
+</section>
+
+<!-- Matching -->
+<section class="fi">
+    <div class="sec-label">Game</div>
+    <h2>개념 매칭</h2>
+    <p style="font-size:0.85rem;">왼쪽 용어와 오른쪽 설명을 순서대로 클릭하여 연결하세요.</p>
+    <div class="match-area" id="matchArea"></div>
+    <div id="matchMsg" style="text-align:center;font-size:0.85rem;color:var(--sage);margin-top:0.5rem;"></div>
+</section>
+
+<!-- Connection -->
+<section class="fi">
+    <div class="sec-label">다음 여정</div>
+    <h2>연결된 강의</h2>
+    <div class="conn">
+        <a href="day12_통합복습_Part1_2.html">
+            <span class="cn">Day 12</span>
+            통합복습 Part 1-2
+        </a>
+        <a href="day14_마르쿠스_아우렐리우스.html">
+            <span class="cn">Day 14</span>
+            마르쿠스 아우렐리우스
+        </a>
+        <a href="day04_인지적_재평가.html">
+            <span class="cn">Day 04</span>
+            인지적 재평가
+        </a>
+    </div>
+</section>
+
+</main>
+
+<footer class="ftr">
+    <div class="wrap">인간 탐구 시리즈 · Day 13/22 · v5.0</div>
+</footer>
+
+<script>
+// Scroll Progress
+window.addEventListener('scroll',()=>{
+    const p=Math.min(100,(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight))*100);
+    document.getElementById('progFill').style.width=p+'%';
+});
+
+// Card Toggle
+function toggleC(el){
+    const b=el.querySelector('.card-body'),a=el.querySelector('.card-arrow');
+    b.classList.toggle('open');a.classList.toggle('open');
+}
+
+// Timer
+let tSec=30,tInt=null,tRun=false;
+function fmtT(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function setT(s){tSec=s;tRun=false;clearInterval(tInt);document.getElementById('tDisp').textContent=fmtT(s);document.getElementById('tBtn').textContent='시작';document.querySelectorAll('.timer-btns button').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');}
+function goT(){
+    if(tRun){clearInterval(tInt);tRun=false;document.getElementById('tBtn').textContent='시작';return;}
+    tRun=true;document.getElementById('tBtn').textContent='정지';
+    tInt=setInterval(()=>{tSec--;document.getElementById('tDisp').textContent=fmtT(tSec);if(tSec<=0){clearInterval(tInt);tRun=false;document.getElementById('tBtn').textContent='완료!';}},1000);
+}
+function rstT(){clearInterval(tInt);tRun=false;tSec=30;document.getElementById('tDisp').textContent=fmtT(30);document.getElementById('tBtn').textContent='시작';}
+
+// Breathing
+let brInt=null,brRun=false;
+function toggleBreath(){
+    const c=document.getElementById('breathC'),b=document.getElementById('breathB');
+    if(brRun){clearInterval(brInt);brRun=false;b.textContent='시작';c.style.transform='scale(1)';c.textContent='시작';c.style.background='var(--sage-light)';c.style.borderColor='var(--sage)';return;}
+    brRun=true;b.textContent='정지';
+    const ph=[{t:'들이쉬기',s:'scale(1.35)',bg:'var(--accent-light)',bc:'var(--accent)'},{t:'멈추기',s:'scale(1.35)',bg:'var(--warm-light)',bc:'var(--warm)'},{t:'내쉬기',s:'scale(1)',bg:'var(--sage-light)',bc:'var(--sage)'},{t:'멈추기',s:'scale(1)',bg:'var(--coral-light)',bc:'var(--coral)'}];
+    let i=0;
+    function run(){c.textContent=ph[i%4].t;c.style.transform=ph[i%4].s;c.style.background=ph[i%4].bg;c.style.borderColor=ph[i%4].bc;i++;}
+    run();brInt=setInterval(run,4000);
+}
+
+// Flashcard
+const fcs=[
+    {f:'통제의 이분법',b:'통제 가능(판단, 반응)에 집중하고 통제 불가(타인, 결과)를 내려놓는 스토아 핵심 원리.'},
+    {f:'에픽테토스',b:'로마 노예 출신 철학자. "사건이 아니라 판단이 우리를 괴롭힌다"는 핵심 통찰.'},
+    {f:'ABC 모델',b:'Activating event→Belief→Consequence. 스토아 철학을 현대 CBT로 번역한 인지 모델.'},
+    {f:'부정적 시각화',b:'세네카의 Premeditatio Malorum. 최악을 미리 상상해 불안을 역설적으로 줄이는 기법.'}
+];
+let fcI=0,fcFlip=false;
+function showFC(){fcFlip=false;document.getElementById('fc').classList.remove('flip');document.getElementById('fcF').textContent=fcs[fcI].f;document.getElementById('fcB').textContent=fcs[fcI].b;document.getElementById('fcN').textContent=(fcI+1)+'/'+fcs.length;}
+function flipFC(){fcFlip=!fcFlip;document.getElementById('fc').classList.toggle('flip');}
+function nextFC(){fcI=(fcI+1)%fcs.length;showFC();}
+function prevFC(){fcI=(fcI-1+fcs.length)%fcs.length;showFC();}
+showFC();
+
+// Scenario
+const scRes=[
+    {cls:'ok',txt:'부분적 통제 가능 영역이지만 완벽주의 함정입니다. 수면 부족 → 코르티솔 상승. 오히려 뇌의 인지 능력이 떨어집니다.'},
+    {cls:'good',txt:'통제 이분법 적용! 준비(통제 가능)와 결과(통제 불가)를 명확히 구분했습니다. 충분한 수면은 전전두피질 기반 의사결정을 강화합니다.'},
+    {cls:'bad',txt:'학습된 무력감. 통제 가능 영역도 포기한 것입니다. 무력감은 편도체 과활성 + 전전두피질 저활성으로 이어집니다.'}
+];
+function pickSc(el,i){
+    document.querySelectorAll('.sc-opt').forEach(o=>o.classList.remove('selected'));
+    el.classList.add('selected');
+    const r=document.getElementById('scR');
+    r.className='sc-result show '+scRes[i].cls;r.textContent=scRes[i].txt;
+}
+
+// Quiz
+function chkQ(el,ok){
+    const q=el.parentElement,opts=q.querySelectorAll('.quiz-opt'),fb=q.querySelector('.quiz-fb');
+    if(fb.classList.contains('show'))return;
+    opts.forEach(o=>o.style.pointerEvents='none');
+    el.classList.add(ok?'correct':'wrong');
+    if(!ok) opts.forEach(o=>{if(o.getAttribute('onclick')&&o.getAttribute('onclick').includes('true'))o.classList.add('correct');});
+    fb.classList.add('show');
+}
+
+// Matching
+const mData=[
+    ['에픽테토스','통제의 이분법'],['세네카','부정적 시각화'],['ABC 모델','사건→신념→결과'],['통제 가능','판단 반응 노력'],['통제 불가','타인 결과 환경']
+];
+let mSel=null,mDone=0;
+function initMatch(){
+    const area=document.getElementById('matchArea');area.innerHTML='';
+    const left=mData.map((d,i)=>({t:d[0],i:i,side:'l'}));
+    const right=mData.map((d,i)=>({t:d[1],i:i,side:'r'})).sort(()=>Math.random()-0.5);
+    left.forEach(d=>{const e=document.createElement('div');e.className='match-item';e.textContent=d.t;e.dataset.i=d.i;e.dataset.s='l';e.onclick=function(){clickM(this);};area.appendChild(e);});
+    right.forEach(d=>{const e=document.createElement('div');e.className='match-item';e.textContent=d.t;e.dataset.i=d.i;e.dataset.s='r';e.onclick=function(){clickM(this);};area.appendChild(e);});
+}
+function clickM(el){
+    if(el.classList.contains('done'))return;
+    if(!mSel){mSel=el;el.classList.add('sel');return;}
+    if(mSel.dataset.s===el.dataset.s){mSel.classList.remove('sel');mSel=el;el.classList.add('sel');return;}
+    if(mSel.dataset.i===el.dataset.i){mSel.classList.remove('sel');mSel.classList.add('done');el.classList.add('done');mDone++;mSel=null;
+        if(mDone===mData.length)document.getElementById('matchMsg').textContent='모두 맞추셨습니다!';
+    } else {mSel.classList.remove('sel');el.style.background='var(--coral-light)';setTimeout(()=>el.style.background='',500);mSel=null;}
+}
+initMatch();
+
+// Fade In
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('v');}),{threshold:0.1});
+document.querySelectorAll('.fi').forEach(el=>obs.observe(el));
+</script>
 </body>
 </html>
-<!-- Extended content for Day 13 to reach 55,000+ characters -->
-<!-- Additional philosophical depth and neurological connections -->
-
-<!-- Section: Extended Research on Locus of Control -->
-<!-- Rotter's Social Learning Theory (1966) deep dive -->
-<!-- Cross-cultural studies on locus of control -->
-<!-- Neuroimaging studies confirming Stoic wisdom -->
-<!-- Longitudinal studies on success and internal control -->
-<!-- Studies on stress resilience and agency -->
-<!-- Research on learned optimism versus learned helplessness -->
-
-<!-- Additional Scenarios -->
-<!-- Career advancement scenarios -->
-<!-- Relationship conflict scenarios -->
-<!-- Health and wellness scenarios -->
-<!-- Financial decision-making scenarios -->
-<!-- Educational achievement scenarios -->
-<!-- Team dynamics in workplace -->
-<!-- How dichotomy of control affects leadership -->
-
-<!-- Historical Context -->
-<!-- Stoicism's influence on Roman civilization -->
-<!-- How enslaved philosophy spread through Rome -->
-<!-- Connection to Buddhism and Eastern philosophy -->
-<!-- Medieval Christianity's adoption of Stoic principles -->
-<!-- Renaissance rediscovery of Stoic texts -->
-<!-- 19th century psychology's relationship to Stoicism -->
-<!-- 20th century psychotherapy revolution -->
-
-<!-- Neuroscience Expansion -->
-<!-- Detailed examination of dlPFC function -->
-<!-- How prefrontal cortex develops through control experience -->
-<!-- Amygdala's role in perceived loss of control -->
-<!-- HPA axis and chronic stress from external locus -->
-<!-- Neuroplasticity research on retraining control perception -->
-<!-- Mirror neurons and vicarious learning of control -->
-<!-- Default mode network and worry about uncontrollables -->
-
-<!-- Practical Integration with Previous Learning -->
-<!-- How emotional labeling (Day 2) supports Stoic practice -->
-<!-- Cognitive reappraisal (Days 3-4) as Stoic technique -->
-<!-- Integration with assertiveness (Day 9) -->
-<!-- How I-messages (Day 10) reflect control boundaries -->
-<!-- Feedback models (Day 11) and accepting uncontrollables -->
-
-<!-- Advanced Philosophical Concepts -->
-<!-- Dichotomy's relationship to virtue ethics -->
-<!-- Amor fati - Nietzsche's response to Stoicism -->
-<!-- Existentialism's development from Stoic foundations -->
-<!-- Modern Stoicism movement revival -->
-<!-- Buddhist concepts of non-attachment versus Stoic dichotomy -->
-<!-- Confucian ethics and control boundaries -->
-
-<!-- Case Studies -->
-<!-- Viktor Frankl's survival in concentration camps -->
-<!-- James Stockdale's resilience as POW using Stoicism -->
-<!-- Modern CEOs who apply Stoic principles -->
-<!-- Athletes using control dichotomy for performance -->
-<!-- Artists and creators leveraging internal control -->
-<!-- Researchers and scientists with internal locus -->
-
-<!-- Integration with Daily Life -->
-<!-- Morning Stoic practice routines -->
-<!-- How to apply dichotomy in real-time situations -->
-<!-- Breaking the worry cycle with control assessment -->
-<!-- Using dichotomy for better decision-making -->
-<!-- Teaching Stoic principles to children -->
-<!-- Family dynamics improved through boundary clarity -->
-
-<!-- Neurological Benefits-->
-<!-- Stress hormone reduction with Stoic practice -->
-<!-- Improved executive function through control focus -->
-<!-- Enhanced resilience markers in neuroscience -->
-<!-- Better sleep patterns with reduced rumination -->
-<!-- Cardiovascular benefits of internal control locus -->
-<!-- Immune function improvement with sense of agency -->
-
-<!-- Combining with Previous 12 Days -->
-<!-- How neuroception of safety enables Stoic wisdom -->
-<!-- Emotional regulation as prerequisite for Stoicism -->
-<!-- Trust and control boundaries intersection -->
-<!-- How Part 1 and Part 2 learning support Stoic practice -->
-
-
-<!-- ADDITIONAL CONTENT FOR DEPTH AND CHARACTER COUNT EXPANSION -->
-<!-- Philosophical Deep Dives and Neuroscience Integration -->
-
-<!-- The Dichotomy in Action: Real World Examples -->
-<!-- Modern application across industries and contexts -->
-<!-- How control dichotomy prevents burnout -->
-<!-- Using boundaries to enhance relationships -->
-<!-- Professional growth through appropriate focus -->
-<!-- Mental health benefits of clarity on control -->
-
-<!-- Comparing Worldviews -->
-<!-- Stoicism vs. Victimhood mentality -->
-<!-- Growth mindset as modern reinterpretation of Stoicism -->
-<!-- Buddhism's emptiness and Stoic acceptance -->
-<!-- Christianity's surrender and Stoic deliberation -->
-<!-- Islamic concept of qadr and human choice -->
-<!-- Confucian rectification of names and control -->
-
-<!-- Neuroscience of Wisdom Development -->
-<!-- How repeated practice rewires neural pathways -->
-<!-- Wisdom as optimization of decision-making circuits -->
-<!-- Integration across brain regions supporting sage behavior -->
-<!-- Development of practical wisdom (phronesis) neurologically -->
-<!-- How elders' brains differ in control processing-->
-<!-- Neurological markers of equanimity -->
-
-
-<!-- Extended day 13 content for proper character count -->
-<!-- Comprehensive neuroscience and philosophy integration -->
-
-<!-- Viktor Frankl's logotherapy and Stoic principles -->
-<!-- How meaning-making relates to control boundaries -->
-<!-- Finding freedom within constraints -->
-<!-- The psychology of voluntary suffering -->
-
-<!-- Neuroscience of meaning-making -->
-<!-- Default mode network's role in narrative self -->
-<!-- How sense of control enables meaning creation -->
-<!-- Temporal lobe integration of autobiographical narrative -->
-<!-- Prefrontal cortex's role in finding purpose -->
-
-<!-- Advanced emotional regulation through Stoicism -->
-<!-- Acceptance and commitment therapy (ACT) foundations in Stoic philosophy -->
-<!-- Values clarification through control dichotomy -->
-<!-- Psychological flexibility as modern Stoicism -->
-
-<!-- Implementing dichotomy in modern contexts -->
-<!-- Digital age challenges to control perception -->
-<!-- Social media and illusion of control -->
-<!-- Information overload and attention management -->
-<!-- Maintaining Stoic perspective in hyperconnected world -->
-
-<!-- Neuroscience of stress-resilience through Stoicism -->
-<!-- HPA axis downregulation through practice -->
-<!-- Vagal tone improvement with control reframing -->
-<!-- Long-term cardiovascular benefits of Stoic practice -->
-
-<!-- The role of acceptance in recovery -->
-<!-- How victims of trauma restore sense of control -->
-<!-- Post-traumatic growth through dichotomy understanding -->
-<!-- Building resilience after loss -->
-
-
-<!-- Final expansion section for day 13 -->
-
-<!-- The neurobiology of acceptance -->
-<!-- How acceptance differs from resignation neurologically -->
-<!-- Salience network's role in distinguishing what matters -->
-<!-- Insula's interoceptive awareness and acceptance -->
-
-<!-- Stoicism in modern therapy -->
-<!-- How REBT extends Stoic principles -->
-<!-- DBT's validation and Stoic acceptance -->
-<!-- Third-wave therapies' philosophical roots in Stoicism -->
-
-<!-- Practical integration with neuroscience-->
-<!-- Combining Day 13 with Days 1-12 learning -->
-<!-- Using control dichotomy to prevent amygdala hijacking -->
-<!-- Supporting PFC activation through boundaries -->
-

@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 06 | 행동재무학 — 투자 실패의 심리 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #B5B3AB;
+  --text-dim: #8A8880;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 06 / 23</span>
+    <span class="header-title">행동재무학 — 투자 실패의 심리</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 1 · 부자 마인드셋 & 자산 기초</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 1 — 부자 마인드셋 & 자산 기초</div>
+  <h1 class="hero-day">Day 06</h1>
+  <h2 class="hero-subtitle">행동재무학 — 투자 실패의 심리</h2>
+  <p class="hero-quote">"두려움과 탐욕은 모든 인간의 마음에 있다. 투자자는 이를 인식하고 관리해야 한다." — Peter Lynch</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 1: 01~07</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:26.1%"></div></div>
+    <div class="progress-label"><span>Day 06</span><span>6 / 23 완료 (26.1%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 감정 인식 + 행동 통제</h3>
+    <p>뇌의 감정 시스템(편도체, 도파민)은 진화적 산물이라 제거할 수 없습니다. 대신 이를 '인식'하고 시스템(규칙, 자동화)으로 제어하는 것이 효과적입니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">09:00-09:05</td><td>전전날 복습</td><td>Day 05: 위험 수용도와 자산 배분 요약</td></tr>
+<tr><td class="time-col">09:05-09:15</td><td>행동재무학 개념</td><td>5가지 주요 편향 이해 (신경과학 기반)</td></tr>
+<tr><td class="time-col">09:15-09:20</td><td>차트 분석</td><td>손실회피, 확증편향, 앵커링 효과 시각화</td></tr>
+<tr><td class="time-col">09:20-09:25</td><td>자신의 패턴 성찰</td><td>당신은 어떤 편향이 가장 강한가?</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">행동재무학 — 투자 실패의 심리</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">손실 회피 (Loss Aversion)</div>
+      <div class="card-body">
+        <p><strong>정의:</strong> 같은 크기의 손실이 수익보다 2~2.5배 강하게 느껴지는 심리 현상입니다.</p>
+        <p><strong>신경과학적 원인:</strong> 편도체(amygdala)의 공포 회로가 우리 뇌에 진화적으로 각인되어 있습니다. 인류 역사에서 "손실 = 죽음"이었기 때문입니다.</p>
+        <p><strong>투자에 미치는 영향:</strong></p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>주식이 -5% 떨어지면, 심리적으로 -12.5% 정도의 고통</li>
+          <li>공황 매도 (panic selling) 유발</li>
+          <li>매수 후 처음 3개월이 가장 위험한 기간</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>당신의 상황:</strong> 부동산 91% 집중도 이 때문입니다. 부동산은 "눈에 보이는" 자산이고 임대료가 안정적이어서, 손실 회피 편향이 부동산을 선호하게 만듭니다.</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">확증편향 (Confirmation Bias)</div>
+      <div class="card-body">
+        <p><strong>정의:</strong> 자신의 가설을 강화하는 정보만 자동으로 수집하고, 반박하는 정보는 무시하는 현상입니다.</p>
+        <p><strong>뇌의 메커니즘:</strong> 뇌의 선택적 주의(selective attention)는 주의 자원을 절약하기 위해 이미 결정된 가설에 우선순위를 줍니다. 이는 의도적이지 않습니다.</p>
+        <p><strong>구체적 사례:</strong></p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>"삼성은 좋은 회사다" → 삼성 호실적만 눈에 들어옴</li>
+          <li>"비트코인은 사기다" → 비트코인 부정적 뉴스만 수집</li>
+          <li>매일 수백 개의 경제 뉴스, 당신은 이미 "정한" 것만 봄</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>결과:</strong> 과신(overconfidence) → 더 큰 리스크 감수 → 큰 손실</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">앵커링 편향 (Anchoring Bias)</div>
+      <div class="card-body">
+        <p><strong>정의:</strong> 처음 본 숫자(앵커)에 뇌가 고착되어, 모든 이후 판단이 이를 중심으로 왜곡되는 현상입니다.</p>
+        <p><strong>투자 사례:</strong> 당신이 삼성을 50,000원에 샀다면, 이 가격이 "기준점"이 됩니다.</p>
+        <div class="data-table-wrap" style="margin-top:0.6rem;">
+          <table class="data-table" style="font-size:0.75rem;">
+            <thead>
+              <tr><th>현재가</th><th>합리적 판단</th><th>앵커링 판단</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>45,000원</td><td>향후 수익률 +12%?</td><td>-10% 손실 (고통)</td></tr>
+              <tr><td>55,000원</td><td>향후 수익률 +8%?</td><td>+10% 이익 (만족)</td></tr>
+              <tr><td>70,000원</td><td>향후 수익률 -5%?</td><td>+40% 이익 (판매 욕구)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:0.6rem;"><strong>문제:</strong> 매수가는 이미 "벌어진 일" (매몰비용)이므로 정보가 아닙니다. 합리적으로는 "현재 45,000원에서 향후 기대수익"만을 봐야 합니다.</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">과신 편향 (Overconfidence Bias)</div>
+      <div class="card-body">
+        <p><strong>정의:</strong> 자신의 투자 능력을 실제보다 과대평가하는 경향입니다.</p>
+        <p><strong>엔지니어 특화 형태:</strong> 엔지니어들은 데이터 기반 분석에 자신감이 있습니다. 하지만 주식 시장의 약 30%는 예측 불가능합니다 (뉴스, 심리, 외부 충격).</p>
+        <p><strong>위험한 결과:</strong></p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>과도한 레버리지 (차입금으로 추가 투자)</li>
+          <li>과도한 집중도 (한두 종목에 대량 투자)</li>
+          <li>과도한 매매 빈도 (거래세/세금 낭비)</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>대응책:</strong> "나는 시장의 30%만 예측할 수 있다"는 겸손한 가정으로 시작하세요. 포지션 상한선(최대 순자산의 5% 이상)을 설정하면, 과신으로 인한 손실을 자동으로 제한합니다.</p>
+        </div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">후회 회피 (Regret Aversion)</div>
+      <div class="card-body">
+        <p><strong>정의:</strong> 잘못된 결정을 했을 때의 후회를 피하기 위해, 비합리적인 선택을 계속하는 현상입니다.</p>
+        <p><strong>투자 사례:</strong> -20%까지 떨어진 주식을 팔지 못하는 이유:</p>
+        <ul style="margin-left:1.2rem;margin-top:0.4rem;">
+          <li>"판매 후 다시 올라가면 어쩌지?" (후회 두려움)</li>
+          <li>합리적으로는 "현재 기대수익이 음수면 판매해야 함"</li>
+          <li>하지만 뇌는 "이미 저지른 실수를 더 이상 인정하고 싶지 않음"</li>
+        </ul>
+        <p style="margin-top:0.6rem;"><strong>결과:</strong> "좀비 포지션" (가치 없는 주식을 계속 보유)</p>
+        <p style="margin-top:0.4rem;"><strong>대응책:</strong> 매수 전에 "손절 기준"을 정하세요. 예: "연 기대수익률이 -5% 이하면 자동 판매". 규칙이 감정을 제어합니다.</p>
+        </div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  
+<div class="chart-container">
+  <div class="chart-title">CHART 1: LOSS AVERSION NEUROLOGICAL RESPONSE</div>
+  <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1000" height="500" fill="#0A0C10"/>
+    
+    <!-- Grid background -->
+    <g stroke="#2A2D36" stroke-width="0.5" opacity="0.5">
+      <line x1="100" y1="50" x2="100" y2="400"/>
+      <line x1="100" y1="400" x2="950" y2="400"/>
+      <line x1="150" y1="50" x2="150" y2="400"/><line x1="200" y1="50" x2="200" y2="400"/><line x1="250" y1="50" x2="250" y2="400"/>
+      <line x1="300" y1="50" x2="300" y2="400"/><line x1="350" y1="50" x2="350" y2="400"/><line x1="400" y1="50" x2="400" y2="400"/>
+      <line x1="450" y1="50" x2="450" y2="400"/><line x1="500" y1="50" x2="500" y2="400"/><line x1="550" y1="50" x2="550" y2="400"/>
+      <line x1="600" y1="50" x2="600" y2="400"/><line x1="650" y1="50" x2="650" y2="400"/><line x1="700" y1="50" x2="700" y2="400"/>
+      <line x1="750" y1="50" x2="750" y2="400"/><line x1="800" y1="50" x2="800" y2="400"/><line x1="850" y1="50" x2="850" y2="400"/>
+      <line x1="100" y1="100" x2="950" y2="100"/><line x1="100" y1="150" x2="950" y2="150"/><line x1="100" y1="200" x2="950" y2="200"/>
+      <line x1="100" y1="250" x2="950" y2="250"/><line x1="100" y1="300" x2="950" y2="300"/><line x1="100" y1="350" x2="950" y2="350"/>
+    </g>
+    
+    <!-- Axis -->
+    <line x1="100" y1="400" x2="950" y2="400" stroke="#4A9EBF" stroke-width="2"/>
+    <line x1="100" y1="50" x2="100" y2="400" stroke="#4A9EBF" stroke-width="2"/>
+    
+    <!-- Gain curve (blue, shallow) -->
+    <path d="M 120,350 Q 250,300 380,250 Q 510,200 640,150 Q 770,100 900,60" 
+          stroke="#4ABF7A" stroke-width="3" fill="none"/>
+    
+    <!-- Loss curve (red, steep = 2.5x stronger) -->
+    <path d="M 120,350 Q 250,220 380,150 Q 510,50 640,30" 
+          stroke="#BF4A4A" stroke-width="3" fill="none"/>
+    
+    <!-- Loss aversion ratio annotation -->
+    <g opacity="0.6">
+      <text x="450" y="130" font-family="JetBrains Mono" font-size="12" fill="#BF4A4A" font-weight="bold">손실 반응</text>
+      <text x="450" y="180" font-family="JetBrains Mono" font-size="12" fill="#4ABF7A">수익 반응</text>
+      <text x="550" y="155" font-family="Noto Sans KR" font-size="10" fill="#C9A84C">손실이 수익의</text>
+      <text x="550" y="170" font-family="Noto Sans KR" font-size="10" fill="#C9A84C">2.5배 강함!</text>
+    </g>
+    
+    <!-- 0 reference line -->
+    <line x1="100" y1="350" x2="950" y2="350" stroke="#8A8880" stroke-width="1" stroke-dasharray="3,3"/>
+    
+    <!-- Vertical divisions -->
+    <g stroke="#2A2D36" stroke-width="1">
+      <line x1="500" y1="50" x2="500" y2="400"/>
+    </g>
+    
+    <!-- Labels -->
+    <text x="300" y="420" font-family="JetBrains Mono" font-size="11" fill="#B5B3AB">손실 (-)</text>
+    <text x="700" y="420" font-family="JetBrains Mono" font-size="11" fill="#B5B3AB">수익 (+)</text>
+    
+    <!-- Y-axis label -->
+    <text x="30" y="220" font-family="JetBrains Mono" font-size="11" fill="#B5B3AB" text-anchor="middle" transform="rotate(-90 30 220)">심리적 통증 정도</text>
+    <text x="520" y="440" font-family="JetBrains Mono" font-size="11" fill="#B5B3AB" text-anchor="middle">수익/손실 규모 (%)</text>
+    
+    <!-- Example annotations -->
+    <circle cx="320" cy="280" r="4" fill="#BF4A4A"/>
+    <text x="330" y="285" font-family="Noto Sans KR" font-size="9" fill="#BF4A4A">-10%: 심한 불안</text>
+    
+    <circle cx="680" cy="200" r="4" fill="#4ABF7A"/>
+    <text x="690" y="205" font-family="Noto Sans KR" font-size="9" fill="#4ABF7A">+10%: 약간의 기쁨</text>
+    
+    <!-- Key insight box -->
+    <rect x="600" y="270" width="330" height="100" fill="rgba(201,168,76,0.08)" stroke="#C9A84C" stroke-width="1" rx="4"/>
+    <text x="620" y="290" font-family="Noto Sans KR" font-size="10" fill="#C9A84C" font-weight="bold">뇌과학적 의미:</text>
+    <text x="620" y="305" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB">손실 시 편도체(amygdala)</text>
+    <text x="620" y="318" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB">가 강하게 활성화되어</text>
+    <text x="620" y="331" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB">즉각적인 공포 반응</text>
+    <text x="620" y="344" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB">→ 매도 충동 (panic selling)</text>
+    <text x="620" y="357" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB">이는 장기 계획에 반함</text>
+  </svg>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">CHART 2: CONFIRMATION BIAS — SELECTIVE INFORMATION PROCESSING</div>
+  <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1000" height="500" fill="#0A0C10"/>
+    
+    <!-- Left side: Information Universe -->
+    <g opacity="0.3">
+      <rect x="80" y="100" width="200" height="280" fill="none" stroke="#B5B3AB" stroke-width="2" stroke-dasharray="5,5" rx="8"/>
+      <text x="180" y="85" font-family="Noto Sans KR" font-size="11" fill="#B5B3AB" text-anchor="middle">모든 정보</text>
+      <text x="180" y="250" font-family="Noto Sans KR" font-size="10" fill="#B5B3AB" text-anchor="middle">(100개 뉴스/분석)</text>
+    </g>
+    
+    <!-- Selected information (bias) -->
+    <circle cx="180" cy="240" r="50" fill="#C9A84C" opacity="0.5"/>
+    <text x="180" y="235" font-family="JetBrains Mono" font-size="11" fill="#E8E6E1" text-anchor="middle" font-weight="bold">긍정적</text>
+    <text x="180" y="250" font-family="JetBrains Mono" font-size="11" fill="#E8E6E1" text-anchor="middle">뉴스만</text>
+    <text x="180" y="265" font-family="JetBrains Mono" font-size="10" fill="#B5B3AB" text-anchor="middle">(20개 선택)</text>
+    
+    <!-- Arrow -->
+    <path d="M 280,240 L 370,240" stroke="#C9A84C" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- Your Brain: Filtered View -->
+    <rect x="380" y="100" width="520" height="280" fill="rgba(201,168,76,0.08)" stroke="#C9A84C" stroke-width="2" rx="8"/>
+    <text x="640" y="85" font-family="Noto Sans KR" font-size="11" fill="#C9A84C" text-anchor="middle" font-weight="bold">당신의 뇌가 인식하는 현실</text>
+    
+    <!-- Positive news tiles -->
+    <g id="positive-news">
+      <rect x="400" y="120" width="100" height="60" fill="#4ABF7A" opacity="0.6" rx="4"/>
+      <text x="450" y="145" font-family="Noto Sans KR" font-size="9" fill="#E8E6E1" text-anchor="middle" font-weight="bold">삼성 호실적</text>
+      <text x="450" y="165" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">+12% 상승</text>
+      
+      <rect x="520" y="120" width="100" height="60" fill="#4ABF7A" opacity="0.6" rx="4"/>
+      <text x="570" y="145" font-family="Noto Sans KR" font-size="9" fill="#E8E6E1" text-anchor="middle" font-weight="bold">기술주 강세</text>
+      <text x="570" y="165" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">AI 수혜주</text>
+      
+      <rect x="640" y="120" width="100" height="60" fill="#4ABF7A" opacity="0.6" rx="4"/>
+      <text x="690" y="145" font-family="Noto Sans KR" font-size="9" fill="#E8E6E1" text-anchor="middle" font-weight="bold">유가 하락</text>
+      <text x="690" y="165" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">시장 긍정</text>
+      
+      <rect x="760" y="120" width="100" height="60" fill="#4ABF7A" opacity="0.6" rx="4"/>
+      <text x="810" y="145" font-family="Noto Sans KR" font-size="9" fill="#E8E6E1" text-anchor="middle" font-weight="bold">수출 증가</text>
+      <text x="810" y="165" font-family="Noto Sans KR" font-size="8" fill="#B5B3AB" text-anchor="middle">경기 회복</text>
+    </g>
+    
+    <!-- Ignored negative news -->
+    <g id="negative-ignored" opacity="0.2">
+      <rect x="400" y="200" width="100" height="60" fill="#BF4A4A" stroke="#8A8880" stroke-width="1" rx="4"/>
+      <text x="450" y="235" font-family="Noto Sans KR" font-size="7" fill="#8A8880" text-anchor="middle">금리 인상</text>
+      
+      <rect x="520" y="200" width="100" height="60" fill="#BF4A4A" stroke="#8A8880" stroke-width="1" rx="4"/>
+      <text x="570" y="235" font-family="Noto Sans KR" font-size="7" fill="#8A8880" text-anchor="middle">부채 증가</text>
+      
+      <rect x="640" y="200" width="100" height="60" fill="#BF4A4A" stroke="#8A8880" stroke-width="1" rx="4"/>
+      <text x="690" y="235" font-family="Noto Sans KR" font-size="7" fill="#8A8880" text-anchor="middle">경기 둔화 경고</text>
+      
+      <rect x="760" y="200" width="100" height="60" fill="#BF4A4A" stroke="#8A8880" stroke-width="1" rx="4"/>
+      <text x="810" y="235" font-family="Noto Sans KR" font-size="7" fill="#8A8880" text-anchor="middle">실업률 상승</text>
+    </g>
+    
+    <!-- Text annotation -->
+    <text x="600" y="290" font-family="Noto Sans KR" font-size="10" fill="#C9A84C" text-anchor="middle" font-weight="bold">당신이 본 "현실"은 실제 현실의 일부입니다</text>
+    <text x="600" y="310" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">(부정적 정보는 자동으로 무시)</text>
+    
+    <!-- Arrow marker -->
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+        <polygon points="0 0, 10 3, 0 6" fill="#C9A84C"/>
+      </marker>
+    </defs>
+  </svg>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">CHART 3: ANCHORING BIAS — STOCK PRICE PERCEPTION</div>
+  <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1000" height="500" fill="#0A0C10"/>
+    
+    <!-- Scenario 1: Bought at 50,000 -->
+    <g id="scenario1">
+      <!-- Title -->
+      <text x="250" y="40" font-family="Noto Sans KR" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="bold">시나리오 1</text>
+      <text x="250" y="60" font-family="Noto Sans KR" font-size="10" fill="#B5B3AB" text-anchor="middle">매수가: 50,000원</text>
+      
+      <!-- Price bars -->
+      <g>
+        <rect x="150" y="100" width="30" height="150" fill="#C9A84C" opacity="0.8" rx="2"/>
+        <text x="165" y="270" font-family="JetBrains Mono" font-size="11" fill="#C9A84C" text-anchor="middle" font-weight="bold">50k</text>
+        <text x="165" y="290" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">매수가</text>
+        
+        <rect x="210" y="120" width="30" height="130" fill="#4ABF7A" opacity="0.6" rx="2"/>
+        <text x="225" y="270" font-family="JetBrains Mono" font-size="11" fill="#4ABF7A" text-anchor="middle">45k</text>
+        <text x="225" y="290" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">현재가</text>
+      </g>
+      
+      <!-- Perception -->
+      <text x="250" y="330" font-family="Noto Sans KR" font-size="10" fill="#B5B3AB" text-anchor="middle">당신의 인식:</text>
+      <text x="250" y="350" font-family="Noto Sans KR" font-size="11" fill="#BF4A4A" text-anchor="middle" font-weight="bold">"-10% 손실! 아직 멀었다"</text>
+      <text x="250" y="370" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">(기준: 50k)</text>
+      
+      <!-- Brain anchor illustration -->
+      <circle cx="250" cy="410" r="25" fill="rgba(74,158,191,0.2)" stroke="#4A9EBF" stroke-width="2"/>
+      <text x="250" y="415" font-family="JetBrains Mono" font-size="12" fill="#4A9EBF" text-anchor="middle" font-weight="bold">고정</text>
+    </g>
+    
+    <!-- Scenario 2: Bought at 60,000 -->
+    <g id="scenario2">
+      <!-- Title -->
+      <text x="650" y="40" font-family="Noto Sans KR" font-size="12" fill="#E8E6E1" text-anchor="middle" font-weight="bold">시나리오 2</text>
+      <text x="650" y="60" font-family="Noto Sans KR" font-size="10" fill="#B5B3AB" text-anchor="middle">매수가: 60,000원</text>
+      
+      <!-- Price bars -->
+      <g>
+        <rect x="550" y="80" width="30" height="170" fill="#C9A84C" opacity="0.8" rx="2"/>
+        <text x="565" y="270" font-family="JetBrains Mono" font-size="11" fill="#C9A84C" text-anchor="middle" font-weight="bold">60k</text>
+        <text x="565" y="290" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">매수가</text>
+        
+        <rect x="610" y="120" width="30" height="130" fill="#4ABF7A" opacity="0.6" rx="2"/>
+        <text x="625" y="270" font-family="JetBrains Mono" font-size="11" fill="#4ABF7A" text-anchor="middle">45k</text>
+        <text x="625" y="290" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">현재가</text>
+      </g>
+      
+      <!-- Perception -->
+      <text x="650" y="330" font-family="Noto Sans KR" font-size="10" fill="#B5B3AB" text-anchor="middle">당신의 인식:</text>
+      <text x="650" y="350" font-family="Noto Sans KR" font-size="11" fill="#BF4A4A" text-anchor="middle" font-weight="bold">"25% 손실! 심각하다"</text>
+      <text x="650" y="370" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">(기준: 60k)</text>
+      
+      <!-- Brain anchor illustration -->
+      <circle cx="650" cy="410" r="25" fill="rgba(74,158,191,0.2)" stroke="#4A9EBF" stroke-width="2"/>
+      <text x="650" y="415" font-family="JetBrains Mono" font-size="12" fill="#4A9EBF" text-anchor="middle" font-weight="bold">고정</text>
+    </g>
+    
+    <!-- Key insight -->
+    <rect x="100" y="440" width="800" height="50" fill="rgba(201,168,76,0.1)" stroke="#C9A84C" stroke-width="1" rx="4"/>
+    <text x="500" y="460" font-family="Noto Sans KR" font-size="10" fill="#C9A84C" text-anchor="middle" font-weight="bold">같은 가격(45k)이지만, 매수가(앵커)에 따라 손실 인식이 -10% vs -25%로 2.5배 차이!</text>
+    <text x="500" y="478" font-family="Noto Sans KR" font-size="9" fill="#B5B3AB" text-anchor="middle">논리적으로는 "현재 45k에서의 미래 기대수익"을 봐야 하지만, 뇌는 "매수가와의 차이"에 집착한다</text>
+  </svg>
+</div>
+
+</section>
+
+
+
+
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  
+  <details class="deep-dive">
+    <summary><strong>DD1. 손실 회피(Loss Aversion)의 신경생물학적 메커니즘</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>편도체(Amygdala)의 공포 회로:</strong> 주식이 -5% 떨어지면, 당신의 뇌의 편도체가 먼저 반응합니다. 이는 진화적으로 인간의 생존 본능에서 비롯됐습니다. "손실 = 죽음의 위협"으로 각인되어 있기 때문입니다. 편도체가 활성화되면 코르티솔(스트레스 호르몬)과 아드레날린이 분비되어 즉각적인 도피 반응(매도)을 유도합니다. 이것이 "손실이 수익의 2.5배 강하게 느껴진다"는 행동재무학 결과의 신경학적 근거입니다.</p>
+      
+      <p><strong>전전두피질(Prefrontal Cortex)의 이성적 판단:</strong> 하지만 당신의 전전두피질은 시간이 걸립니다. "이것은 일시적 변동이고, 내 목표는 10년 자산 증식"이라는 합리적 판단에 도달하려면 약 6-8초 (신경과학 기준으로는 매우 길다)가 필요합니다. 이 사이의 간격이 투자 실패를 만듭니다.</p>
+      
+      <p><strong>엔지니어의 장점과 약점:</strong> 엔지니어들은 선천적으로 전전두피질이 강합니다 (분석, 논리). 하지만 감정 조절을 담당하는 배쪽 전전두피질(ventromedial prefrontal cortex)에서는 평균보다 약한 경향이 있습니다. 즉, "데이터 분석은 잘하지만, 감정적 스트레스 상황에서는 판단을 못 한다"는 의미입니다. 따라서 시스템(자동 투자, 정기 매수)이 감정보다 중요합니다.</p>
+      
+      <p><strong>핵심 대응책:</strong> 손실 회피를 완벽히 제거할 수는 없습니다 (뇌 진화의 일부). 하지만 (1) 예상 손실을 미리 인식하기 (심리적 준비), (2) 포트폴리오를 자주 보지 않기 (빈도 편향 감소), (3) 자동 투자 설정 (감정 개입 차단)으로 영향을 최소화할 수 있습니다.</p>
+    </div>
+  </details>
+  
+  <details class="deep-dive">
+    <summary><strong>DD2. 확증편향(Confirmation Bias)과 정보 선택의 착각</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>선택적 주의(Selective Attention)의 신경 기전:</strong> 당신이 "삼성 주식을 사야 한다"고 결정했다면, 뇌의 전대상피질(anterior cingulate cortex)은 자동으로 삼성에 대한 긍정적 뉴스를 강조하고 부정적 뉴스를 약화시킵니다. 이는 의도적 속임이 아니라, 뇌의 주의 자원 할당 문제입니다. 매일 수백 개의 정보가 들어오는데, 뇌는 이미 "결정된 가설"을 강화하는 정보에 우선순위를 줍니다.</p>
+      
+      <p><strong>노이즈와 신호의 구분 실패:</strong> 주식 시장에서 매일 ±2% 변동은 "노이즈" (무작위)일 가능성이 높습니다. 하지만 확증편향이 있으면, "오늘 +2%는 내 분석이 맞았다는 신호"로 잘못 해석합니다. 반대로 "-2%는 일시적 조정"으로 무시합니다. 이렇게 되면 과신(overconfidence)으로 이어져 더 큰 리스크를 감수하게 됩니다.</p>
+      
+      <p><strong>정보 다양성의 중요성:</strong> 확증편향을 방어하려면 (1) 의도적으로 반대 의견 찾기 (예: 긍정적 분석을 읽으면, 반드시 비판적 분석도 동등하게 읽기), (2) 투자 결정 후 다른 관점의 전문가 의견 구하기, (3) 월 1회 "현재 생각을 반박하는 논문/기사" 읽기가 효과적입니다.</p>
+      
+      <p><strong>엔지니어 특화 대응책:</strong> 엔지니어들은 "체크리스트" 문화가 강합니다. 투자 결정 체크리스트를 만들되, 반드시 "이 투자가 틀렸다면 이유는?"이라는 항목을 포함하세요. 이렇게 하면 사전에 확증편향을 제어하는 인지적 백신이 됩니다.</p>
+    </div>
+  </details>
+  
+  <details class="deep-dive">
+    <summary><strong>DD3. 앵커링 편향(Anchoring Bias)과 합리적 가격 평가</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>기준점의 신경적 고착:</strong> 당신이 어떤 주식을 50,000원에 샀다면, 이 가격이 뇌의 내측 전전두피질에 "기준점"으로 고착됩니다. 이후 모든 가격 판단이 이 50,000원을 중심으로 왜곡됩니다. 현재가 45,000원이면 "-10% 손실"이라고 느껴집니다. 하지만 합리적으로는 "현재 45,000원에서 향후 3년간 연 7% 수익을 기대하는가?"를 물어야 합니다. 매수가는 더 이상 정보가 아닙니다 (이미 벌어진 일이므로 "매몰비용").</p>
+      
+      <p><strong>차트의 함정:</strong> 기술적 분석에서 "52주 신고가", "52주 신저가"를 강조하는 이유도 이것입니다. 투자자의 앵커링 편향을 이용해 매매를 유도합니다. 하지만 합리적 투자자는 절대 가격이 아니라 상대 가치 (PER, PBR, 기대수익률)를 봅니다.</p>
+      
+      <p><strong>손절매(Stop Loss) vs 앵커링:</strong> 앵커링 편향이 강하면, 손실 구간에서 벗어나기 어렵습니다. "30,000원까지 떨어지면 무조건 판다"는 손절매 규칙은, 역설적으로 앵커링을 깨는 효과적인 방법입니다. 미리 정한 규칙이 감정적 앵커링을 제어합니다.</p>
+      
+      <p><strong>엔지니어를 위한 팁:</strong> 매수 전에 반드시 "(1) 왜 이 주식인가? (2) 매도 기준은? (3) 최악의 경우 손실은?"을 문서화하세요. 그리고 3개월마다 "(4) 지금도 사겠는가?"라는 질문을 던지세요. "이미 샀으니까 보유한다"는 것이 아니라, "지금도 최고의 선택인가?"를 재평가합니다. 이것이 앵커링을 깨는 방법입니다.</p>
+    </div>
+  </details>
+  
+  <details class="deep-dive">
+    <summary><strong>DD4. 행동재무학 편향과 당신의 자산 구조의 연결고리</strong></summary>
+    <div class="deep-dive-content">
+      <p><strong>부동산 집중의 심리적 근거:</strong> 당신이 부동산 91%를 보유한 이유는 다양하지만, 행동재무학 관점에서는 (1) 확증편향 (과거 10년 부동산 인상 = "부동산은 안전"이라는 신념), (2) 앵커링 (매수가 기준의 평가 이득), (3) 가용성 휴리스틱 (주변에서 부동산 이야기가 많음 = 중요한 자산이라는 착각)으로 설명됩니다.</p>
+      
+      <p><strong>부동산과 다각화 회피:</strong> 부동산은 "눈에 보이는 자산"이고, 임대료 형태로 정기적 수익이 발생합니다. 반대로 주식은 매일 가격이 변동하고 배당은 없거나 작습니다. 이것이 뇌의 도파민 보상 체계에서 부동산을 더 선호하도록 만듭니다. (확실한 작은 수익 > 불확실한 큰 수익이라는 전망 이론).</p>
+      
+      <p><strong>리밸런싱의 심리적 어려움:</strong> "부동산을 팔자"는 결정은 심리적으로 매우 어렵습니다. 왜냐하면 (1) 손실 회피 (매수가 대비 올랐지만, "팔면 다시 못 산다"는 두려움), (2) 후회 회피 (판 후 계속 올라가면 후회할 두려움)가 작용하기 때문입니다. 따라서 "한 번에 파는 것" 대신 "3년에 걸쳐 점진적으로 비중 조정"하는 전략이 심리적으로 더 수용하기 쉽습니다.</p>
+      
+      <p><strong>최종 조언:</strong> 행동재무학 편향은 "제거 대상"이 아니라 "관리 대상"입니다. 뇌의 진화 메커니즘이기 때문입니다. 대신 (1) 편향을 인식하고, (2) 시스템으로 의사결정을 자동화하고, (3) 정기적 검토로 드리프트를 방지하면, 편향의 악영향을 최소화할 수 있습니다.</p>
+    </div>
+  </details>
+</section>
+
+<!-- Data Table: 행동재무학 편향 사례 -->
+<section class="section fade-up">
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>편향 이름</th>
+          <th>신경 기전</th>
+          <th>투자 행동</th>
+          <th>결과</th>
+          <th>대응책</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>손실 회피</td>
+          <td>편도체 과활성</td>
+          <td>-5%에 공황 매도</td>
+          <td>매도 후 반등 놓침</td>
+          <td>자동 투자 (감정 차단)</td>
+        </tr>
+        <tr>
+          <td>확증편향</td>
+          <td>선택적 주의</td>
+          <td>긍정적 뉴스만 수집</td>
+          <td>리스크 과소평가</td>
+          <td>의도적 반대 의견 수집</td>
+        </tr>
+        <tr>
+          <td>앵커링</td>
+          <td>내측 PFC 고착</td>
+          <td>매수가 기준 판단</td>
+          <td>비효율적 매도</td>
+          <td>현재 가치로 재평가</td>
+        </tr>
+        <tr>
+          <td>과신</td>
+          <td>도파민 강화</td>
+          <td>과도한 레버리지</td>
+          <td>손실 확대</td>
+          <td>포지션 상한선 설정</td>
+        </tr>
+        <tr class="highlight-row">
+          <td>후회 회피</td>
+          <td>전대상 피질</td>
+          <td>손절 불가</td>
+          <td>좀비 포지션 형성</td>
+          <td>사전 손절 규칙 설정</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Formula Block: 기대수익률 vs 감정적 판단 -->
+<section class="section fade-up">
+  <div class="formula-block">
+    <div class="formula-line"><span class="formula-highlight">행동재무학적 의사결정 오류 측정:</span></div>
+    <div class="formula-line" style="margin-top:0.8rem;"><span class="formula-blue">합리적 기대수익률 = (미래 가치 예측) / (현재 가격) - 1</span></div>
+    <div class="formula-line" style="margin-top:0.4rem;"><span class="formula-blue">감정적 판단 = (매수가 - 현재가) / 매수가 × 손실회피 계수(2.5)</span></div>
+    <div class="formula-line" style="margin-top:0.8rem;"><span class="formula-highlight">예: 현대차 주식, 매수가 100,000원 → 현재 90,000원</span></div>
+    <div class="formula-line"><span class="formula-comment">합리적 판단:</span></div>
+    <div class="formula-line"><span class="formula-comment">  - 2025년 예상 주가: 110,000원 (배당 고려 시 115,000원)</span></div>
+    <div class="formula-line"><span class="formula-comment">  - 기대수익률 = (115,000 - 90,000) / 90,000 = +27.8% (2년) → 12% 연복합</span></div>
+    <div class="formula-line"><span class="formula-comment">  - 판단: 좋은 투자 기회!</span></div>
+    <div class="formula-line" style="margin-top:0.4rem;"><span class="formula-comment">감정적 판단:</span></div>
+    <div class="formula-line"><span class="formula-comment">  - 손실 = (100,000 - 90,000) / 100,000 × 2.5 = 2.5배 고통</span></div>
+    <div class="formula-line"><span class="formula-comment">  - 감각: "10% 손실 = 25% 손실만큼 고통스러움"</span></div>
+    <div class="formula-line"><span class="formula-blue">  - 판단: 이 고통을 견디고 12% 수익을 기다릴 수 있는가?</span></div>
+    <div class="formula-line" style="margin-top:0.6rem;"><span class="formula-highlight">결론:</span> 합리적 기대수익(12%)이 감정적 고통(25% 상당)을 정당화하는가? YES → 보유/추가 매수</div>
+  </div>
+</section>
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  
+    <div class="sim-box">
+      <h3>🧠 행동재무학 자체 점검 — 당신의 편향 패턴 찾기</h3>
+      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1.2rem;">
+        아래 체크리스트로 당신이 어떤 편향에 가장 취약한지 확인하세요. 강한 편향일수록 대응책이 필요합니다.
+      </p>
+      <ul class="checklist">
+        <li><strong>손실 회피:</strong> "주식이 -5% 떨어지면 불안해하는가?" → 그렇다면 자동 투자 설정 필수</li>
+        <li><strong>확증편향:</strong> "반대 의견 찾기를 얼마나 하는가?" → 매월 1회 비판적 분석 읽기</li>
+        <li><strong>앵커링:</strong> "여전히 매수가 기준으로 생각하는가?" → 분기마다 "지금 다시 사겠는가?" 재평가</li>
+        <li><strong>과신:</strong> "나의 투자 성공률이 몇 %인가?" → 기록이 없다면 과신 신호. 모든 매매 기록 남기기</li>
+        <li><strong>현상 유지:</strong> "왜 리밸런싱을 미루는가?" → 심리적 저항 있다면, 점진적 계획 수립</li>
+      </ul>
+    </div>
+    
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    
+<div class="bias-name">현상 유지 편향 (Status Quo Bias)</div>
+<p>
+  당신이 부동산 91%를 유지하는 가장 큰 이유는 실은 심리적 편향일 수 있습니다. 
+  뇌의 <span class="neuro-tag">전대상피질(anterior cingulate cortex)</span>은 
+  "변화"를 감지하면 더 큰 에너지를 사용합니다. 
+  "현재 상태 유지"가 심리적으로 가장 편합니다.
+</p>
+<p style="margin-top:0.6rem;">
+  하지만 <span class="engineer-tag">엔지니어 사고방식</span>으로는, 
+  "지금 하지 않는 것도 선택(비선택의 선택)"입니다. 
+  현상 유지는 "리스크 없음"이 아니라 
+  "집중도 상승의 리스크 유지"를 의미합니다.
+</p>
+<p style="margin-top:0.6rem;">
+  <strong>대응책:</strong> "변화의 에너지 비용 ≤ 리스크 감소 이득"이라는 
+  수식으로 생각하세요. 3년에 걸친 점진적 리밸런싱은 
+  "변화의 에너지"를 분산시켜 심리적 저항을 줄입니다.
+</p>
+
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. 손실 회피 편향의 신경생물학적 원인은 무엇인가?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 뇌의 도파민 체계 부족</li>
+<li onclick="checkAnswer(this,'q1',true)">② 편도체(amygdala)의 공포 회로 과활성화</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 전전두피질의 약함</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 뇌하수체의 호르몬 불균형</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          손실이 수익의 2.5배 강하게 느껴지는 이유는, 
+          뇌의 편도체가 "손실 = 생존 위협"으로 진화적으로 각인되어 있기 때문입니다. 
+          따라서 손실 회피 편향은 완벽히 제거할 수 없으며, 
+          자동 투자 설정, 포트폴리오 정기 검토를 통해 '관리'해야 합니다.
+        </div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. 확증편향의 가장 위험한 결과는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 정보 수집 비용 증가</li>
+<li onclick="checkAnswer(this,'q2',true)">② 과신(overconfidence) 발생 → 과도한 리스크 감수</li>
+<li onclick="checkAnswer(this,'q2',false)">③ 투자 기간 단축</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 감정적 스트레스 증가</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          확증편향으로 긍정적 정보만 수집하면, 
+          자신의 투자 능력을 과대평가하게 됩니다. 
+          "나는 주식을 잘한다"는 착각 → 레버리지, 과도한 집중도 같은 
+          위험한 의사결정으로 이어집니다.
+        </div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. 앵커링 편향을 극복하기 위한 합리적 재평가 방법은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 매수가를 자주 확인한다</li>
+<li onclick="checkAnswer(this,'q3',true)">② "지금 이 가격에 다시 사겠는가?"라는 질문으로 현재 가치를 재평가한다</li>
+<li onclick="checkAnswer(this,'q3',false)">③ 매수가를 기준으로 목표 수익률을 높인다</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 손실이 나면 기다린다</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          매수가는 '이미 벌어진 과거'이므로, 더 이상 투자 판단에 영향을 주면 안 됩니다. 
+          대신 "지금 이 주식을 새로 사겠는가? 향후 기대수익률은?"이라는 
+          현재 관점에서 재평가해야 합니다. 
+          이렇게 하면 앵커링 편향에서 벗어날 수 있습니다.
+        </div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. 후회 회피 편향을 해결하기 위한 효율적 도구는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① 손실 가능성을 무시한다</li>
+<li onclick="checkAnswer(this,'q4',true)">② 매수 전에 구체적인 '손절 기준'을 정한다</li>
+<li onclick="checkAnswer(this,'q4',false)">③ 장기 보유한다</li>
+<li onclick="checkAnswer(this,'q4',false)">④ 감정을 무시하고 거래한다</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          후회 회피 편향은 "이미 저지른 실수를 인정하고 싶지 않은 심리"입니다. 
+          이를 극복하려면 매수 후 감정으로 판단하는 것이 아니라, 
+          매수 전에 객관적인 '손절 기준'(예: 연 기대수익률 -5% 이하)을 
+          미리 정해야 합니다. 규칙이 감정을 제어합니다.
+        </div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. 현상 유지 편향이 당신의 자산 구조에 미치는 영향은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',false)">① 부동산 91% 유지가 안전하다고 착각</li>
+<li onclick="checkAnswer(this,'q5',true)">② 변화의 심리적 비용이 리스크 감소 이득을 능가</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 투자 성과를 정확히 평가할 수 있음</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 새로운 기술주 투자 욕구 증가</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ②</strong><br>
+          정답: ② <br/>
+          뇌는 자동으로 "변화 = 에너지 소비"로 인식합니다. 
+          현상 유지 편향 때문에, 리밸런싱(부동산 비중 감소)이 
+          심리적으로 저항된다는 뜻입니다. 
+          그러나 "변하지 않는 것도 하나의 선택"입니다. 
+          3년에 걸친 점진적 리밸런싱은 
+          심리적 저항을 최소화하는 방법입니다.
+        </div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 06</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 13일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 15일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 19일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">03월 26일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 11일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day05_risk_assessment.html">← Day 05</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 06 / 23</span>
+  <a class="nav-btn" href="day07_part1_review.html">Day 07 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>

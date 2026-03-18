@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 03 | 한국 직장인 자산 형성 경로 — 부자 마인드셋 스터디</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ DESIGN SYSTEM v2 ═══ */
+:root {
+  --bg-primary: #0A0C10;
+  --bg-card: #12151C;
+  --bg-card-hover: #181C26;
+  --bg-accent: #1A1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4A9EBF;
+  --blue-dim: rgba(74,158,191,0.15);
+  --blue-glow: rgba(74,158,191,0.3);
+  --text-primary: #E8E6E1;
+  --text-secondary: #B5B3AB;
+  --text-dim: #8A8880;
+  --border: #2A2D36;
+  --red: #BF4A4A;
+  --green: #4ABF7A;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Noto Sans KR', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-glow); }
+
+/* ═══ FADE-UP ANIMATION ═══ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ STICKY HEADER ═══ */
+.sticky-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-day {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold);
+  background: var(--gold-dim); padding: 0.2rem 0.7rem; border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+.header-title { font-family: var(--font-body); font-size: 0.85rem; color: var(--text-secondary); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.header-badge { font-family: var(--font-mono); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; letter-spacing: 0.05em; }
+.badge-asset { color: var(--blue); background: var(--blue-dim); }
+.badge-series { color: var(--text-dim); background: rgba(255,255,255,0.04); }
+.timer-btn {
+  background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer; transition: all 0.3s;
+}
+.timer-btn:hover { background: var(--gold-glow); }
+
+/* ═══ LAYOUT ═══ */
+.container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 3rem;
+}
+.hero-part { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.hero-day { font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-bottom: 0.3rem; }
+.hero-subtitle { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; color: var(--gold); margin-bottom: 1.5rem; }
+.hero-quote { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; color: var(--text-secondary); max-width: 600px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.hero-badges { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.hero-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 0.35rem 0.8rem; border-radius: 4px; display: flex; align-items: center; gap: 0.4rem; }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+.hb-net { color: var(--gold); background: var(--gold-dim); } .hb-net .dot { background: var(--gold); }
+.hb-house { color: var(--blue); background: var(--blue-dim); } .hb-house .dot { background: var(--blue); }
+.hb-debt { color: var(--red); background: rgba(191,74,74,0.12); } .hb-debt .dot { background: var(--red); }
+.hb-stock { color: var(--green); background: rgba(74,191,122,0.12); } .hb-stock .dot { background: var(--green); }
+.series-info { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-wrap { margin: 1.5rem 0; }
+.progress-bar-bg { height: 4px; background: var(--bg-accent); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,var(--gold),var(--blue)); border-radius: 2px; transition: width 0.5s; }
+.progress-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem; display: flex; justify-content: space-between; }
+
+/* ═══ SECTIONS ═══ */
+.section { margin-bottom: 3rem; }
+.section-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+
+/* ═══ BRAIN BOX ═══ */
+.brain-box {
+  background: linear-gradient(135deg,var(--bg-card),var(--bg-accent));
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+}
+.brain-box h3 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--blue); margin-bottom: 0.8rem; }
+.brain-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.6rem; line-height: 1.7; }
+.time-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.8rem; }
+.time-table th { text-align: left; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); }
+.time-table td { padding: 0.5rem 0.8rem; color: var(--text-secondary); border-bottom: 1px solid rgba(42,45,54,0.5); }
+.time-table .time-col { font-family: var(--font-mono); color: var(--gold); white-space: nowrap; }
+
+/* ═══ CONCEPT CARDS ═══ */
+.cards-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+.concept-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; transition: all 0.3s;
+}
+.concept-card:hover { background: var(--bg-card-hover); border-color: var(--gold-glow); }
+.card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem; }
+.card-body { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8; }
+.card-body p { margin-bottom: 0.6rem; }
+
+/* ═══ FORMULA BLOCK — GOLD LEFT BORDER ═══ */
+.formula-block {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-line { color: var(--text-primary); }
+.formula-comment { color: var(--text-dim); font-size: 0.72rem; }
+.formula-highlight { color: var(--gold); }
+.formula-blue { color: var(--blue); }
+
+/* ═══ DATA TABLE ═══ */
+.data-table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.data-table th {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.7rem; text-align: right;
+  border-bottom: 2px solid var(--gold-dim); white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 0.6rem 0.7rem; text-align: right; color: var(--text-secondary);
+  border-bottom: 1px solid rgba(42,45,54,0.5); font-family: var(--font-mono); font-size: 0.78rem;
+}
+.data-table td:first-child { text-align: left; font-family: var(--font-body); color: var(--text-primary); font-weight: 400; }
+.data-table tr:hover td { background: rgba(201,168,76,0.04); }
+.highlight-row td { color: var(--gold) !important; font-weight: 500; background: var(--gold-dim) !important; }
+
+/* ═══ CHART ═══ */
+.chart-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.chart-title {
+  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+
+/* ═══ SIMULATION BOX ═══ */
+.sim-box {
+  background: linear-gradient(135deg,rgba(201,168,76,0.06),rgba(74,158,191,0.06));
+  border: 1px solid var(--gold-dim); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.sim-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 1rem; }
+.checklist { list-style: none; margin-top: 1rem; }
+.checklist li {
+  font-size: 0.85rem; color: var(--text-secondary); padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative; border-bottom: 1px solid rgba(42,45,54,0.3); cursor: pointer;
+}
+.checklist li::before {
+  content: ''; position: absolute; left: 0; top: 0.65rem;
+  width: 14px; height: 14px; border: 1.5px solid var(--gold); border-radius: 3px;
+}
+.checklist li.checked::before { background: var(--gold); }
+.checklist li.checked::after {
+  content: '✓'; position: absolute; left: 2px; top: 0.42rem;
+  color: var(--bg-primary); font-size: 0.75rem; font-weight: 700;
+}
+
+/* ═══ PSYCHOLOGY BOX ═══ */
+.psych-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;
+}
+.psych-box h3 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--gold); margin-bottom: 0.8rem; }
+.psych-box .bias-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+.psych-box p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0.5rem; }
+.neuro-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--blue); background: var(--blue-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+.engineer-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--gold); background: var(--gold-dim); padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin: 0.3rem 0.3rem 0.3rem 0; letter-spacing: 0.05em;
+}
+
+/* ═══ DEEP DIVE ═══ */
+.deep-dive {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  margin: 1rem 0; overflow: hidden;
+}
+.deep-dive summary {
+  padding: 1rem 1.2rem; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.88rem; font-weight: 500; color: var(--text-primary);
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+  transition: background 0.2s;
+}
+.deep-dive summary::-webkit-details-marker { display: none; }
+.deep-dive summary::before {
+  content: '▸'; font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold);
+  transition: transform 0.2s;
+}
+.deep-dive[open] summary::before { transform: rotate(90deg); }
+.deep-dive summary:hover { background: var(--bg-card-hover); }
+.deep-dive-content {
+  padding: 0 1.2rem 1.2rem; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.8;
+}
+.deep-dive-content p { margin-bottom: 0.6rem; }
+
+/* ═══ QUIZ ═══ */
+.quiz-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; }
+.quiz-q { margin-bottom: 1.5rem; }
+.quiz-q h4 { font-family: var(--font-body); font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem; }
+.quiz-options { list-style: none; }
+.quiz-options li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 0.5rem 0.8rem;
+  margin-bottom: 0.3rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.quiz-options li:hover { background: var(--bg-accent); border-color: var(--border); }
+.quiz-options li.correct { background: rgba(74,191,122,0.12); border-color: var(--green); color: var(--green); }
+.quiz-options li.wrong { background: rgba(191,74,74,0.12); border-color: var(--red); color: var(--red); }
+.quiz-answer {
+  display: none; margin-top: 0.5rem; padding: 0.8rem; background: var(--bg-accent);
+  border-radius: 4px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* ═══ SR TRACKER ═══ */
+.sr-tracker {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.sr-tracker h3 {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem;
+}
+.sr-slots { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 0.5rem; }
+.sr-slot {
+  background: var(--bg-accent); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.6rem; text-align: center; cursor: pointer; transition: all 0.2s;
+}
+.sr-slot:hover { border-color: var(--gold); }
+.sr-slot.done { border-color: var(--green); background: rgba(74,191,122,0.08); }
+.sr-slot .sr-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.sr-slot .sr-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+/* ═══ DISCLAIMER ═══ */
+.disclaimer {
+  margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; text-align: center;
+}
+
+/* ═══ NAV FOOTER ═══ */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem 0; }
+.nav-btn {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border);
+  border-radius: 4px; transition: all 0.3s;
+}
+.nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.nav-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .sticky-header { padding: 0.5rem 1rem; }
+  .hero-day { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.3rem; }
+  .container { padding: 4.5rem 1rem 2rem; }
+  .section-title { font-size: 1.3rem; }
+  .sr-slots { grid-template-columns: repeat(2, 1fr); }
+  .header-right { gap: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="sticky-header">
+  <div class="header-left">
+    <span class="header-day">DAY 03 / 23</span>
+    <span class="header-title">한국 직장인 자산 형성 경로</span>
+  </div>
+  <div class="header-right">
+    <span class="header-badge badge-asset">순자산 3억 2,800만</span>
+    <span class="header-badge badge-series">PART 1 · 부자 마인드셋 & 자산 기초</span>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ 25:00</button>
+  </div>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <div class="hero-part">PART 1 — 부자 마인드셋 & 자산 기초</div>
+  <h1 class="hero-day">Day 03</h1>
+  <h2 class="hero-subtitle">한국 직장인 자산 형성 경로</h2>
+  <p class="hero-quote">"자산은 빨리 만들수록 좋다. 그 자산이 당신을 위해 일하기 때문이다." — 워렌 버펫</p>
+  <div class="hero-badges">
+    <span class="hero-badge hb-net"><span class="dot"></span>순자산 3억 2,800만</span>
+    <span class="hero-badge hb-house"><span class="dot"></span>주택 7억</span>
+    <span class="hero-badge hb-debt"><span class="dot"></span>부채 4억</span>
+    <span class="hero-badge hb-stock"><span class="dot"></span>주식 2,800만</span>
+  </div>
+  <div class="series-info">포모도로 1세션(25분) × 23일 = 약 9.6시간 | PART 1: 01~07</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:13.0%"></div></div>
+    <div class="progress-label"><span>Day 03</span><span>3 / 23 완료 (13.0%)</span></div>
+  </div>
+</section>
+
+<!-- 뇌과학 학습 전략 -->
+<section class="section fade-up">
+  <div class="brain-box">
+    <h3>🧠 뇌과학 학습 전략: 세금 회피 최적화 (Tax Optimization Awareness)</h3>
+    <p>한국의 금융 제도는 복잡하지만 체계적입니다. ISA(비과세), IRP(세 공제), 실손의료보험 등은 모두 국가가 제공하는 "세금 할인" 도구입니다. 엔지니어가 설계 최적화를 하듯이, 가계 재정도 세금 최소화를 중심으로 구조화해야 합니다.</p>
+    <table class="time-table">
+      <thead><tr><th>시간</th><th>내용</th><th>방법</th></tr></thead>
+      <tbody><tr><td class="time-col">0–5분</td><td>한국 직장인 자산 형성 경로: ISA/IRP/연금 체계</td><td>제도 이해</td></tr>
+<tr><td class="time-col">5–10분</td><td>실제 연 투자 순서: 어디부터 먼저?</td><td>우선순위 결정</td></tr>
+<tr><td class="time-col">10–15분</td><td>부동산 갈아타기 전략 (집 여러 채 vs 1채)</td><td>시뮬레이션</td></tr>
+<tr><td class="time-col">15–22분</td><td>세금 회피 계산: 실제 수익률 차이</td><td>사례 분석</td></tr>
+<tr><td class="time-col">22–25분</td><td>오늘부터 실행할 3가지 세금 도구</td><td>액션 플랜</td></tr>
+</tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 핵심 개념 카드 -->
+<section class="section">
+  <div class="section-label">CORE CONCEPTS</div>
+  <h2 class="section-title">한국 직장인 자산 형성 경로</h2>
+  <div class="cards-grid">
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 01</div>
+      <div class="card-title">ISA (Individual Savings Account): 비과세의 황금알</div>
+      <div class="card-body"><p>연 2,000만까지 투자 수익에 <strong>세금이 없는</strong> 계좌입니다. 한국의 가장 강력한 세금 회피 도구입니다.</p>
+<div class="formula-block">
+<div class="formula-blue">ISA vs 일반 계좌 비교:</div>
+<div class="formula-line">  일반 계좌: 1억 × 1.08 = 1.08억 (800만 이득)</div>
+<div class="formula-line">  세금 15.4% = 123만 납부 → 실수익 <span class="formula-highlight">677만</span></div>
+<br>
+<div class="formula-line">  ISA 계좌: 1억 × 1.08 = 1.08억 (800만 이득)</div>
+<div class="formula-line">  세금 0% = <span class="formula-highlight">800만 전액 취득</span></div>
+<br>
+<div class="formula-comment">// 차이: 123만 절약 (1.8배 더 효율적)</div>
+<div class="formula-comment">// 3년간 보유 조건 有, 연 최대 투자액 2,000만</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 02</div>
+      <div class="card-title">IRP (Individual Retirement Pension): 소득공제의 힘</div>
+      <div class="card-body"><p>퇴직금 대체 제도. 투자 금액을 <strong>소득에서 공제</strong>해서 세금을 줄입니다. 근로소득이 높을수록 효과가 큽니다.</p>
+<div class="formula-block">
+<div class="formula-blue">IRP 소득공제 효과 (세율 40% 기준):</div>
+<div class="formula-line">  IRP 납입 1,000만 → 소득공제 1,000만</div>
+<div class="formula-line">  세금 감면 = 1,000만 × 40% = <span class="formula-highlight">400만</span></div>
+<br>
+<div class="formula-comment">// 즉, 400만을 절약하고 1,000만을 투자한 셈</div>
+<div class="formula-comment">// 이후 수익에도 비과세 (55세 이후 인출)</div>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 03</div>
+      <div class="card-title">부동산 갈아타기: 1차 2차 3차 집 전략</div>
+      <div class="card-body"><p>한국에서 자산을 빠르게 불리는 가장 효과적인 방법입니다. 현금 자산이 아니라 대출을 활용한 레버리지입니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>단계</th><th>자산 규모</th><th>전략</th><th>주의점</th></tr></thead>
+<tbody>
+<tr><td>1차 (현재)</td><td>자산 3.3억, 부채 4억</td><td>기존 주택 유지 (기울임세 대상)</td><td>LTV 60% 유지</td></tr>
+<tr><td>2차</td><td>월 300만 저축으로 5년 뒤 추가 자본금 2억 확보</td><td>전세/월세 투자로 현금흐름 확보</td><td>DSR 주의</td></tr>
+<tr><td>3차</td><td>2차 부동산 수익 + 1차 부동산 가격 상승</td><td>부동산 교체 (가치 상승지역)</td><td>세금 최소화</td></tr>
+</tbody>
+</table>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 04</div>
+      <div class="card-title">연금 시스템 완전 정복: 국민연금 vs 개인연금</div>
+      <div class="card-body"><p>퇴직 후 생활비를 충당하는 3층 구조입니다. 각 층의 역할이 다릅니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>연금 유형</th><th>가입방식</th><th>수익률</th><th>수령시기</th></tr></thead>
+<tbody>
+<tr><td>국민연금</td><td>강제 (월 9%)</td><td>보장 (인상률 평균 5%)</td><td>65세</td></tr>
+<tr><td>퇴직금/IRP</td><td>선택 (연 한도 내)</td><td>자산배분 (4~8%)</td><td>55세</td></tr>
+<tr><td>개인연금</td><td>선택 (세제혜택 제한)</td><td>자산배분 (4~8%)</td><td>55세</td></tr>
+</tbody>
+</table>
+</div></div>
+    </div>
+    <div class="concept-card fade-up">
+      <div class="card-num">CONCEPT 05</div>
+      <div class="card-title">실전 액션: 올해 설정해야 할 3가지</div>
+      <div class="card-body"><p>이론만으로는 자산이 증가하지 않습니다. 구체적인 행동이 필요합니다.</p>
+<div class="data-table-wrap">
+<table class="data-table">
+<thead><tr><th>액션</th><th>기대 효과</th><th>실행 난도</th></tr></thead>
+<tbody>
+<tr><td style="font-weight:500;">ISA 개설 + 월 300만 자동이체</td><td>연 123만 세금 절약</td><td>하 (5분)</td></tr>
+<tr><td>IRP에 연 3,000만 납입 (소득공제)</td><td>연 1,200만 세금 절약</td><td>중 (1주)</td></tr>
+<tr><td>부동산 추가 구매 계획 수립 (LTV <60%)</td><td>자산 2배 가능 (10년)</td><td>상 (1개월)</td></tr>
+</tbody>
+</table>
+</div></div>
+    </div></div>
+</section>
+
+<!-- SVG 차트 -->
+<section class="section fade-up">
+  <div class="section-label">VISUALIZATION</div>
+  <h2 class="section-title">시각화 자료</h2>
+  
+<div class="chart-container">
+    <div class="chart-title">한국 직장인 자산 형성 경로 (세금 고려)</div>
+    <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+      <rect width="1000" height="450" fill="#0A0C10"/>
+      <text x="50" y="35" fill="#E8E6E1" font-family="Noto Sans KR" font-size="14" font-weight="600">투자 순서 우선순위</text>
+      <rect x="50" y="70" width="150" height="80" fill="#4ABF7A" rx="4"/>
+      <text x="125" y="100" fill="#0A0C10" font-family="Noto Sans KR" font-size="12" font-weight="600" text-anchor="middle">① ISA</text>
+      <text x="125" y="135" fill="#0A0C10" font-family="JetBrains Mono" font-size="11" text-anchor="middle">월 200만</text>
+      <rect x="230" y="70" width="150" height="80" fill="#4A9EBF" rx="4"/>
+      <text x="305" y="100" fill="#E8E6E1" font-family="Noto Sans KR" font-size="12" font-weight="600" text-anchor="middle">② IRP</text>
+      <text x="305" y="135" fill="#E8E6E1" font-family="JetBrains Mono" font-size="11" text-anchor="middle">월 250만</text>
+      <rect x="410" y="70" width="150" height="80" fill="#C9A84C" rx="4"/>
+      <text x="485" y="100" fill="#0A0C10" font-family="Noto Sans KR" font-size="12" font-weight="600" text-anchor="middle">③ 일반</text>
+      <text x="485" y="135" fill="#0A0C10" font-family="JetBrains Mono" font-size="11" text-anchor="middle">월 50만</text>
+      <text x="50" y="210" fill="#E8E6E1" font-family="Noto Sans KR" font-size="13" font-weight="600">세금 절약 효과</text>
+      <rect x="50" y="240" width="180" height="100" fill="rgba(74,191,122,0.12)" stroke="#4ABF7A" stroke-width="1" rx="4"/>
+      <text x="140" y="265" fill="#4ABF7A" font-family="Noto Sans KR" font-size="11" font-weight="600" text-anchor="middle">ISA</text>
+      <text x="140" y="295" fill="#E8E6E1" font-family="JetBrains Mono" font-size="12" text-anchor="middle">연 123만</text>
+      <text x="140" y="320" fill="#B5B3AB" font-family="Noto Sans KR" font-size="10" text-anchor="middle">비과세</text>
+      <rect x="280" y="240" width="180" height="100" fill="rgba(74,158,191,0.12)" stroke="#4A9EBF" stroke-width="1" rx="4"/>
+      <text x="370" y="265" fill="#4A9EBF" font-family="Noto Sans KR" font-size="11" font-weight="600" text-anchor="middle">IRP</text>
+      <text x="370" y="295" fill="#E8E6E1" font-family="JetBrains Mono" font-size="12" text-anchor="middle">연 1,200만</text>
+      <text x="370" y="320" fill="#B5B3AB" font-family="Noto Sans KR" font-size="10" text-anchor="middle">소득공제</text>
+      <text x="600" y="350" fill="#B5B3AB" font-family="Noto Sans KR" font-size="12">합계: 연 1,323만 절약 (저축액의 36%)</text>
+    </svg>
+</div>
+
+<div class="chart-container">
+    <div class="chart-title">부동산 갈아타기: 3단계 자산 성장</div>
+    <svg viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+      <rect width="1000" height="420" fill="#0A0C10"/>
+      <text x="50" y="35" fill="#E8E6E1" font-family="Noto Sans KR" font-size="14" font-weight="600">부동산 자산 규모 변화</text>
+      <rect x="50" y="70" width="100" height="80" fill="#4A9EBF" rx="3"/>
+      <text x="100" y="110" fill="#E8E6E1" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle">7억</text>
+      <text x="100" y="200" fill="#B5B3AB" font-family="Noto Sans KR" font-size="11" text-anchor="middle">현재</text>
+      <text x="100" y="230" fill="#B5B3AB" font-family="Noto Sans KR" font-size="10" text-anchor="middle">1차 집</text>
+      <rect x="250" y="60" width="120" height="90" fill="#4ABF7A" rx="3"/>
+      <text x="310" y="110" fill="#0A0C10" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle">14억</text>
+      <text x="310" y="200" fill="#B5B3AB" font-family="Noto Sans KR" font-size="11" text-anchor="middle">5년 뒤</text>
+      <text x="310" y="230" fill="#B5B3AB" font-family="Noto Sans KR" font-size="10" text-anchor="middle">1차 + 2차</text>
+      <rect x="450" y="40" width="140" height="110" fill="#C9A84C" rx="3"/>
+      <text x="520" y="110" fill="#0A0C10" font-family="JetBrains Mono" font-size="12" font-weight="600" text-anchor="middle">28억</text>
+      <text x="520" y="200" fill="#B5B3AB" font-family="Noto Sans KR" font-size="11" text-anchor="middle">10년 뒤</text>
+      <text x="520" y="230" fill="#B5B3AB" font-family="Noto Sans KR" font-size="10" text-anchor="middle">1차 + 2차 + 3차</text>
+      <path d="M 100,70 L 310,60 L 520,40" fill="none" stroke="#gold" stroke-width="2" stroke-dasharray="5,3"/>
+    </svg>
+</div>
+
+<div class="chart-container">
+    <div class="chart-title">ISA vs 일반 계좌: 실제 수익 비교 (10년)</div>
+    <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+      <rect width="1000" height="350" fill="#0A0C10"/>
+      <rect x="100" y="50" width="200" height="120" fill="#4A9EBF" rx="3"/>
+      <text x="200" y="95" fill="#E8E6E1" font-family="Noto Sans KR" font-size="12" font-weight="600" text-anchor="middle">일반 계좌</text>
+      <text x="200" y="125" fill="#E8E6E1" font-family="JetBrains Mono" font-size="13" text-anchor="middle">5.5억</text>
+      <rect x="500" y="50" width="200" height="150" fill="#4ABF7A" rx="3"/>
+      <text x="600" y="95" fill="#0A0C10" font-family="Noto Sans KR" font-size="12" font-weight="600" text-anchor="middle">ISA</text>
+      <text x="600" y="125" fill="#0A0C10" font-family="JetBrains Mono" font-size="13" text-anchor="middle">6.2억</text>
+      <text x="350" y="280" fill="#B5B3AB" font-family="Noto Sans KR" font-size="12" text-anchor="middle">초기자본 3.28억, 월 저축 100만, 연 8%</text>
+      <text x="350" y="310" fill="#B5B3AB" font-family="Noto Sans KR" font-size="12" text-anchor="middle">차이: +0.7억 (13% 향상)</text>
+    </svg>
+</div>
+
+</section>
+
+
+<!-- Deep Dive -->
+<section class="section fade-up">
+  <div class="section-label">DEEP DIVE</div>
+  <h2 class="section-title">심화 학습</h2>
+  
+<details class="deep-dive">
+  <summary>한국의 금융 제도: 세금이 아닌 부의 재분배 시스템</summary>
+  <div class="deep-dive-content">
+    <p>ISA, IRP, 퇴직금 제도 등은 정부가 제공하는 "적극적 자산 형성 인센티브"입니다. 이를 모르고 투자하는 것은 마치 프로그래밍할 때 이미 있는 라이브러리를 무시하고 처음부터 코딩하는 것과 같습니다.</p>
+    <p>한국 정부의 입장: 국민이 자산을 빨리 형성하면, (1) 연금 부담 감소, (2) 빈부격차 완화, (3) 금융시장 활성화라는 이점이 있습니다. 따라서 세금 혜택을 줍니다.</p>
+    <div class="formula-block" style="margin: 0.8rem 0;">
+      <div class="formula-highlight">한국의 3층 금융 시스템:</div>
+      <div class="formula-line">  1층: 국민연금 (강제, 보장)</div>
+      <div class="formula-line">  2층: 퇴직금/IRP (기업/개인 선택)</div>
+      <div class="formula-line">  3층: 개인투자 (자유, ISA 등)</div>
+    </div>
+  </div>
+</details>
+
+<details class="deep-dive">
+  <summary>LTV 60% & DSR 40% 이내: 부동산 갈아타기의 핵심 제약</summary>
+  <div class="deep-dive-content">
+    <p>부동산 갈아타기를 반복할 수 있는 이유는 현재 LTV 57%, DSR 15%라는 초저 수준이기 때문입니다. 여기서 가장 중요한 것은 이 두 지표를 항상 안전 범위 내에 유지하는 것입니다.</p>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>시나리오</th><th>2차 구매 가능액</th><th>조건</th></tr></thead>
+        <tbody>
+          <tr><td>보수적</td><td>3억 (LTV 60%, DSR 40% 유지)</td><td>안정성 우선</td></tr>
+          <tr><td>적극적</td><td>4억 (LTV 70%, DSR 35%)</td><td>수익률 우선</td></tr>
+          <tr class="highlight-row"><td>공격적</td><td>5억+ (LTV 80%+, DSR 40%+)</td><td>위험 높음</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>금리 인상, 부동산 하락 등의 리스크를 고려하면, "보수적" 시나리오(LTV 60% 이하)를 추천합니다. 이 수준이면 경제 위기에도 버틸 수 있습니다.</p>
+  </div>
+</details>
+
+<details class="deep-dive">
+  <summary>세금 최적화: 연금수령 시점의 선택</summary>
+  <div class="deep-dive-content">
+    <p>IRP와 개인연금은 수령 시점에 따라 세금이 달라집니다. 55세에 받을지, 65세에 받을지가 중요합니다.</p>
+    <div class="formula-block" style="margin: 0.8rem 0;">
+      <div class="formula-highlight">55세 수령 vs 65세 수령:</div>
+      <div class="formula-line">  55세: 일시금으로 받기 (세금율 낮음, 유동성 높음)</div>
+      <div class="formula-line">  65세: 연금으로 받기 (세금율 낮음, 장기 흐름)</div>
+      <div class="formula-comment">// 선택지: 55세에 일시금 → ISA에서 재투자 (자유도 높음)</div>
+      <div class="formula-comment">// 또는: 65세 연금 (확실한 생활비)</div>
+    </div>
+  </div>
+</details>
+
+<details class="deep-dive">
+  <summary>엔지니어 관점: 부동산은 "복합 시스템"</summary>
+  <div class="deep-dive-content">
+    <p>부동산 투자는 단순히 "주택 구매"가 아니라, (1) 자금 조달, (2) 세금 회피, (3) 금리 리스크, (4) 부동산 사이클 등이 모두 연계된 복합 시스템입니다.</p>
+    <p>마치 마이크로서비스 아키텍처처럼, 각 요소를 독립적으로 최적화할 수 없습니다. 전체 수익률을 최대화하려면 모든 변수를 동시에 고려해야 합니다. Day 04와 Day 16~17에서 심화 학습합니다.</p>
+  </div>
+</details>
+
+</section>
+
+
+
+<!-- 시뮬레이션 -->
+<section class="section fade-up">
+  <div class="section-label">APPLY TO MY ASSETS</div>
+  <h2 class="section-title">내 자산에 직접 적용</h2>
+  
+<div class="sim-box">
+  <h3>📊 세금 절약 시뮬레이터</h3>
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:end;margin-top:0.5rem;">
+    <div>
+      <label style="font-size:0.72rem;color:var(--text-dim);font-family:var(--font-mono);display:block;margin-bottom:0.3rem;">투자금액 (만원)</label>
+      <input type="number" id="tax-amount" value="2000" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--gold);font-family:var(--font-mono);font-size:1rem;padding:0.5rem 0.8rem;border-radius:4px;width:140px;outline:none;" oninput="calcTaxSavings()">
+    </div>
+    <div>
+      <label style="font-size:0.72rem;color:var(--text-dim);font-family:var(--font-mono);display:block;margin-bottom:0.3rem;">연 수익률 (%)</label>
+      <input type="number" id="tax-rate" value="8" step="0.1" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--blue);font-family:var(--font-mono);font-size:1rem;padding:0.5rem 0.8rem;border-radius:4px;width:100px;outline:none;" oninput="calcTaxSavings()">
+    </div>
+  </div>
+  <div id="taxResult" style="margin-top:1rem;padding:1rem;background:rgba(201,168,76,0.12);border:1px solid var(--gold);border-radius:4px;font-family:var(--font-mono);font-size:0.9rem;color:var(--text-primary);">
+    계산 결과
+  </div>
+</div>
+
+<div class="sim-box">
+  <h3>📋 오늘의 액션 리스트</h3>
+  <ul class="checklist">
+    <li><strong>ISA 계좌 개설:</strong> 증권사 앱에서 5분 (비과세 혜택)</li>
+    <li><strong>IRP 납입 자동이체:</strong> 은행에서 설정 (소득공제)</li>
+    <li><strong>부동산 추가 매입 가능액 계산:</strong> LTV <60%, DSR <40%</li>
+    <li><strong>세금 회피 효과 기록:</strong> 매년 절약액 추적</li>
+    <li><strong>연금 수령 계획:</strong> 55세 vs 65세 선택 검토</li>
+  </ul>
+</div>
+
+<script>
+function calcTaxSavings(){
+  const amount = parseFloat(document.getElementById('tax-amount').value) || 0;
+  const rate = parseFloat(document.getElementById('tax-rate').value) / 100 || 0;
+  const profit = amount * rate;
+  const tax_general = profit * 0.154;
+  const isa_savings = tax_general * (amount / 20000);
+  const irp_savings = amount * 0.40;
+  const total_savings = Math.min(isa_savings, 123) + Math.min(irp_savings, 1200);
+  document.getElementById('taxResult').innerHTML = 
+    `<strong>투자 ${amount}만, 연 ${rate*100}% 수익 = ${profit.toFixed(0)}만</strong><br>
+    <span style="color:var(--gold);">ISA 절약: 최대 ${Math.min(123, isa_savings).toFixed(0)}만/년</span><br>
+    <span style="color:var(--blue);">IRP 절약: 최대 ${Math.min(1200, irp_savings).toFixed(0)}만/년</span><br>
+    <strong style="font-size:1.1rem;color:var(--gold);">합계: ${total_savings.toFixed(0)}만/년</strong>`;
+}
+calcTaxSavings();
+</script>
+
+</section>
+
+<!-- 투자 심리 -->
+<section class="section fade-up">
+  <div class="section-label">INVESTOR PSYCHOLOGY</div>
+  <h2 class="section-title">오늘의 투자 심리</h2>
+  <div class="psych-box">
+    <h3>행동재무학 편향</h3>
+    
+<div class="bias-name">현상유지 편향 (Status Quo Bias)</div>
+<p><span class="neuro-tag">뇌과학: 기저핵 관성</span> <span class="engineer-tag">엔지니어 특성: 기존 시스템 신뢰</span></p>
+<p>우리는 "지금의 상태"를 유지하려는 경향이 강합니다. ISA나 IRP의 혜택을 알아도 "귀찮으니까 나중에"라고 미룹니다. 뇌의 기저핵(습관)이 새로운 시스템을 거부합니다.</p>
+<p><strong style="color:var(--gold);">극복 규칙:</strong> (1) 자동화 (선택의 여지 제거), (2) 1회성 설정 비용 투자 (5분), (3) 매달 '세금 절약 효과'를 시각화해서 보상 느끼기</p>
+
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="section fade-up">
+  <div class="section-label">REVIEW</div>
+  <h2 class="section-title">복습 퀴즈</h2>
+  <div class="quiz-section">
+    <div class="quiz-q" id="q1">
+      <h4>Q1. ISA 계좌의 가장 큰 혜택은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q1',false)">① 높은 이자율</li>
+<li onclick="checkAnswer(this,'q1',true)">② 투자 수익에 세금이 없음</li>
+<li onclick="checkAnswer(this,'q1',false)">③ 한도가 무제한</li>
+<li onclick="checkAnswer(this,'q1',false)">④ 정부 매칭금</li>
+</ul>
+      <div class="quiz-answer" id="q1-answer"><strong>정답: ②</strong><br>연 2,000만까지 투자 수익이 완전히 비과세됩니다. 이는 고금리 통장보다 훨씬 강력한 혜택입니다.</div>
+    </div>
+    <div class="quiz-q" id="q2">
+      <h4>Q2. IRP에 연 3,000만을 납입했을 때 세금 절약액은? (세율 40% 기준)</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q2',false)">① 0원</li>
+<li onclick="checkAnswer(this,'q2',false)">② 약 300만원</li>
+<li onclick="checkAnswer(this,'q2',true)">③ 약 1,200만원</li>
+<li onclick="checkAnswer(this,'q2',false)">④ 약 3,000만원</li>
+</ul>
+      <div class="quiz-answer" id="q2-answer"><strong>정답: ③</strong><br>IRP 납입액은 소득에서 공제됩니다. 3,000만 × 40% = 1,200만 세금 절약.</div>
+    </div>
+    <div class="quiz-q" id="q3">
+      <h4>Q3. 부동산 2차 매입을 위한 안전한 LTV 기준은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q3',false)">① 70% 이상</li>
+<li onclick="checkAnswer(this,'q3',false)">② 60% 이상</li>
+<li onclick="checkAnswer(this,'q3',true)">③ 60% 이하</li>
+<li onclick="checkAnswer(this,'q3',false)">④ 80% 이상</li>
+</ul>
+      <div class="quiz-answer" id="q3-answer"><strong>정답: ③</strong><br>금리 인상, 부동산 하락 등의 리스크를 고려하면 LTV 60% 이하를 권장합니다.</div>
+    </div>
+    <div class="quiz-q" id="q4">
+      <h4>Q4. 한국의 3층 금융 시스템 순서는?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q4',false)">① 개인투자 → IRP → 국민연금</li>
+<li onclick="checkAnswer(this,'q4',true)">② 국민연금 → IRP → 개인투자</li>
+<li onclick="checkAnswer(this,'q4',false)">③ IRP → 국민연금 → 개인투자</li>
+<li onclick="checkAnswer(this,'q4',false)">④ 개인투자 → 국민연금 → IRP</li>
+</ul>
+      <div class="quiz-answer" id="q4-answer"><strong>정답: ②</strong><br>1층 국민연금(강제), 2층 IRP(퇴직금), 3층 개인투자(자유). 이 순서가 세금 효율성도 높습니다.</div>
+    </div>
+    <div class="quiz-q" id="q5">
+      <h4>Q5. 현상유지 편향을 극복하는 가장 효과적인 방법은?</h4>
+      <ul class="quiz-options"><li onclick="checkAnswer(this,'q5',false)">① 더 열심히 의지력 발휘</li>
+<li onclick="checkAnswer(this,'q5',true)">② 자동화 (선택의 여지 제거)</li>
+<li onclick="checkAnswer(this,'q5',false)">③ 자주 계산하기</li>
+<li onclick="checkAnswer(this,'q5',false)">④ 금리가 오를 때까지 기다리기</li>
+</ul>
+      <div class="quiz-answer" id="q5-answer"><strong>정답: ②</strong><br>ISA/IRP를 설정한 후 자동이체를 켜면, 뇌는 그 돈을 '이미 쓰지 않은 돈'으로 인식해서 지출하지 않습니다.</div>
+    </div></div>
+</section>
+
+<!-- 간격 반복 -->
+<section class="section fade-up">
+  <div class="sr-tracker">
+    <h3>간격 반복 트래커 — Day 03</h3>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:1rem;">에빙하우스 망각곡선: D+1→D+3→D+7→D+14→D+30 복습으로 장기 기억 전환</p>
+    <div class="sr-slots"><div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+1</div><div class="sr-date">03월 10일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+3</div><div class="sr-date">03월 12일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+7</div><div class="sr-date">03월 16일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+14</div><div class="sr-date">03월 23일</div></div>
+<div class="sr-slot" onclick="this.classList.toggle('done')"><div class="sr-label">D+30</div><div class="sr-date">04월 08일</div></div>
+</div>
+  </div>
+</section>
+
+<nav class="nav-footer">
+  <a class="nav-btn" href="day02_compound_interest.html">← Day 02</a>
+  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);">DAY 03 / 23</span>
+  <a class="nav-btn" href="day04_mortgage_optimization.html">Day 04 →</a>
+</nav>
+
+<div class="disclaimer">
+  <strong>⚠️ 면책 고지</strong><br>
+  본 콘텐츠는 투자·자산관리 교육 목적으로 제작되었으며, 특정 금융 상품이나 투자 전략에 대한 추천이 아닙니다.<br>
+  모든 투자 판단과 그에 따른 결과의 책임은 전적으로 본인에게 있습니다. 실제 투자 전 공인 재무설계사와 상담하시기 바랍니다.<br>
+  수익률은 과거 데이터 기반 가정치이며 미래 수익을 보장하지 않습니다. 세금·규제 정보는 2026년 3월 기준이며 변경될 수 있습니다.<br>
+  <span style="color:var(--text-dim);font-size:0.65rem;">© 2026 부자 마인드셋 스터디 · 교육 목적 Only</span>
+</div>
+
+</div>
+
+<script>
+/* ═══ POMODORO TIMER ═══ */
+let timerRunning=false, timerSeconds=25*60, timerInterval=null;
+function toggleTimer() {
+  const b = document.getElementById('timerBtn');
+  if (!timerRunning) {
+    timerRunning = true;
+    b.textContent = formatTime(timerSeconds);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      b.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        b.textContent = '✓ 완료!';
+        b.style.borderColor = '#4ABF7A';
+        b.style.color = '#4ABF7A';
+        timerRunning = false;
+      }
+    }, 1000);
+  } else {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    b.textContent = '▶ ' + formatTime(timerSeconds);
+  }
+}
+function formatTime(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+/* ═══ QUIZ ═══ */
+function checkAnswer(el, qId, ok) {
+  el.parentElement.querySelectorAll('li').forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(ok ? 'correct' : 'wrong');
+  document.getElementById(qId + '-answer').style.display = 'block';
+}
+
+/* ═══ CHECKLIST ═══ */
+document.querySelectorAll('.checklist li').forEach(li =>
+  li.addEventListener('click', function() { this.classList.toggle('checked'); }));
+
+/* ═══ FADE-UP INTERSECTION OBSERVER ═══ */
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+</script>
+</body>
+</html>
