@@ -671,66 +671,6 @@ function toggleBreath(){
 }
 
 // Flashcard
-const fcs=[
-    {f:'편도체 (Amygdala)',b:'위험 탐지의 중추. 0.02초 만에 활성화되어 의식적 판단보다 10배 빠르게 경보를 울린다.'},
-    {f:'구성주의 감정 이론',b:'감정은 선천적 회로가 아니라, 뇌가 신체 신호 + 과거 경험으로 실시간 구성하는 것. (Barrett, 2017)'},
-    {f:'내수용감각 (Interoception)',b:'심장 박동, 호흡, 위장 상태 등 신체 내부 신호를 감지하는 능력. 감정 인식의 기초.'},
-    {f:'감정 세분화 (Granularity)',b:'"화남" 대신 "실망·억울·좌절"로 정밀하게 구분하면 편도체 활성 30% 감소, 충동 행동 40% 감소.'}
-];
-let fcI=0,fcFlip=false;
-function showFC(){fcFlip=false;document.getElementById('fc').classList.remove('flip');document.getElementById('fcF').textContent=fcs[fcI].f;document.getElementById('fcB').textContent=fcs[fcI].b;document.getElementById('fcN').textContent=(fcI+1)+'/'+fcs.length;}
-function flipFC(){fcFlip=!fcFlip;document.getElementById('fc').classList.toggle('flip');}
-function nextFC(){fcI=(fcI+1)%fcs.length;showFC();}
-function prevFC(){fcI=(fcI-1+fcs.length)%fcs.length;showFC();}
-showFC();
-
-// Scenario
-const scRes=[
-    {cls:'ok',txt:'회피 반응입니다. 편도체의 위협 신호에 따른 자연스러운 반응이지만, 상황을 해결하지는 못합니다. 일시적으로 각성이 낮아지지만 불안은 유지됩니다.'},
-    {cls:'good',txt:'인지적 재평가! 전전두피질을 활성화하여 편도체 반응을 조절하는 가장 효과적인 전략입니다. 연구에 따르면 이 재해석만으로 수행 불안이 47% 감소합니다.'},
-    {cls:'bad',txt:'감정 억압입니다. 겉으로는 참지만 편도체는 계속 활성화 상태. 오히려 인지 자원이 소모되어 발표 수행이 떨어질 수 있습니다.'}
-];
-function pickSc(el,i){
-    document.querySelectorAll('.sc-opt').forEach(o=>o.classList.remove('selected'));
-    el.classList.add('selected');
-    const r=document.getElementById('scR');
-    r.className='sc-result show '+scRes[i].cls;r.textContent=scRes[i].txt;
-}
-
-// Quiz
-function chkQ(el,ok){
-    const q=el.parentElement,opts=q.querySelectorAll('.quiz-opt'),fb=q.querySelector('.quiz-fb');
-    if(fb.classList.contains('show'))return;
-    opts.forEach(o=>o.style.pointerEvents='none');
-    el.classList.add(ok?'correct':'wrong');
-    if(!ok) opts.forEach(o=>{if(o.getAttribute('onclick')&&o.getAttribute('onclick').includes('true'))o.classList.add('correct');});
-    fb.classList.add('show');
-}
-
-// Matching
-const mData=[
-    ['편도체','위험 탐지 0.02초'],['전전두피질','감정 조절 0.2초'],['내수용감각','신체 내부 신호'],['구성주의','감정은 뇌의 구성물'],['세분화','정밀 라벨링 효과']
-];
-let mSel=null,mDone=0;
-function initMatch(){
-    const area=document.getElementById('matchArea');area.innerHTML='';
-    const left=mData.map((d,i)=>({t:d[0],i:i,side:'l'}));
-    const right=mData.map((d,i)=>({t:d[1],i:i,side:'r'})).sort(()=>Math.random()-0.5);
-    left.forEach(d=>{const e=document.createElement('div');e.className='match-item';e.textContent=d.t;e.dataset.i=d.i;e.dataset.s='l';e.onclick=function(){clickM(this);};area.appendChild(e);});
-    right.forEach(d=>{const e=document.createElement('div');e.className='match-item';e.textContent=d.t;e.dataset.i=d.i;e.dataset.s='r';e.onclick=function(){clickM(this);};area.appendChild(e);});
-}
-function clickM(el){
-    if(el.classList.contains('done'))return;
-    if(!mSel){mSel=el;el.classList.add('sel');return;}
-    if(mSel.dataset.s===el.dataset.s){mSel.classList.remove('sel');mSel=el;el.classList.add('sel');return;}
-    if(mSel.dataset.i===el.dataset.i){mSel.classList.remove('sel');mSel.classList.add('done');el.classList.add('done');mDone++;mSel=null;
-        if(mDone===mData.length)document.getElementById('matchMsg').textContent='모두 맞추셨습니다!';
-    } else {mSel.classList.remove('sel');el.style.background='var(--coral-light)';setTimeout(()=>el.style.background='',500);mSel=null;}
-}
-initMatch();
-
-// Fade In
-// Fade In - safe for mobile
 if('IntersectionObserver' in window){
     document.querySelectorAll('.fi').forEach(el=>{el.style.opacity='0';el.style.transform='translateY(12px)';});
     const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.style.opacity='1';x.target.style.transform='none';}}),{threshold:0.05,rootMargin:'0px 0px 50px 0px'});
