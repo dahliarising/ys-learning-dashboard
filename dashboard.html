@@ -332,6 +332,7 @@ function initFirebase(){
       const local=gs(),localTs=local._ts||0,remoteTs=remote._ts||0;
       if(remoteTs>localTs){
         localStorage.setItem(SK,JSON.stringify(remote));
+        _dailyPlanCache=null;
         if(typeof renderAll==='function')renderAll();
         showSyncStatus('synced','SYNCED');
       }
@@ -361,7 +362,7 @@ function forcePull(){
   if(!_fbDb)return;
   _fbDb.ref('savoir/data').once('value').then(function(snap){
     const remote=snap.val();
-    if(remote){localStorage.setItem(SK,JSON.stringify(remote));renderAll();showSyncStatus('synced','PULLED')}
+    if(remote){localStorage.setItem(SK,JSON.stringify(remote));_dailyPlanCache=null;renderAll();showSyncStatus('synced','PULLED')}
   });
 }
 
@@ -627,7 +628,7 @@ window.addEventListener('focus',function(){if(_fbDb)forcePull()});
 // ═══ INIT ═══
 function renderAll(){[renderStats,renderTotalStats,renderDaily,renderTip,renderReviewQueue,renderCourseGrid,renderAllLessons,renderCatTabs,renderScenarioList,renderWeeklyGoal,renderWeekly,renderHeatmap,renderAllProgress,updTimer].forEach(function(fn){try{fn()}catch(e){console.error(fn.name,e)}})}
 renderAll();
-if(_fbReady){_fbDb.ref('savoir/data').once('value').then(function(snap){var remote=snap.val();if(remote){var local=gs(),lt=local._ts||0,rt=remote._ts||0;if(rt>lt){localStorage.setItem(SK,JSON.stringify(remote));renderAll();showSyncStatus('synced','CLOUD DATA LOADED')}}})}
+if(_fbReady){_fbDb.ref('savoir/data').once('value').then(function(snap){var remote=snap.val();if(remote){var local=gs(),lt=local._ts||0,rt=remote._ts||0;if(rt>lt){localStorage.setItem(SK,JSON.stringify(remote));_dailyPlanCache=null;renderAll();showSyncStatus('synced','CLOUD DATA LOADED')}}})}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
 </script>
 </body>
