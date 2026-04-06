@@ -1,5 +1,5 @@
 // 학습 멘토 Service Worker v1
-const CACHE_NAME = 'learn-app-v1';
+const CACHE_NAME = 'learn-app-v2';
 const OFFLINE_URL = './dashboard.html';
 
 // Files to cache immediately on install
